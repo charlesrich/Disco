@@ -1,0 +1,44 @@
+    # May 5, 2010 1:48:21 PM - TaskEngine 0.9.6 beta / Guide 0.9.6 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/Library.xml
+CE> task Borrow / new Book("Brin","The Uplift War")
+    Let's start to borrow The Uplift War.
+CE> next
+    Please go to the library.
+CE> done
+    Ok.
+CE> next
+    Shall I look The Uplift War up in the catalog?
+CE> yes
+    Ok.
+    Failed look The Uplift War up in the catalog.
+CE> status
+
+[Borrow The Uplift War] -live <-focus
+   [User go to the library] -done
+   [Choose The Uplift War using the catalog] -failed
+      [System look The Uplift War up in the catalog] -failed
+      [Take The Uplift War from a shelf]
+   [Choose The Uplift War] -live
+   [Check out a book]
+
+CE> next
+    Please use the search engine.
+CE> task / "Heinlein"
+    Ok.
+    Shall I use the search engine?
+CE> yes
+    Ok.
+    Done use the search engine.
+CE> next
+    Please take Stranger in a Strange Land from Shelf 1.
+CE> done
+    Ok.
+    Shall I check out Stranger in a Strange Land?
+CE> yes
+    Ok.
+[Stranger in a Strange Land checked out!]
+    Done check out Stranger in a Strange Land.
+    Completed borrow The Uplift War.
+CE> quit
+    Goodbye.

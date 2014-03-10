@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<model about="urn:fr.telecom-paristech:tardis:Interview"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- Language-specific part of interview dialog.
+       See InterviewTop.xml for toplevel goals.
+       See Coach for coaching dialog
+ 
+       NOTE: This dialogue begins with a receptionist, which really 
+       should be a separate character, but is not modelled here.
+       However, this is much easier than the coach and interviewer 
+       coordination.   We simply start with the receptionist and then
+       have an action which changes to the interviewer.  -CR
+  -->
+
+  <agent id="Opening" text="Good morning.  Welcome to the XX Company.">
+    <user id="Hello" text="Uh, hello">
+      <do task="Opening" />
+    </user>
+    <user id="correctOpening" text="Good morning."/>
+    <user text="Hi">
+      <do task="Opening" />
+    </user>
+    <user text="Hey">
+      <do task="Opening" />
+    </user>
+  </agent>
+
+  <agent id="WhoToSee"  text="How may I help you?">
+    <user text="I'm here to see Mr. {interviewer}.">
+      <agent text="Just a minute, please."/>
+    </user>
+  </agent>
+
+  <agent id="ApplicantName" text="What is your name?">
+    <user text="{$resume.interviewee}">
+      <agent text="Yes, please sit down and Mr. {interviewer}  will be with you shortly"/>
+    </user>
+  </agent>
+
+  <agent id="GreetInterviewee" text="Hello I am Mr. {interviewer}.">
+    <user id="hi" text="Hi">
+      <do task="GreetInterviewee" />
+    </user>
+    <user text="Hello, I'm {$resume.interviewee}" >
+      <agent text="Good to meet you.">
+        <do task="ShakeHands" />
+      </agent>
+    </user>
+    <user id="hey" text="Hey man what's up?">
+      <do task="GreetInterviewee" />
+    </user>
+  </agent>
+
+ <agent id="GetResume" text="May I have your resume?">
+    <user text="Sure here it is.">
+      <agent text="Thank you.">
+        <user text="yeh" />
+        <user text="you are welcome."/>
+      </agent>
+    </user>
+    <user id="noResume" text="Uh, I don't have a resume." >
+      <do task="GetResume" />
+    </user>
+    <user text="I didn't bring one today.">
+      <agent text="well, we can continue but make sure to bring one tomorrow and leave it with the receptionist."  >
+	<user text="I guess so." >
+	</user>
+	<user text="okay, I'll bring it tomorrow."/>
+	<do task="DiscussEducation" />
+      </agent>
+    </user>
+ </agent>
+
+ <agent id="DiscussResume" text="I see from your resume that you are in {$resume.education[0].name}">
+  <user text="yes."/>
+  <user text="I guess so.">
+  </user>
+ </agent>
+
+ <agent id="DiscussEducation" text="I see from your resume that you are in {$resume.education[0].name}, is that correct?">
+  <user text="I guess so.">
+	<agent text ="Can you tell me what you most liked that you learned in school?">
+                <user text="{companyBusiness}">
+                  <agent text="Great. That's what we do!"/>
+                </user>
+		<user text="computer technology"
+                      applicable="companyBusiness != 'computer technology'"
+		      eval="studentLikedAtSchool='computer technology'">
+			<agent text="Very good, that's relevant to our business." />
+		</user>
+		<user text="sports"
+                      applicable="companyBusiness != 'sports'"
+		      eval="studentLikedAtSchool='sports'">
+		  <agent text="I see." />
+		</user>
+		<user text="science"
+                      applicable="companyBusiness != 'science'"
+                      eval="studentLikedAtSchool='sports'">
+		  <agent text="Science is useful in our business."/>
+		</user>
+		<user text="english"
+                      applicable="companyBusiness != 'english'"
+		      eval="studentLikedAtSchool = 'english'">
+		  <agent text="Good writing is important."/>
+		</user>
+	</agent>
+  </user>
+ </agent>
+
+ <agent id="DiscussLearn" text="I see from your resume that you have worked at {$resume.work[0].name}. What did you learn there ?">
+  <user id="nothing" text="Nothin' special.">
+    <do task="DiscussLearn" />
+  </user>
+  <user text="Teamwork.">
+  </user>
+  <user text="Responsibility.">
+  </user>
+ </agent>
+
+ <agent id="DiscussUsefulActivity" text="I see that you didn't specify any work experience in your resume. Have you done any unpaid work ?">
+<!-- applicability doesn't work here.  Why?
+	applicable="job1 !== 'Mcdonalds'" -->
+  <user text="nothin' special.">
+        <!--  next part to be moved to Coach -->
+	<agent text="Coach says : try again !">
+		<user text="oh, right. I'll try again">
+			<do task="DiscussUsefulActivity"/>
+		</user>
+	</agent>
+  </user>
+  <user text="I've watched over the neighbour's kids a few times.">
+    <agent text="oh that shows good responsibility."/>
+  </user>
+  <user text="I've refereed some soccer games.">
+    <agent text="So you have learned a bit about organizing things, right?">
+      <user text="yeh, the kids need to be told a lot of stuff."/>
+      <user text="yeh, I had to get all the kids to meet."> 
+      </user>
+    </agent>
+  </user>
+ </agent>
+
+<!-- this talk is currently not in the upper level task description. -->
+ <agent id="DiscussInterests" text="Tell me what you do outside of school.">
+    <!-- this could be expanded with the coach -->
+   <user text="I jus' hang out with me friends."/>
+   <user text="I don' do nothing." >
+   </user>
+ </agent>
+
+
+ <agent id="Closing"  text="Well, Thank you for coming.  We will review your case further." >
+   <user text="thank you." >
+     <agent text="You are welcome.  Good bye." >
+       <user text="Good-bye" />
+     </agent>
+   </user>
+   <user id="justbye" text="yeh that was great.">
+     <do task="Closing" />
+   </user>
+   <user id="nojob" text="you mean I don't have a job?">
+     <do task="Closing" />
+   </user>  
+ </agent>
+
+  <t:task id="ShakeHands">
+    <t:script> println("[Agent and User Shake Hands now]"); </t:script>
+  </t:task>
+
+</model>
+
+
+ 

@@ -1,0 +1,198 @@
+<taskModel about="urn:disco.wpi.edu:examples:Team"
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- See Dummy.xml and Game.xml for game API definitions -->
+
+  <task id="Say">
+    <input name="who" type="Character"/>
+    <input name="text" type="string"/>
+    <script> say($this.who, $this.text) </script>
+  </task>
+
+  <task id="Shoot">
+    <input name="who" type="Character"/>
+    <input name="target" type="string"/>
+    <script> shoot($this.who, $this.target) </script>
+  </task>
+
+  <task id="GoTo">
+    <input name="who" type="Character"/>
+    <input name="destination" type="UnityEngine.Vector3"/>
+    <postcondition sufficient="true">
+      $this.who != undefined &amp;&amp; $this.destination != undefined 
+      &amp;&amp; equalLocation($this.who.getLocation(), $this.destination)
+    </postcondition>
+
+    <subtasks id="goto">
+      <step name="set" task="SetDestination"/>
+      <step name="arrived" task="_Arrived"/>
+      <binding slot="$set.who" value="$this.who"/>
+      <binding slot="$arrived.who" value="$this.who"/>
+      <binding slot="$set.destination" value="$this.destination"/>
+      <binding slot="$arrived.destination" value="$this.destination"/>
+    </subtasks>
+  </task>
+
+  <task id="SetDestination">
+    <input name="who" type="Character"/>
+    <input name="destination" type="Unity3d.Vector3"/>
+    <script> setDestination($this.who, $this.destination) </script>
+  </task>
+    
+  <task id="_Arrived">
+    <input name="who" type="Character"/>
+    <input name="destination" type="Unity3d.Vector3"/>
+  </task>
+
+ <!-- GoToCover is similar to GoTo except the specific destination is chosen
+      in the game code.
+      NB:  Game code is responsible for changing value returned by isInCover()
+  -->
+
+ <task id="GoToCover">
+    <input name="who" type="Character"/>
+    <postcondition sufficient="true">
+      $this.who != undefined &amp;&amp; $this.who.isInCover()
+    </postcondition>
+
+    <subtasks id="cover">
+      <step name="find" task="FindCover"/>
+      <step name="arrived" task="_ArrivedCover"/>
+      <binding slot="$find.who" value="$this.who"/>
+      <binding slot="$arrived.who" value="$this.who"/>
+    </subtasks>
+  </task>
+
+  <task id="FindCover">
+    <input name="who" type="Character"/>
+    <script> findCover($this.who) </script>
+  </task>
+
+  <task id="_ArrivedCover">
+    <input name="who" type="Character"/>
+  </task>
+
+  <!-- a simple example strategy: all three characters go to 
+       designated locations (in parallel), then Watson yells 
+       Ready!, then Kevin shoots.
+  -->
+  <task id="_Strategy1">
+    <subtasks id="subtasks1" ordered="false">
+      <step name="kevinGo" task="GoTo"/>
+      <step name="watsonGo" task="GoTo"/>
+      <step name="lilyGo" task="GoTo"/>
+      <step name="watsonSay" task="Say" requires="kevinGo watsonGo lilyGo"/>
+      <step name="kevinShoot" task="Shoot" requires="watsonSay"/>
+      <binding slot="$kevinGo.who" value="Character.KEVIN"/>
+      <binding slot="$kevinGo.destination" value="Location.DOORWAY"/>
+      <binding slot="$watsonGo.who" value="Character.WATSON"/>
+      <binding slot="$watsonGo.destination" value="Location.DOORWAY"/>
+      <binding slot="$lilyGo.who" value="Character.LILY"/>
+      <binding slot="$lilyGo.destination" value="Location.ARCH"/>
+      <binding slot="$watsonSay.who" value="Character.WATSON"/>
+      <binding slot="$watsonSay.text" value="'Ready!'"/>
+      <binding slot="$kevinShoot.who" value="Character.KEVIN"/>
+      <binding slot="$kevinShoot.target" value="'monster1'"/>
+    </subtasks>
+  </task>
+
+  <!--- Example low-health strategy: either go to healer, or if
+        healer is not active, then seek cover.  Note this is a 
+        "standing order", so it reinstalls itself (see 'add' step).
+  -->
+
+  <task id="_LowHealthStrategy">
+    <input name="who" type="Character"/>
+    <precondition> 
+       $this.who != undefined 
+       &amp;&amp; $this.who.getHealth() &lt; LOW_HEALTH
+       &amp;&amp; !$this.who.isInCover()
+    </precondition>
+
+    <subtasks id="active">
+      <step name="get" task="GetHealer"/>
+      <step name="go" task="GoTo"/>
+      <step name="wait" task="_WaitForHealing"/>
+      <step name="add" task="AddLowHealth"/>
+      <applicable> getHealer() != null </applicable>
+      <binding slot="$go.who" value="$this.who"/>
+      <binding slot="$go.destination" 
+               value="$get.healer == undefined ? undefined : $get.healer.getLocation()"/>
+      <binding slot="$wait.who" value="$this.who"/>
+      <binding slot="$add.who" value="$this.who"/>
+    </subtasks>
+
+    <subtasks id="inactive">
+      <step name="go" task="GoToCover"/>
+      <step name="add" task="AddLowHealth"/>
+      <applicable> getHealer() == null </applicable>
+      <binding slot="$go.who" value="$this.who"/>
+      <binding slot="$add.who" value="$this.who"/>
+    </subtasks>
+
+  </task>
+
+  <!-- use GetHealer system task instead of binding value of 
+       getHealer() directly, to avoid race condition with value
+       of getHealer() changing -->
+
+  <task id="GetHealer">
+    <output name="healer" type="Character"/>
+    <binding slot="$this.external" value="false"/>
+    <script> $this.healer = getHealer() </script>
+  </task>
+
+  <task id="AddLowHealth">
+    <input name="who" type="Character"/>
+    <binding slot="$this.external" value="false"/>
+    <script> addLowHealth($this.who) </script>
+  </task>
+
+  <task id="_WaitForHealing">
+    <input name="who" type="Character"/>
+    <postcondition sufficient="true">
+      $this.who != undefined
+      &amp;&amp; $this.who.getHealth() &gt;= LOW_HEALTH
+    </postcondition>
+  </task>
+
+  <!-- for adding any toplevel goal with no inputs (not used here) -->
+
+  <task id="AddTop">
+    <input name="goal" type="string"/>
+    <binding slot="$this.external" value="false"/>
+    <script> $disco.addTop($disco.getTaskClass($this.goal)) </script>
+  </task>
+
+  <script init="true"> 
+
+  var LOW_HEALTH = 0;
+
+  // function to install low-health strategy for each character that should use it
+  // (note factored into two function to work around strange Jint error)
+
+  function addLowHealth (character) {
+     $disco.addTop(newLowHealth(character));
+  }
+ 
+  function newLowHealth (character) {
+     var task = $disco.getTaskClass("_LowHealthStrategy").newInstance();
+     task.setSlotValue("who", character);
+     return task;
+  }
+
+  /* 
+     Toplevel goal management, e.g., installing and stopping toplevel goals should
+     be handled procedurally, using calls such as those below (see test cases).
+     Note $disco.tops() returns an Iterator for current toplevel plans.
+
+        $disco.addTop($disco.getTaskClass("_Strategy1")) 
+        addLowHealth(Character.LILY);
+
+     This code needs to decide, for example, to stop Strategy1 if one of the characters
+     has low health.
+  */
+
+  </script>
+
+</taskModel>

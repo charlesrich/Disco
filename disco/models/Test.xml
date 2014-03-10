@@ -1,0 +1,379 @@
+<taskModel about="urn:disco.wpi.edu:models:Test" 
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <!-- Misc definitions used for testing Disco -->
+
+  <!-- for optional steps Optional1 -->
+  
+  <task id="A">
+    <subtasks id="BC">
+      <step name="b" task ="B" minOccurs="0"/>
+      <step name="c" task="C"/>
+      <step name="d" task="D" minOccurs="0"/>
+    </subtasks>
+  </task>
+  
+  <task id="B"/>
+  <task id="C"/>
+  <task id="D"/>
+
+  <!-- unauthorized primitive for AskWho1; see properties -->
+  
+  <task id="UnauthTop">
+    <subtasks id="unauth">
+      <step name="a" task="Unauth"/>
+    </subtasks>
+  </task>
+  
+  <task id="Unauth"/>
+  
+  <!-- for plan recognition interpolation Recog1 -->
+  
+  <task id="IntA">
+    <subtasks id="IntBC" ordered="false">
+      <step name="b" task="IntB"/>
+      <step name="c" task="IntC"/>
+    </subtasks>	
+    <subtasks id="IntBD" ordered="false">
+      <step name="b" task="IntB"/>
+      <step name="d" task="IntD"/>
+    </subtasks>	
+  </task>
+  
+  <task id="IntB">
+    <subtasks id="IntEF" ordered="false">
+      <step name="e" task="IntE"/>
+      <step name="f" task="IntF"/>
+    </subtasks>	
+    <subtasks id="IntEG" ordered="false">
+      <step name="e" task="IntE"/>
+      <step name="g" task="IntG"/>
+    </subtasks>	
+  </task>
+  
+  <task id="IntC">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntD">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntE">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntF">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntG">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="SayEval1">
+    <subtasks id="subtasks1">
+      <step name="step1" task="disco:Say.Eval"/>
+      <binding slot="$step1.text" value="'SayEval1'"/>
+      <binding slot="$step1.eval" value="'print(&quot;SayEval1!&quot;)'"/>
+    </subtasks>
+  </task>
+  
+  <!-- for simple dialog tree for Dialog1 (starting with agent) -->
+  
+  <!-- note ok to use same step name as subtasks id -->
+  
+  <task id="_A1">
+    <subtasks id="a1"> 
+      <step name="a1" task="disco:Say.Agent"/>
+      <step name="a1_u" task="_A1_U"/>
+      <binding slot="$a1.text" value="'Agent1'"/>
+    </subtasks>
+  </task>
+  
+  <task id="_A1_U">
+    <subtasks id="a1_u1">
+      <step name="a1_u1" task="disco:Say.User"/>
+      <binding slot="$a1_u1.text" value="'Agent1_User1'"/>
+    </subtasks>
+    <subtasks id="_a1_u2">
+      <step name="a1_u2" task="disco:Say.User"/>
+      <binding slot="$a1_u2.text" value="'Agent1_User2'"/>
+    </subtasks>
+  </task>
+  
+  <!-- adding actions to dialog tree for Dialog2  -->
+  
+  <task id="_A5">
+    <subtasks id="a5"> 
+      <step name="b" task="B"/> 
+      <step name="a5" task="disco:Say.Agent"/>
+      <step name="a5_u" task="_A5_U"/>
+      <binding slot="$a5.text" value="'Agent5'"/>
+      <binding slot="$b.external" value="false"/>
+    </subtasks>
+  </task>
+  
+  <task id="_A5_U">
+    <subtasks id="a5_u1">
+      <step name="a5_u1" task="disco:Say.User"/>
+      <step name="c" task="C"/>
+      <step name="a1" task="_A1"/>
+      <step name="b" task="IntB"/>
+      <binding slot="$a5_u1.text" value="'Agent5_User1'"/>
+      <binding slot="$c.external" value="true"/>    
+    </subtasks>
+    <subtasks id="a5_u2">
+      <step name="a5_u2" task="disco:Say.User"/>
+      <binding slot="$a5_u2.text" value="'Agent5_User2'"/>
+    </subtasks>
+  </task>
+  
+  <task id="ChooseFlavor">
+    <input name="flavor" type="Flavor"/>
+    <script> println("["+$this.flavor+" chosen!]"); </script>
+  </task>
+  
+  <task id="TestBooleanInput">
+  	 <input name="input" type="boolean" />
+  </task>
+  
+  <!-- see Test.properties for alternative formatting -->
+  
+  <task id="Alt"/>
+    
+  <!-- recipe with only optional steps -->
+
+  <task id="Optional2">
+      <subtasks id="optional2">
+         <step name="s1" task="Optional2_1" minOccurs="0"/>
+         <step name="s2" task="Optional2_2" minOccurs="0"/>
+      </subtasks>
+   </task>
+
+   <task id="Optional2_1">
+      <subtasks id="optional2_1">
+         <step name="b" task="B"/>
+      </subtasks>
+   </task>
+
+   <task id="Optional2_2">
+      <subtasks id="optional2_2">
+         <step name="say" task="disco:Say.Agent"/>
+         <binding slot="$say.text" value="'Test'"/>
+      </subtasks>
+   </task>
+
+   <task id="_How">
+     <subtasks id="how1">
+       <step name="a" task="A"/>
+     </subtasks>	
+     <subtasks id="how2">
+       <step name="b" task="B"/>
+     </subtasks>	
+     <subtasks id="how3">
+       <step name="C" task="C"/>
+     </subtasks>	
+   </task>
+   
+   <task id="HowPlus">
+     <subtasks id="plus">
+       <step name="how" task="_How" minOccurs="0"/>
+       <step name="a" task="A"/>
+     </subtasks>
+   </task>
+   
+   <task id="NonPrimitive"/>
+  
+   <task id="Repeating">
+     <subtasks id="repeating">
+       <step name="repeat" task="B" maxOccurs="4"/>
+       <step name="next" task="C"/>
+     </subtasks>
+   </task>
+
+   <task id="RepeatingMinMax">
+     <subtasks id="repeatingMinMax">
+       <step name="repeat" task="B" minOccurs="2" maxOccurs="4"/>
+       <step name="next" task="C" minOccurs="3" maxOccurs="3"/>
+     </subtasks>
+   </task>
+   
+   <task id="RepeatingAll">
+     <subtasks id="repeatingAll">
+       <step name="first" task="B" minOccurs="0" maxOccurs="4"/>
+     </subtasks>
+   </task>
+
+   <task id="_B"/>
+
+   <task id="RepeatingBug">
+     <subtasks id="repeatingBug">
+       <step name="first" task="_B"/>
+       <step name="repeat" task="C" maxOccurs="2"/>
+       <step name="last" task="D"/>
+     </subtasks>
+   </task>
+
+   <task id="PostA">
+     <binding slot="$this.external" value="false"/>
+     <postcondition> A == 0 </postcondition>
+     <script> A-- </script>
+   </task>
+
+   <task id="RetryA">
+     <subtasks id="retryA1">
+       <step name="a" task="PostA"/>
+     </subtasks>
+     <subtasks id="retryA2">
+       <step name="a" task="PostA"/>
+     </subtasks>
+     <subtasks id="retryA3">
+       <step name="a" task="PostA" minOccurs="0"/>
+     </subtasks>
+   </task>
+
+   <task id="Optional3">
+     <input name="input1" type="string"/>
+     <input name="input2" type="Flavor"/>
+     <input name="input3" type="string"/>
+   </task>
+
+   <task id="IterateArray">
+     <subtasks id="_iterateArray">
+       <step name="step" task="IteratedTask" minOccurs="0" maxOccurs="10"/>
+     </subtasks>
+   </task>
+
+   <!-- see Test.properties re IteratedTask -->
+
+   <task id="IteratedTask">
+     <precondition> 
+        ($plan != undefined &amp;&amp; $plan.getRepeatStep() &lt; cities.length) ? undefined : false
+     </precondition>
+     <subtasks id="_iteratedTask">
+       <step name="get" task="_GetCity"/>
+       <step name="say" task="disco:Say$Agent"/>
+       <binding slot="$say.text" 
+                value="$get.city == undefined ? undefined :
+                       ('I love '+$get.city)"/>
+     </subtasks>
+   </task>
+
+   <task id="_GetCity">
+     <output name="city" type="string"/>
+     <binding slot="$this.external" value="false"/>
+     <script> $this.city = cities[$plan.getParent().getRepeatStep()] </script>
+   </task>
+
+   <task id="Default">
+     <input name="input1" type="number"/>
+     <input name="input2" type="number"/>
+     <binding slot="$this.input1" value="$this.input1 == undefined ? 5 : undefined"/>
+     <binding slot="$this.input2" value="undefined"/>
+   </task>
+
+   <task id="DefaultTop">
+     <subtasks id="defaultTasks">
+       <step name="step1" task="Optional3"/>
+       <step name="step2" task="Optional3"/>
+       <binding slot="$step1.input1" value="$step1.input1 == undefined ? 'hello' : undefined"/>
+       <binding slot="$step2.input1" value="undefined"/>
+     </subtasks>
+   </task>
+
+  <task id="ModifiedA">
+    <input name="input1" type="Mutable" modified="output"/>
+    <input name="input2" type="number"/>
+    <output name="output" type="Mutable"/>
+    <precondition> $this.input2 == undefined || $this.input2 &gt; 0 </precondition>
+    <postcondition sufficient="true">
+      $this.output != undefined &amp;&amp;
+      $this.output.loc &gt; $this.input1.loc 
+    </postcondition>
+    <script> $this.output.loc = $this.input1.loc + $this.input2; </script>
+  </task>	
+
+  <task id="ModifiedB">
+    <input name="input" type="Mutable"/>
+  </task>
+
+  <task id="ModifiedC">
+    <subtasks id="c">
+      <step name="a" task="ModifiedA"/>
+      <step name="b" task="ModifiedB"/>
+      <binding slot="$b.input" value="$a.output"/>
+    </subtasks>
+  </task>
+  
+  <task id="BindingsValueTest">
+    <subtasks id="bindingsValueTest">
+       <step name="set" task="disco:Say.Eval"/>
+       <step name="one" task="BindingsValue"/>
+       <step name="two" task="BindingsValue"/>
+       <step name="three" task="BindingsValue"/>
+       <binding slot="$set.text" value="'Setting test to 1'"/>
+       <binding slot="$set.eval" value="'test = 1'"/>
+    </subtasks>
+  </task>
+    
+  <task id="BindingsValue">
+    <input name="input" type="number"/>
+    <binding slot="$this.input" value="test"/>		
+    <script> println($this.input); test++; </script>
+  </task>
+  
+  <task id="BindingsValueTestSubtasks">
+    <subtasks id="bindingsValueTestSubtasks">
+      <step name="set" task="disco:Say.Eval"/>
+       <step name="one" task="BindingsValue"/>
+       <step name="two" task="BindingsValue"/>
+       <step name="three" task="BindingsValue"/>
+       <binding slot="$set.text" value="'Setting test to 1'"/>
+       <binding slot="$set.eval" value="'test = 1'"/>
+       <binding slot="$one.input" value="test"/>
+       <binding slot="$two.input" value="test"/>
+       <binding slot="$three.input" value="test"/>
+    </subtasks>
+  </task>
+
+  <task id="BindingsValueStep">
+    <input name="input" type="number"/>
+    <script> println($this.input); test++; </script>
+  </task>
+    
+  <script init="true">
+  
+    // for BindingsValueTest
+    var test;
+    
+    // number of times A needs to be done to succeed (-1 means never)
+    var A = -1;
+    var optional2 = false;
+
+    // enumerated type for use with Propose.What or Propose.Global
+    // format string is default formatting provided by ProposeWhatPlugin
+    // and ProposeGlobalPlugin in user menus
+
+    function Flavor (format) { this.format = format; }
+    
+    Flavor.ENUM = { Chocolate : new Flavor("chocolate"), 
+                    Vanilla : new Flavor("vanilla"),
+                    Strawberry : new Flavor("strawberry") }
+    
+    Flavor.prototype.toString = function () {
+       return edu.wpi.disco_helper.toString(this.format, Flavor, "Flavor");
+    }
+    
+    // data for IterateArray
+    var cities = new Array("Chicago", "Detroit", "Boston");
+
+    // for Modified
+    function Mutable (loc) { this.loc = loc; }
+    
+    Mutable.prototype.toString = function () { return '['+this.loc+']'; }
+
+  </script>
+
+</taskModel>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Mixed">
+   <task id="Greetings">
+      <subtasks id="_Greetings_subtasks">
+         <step name="_Greetings_step" task="disco:Say"/>
+         <step name="_Greetings_ref" task="_Greetings_tree"/>
+         <binding slot="$_Greetings_step.text" value="&#34;Hi&#34;"/>
+         <binding slot="$_Greetings_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="Response">
+      <subtasks id="_Response_subtasks">
+         <step name="_Response_step" task="disco:Say"/>
+         <binding slot="$_Response_step.text" value="&#34;Good to see you!&#34;"/>
+         <binding slot="$_Response_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Greetings_tree">
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:Say"/>
+         <step name="_d4e9_step" task="Response"/>
+         <applicable>getHours() &gt;= 4 &amp;&amp; getHours() &lt; 12</applicable>
+         <binding slot="$_d4e8_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_d4e8_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e10_subtasks">
+         <step name="_d4e10_step" task="disco:Say"/>
+         <step name="_d4e11_step" task="Response"/>
+         <applicable>getHours() &gt;= 12 &amp;&amp; getHours() &lt; 17</applicable>
+         <binding slot="$_d4e10_step.text" value="&#34;Good afternoon&#34;"/>
+         <binding slot="$_d4e10_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e12_subtasks">
+         <step name="_d4e12_step" task="disco:Say"/>
+         <step name="_d4e13_step" task="Response"/>
+         <binding slot="$_d4e12_step.text" value="&#34;Hi&#34;"/>
+         <binding slot="$_d4e12_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="Startup">
+      <subtasks id="startingUp">
+         <step name="greet" task="Greetings"/>
+         <step name="print" task="PrintDone"/>
+      </subtasks>
+   </task>
+   <task id="PrintDone">
+      <binding slot="$this.external" value="false"/>
+      <script> println("Done") </script>
+   </task>
+   <script init="true"> 
+     // for testing, return constant instead of 'new Date().getHours()' 
+     function getHours () { return 8; }  
+  </script>
+</taskModel>

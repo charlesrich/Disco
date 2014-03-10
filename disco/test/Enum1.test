@@ -1,0 +1,25 @@
+    # Jan 29, 2012 4:52:35 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor"
+    User says "One of us should Propose.Global on FOO and Flavor."
+    Agent says "Ok."
+  > say
+[1] Chocolate.
+[2] Vanilla.
+[3] Strawberry.
+  >> 2
+    User says "Vanilla."
+    Agent says "Yup."
+  > history
+
+[User says Propose.Global on FOO and Flavor and vanilla] -accepted -done <-focus
+   User says "One of us should Propose.Global on FOO and Flavor."
+   Agent says "Ok."
+   User says "Vanilla."
+   Agent says "Yup."
+
+  > eval FOO.toString()
+    # Returned 'vanilla'
+  > quit
+    

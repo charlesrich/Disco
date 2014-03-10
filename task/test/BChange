@@ -1,0 +1,9 @@
+verbose
+load models/BChange.xml
+task top
+execute Login / "John Smith" / "exercise"
+next
+status
+execute TellHomework / true / "exercise" / "search web" /
+status
+quit

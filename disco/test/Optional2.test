@@ -1,0 +1,36 @@
+    # Jan 9, 2012 7:45:08 PM - TaskEngine 1.1.4 / Disco 1.3.9
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task Optional2
+    User says "Let's achieve Optional2."
+    Agent says "Should we achieve Optional2_1?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve Optional2.
+  >> 2
+    User says "No."
+    Agent says "Should we achieve Optional2_2?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve Optional2.
+  >> 1
+    User says "Yes."
+    Agent says "Test."
+  > history
+
+[Achieve Optional2] -accepted -done
+   User says "Let's achieve Optional2."
+   [Achieve Optional2_1] -optional -rejected
+      [User says let's achieve Optional2_1]
+         Agent says "Should we achieve Optional2_1?"
+         User says "No."
+   [Achieve Optional2_2] -optional -accepted -done <-focus
+      [User says let's achieve Optional2_2]
+         Agent says "Should we achieve Optional2_2?"
+         User says "Yes."
+      Agent says "Test."
+
+  > quit
+    

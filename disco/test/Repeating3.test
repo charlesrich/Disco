@@ -1,0 +1,68 @@
+    # May 18, 2012 1:29:22 PM - TaskEngine 1.2.1 / Disco 1.4.3
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task RepeatingAll
+    User says "Let's achieve RepeatingAll."
+    Agent says "Do you want to do B?"
+  > history
+
+[Achieve RepeatingAll] -accepted -done
+   User says "Let's achieve RepeatingAll."
+   [Execute B] -optional -live
+      [User says one of us should execute B] -live <-focus
+         [User accept] -live
+            Agent says "Do you want to do B?"
+   [Execute B] -optional
+   [Execute B] -optional
+   [Execute B] -optional
+
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve RepeatingAll.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent says "Do you want to do B again?"
+  > history
+
+[Achieve RepeatingAll] -accepted -done
+   User says "Let's achieve RepeatingAll."
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B]
+         Agent says "Do you want to do B?"
+         User says "Yes."
+      Agent execute B.
+   [Execute B] -optional -live
+      [User says one of us should execute B again] -live <-focus
+         [User accept] -live
+            Agent says "Do you want to do B again?"
+   [Execute B] -optional
+   [Execute B] -optional
+
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve RepeatingAll.
+  >> 2
+    User says "No."
+    Agent says "Ok."
+  > history
+
+[Achieve RepeatingAll] -accepted -done
+   User says "Let's achieve RepeatingAll."
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B]
+         Agent says "Do you want to do B?"
+         User says "Yes."
+      Agent execute B.
+   [Execute B] -optional -rejected
+      [User says one of us should execute B again] <-focus
+         Agent says "Do you want to do B again?"
+         User says "No."
+         Agent says "Ok."
+   [Execute B] -optional
+   [Execute B] -optional
+
+  > quit
+    

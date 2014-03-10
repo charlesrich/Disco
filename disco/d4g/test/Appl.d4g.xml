@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:secrets.wpi.edu:models:test:D4g1"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+       xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <!-- test for generated warning and ignored <applicable> -->
+  <say text="text1">
+    <say text="text2" applicable="app2">
+      <say text="text3" applicable="app3">
+	<say text="text4" applicable="text4">
+	  <say text="text5" applicable="app5"/>
+	  <say text="text6" applicable="app6"/>
+	</say>
+        <say text="text4a"/>
+      </say>
+      <say text="text3a"/>
+    </say>
+    <say text="text2a"/>
+  </say>
+
+  <!-- test for compatibility with other attributes -->
+  <say text="t0">
+    <say text="t1" eval="e1" applicable="app1">
+      <say text="t2" eval="e2" applicable="app2"/>
+      <user text="t3" applicable="app3"/>
+    </say>
+    <say text="t4" applicable="app4"/>
+  </say>
+  
+  <!-- test for normal usage of applicable -->
+  <say text="0" precondition="app0"/>
+  <say text="a">
+    <say text="b" applicable="a">
+      <say text="c" applicable="b">
+	<say text="d"/>
+	<say text="e" applicable="c"/>
+	<say text="f" applicable="d">
+	  <say text="g"/>
+	  <say text="h"/>
+	  <say text="i" applicable="e">
+	    <say text="j"/>
+	    <say text="k" applicable="f"/>
+	  </say>
+	</say>
+      </say>
+      <say text="l" applicable="g"/>
+      <say text="m" applicable="h">
+	<say text="n"/>
+      </say>
+    </say>
+    <say text="o"/>
+  </say>
+
+  <!-- The follow two lines are now out of date. Need to add test cases
+       for do's @applicable (copy/paste & find/replace say's test cases)
+    -->
+  <!-- test to ensure <do> cannot have @applicable -->
+  <!-- <do task="task" applicable="nope"/> -->
+
+</model>
+

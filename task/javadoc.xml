@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+<target name="javadoc">
+<javadoc access="protected" additionalparam="-J-Xmx256m " author="true" classpath="speech/cmulex.jar:speech/en_us.jar:speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar:speech/sphinx4.jar:speech/freetts.jar:lib/jing.jar:speech/tags.jar:speech/jsapi.jar:speech/cmu_us_kal.jar:lib/mono/Jint.jar" destdir="docs/api" doctitle="CE Task" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="edu.wpi.cetask,edu.wpi.cetask.guide" source="1.7" sourcefiles="java/GuiExample.java" sourcepath="java" splitindex="false" use="false" version="true">
+<link href="http://docs.oracle.com/javase/7/docs/api/"/>
+<link href="http://www.thaiopensource.com/relaxng/api/jing/"/>
+</javadoc>
+</target>
+</project>

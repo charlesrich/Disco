@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:fr.telecom-paristech:models:Interview">
+   <task id="_Opening">
+      <subtasks id="__Opening_subtasks">
+         <step name="__Opening_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="__Opening_ref" task="__Opening_tree"/>
+         <binding slot="$__Opening_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$__Opening_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Applicant_Name">
+      <subtasks id="__Applicant_Name_subtasks">
+         <step name="__Applicant_Name_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e54_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="_d4e55_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <binding slot="$__Applicant_Name_step.text" value="&#34;What is your name?&#34;"/>
+         <binding slot="$__Applicant_Name_step.external" value="false"/>
+         <binding slot="$_d4e54_step.text" value="&#34;\&#34; \&#34;+(interviewee)+\&#34; \&#34;&#34;"/>
+         <binding slot="$_d4e54_step.external" value="true"/>
+         <binding slot="$_d4e55_step.text"
+                  value="&#34;\&#34;Yes, please sit down and Mr. \&#34;+(interviewer)+\&#34;  will be with you shortly\&#34;&#34;"/>
+         <binding slot="$_d4e55_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Who_To_See">
+      <subtasks id="__Who_To_See_subtasks">
+         <step name="__Who_To_See_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e57_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="_d4e58_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$__Who_To_See_step.text" value="&#34;How may I help you?&#34;"/>
+         <binding slot="$__Who_To_See_step.external" value="false"/>
+         <binding slot="$_d4e57_step.text" value="&#34;\&#34;I'm here to see \&#34;+(interviewer)+\&#34;.\&#34;&#34;"/>
+         <binding slot="$_d4e57_step.external" value="true"/>
+         <binding slot="$_d4e58_step.text" value="&#34;Just a minute, please.&#34;"/>
+         <binding slot="$_d4e58_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Greet_Interviewee">
+      <subtasks id="__Greet_Interviewee_subtasks">
+         <step name="__Greet_Interviewee_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="__Greet_Interviewee_ref" task="__Greet_Interviewee_tree"/>
+         <binding slot="$__Greet_Interviewee_step.text"
+                  value="&#34;\&#34;Hello I am Mr \&#34;+(interviewer)+\&#34;.\&#34;&#34;"/>
+         <binding slot="$__Greet_Interviewee_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Get_Resume">
+      <subtasks id="__Get_Resume_subtasks">
+         <step name="__Get_Resume_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="__Get_Resume_ref" task="__Get_Resume_tree"/>
+         <binding slot="$__Get_Resume_step.text" value="&#34;May I have your resume?&#34;"/>
+         <binding slot="$__Get_Resume_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussResume">
+      <subtasks id="__DiscussResume_subtasks">
+         <step name="__DiscussResume_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e91_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e92_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$__DiscussResume_step.text" value="&#34;Let's see your resume.&#34;"/>
+         <binding slot="$__DiscussResume_step.external" value="false"/>
+         <binding slot="$_d4e91_step.text" value="&#34;Okay.&#34;"/>
+         <binding slot="$_d4e91_step.external" value="true"/>
+         <binding slot="$_d4e92_step.text" value="&#34;First, let us talk about your education.&#34;"/>
+         <binding slot="$_d4e92_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussEducation">
+      <subtasks id="__DiscussEducation_subtasks">
+         <step name="__DiscussEducation_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="_d4e94_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e95_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e95_ref" task="_d4e95_tree"/>
+         <binding slot="$__DiscussEducation_step.text"
+                  value="&#34;\&#34;I see from your resume that you are in \&#34;+(education1)+\&#34;, is that correct?\&#34;&#34;"/>
+         <binding slot="$__DiscussEducation_step.external" value="false"/>
+         <binding slot="$_d4e94_step.text" value="&#34;I guess so.&#34;"/>
+         <binding slot="$_d4e94_step.external" value="true"/>
+         <binding slot="$_d4e95_step.text"
+                  value="&#34;Can you tell me what you most liked that you learned in school?&#34;"/>
+         <binding slot="$_d4e95_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussLearn">
+      <subtasks id="__DiscussLearn_subtasks">
+         <step name="__DiscussLearn_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="__DiscussLearn_ref" task="__DiscussLearn_tree"/>
+         <binding slot="$__DiscussLearn_step.text"
+                  value="&#34;\&#34;I see from your resume that you have worked at \&#34;+(job1)+\&#34;. What did you learn there ?\&#34;&#34;"/>
+         <binding slot="$__DiscussLearn_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussUsefulActivity">
+      <subtasks id="__DiscussUsefulActivity_subtasks">
+         <step name="__DiscussUsefulActivity_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="__DiscussUsefulActivity_ref" task="__DiscussUsefulActivity_tree"/>
+         <binding slot="$__DiscussUsefulActivity_step.text"
+                  value="&#34;I see that you didn't specify any work experience in your resume. Have you done any unpaid work ?&#34;"/>
+         <binding slot="$__DiscussUsefulActivity_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussInterests">
+      <subtasks id="__DiscussInterests_subtasks">
+         <step name="__DiscussInterests_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="__DiscussInterests_ref" task="__DiscussInterests_tree"/>
+         <binding slot="$__DiscussInterests_step.text"
+                  value="&#34;Tell me what you do outside of school.&#34;"/>
+         <binding slot="$__DiscussInterests_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Closing">
+      <subtasks id="__Closing_subtasks">
+         <step name="__Closing_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="__Closing_ref" task="__Closing_tree"/>
+         <binding slot="$__Closing_step.text"
+                  value="&#34;Well, Thank you for coming.  We will review your case further.&#34;"/>
+         <binding slot="$__Closing_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="__Opening_tree">
+      <subtasks id="_Hello_subtasks">
+         <step name="_Hello_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_Hello_ref" task="_Hello_tree"/>
+         <binding slot="$_Hello_step.text" value="&#34;Hello&#34;"/>
+         <binding slot="$_Hello_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e48_subtasks">
+         <step name="_d4e48_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e48_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_d4e48_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e49_subtasks">
+         <step name="_d4e49_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e50_step" task="_Hello_tree"/>
+         <binding slot="$_d4e49_step.text" value="&#34;Hi&#34;"/>
+         <binding slot="$_d4e49_step.external" value="true"/>
+         <binding slot="$_d4e50_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e51_subtasks">
+         <step name="_d4e51_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e52_step" task="_Hello_tree"/>
+         <binding slot="$_d4e51_step.text" value="&#34;hey&#34;"/>
+         <binding slot="$_d4e51_step.external" value="true"/>
+         <binding slot="$_d4e52_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Hello_tree">
+      <subtasks id="_d4e39_subtasks">
+         <step name="_d4e39_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e39_ref" task="_d4e39_tree"/>
+         <applicable>emotion == 'happy' </applicable>
+         <binding slot="$_d4e39_step.text"
+                  value="&#34;Coach says:  A better way to respond would be to say 'Good morning'.  It conveys respect. Try starting over.&#34;"/>
+         <binding slot="$_d4e39_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e44_subtasks">
+         <step name="_d4e44_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e46_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e47_step" task="_Opening"/>
+         <applicable>emotion == 'sad' </applicable>
+         <binding slot="$_d4e44_step.text"
+                  value="&#34;Coach says: You seem a bit under the weather.  If you are nervous, don't be.  This is a chance to learn and get a job! Try again with good morning.&#34;"/>
+         <binding slot="$_d4e44_step.external" value="false"/>
+         <binding slot="$_d4e46_step.text" value="&#34;okay&#34;"/>
+         <binding slot="$_d4e46_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e39_tree">
+      <subtasks id="_d4e40_subtasks">
+         <step name="_d4e40_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e41_step" task="_Opening"/>
+         <binding slot="$_d4e40_step.text" value="&#34;sure!&#34;"/>
+         <binding slot="$_d4e40_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e42_subtasks">
+         <step name="_d4e42_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e43_step" task="_Opening"/>
+         <binding slot="$_d4e42_step.text" value="&#34;okay&#34;"/>
+         <binding slot="$_d4e42_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__Greet_Interviewee_tree">
+      <subtasks id="_d4e60_subtasks">
+         <step name="_d4e60_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e60_ref" task="_d4e60_tree"/>
+         <binding slot="$_d4e60_step.text" value="&#34;Hi&#34;"/>
+         <binding slot="$_d4e60_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e65_subtasks">
+         <step name="_d4e65_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="_d4e66_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e67_step" task="_Shake_Hands"/>
+         <binding slot="$_d4e65_step.text" value="&#34;\&#34;Hello, I'm \&#34;+(interviewee)+\&#34;\&#34;&#34;"/>
+         <binding slot="$_d4e65_step.external" value="true"/>
+         <binding slot="$_d4e66_step.text" value="&#34;Good to meet you.&#34;"/>
+         <binding slot="$_d4e66_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e68_subtasks">
+         <step name="_d4e68_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e70_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e71_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e73_step" task="_Greet_Interviewee"/>
+         <binding slot="$_d4e68_step.text" value="&#34;Hey man what's up?&#34;"/>
+         <binding slot="$_d4e68_step.external" value="true"/>
+         <binding slot="$_d4e70_step.text"
+                  value="&#34;Coach says: You could better respond with a greeting such as 'Hello' and your name. How about trying this again.&#34;"/>
+         <binding slot="$_d4e70_step.external" value="false"/>
+         <binding slot="$_d4e71_step.text" value="&#34;okay&#34;"/>
+         <binding slot="$_d4e71_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e60_tree">
+      <subtasks id="_d4e62_subtasks">
+         <step name="_d4e62_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e62_step.text"
+                  value="&#34;Coach says: You could respond by telling the interviewer your name.  Try again.&#34;"/>
+         <binding slot="$_d4e62_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e63_subtasks">
+         <step name="_d4e63_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e64_step" task="_Greet_Interviewee"/>
+         <!--Warning, <say> with different actor than sibling. Say @text="okay"-->
+<binding slot="$_d4e63_step.text" value="&#34;okay&#34;"/>
+         <binding slot="$_d4e63_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__Get_Resume_tree">
+      <subtasks id="_d4e76_subtasks">
+         <step name="_d4e76_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e77_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e77_ref" task="_d4e77_tree"/>
+         <binding slot="$_d4e76_step.text" value="&#34;Sure here it is.&#34;"/>
+         <binding slot="$_d4e76_step.external" value="true"/>
+         <binding slot="$_d4e77_step.text" value="&#34;Thank you.&#34;"/>
+         <binding slot="$_d4e77_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e80_subtasks">
+         <step name="_d4e80_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e82_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e83_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e84_step" task="_Get_Resume"/>
+         <binding slot="$_d4e80_step.text" value="&#34;Uh, I don't have a resume.&#34;"/>
+         <binding slot="$_d4e80_step.external" value="true"/>
+         <binding slot="$_d4e82_step.text"
+                  value="&#34;Coach says: A resume tells your employer about your past experience, both your education and work experience if you have any.  You will need a resume for your employer. After this game, you can create a resume with the ResumeHelper game. For now, start again and tell the interviewer that you did not bring one.&#34;"/>
+         <binding slot="$_d4e82_step.external" value="false"/>
+         <binding slot="$_d4e83_step.text" value="&#34;okay&#34;"/>
+         <binding slot="$_d4e83_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e85_subtasks">
+         <step name="_d4e85_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e86_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e86_ref" task="_d4e86_tree"/>
+         <binding slot="$_d4e85_step.text" value="&#34;I didn't bring one today.&#34;"/>
+         <binding slot="$_d4e85_step.external" value="true"/>
+         <binding slot="$_d4e86_step.text"
+                  value="&#34;well, we can continue but make sure to bring one tomorrow and leave it with the receptionist.&#34;"/>
+         <binding slot="$_d4e86_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e77_tree">
+      <subtasks id="_d4e78_subtasks">
+         <step name="_d4e78_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e78_step.text" value="&#34;you are welcome.&#34;"/>
+         <binding slot="$_d4e78_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e79_subtasks">
+         <step name="_d4e79_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e79_step.text" value="&#34;yes, that's right.&#34;"/>
+         <binding slot="$_d4e79_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e86_tree">
+      <subtasks id="_d4e87_subtasks">
+         <step name="_d4e87_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e87_step.text" value="&#34;I guess so.&#34;"/>
+         <binding slot="$_d4e87_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e88_subtasks">
+         <step name="_d4e88_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e88_step.text" value="&#34;okay, I'll bring it tomorrow.&#34;"/>
+         <binding slot="$_d4e88_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e89_subtasks">
+         <step name="_d4e89_step" task="_DiscussInterests"/>
+      </subtasks>
+   </task>
+   <task id="_d4e95_tree">
+      <subtasks id="_d4e96_subtasks">
+         <step name="_d4e96_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e97_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e96_step.text" value="&#34;computer technology&#34;"/>
+         <binding slot="$_d4e96_step.external" value="true"/>
+         <binding slot="$_d4e97_step.text" value="&#34;Very good, that's relevant to our business.&#34;"/>
+         <binding slot="$_d4e97_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e99_subtasks">
+         <step name="_d4e99_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e101_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e99_step.text" value="&#34;sports&#34;"/>
+         <binding slot="$_d4e99_step.external" value="true"/>
+         <binding slot="$_d4e101_step.text" value="&#34;I see.&#34;"/>
+         <binding slot="$_d4e101_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="__DiscussLearn_tree">
+      <subtasks id="_d4e105_subtasks">
+         <step name="_d4e105_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e106_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e107_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e108_step" task="_DiscussLearn"/>
+         <binding slot="$_d4e105_step.text" value="&#34;nothin' special.&#34;"/>
+         <binding slot="$_d4e105_step.external" value="true"/>
+         <binding slot="$_d4e106_step.text"
+                  value="&#34;Coach says : try to think of some skill that you could have developped at your job, like teamwork, or resistance to pressure. These are called 'transferable skills' and are very important. Even if your previous job wasn't exactly in the company field, you should be able to point out something that experience gave you&#34;"/>
+         <binding slot="$_d4e106_step.external" value="false"/>
+         <binding slot="$_d4e107_step.text" value="&#34;oh, right. I'll try again&#34;"/>
+         <binding slot="$_d4e107_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e109_subtasks">
+         <step name="_d4e109_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e109_step.text" value="&#34;Teamwork.&#34;"/>
+         <binding slot="$_d4e109_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e110_subtasks">
+         <step name="_d4e110_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e110_step.text" value="&#34;Responsibility.&#34;"/>
+         <binding slot="$_d4e110_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__DiscussUsefulActivity_tree">
+      <subtasks id="_d4e112_subtasks">
+         <step name="_d4e112_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e113_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e114_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e115_step" task="_DiscussUsefulActivity"/>
+         <binding slot="$_d4e112_step.text" value="&#34;nothin' special.&#34;"/>
+         <binding slot="$_d4e112_step.external" value="true"/>
+         <binding slot="$_d4e113_step.text" value="&#34;Coach says : try again !&#34;"/>
+         <binding slot="$_d4e113_step.external" value="false"/>
+         <binding slot="$_d4e114_step.text" value="&#34;oh, right. I'll try again&#34;"/>
+         <binding slot="$_d4e114_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e116_subtasks">
+         <step name="_d4e116_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e116_step.text"
+                  value="&#34;I've watched over the neighbour's kids a few times.&#34;"/>
+         <binding slot="$_d4e116_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e117_subtasks">
+         <step name="_d4e117_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e117_step.text" value="&#34;I've refereed some soccer games.&#34;"/>
+         <binding slot="$_d4e117_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__DiscussInterests_tree">
+      <subtasks id="_d4e119_subtasks">
+         <step name="_d4e119_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e119_step.text" value="&#34;I jus' hang out with me friends.&#34;"/>
+         <binding slot="$_d4e119_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e120_subtasks">
+         <step name="_d4e120_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e120_step.text" value="&#34;I don' do nothing.&#34;"/>
+         <binding slot="$_d4e120_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__Closing_tree">
+      <subtasks id="_d4e122_subtasks">
+         <step name="_d4e122_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e123_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e124_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e122_step.text" value="&#34;thank you.&#34;"/>
+         <binding slot="$_d4e122_step.external" value="true"/>
+         <binding slot="$_d4e123_step.text" value="&#34;You are welcome.  Good bye.&#34;"/>
+         <binding slot="$_d4e123_step.external" value="false"/>
+         <binding slot="$_d4e124_step.text" value="&#34;Good-bye&#34;"/>
+         <binding slot="$_d4e124_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e125_subtasks">
+         <step name="_d4e125_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e126_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e127_step" task="_Closing"/>
+         <binding slot="$_d4e125_step.text" value="&#34;yeh that was great.&#34;"/>
+         <binding slot="$_d4e125_step.external" value="true"/>
+         <binding slot="$_d4e126_step.text" value="&#34;Try just saying thank you and good bye.&#34;"/>
+         <binding slot="$_d4e126_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e128_subtasks">
+         <step name="_d4e128_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e129_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e129_ref" task="_d4e129_tree"/>
+         <binding slot="$_d4e128_step.text" value="&#34;you mean I don't have a job?&#34;"/>
+         <binding slot="$_d4e128_step.external" value="true"/>
+         <binding slot="$_d4e129_step.text"
+                  value="&#34;Coach says: Companies generally do not offer jobs at interviews.  They interview lots of candidates and pick the most qualified people.&#34;"/>
+         <binding slot="$_d4e129_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e129_tree">
+      <subtasks id="_d4e131_subtasks">
+         <step name="_d4e131_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e132_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e132_ref" task="_d4e132_tree"/>
+         <binding slot="$_d4e131_step.text" value="&#34;oh, so no job yet.&#34;"/>
+         <binding slot="$_d4e131_step.external" value="true"/>
+         <binding slot="$_d4e132_step.text" value="&#34;Coach says: Right. But they may call you.&#34;"/>
+         <binding slot="$_d4e132_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e137_subtasks">
+         <step name="_d4e137_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e138_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e139_step" task="_Closing"/>
+         <binding slot="$_d4e137_step.text" value="&#34;oh, too bad. okay.&#34;"/>
+         <binding slot="$_d4e137_step.external" value="true"/>
+         <binding slot="$_d4e138_step.text"
+                  value="&#34;Coach says: But they may choose you.  For now, just say thank you and good bye.&#34;"/>
+         <binding slot="$_d4e138_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e132_tree">
+      <subtasks id="_d4e133_subtasks">
+         <step name="_d4e133_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e133_step.text" value="&#34;I sure hope so.&#34;"/>
+         <binding slot="$_d4e133_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e134_subtasks">
+         <step name="_d4e134_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e135_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e136_step" task="_Closing"/>
+         <binding slot="$_d4e134_step.text" value="&#34;Seems like a lot of work for nothing.&#34;"/>
+         <binding slot="$_d4e134_step.external" value="true"/>
+         <binding slot="$_d4e135_step.text"
+                  value="&#34;Start again and just say thank you and good bye for now.&#34;"/>
+         <binding slot="$_d4e135_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="Interview">
+      <output name="interviewee" type="string"/>
+      <subtasks id="how_to_interview">
+         <step name="open" task="_Opening"/>
+         <step name="who" task="_Who_To_See"/>
+         <step name="name" task="_Applicant_Name"/>
+         <step name="interview" task="_Interview_Person"/>
+         <step name="close" task="_Closing"/>
+         <binding slot="$this.interviewee" value="interviewee"/>
+      </subtasks>
+   </task>
+   <task id="_Interview_Person">
+      <subtasks id="actual_interview">
+         <step name="greet" task="_Greet_Interviewee"/>
+         <step name="resume" task="_Get_Resume"/>
+         <step name="discussr" task="_DiscussResume"/>
+         <step name="discusse" task="_DiscussEducation"/>
+         <step name="discussj" task="_DiscussJob"/>
+         <step name="interests" task="_DiscussInterests"/>
+      </subtasks>
+   </task>
+   <task id="_DiscussJob">
+      <subtasks id="jobrelated">
+         <step name="dl" task="_DiscussLearn"/>
+         <applicable> job1 != null </applicable>
+      </subtasks>
+      <subtasks id="afterschool">
+         <step name="dua" task="_DiscussUsefulActivity"/>
+      </subtasks>
+   </task>
+   <task id="_Shake_Hands"/>
+   <task id="ChangeEmotion">
+      <script> emotion="happy"; </script>
+   </task>
+   <script init="true"> 
+	  var studentLikedAtSchool;
+	  var companyBusiness; 
+	  var interviewer; 
+	  var interviewee; 
+	  var emotion; 
+	  var education1; 
+	  var job1; 
+	  companyBusiness="computer technology"; 
+	  emotion="sad"; 
+	  interviewer="Marceau"; 
+	  interviewee="Daniel Blanc"; 
+	  education1="12th grade at the Lycee de Paris"; 
+	  job1="Mcdonald's";
+  </script>
+</taskModel>

@@ -1,0 +1,33 @@
+<taskModel about="urn:cetask.wpi.edu:examples:GHIJ" xmlns="http://ce.org/cea-2018">
+
+  <task id="G">
+    <subtasks id="decomp1">
+      <step name="h" task="H"/>
+    </subtasks>
+    <subtasks id="decomp2">
+      <step name="j" task="J"/>
+      <binding slot="$j.external" value="true"/>
+    </subtasks>
+  </task>
+
+  <task id="H">
+    <postcondition> false </postcondition>
+    <subtasks id="decomp3">
+      <step name="i" task="I"/>
+      <binding slot="$i.external" value="true"/>
+    </subtasks>
+    <subtasks id="decomp4">
+      <step name="j" task="J"/>
+      <binding slot="$j.external" value="true"/>
+    </subtasks>
+  </task>
+
+  <task id="I">
+    <postcondition> false </postcondition>
+  </task>
+
+  <task id="J">
+    <postcondition> false </postcondition>
+  </task>
+
+</taskModel>

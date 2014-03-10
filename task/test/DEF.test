@@ -1,0 +1,98 @@
+    # Jul 31, 2009 4:30:25 PM - TaskEngine 0.9.4 beta / Guide 0.9.3 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/DEF.xml
+CE> task D
+    Let's start to achieve D.
+    Shall I execute F?
+CE> next
+    Shall I execute F?
+CE> status
+
+[Achieve D] -live
+   [User execute E] -live
+   [User execute E] -optional
+   [User execute E] -optional
+   [System execute F] -live <-focus
+
+CE> no
+    Ok.
+CE> next
+    Please execute E.
+CE> done
+    Ok.
+    Shall I execute F?
+CE> no
+    Ok.
+CE> next
+    Optionally execute E.
+CE> done E
+    Ok.
+    Shall I execute F?
+CE> status
+
+[Achieve D] -live
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -live
+   [System execute F] -live <-focus
+
+CE> no
+    Ok.
+CE> next
+    Optionally execute E.
+CE> done
+    Ok.
+    Shall I execute F?
+CE> no
+    Ok.
+CE> next
+    Let's achieve D.
+CE> no
+    Ok.
+    We have not finished achieve D.
+CE> status
+
+[Achieve D] -live
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -done
+   [System execute F] -live
+
+CE> task D
+    Ok.
+    Shall I execute F?
+CE> status
+
+[Achieve D] -live
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -done
+   [System execute F] -live <-focus
+
+CE> yes
+    Ok.
+[Executing script for F]
+    Done execute F.
+    Completed achieve D.
+CE> next
+    I don't know what we're doing.
+CE> status
+
+[Achieve D] -done
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -done
+   [System execute F] -done
+
+CE> clear
+CE> task DD
+    Let's start to achieve DD.
+CE> next
+    Please execute FF.
+CE> eval TEST=true
+    # Returned 'true'
+CE> next
+    Completed execute FF.
+    Please execute GG.
+CE> quit
+    Goodbye.

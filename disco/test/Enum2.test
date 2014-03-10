@@ -1,0 +1,25 @@
+    # Feb 19, 2010 10:06:08 PM - TaskEngine 0.9.6 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task ChooseFlavor
+    User says "One of us should execute ChooseFlavor."
+    Agent says "Who should execute ChooseFlavor?"
+  > say
+[1] I should execute ChooseFlavor.
+[2] You should execute ChooseFlavor.
+[3] Let's not execute ChooseFlavor.
+  >> 2
+    User says "You should execute ChooseFlavor."
+    Agent says "What is the ChooseFlavor flavor?"
+  > say
+[1] Chocolate.
+[2] Vanilla.
+[3] Strawberry.
+[4] Please do not execute ChooseFlavor.
+  >> 2
+    User says "Vanilla."
+[vanilla chosen!]
+    Agent execute ChooseFlavor on vanilla.
+    Agent says "Ok."
+  > quit
+    

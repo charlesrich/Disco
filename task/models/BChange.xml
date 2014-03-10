@@ -1,0 +1,215 @@
+<taskModel about="urn:cs.neu.edu:BChange" xmlns="http://ce.org/cea-2018">
+
+  <!-- This model was developed as an example for Tim Bickmore's Behaviorial Agents
+       Research Group (http://www.ccs.neu.edu/research/rag).  'BChange' stands for
+       'Behavioral Change' -->
+
+  <task id="top">
+     <subtasks id="toplevel">
+       <step name="login" task="Login"/>
+       <step name="recent" task="RecentHFollowup"/>
+       <binding slot="$recent.activity" value="$login.activity" />
+       <binding slot="$recent.homework" value="$login.homework" />
+     </subtasks>
+  </task>
+	 
+  <task id="Login">
+    <input name="user" type="string"/>
+    <input name="activity" type="string"/>
+    <output name="homework" type="string"/>
+    <script> 
+       USER = $this.user;
+       $this.homework = getPending($this.activity);
+    </script>
+  </task>
+
+  <task id="RecentHFollowup" >
+    <input name="activity" type="string"/>
+    <input name="homework" type="string"/>
+    <precondition> $this.homework != undefined </precondition>
+
+    <subtasks id="followingup">
+      <step name="tell" task="TellHomework" />
+      <step name="doneness" task="HomeworkAssignment" />
+      <binding slot="$tell.activity" value="$this.activity" />
+      <binding slot="$tell.homework" value="$this.homework" />
+      <binding slot="$tell.external" value="true" />
+      <binding slot="$doneness.activity" value="$this.activity" />
+      <binding slot="$doneness.homework" value="$this.homework" />
+    </subtasks>
+  </task>
+
+  <!-- this task is done by user and is answer to a question with yes or no, 
+       which is interpreted to when yes, update User db with homework homework as done, 
+       and when no, as to do no updates to db -->
+  <task id="TellHomework" >
+    <input name="done" type="boolean"/>
+    <input name="activity" type="string" />
+    <input name="homework" type="string" />
+    <script> 
+      if ($this.done) setValue($this.activity, $this.homework, "done"); 
+    </script>
+  </task>
+
+  <task id="HomeworkAssignment" >
+      <input name="activity" type="string"/>
+      <input name="homework" type="string" />
+
+      <subtasks id="HomeworkDone">
+        <step name="useful" task="HomeworkUseful" />
+        <step name="finishup" task="FinishWithHomework" />
+        <applicable> isDone($this.activity, $this.homework) </applicable>
+        <binding slot = "$useful.external" value="true"/>
+        <binding slot = "$finishup.external" value="$useful.wasuseful"/>
+      </subtasks>
+
+    <subtasks id="HomeworkNotDone">
+      <step name="getdone" task="GetHomeworkDone" />
+      <applicable> !isDone($this.activity, $this.homework) </applicable>
+        <binding slot ="$getdone.external" value="true" />
+        <binding slot= "$getdone.homework" value="$this.homework" />
+    </subtasks>
+
+    </task>
+
+	<task id="GetHomeworkDone">
+      <input name="todo" type="boolean" />
+      <input name="homework" type="string"/>  
+      <input name="activity" type="string"/>  
+  <script>
+    setValue($this.activity, $this.homework, "retry");
+  </script>
+	</task>
+
+	<!-- this task is done by user to answer question about usefulness -->
+	<task id="HomeworkUseful">
+  		<input name="wasuseful" type="boolean"/>
+	</task>
+
+	<task id="FinishWithHomework" >
+  		<input name="wasuseful" type="boolean"/>
+  		<input name="homework" type="string"/>  
+  		<input name="activity" type="string"/>  
+
+  		<subtasks id="finishdone">
+      	<step name="reward" task="RewardClient" />
+      	<applicable> $this.wasuseful </applicable>
+      	<binding slot="$reward.external" value="true" />
+      	<binding slot="$reward.homework" value="$this.homework" />
+      	<binding slot="$reward.activity" value="$this.activity" />
+    	</subtasks>
+
+    	<subtasks id="finishretry">
+      	<step name="retry" task="TalkToFriends" />
+      	<applicable> !$this.wasuseful </applicable>
+      	<binding slot="$retry.external" value="true" />
+      	<binding slot="$retry.homework" value="$this.homework" />
+      	<binding slot="$retry.activity" value="$this.activity" />
+    	</subtasks>
+
+	</task>
+
+	<!-- tell client good job and update homework as done -->
+	<task id="RewardClient">
+  		<input name="homework" type="string"/> 
+  		<input name="activity" type="string"/> 
+  		<script>
+     		setValue($this.activity, $this.homework, "done");
+  		</script>
+	</task>
+
+	<!-- tell client to talk to friends and update homework as retry -->
+	<task id="TalkToFriends">
+  	<input name="homework" type="string"/> 
+  	<input name="activity" type="string"/> 
+
+  <script>
+     setValue($this.activity, $this.homework, "retry");
+  </script>
+</task>
+
+  <script init="true">
+
+    var USER = null;  // name of current user
+    
+    // return pending action for given activity of current user
+    function getPending (activity) {
+       return getAction(activity, "pending"); 
+    }
+
+    // test whether given homework for given activity of current user is done
+    function isDone (activity, homework) {
+       return getValue(activity, homework) == "done";
+    }
+
+    // return action with given value for given activity of current user 
+    function getAction (activity, value) {
+        work = getHomework(activity);
+        if ( work == undefined ) return;
+        for (i = 0; i &lt; work.length; i++)
+           if ( work[i].value == value ) return work[i].action;
+    }
+
+    // return value for given homework for given activity of current user
+    function getValue (activity, homework) {
+        work = getHomework(activity);
+        if ( work == undefined ) return;
+        for (i = 0; i &lt; work.length; i++)
+           if ( work[i].action == homework )  return work[i].value;
+    }
+
+    // set value for given homework for given activity of current user
+    function setValue (activity, homework, value) {
+        work = getHomework(activity);
+        if ( work == undefined ) return;
+        for (i = 0; i &lt; work.length; i++)
+           if ( work[i].action == homework ) work[i].value = value;
+    }
+
+    // return homework for given activity of current user
+    function getHomework (activity) {
+       data = getData(USER).activities;
+       if ( data == undefined ) return;
+       for (i = 0; i &lt; data.length; i++) 
+         if ( data[i].name == activity ) return data[i].homework;
+    }
+
+    // return data for given user name
+    function getData (name) {
+       for (i = 0; i &lt; DATA.length; i++)
+         if ( DATA[i].name == name ) return DATA[i];
+    }
+
+    // note possible values for actions in homework are pending, done, 
+    // retry, failed and undefined (default).
+
+    var DATA = 
+    
+    [ {name: "John Smith",
+       trust: 7,
+       activities: 
+          [{name: "exercise",
+           homework:
+              [{action: "go shopping", value: "done"},
+               {action: "search web", value: "pending"},
+               {action: "go to gym" }
+              ]}
+          ]},
+
+      {name: "Mary Jones",
+       trust: 7,
+       activities: 
+          [{name: "exercise",
+            homework:
+              [{action: "go shopping"},
+               {action: "search web"},
+               {action: "go to gym" }
+              ]}
+          ]}
+
+    ];
+
+  </script>
+      
+
+</taskModel>

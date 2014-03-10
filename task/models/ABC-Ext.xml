@@ -1,0 +1,27 @@
+<taskModel about="urn:cetask.wpi.edu:examples:ABC-Ext" xmlns="http://ce.org/cea-2018"
+	        xmlns:abc="urn:cetask.wpi.edu:examples:ABC">
+
+	<!-- This is an extension of the ABC model illustrating:
+	
+	     (1) the use of grounding scripts (the sum of the numerical
+	         outputs of B and C is accumulated in a JavaScript variable; see
+		      GuiExample for use)
+		         
+		  (2) the use of LiveConnect to call a Java method from JavaScript
+		      (see beep below; see O'Reilly manual Chap. 12 for more details)
+   -->
+
+	<script init="true">
+	  var sum = 0; 
+	  Packages.java.awt.Toolkit.getDefaultToolkit().beep();
+	</script>
+
+	<script task="abc:B"> 
+	  sum += $this.output1; 
+	</script>
+
+	<script task="abc:C"> 
+	  sum += $this.output;
+	</script>
+
+</taskModel>

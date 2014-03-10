@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<model about="urn:fr.telecom-paristech:tardis:FirstScenario"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+<t:script init="true"> 
+	//User model
+	var user = {};
+	user.name = "Miss Smith";
+	user.previousPosition = "secretary";
+	user.personality = "";
+	user.personality += "desperate";
+	
+	//agent model
+	var agent = {};
+	agent.name = "George Parson";
+	agent.frustration=0;
+	agent.personality = "DF"; 
+		
+	//scenario variables
+	var company = "Future Networks";
+	var locateCompany = false;
+	var applyJob = false;
+	
+</t:script>
+
+<!--
+###Mathieu
+Top level structure
+-->
+
+<t:task id="Interview">
+	<t:subtasks id="interviewSteps">
+		<t:step name="welcome" task="fs:Welcome"/>
+		<t:step name="introduction" task="fs:Introduction"/>
+		<!--<t:step name="elaboration" task="Elaboration"/>
+		<t:step name="synthesis" task="Synthesis" />
+		<t:step name="conclusion" task="Conclusion" />-->
+	</t:subtasks>
+</t:task>
+
+<t:task id="Welcome">
+	<t:subtasks id="Typical">
+		<t:step name="greet" task="fs:Greet"/>
+		<t:step name="proceedtoseat" task="fs:ProceedToSeat"/>
+		<t:step name="foundcompanyeasily" task="fs:FoundCompanyEasily" minOccurs="0"/>
+	</t:subtasks>
+</t:task>
+
+<t:task id="Introduction">
+	<t:subtasks id="Normal">
+		<t:step name="introSelf" task="fs:IntroSelf"/>
+		<t:step name="locateCompany" task="fs:LocateCompany" minOccurs="0"/>
+		<t:step name="applyJob" task="fs:ApplyJob" minOccurs="0"/>
+		<t:step name="essentialJobQualities" task="fs:Essentialjobqualities"/>
+		<t:step name="goodCandidate" task="fs:GoodCandidate"/>
+	</t:subtasks>
+</t:task>
+<!-- 
+###Mathieu
+Phase 1 of Tardis scenario
+
+TODO applicability conditions on NVB and stance
+-->
+
+<agent id="Greet" text="Good morning {user.name}, my name is {agent.name}. 
+						I am a senior HR administrator at {company} and will interview you today.">
+	<user text="Hello." eval="agent.frustration=agent.frustration + .25;"/> 
+		<!-- disengagement signs: low voice and energy. No smile or expression. no gestures. head averted. -->
+	<user text="Good morning !"/> 
+		<!-- /friendly behavior : smile, gesture, nod, mutual gaze -->
+</agent>
+	
+<agent id="ProceedToSeat" text="welcome.enter">
+	<user text="Ok !">
+		<agent text="welcome.sit"/>
+	</user>
+</agent>
+
+<agent id="FoundCompanyEasily" text="Did you find us easily ?" applicable="agent.personality=='DF'" >
+	<user text="Yes." eval="agent.frustration=agent.frustration + .5;"/> 
+		<!-- no friendliness signs: no smile or expressions. no gestures. -->
+	<user text="Yes, thank you, I double checked the location online so it was very easy !"/> 
+		<!-- high friendliness: smiles, nods, gestures, variations in pitch (but overall high) and rythm, mutual gaze -->
+	<user text="Yes, I did." eval="agent.frustration=agent.frustration - .5;"/> 
+		<!-- low positive friendliness and submission (politeness?): smile, nod. Gaze or head aversion. Limited movement (sweep gesture "it was nothing"). Adaptors -->
+</agent>
+	
+<!-- 
+###Candy
+Phase 2 of Tardis scenario
+
+TODO applicability conditions on NVB and stance
+-->
+
+
+<agent id="IntroSelf" text="intro.self">
+	<user text="I have been working for the past while as a {user.previousPosition} but now I'm unemployed.  I need a job." 
+		  eval="agent.frustration=agent.frustration + .5; user.personality= user.personality ++ 'desperate';"/> 
+		<!-- disengagement signs: low voice and energy. No smile or expression. no gestures. head averted. -->
+	<user text="I have been employed up til now as a {user.previousPosition}.  I saw your advertisement and 
+                looked up your company. I thought my skills matched well with your company."
+		  eval="locateCompany=true; user.personality = user.personality ++ 'motivated'"/> 
+		<!-- /friendly behavior : smile, gesture, nod, mutual gaze -->
+	<user text="Well, I haven't ever had a job, but I'd like to work for you."/>
+</agent>
+<!--Mathieu: if the user already had a job (previousPosition != null), then the third sentence isn't possible.
+    vice-versa, if the user.previousPosition variable is undefined, then only the third is possible (perhaps should add a "bad" answer for this case) 
+	
+Candy: note that the second two user choices don't change the agent frustration level.  But you might want 
+      to do that!
+-->
+
+<agent id="LocateCompany" text="intro.locateCompany" applicable="locateCompany==false" >
+	<user text="I really needed a job and I saw your advertisement.  You office is near my place so I applied." 
+		  eval="agent.frustration=agent.frustration + .5;"/> 
+	<user text="The position your company advertised fits my skill set.  And your company has a mission that I am interested in."
+		  eval="agent.frustration=agent.frustration - .5; user.personality= user.personality ++ 'motivated';applyJob = true;"/> 
+	<user text="I found out about your company in the newspaper.  I looked up {company name} on the web.  I was impressed by your mission statement." 
+		  eval="agent.frustration=agent.frustration - .5; user.personality= user.personality ++ 'motivated'; applyJob = true"/>
+</agent>
+
+
+<agent id="ApplyJob" text="intro.whyApply" applicable="agent.personality=='DF' &amp;&amp; applyJob==false"  >
+	
+	<user text="I think I can do this job.  It's like my last one."
+		  eval="agent.frustration=agent.frustration + .5;"/>  
+	<user text="I am basically organized and hard working.  I learn fast. I can use those skills."/> 
+	<user text="My previous job as a {previousPosition} taught me skills I can use in this position."/> 
+</agent>
+
+<agent id="Essentialjobqualities" text="intro.essentialJobQualities">
+	<user text="I think that I will need to be efficient and well organized."
+		  eval="agent.frustration=agent.frustration + .5;">
+		<do task="Try2EssentialJobQualities" applicable="agent.frustration &lt;= 2"/>
+	</user>
+	<user text="Efficient, well organized, mission focused and ready to learn new skills."/> 
+	<user text="Being ready to learn whatever I can."/> 
+</agent>
+<agent id="Try2EssentialJobQualities" text="intro.try2qualities">
+	<user text="Be polite."
+		  eval="agent.frustration=agent.frustration + .5;"/>
+	<user text="Be willing to learn."/> 
+	<user text="Be willing to ask for help."/> 
+</agent>
+
+<agent id="GoodCandidate" text="intro.goodCandidate">
+	<user text="I am usually well organized and nice with people so I think I can perform well in
+             this job. In addition, I have experience of doing this type of job."
+		  eval="agent.frustration=agent.frustration + .5;"/>
+	<user text="I have learned the basic skill set for this job, and I want to learn more.  I can contribute 
+       	    to the company's goals because I'm a hard worker and get on with other people."/> 
+	<user text="I'm polite and hard working. My last job is similar to this one."
+		  eval="agent.frustration=agent.frustration + .5;"/>
+</agent>
+
+</model>
+
+
+
+

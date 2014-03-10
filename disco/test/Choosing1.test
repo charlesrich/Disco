@@ -1,0 +1,102 @@
+    # Dec 20, 2012 6:14:56 PM - TaskEngine 1.4.1 / Disco 1.6.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Choosing.xml
+  > task Top
+    User says "Let's achieve Top."
+    Agent says "Good morning."
+  > say
+[1] Good morning.
+  >> 1
+    User says "Good morning."
+    Agent says "Do you want to know the weather where one of your friends lives?"
+  > say
+[1] Yes.
+[2] No.
+  >> 1
+    User says "Yes."
+    Agent says "Which friend?"
+  > say
+[1] Joe.
+[2] Bill.
+[3] Suzie.
+[4] No more weather.
+  >> 1
+    User says "Joe."
+    Agent record choice of Joe.
+    Agent says "Do you want the short or the long version?"
+  > say
+[1] Short.
+[2] Long.
+  >> 1
+    User says "Short."
+    Agent says "The weather in Chicago is windy."
+  > say
+[1] More weather.
+[2] No more weather.
+  >> 1
+    User says "More weather."
+    Agent says "Which friend?"
+  > say
+[1] Joe.
+[2] Bill.
+[3] Suzie.
+[4] No more weather.
+  >> 2
+    User says "Bill."
+    Agent record choice of Bill.
+    Agent says "Do you want the short or the long version?"
+  > say
+[1] Short.
+[2] Long.
+  >> 2
+    User says "Long."
+    Agent says "The weather in Chicago is 50 degrees, wind 25 mph."
+  > say
+[1] More weather.
+[2] No more weather.
+  >> 2
+    User says "No more weather."
+    Agent says "Ok."
+  > history
+
+[Achieve Top] -accepted -done
+   User says "Let's achieve Top."
+   Agent says "Good morning."
+   [ ] -done
+      User says "Good morning."
+      [Achieve Weather] -optional -accepted -done
+         [User says let's achieve Weather]
+            Agent says "Do you want to know the weather where one of your friends lives?"
+            User says "Yes."
+         [Agent record choice of Joe] -done
+            [User says the SetChoice choice is Joe] -done
+               Agent says "Which friend?"
+               User says "Joe."
+            Agent record choice of Joe.
+         [ ] -done
+            Agent says "Do you want the short or the long version?"
+            [ ] -done
+               User says "Short."
+               Agent says "The weather in Chicago is windy."
+      [Achieve Weather] -optional -accepted -done
+         User says "More weather."
+         [Agent record choice of Bill] -done
+            [User says the SetChoice choice is Bill] -done
+               Agent says "Which friend?"
+               User says "Bill."
+            Agent record choice of Bill.
+         [ ] -done
+            Agent says "Do you want the short or the long version?"
+            [ ] -done
+               User says "Long."
+               Agent says "The weather in Chicago is 50 degrees, wind 25 mph."
+      [Achieve Weather] -optional -rejected <-focus
+         User says "No more weather."
+         Agent says "Ok."
+         [Agent record choice of a person]
+         [ ]
+      [Achieve Weather] -optional
+      [Achieve Weather] -optional
+
+  > quit
+    

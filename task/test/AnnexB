@@ -1,0 +1,4 @@
+load models/AnnexB.xml
+task playMusic
+status
+quit

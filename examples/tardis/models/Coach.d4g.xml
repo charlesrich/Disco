@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<model about="urn:fr.telecom-paristech:models:Coach"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- 
+
+       These are the coaching dialogs to go with InterviewTop and
+       Interview.  They are organized as toplevel goals, each
+       with an enabling precondition and an associated dialogue tree.
+       
+       NB: There must be a call to addTop in the <script> block below 
+       for each toplevel goal, and an 'eval' of resetTop for the first
+       step of each decomposition.
+
+  -->
+
+  <t:task id="CoachOpening">
+    <t:precondition> otherLastChosen('Opening', 'correctOpening') </t:precondition>
+
+    <t:subtasks id="coachOpeningSubtasks">
+      <t:step name="coach" task="CoachOpeningDialog"/>
+      <t:applicable> getUserEmotion() == 'happy' </t:applicable>    
+    </t:subtasks>
+
+    <t:subtasks id="coachAltOpeningSubtasks">
+      <t:step name="coach" task="CoachAltOpeningDialog"/>
+      <t:applicable> getUserEmotion() == 'sad' </t:applicable>
+    </t:subtasks>
+
+  </t:task>
+
+  <agent id="CoachOpeningDialog"
+         text="A better way to respond would be to say 'Good morning'.  It conveys respect. Ready to try again?"
+         eval="resetTop('CoachOpening', 'Opening')">
+    <user text="Sure!"/>
+  </agent>
+
+  <agent id="CoachAltOpeningDialog"
+	 text= "You seem a bit under the weather.  If you are nervous, don't be.  This is a chance to learn and get a job! Try again with good morning."
+         eval="resetTop('CoachOpening', 'Opening')">
+    <user text="Okay I will try that."/>
+  </agent>
+
+  <t:task id="CoachGreetInterviewee">
+    <t:precondition> chosen('GreetInterviewee') </t:precondition>
+
+    <t:subtasks id="coachGreetIntervieweeSubtasks1">
+       <t:step name="coach" task="CoachGreetIntervieweeDialog1"/>
+       <t:applicable> lastChosen('GreetInterviewee', 'hi') </t:applicable>
+     </t:subtasks>
+
+    <t:subtasks id="coachGreetIntervieweeSubtasks2">
+       <t:step name="coach" task="CoachGreetIntervieweeDialog2"/>
+       <t:applicable> lastChosen('GreetInterviewee', 'hey') </t:applicable>
+     </t:subtasks>
+  </t:task>
+
+  <agent id="CoachGreetIntervieweeDialog1"
+         text="You could respond by telling the interviewer your name.  Ready to try again?"
+         eval="resetTop('CoachGreetInterviewee', 'GreetInterviewee')">
+    <user text="Ok"/>
+  </agent>
+
+  <agent id="CoachGreetIntervieweeDialog2"
+         text="You could better respond with a greeting such as 'Hello' and your name. Ready to try again?"
+         eval="resetTop('CoachGreetInterviewee', 'GreetInterviewee')">         
+    <user text="Ok"/>
+  </agent>
+
+  <t:task id="CoachGetResume">
+    <t:precondition> lastChosen('GetResume', 'noResume') </t:precondition>
+    <t:subtasks id="coachGetResumeSubtasks">
+       <t:step name="coach" task="CoachGetResumeDialog"/>
+     </t:subtasks>
+  </t:task>
+
+  <agent id="CoachGetResumeDialog"
+         text="A resume tells your employer about your past experience, both your education and work experience if you have any.  You will need a resume for your employer.  After this game, you can create a resume with the ResumeHelper game. For now, start again and tell the interviewer that you did not bring one."
+         eval="resetTop('CoachGetResume', 'GetResume')">
+	<user text="Sure."/>
+  </agent>
+
+  <t:task id="CoachDiscussLearn" >
+    <t:precondition> lastChosen('DiscussLearn', 'nothing') </t:precondition>
+    <t:subtasks id="coachDiscussLearnSubtasks">
+       <t:step name="coach" task="CoachDiscussLearnDialog"/>
+    </t:subtasks>
+  </t:task>
+
+  <agent id="CoachDiscussLearnDialog"  
+	 text="Try to think of some skill that you could have developed at your job, like teamwork, or resistance to pressure. These are called 'transferable skills' and are very important. Even if your previous job wasn't exactly in the company field, you should be able to point out something that experience gave you"
+         eval="resetTop('CoachDiscussLearn', 'DiscussLearn')">
+    <user text="Sure"/>
+  </agent>
+
+  <t:task id="CoachClosing">
+    <t:precondition> chosen('Closing') </t:precondition>
+
+    <t:subtasks id="coachClosingSubtasks1">
+       <t:step name="coach" task="CoachClosingDialog1"/>
+       <t:applicable> lastChosen('Closing', 'justbye') </t:applicable>
+     </t:subtasks>
+
+   <t:subtasks id="coachClosingSubtasks2">
+     <t:step name="company" task="CoachClosingDialog2"/>
+     <t:applicable> lastChosen('Closing', 'nojob') </t:applicable>
+   </t:subtasks>
+  </t:task>
+  
+  <agent id="CoachClosingDialog1"
+         text="Try just saying thank you and good bye."
+         eval="resetTop('CoachClosing', 'Closing')">
+    <user text="Sure"/>
+  </agent>
+
+  <agent id="CoachClosingDialog2"
+	 text="Companies generally do not offer jobs at interviews.  They interview lots of candidates and pick the most qualified people. For now, please start again and just say thank you and good bye."
+         eval="resetTop('CoachClosing', 'Closing')">
+    <user text="That's fine."/>
+    <user text="Oh, so no job yet.">
+      <agent text="Right. But they may call you.">
+        <user text="I sure hope so." >
+          <agent text="For now, please start again and just say thank you and good bye for now."/>
+        </user>
+        <user text="Seems like a lot of work for nothing." >
+          <agent text="Start again and just say thank you and good bye for now."/>
+        </user>
+      </agent>
+    </user>
+    <user text="Oh, too bad. okay.">
+      <agent text="But they may choose you.  For now, just say thank you and good bye."/>
+    </user>
+  </agent>
+
+  <t:script init="true">
+
+    if ( ! ($disco.getInteraction() instanceof Packages.edu.wpi.disco.game.SingleInteraction
+            &amp;&amp; $disco.getInteraction().getNWay() instanceof
+                Packages.edu.wpi.disco.game.CoachedInteraction) )
+      println("WARNING: Task model must be run in CoachedInteraction!");
+    
+    // remove plugin that adds cancel items to menu
+    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin);
+    // remove plugin that will re-propose toplevel goals
+    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.TopsPlugin);
+    // remove plugin that asks about toplevel goals
+    $disco.removeAgentPlugin(Packages.edu.wpi.disco.plugin.AskShouldTopPlugin);
+
+    // get pointer to disco instance for interview
+    var $interview = $disco.getInteraction().getNWay().getActiveInteractions().get(0).getDisco();
+    if ( $interview == $disco || $interview == undefined )
+      println("WARNING: $interview not correctly defined. Check that Coach model loaded into proper configuration!");
+
+    // set pointer to coaching interaction in interview (for debugging)
+    // for example:   > eval $coaching.status()
+    $interview.setGlobal("$coaching", $disco);
+
+    function addTop (task) { $disco.addTop($disco.getTaskClass(task)); }
+
+    // must be after $interview is set
+    addTop("CoachOpening"); 
+    addTop("CoachGreetInterviewee");
+    addTop("CoachGetResume");
+    addTop("CoachDiscussLearn");
+    addTop("CoachClosing");
+
+    function resetTop (task, agent) {
+       $interview.getTaskClass(_tree(agent)).setLastDecomposition(null);
+       addTop(task);
+    }
+
+    function getUserEmotion () { return $interview.getGlobal("userEmotion"); }
+
+    // returns true iff user has responded to given in-focus agent id
+    function chosen (agent) { return _last(agent) != null; }
+
+    // returns true iff given user id is the last user
+    // choice made in response to given in-focus agent id
+    function lastChosen (agent, user) {
+       return _last(agent) == _subtasks(user);
+    }
+
+    // returns true iff *other* than given user id is the last user
+    // choice made in response to given in-focus agent id
+    function otherLastChosen (agent, user) {
+       var last = _last(agent);
+       return last != null &amp;&amp; last != _subtasks(user);
+    }
+
+    function _last (agent) {
+       var tree = _tree(agent);
+       var type = $interview.getTaskClass(tree);
+       var focus = $interview.getFocus();
+       if ( focus == null || focus.getGoal().getType() != type )
+          return null;
+       var decomp = type.getLastDecomposition();
+       return decomp == null ? null : decomp.getType().getId();
+    }
+
+    function _subtasks (user) { return "_"+user+"_subtasks"; }
+    function _tree (agent) { return "_"+agent+"_tree"; }
+
+  </t:script>
+</model>
+
+ 

@@ -1,0 +1,39 @@
+    # Apr 13, 2013 2:39:21 PM - TaskEngine 1.4.6 / Disco 1.6.7
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > next false
+  > task Default
+    User says "One of us should execute Default on 5.0."
+  > history
+
+[Execute Default on 5.0] -accepted -live <-focus
+   User says "One of us should execute Default on 5.0."
+
+  > eval $disco.getFocus().getGoal().setSlotValue("input1", 7)
+    # Returned '7.0'
+  > history
+
+[Execute Default on 7.0] -accepted -live <-focus
+   User says "One of us should execute Default on 5.0."
+
+  > next
+    Agent says "Who should execute Default on 7.0?"
+  > clear
+  > task Default
+    User says "One of us should execute Default on 5.0."
+  > eval $disco.getFocus().getGoal().setSlotValue("input1", 7)
+    # Returned '7.0'
+  > eval $disco.getFocus().getGoal().deleteSlotValue("input1")
+    # Returned 'null'
+  > history
+
+[Execute Default on 5.0] -accepted -live <-focus
+   User says "One of us should execute Default on 5.0."
+
+  > eval $disco.getFocus().getGoal().setSlotValue("input2", 9)
+    # Returned '9.0'
+  > next
+    Agent execute Default on 5.0 and 9.0.
+    Agent says "Ok."
+  > quit
+    

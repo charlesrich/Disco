@@ -1,0 +1,27 @@
+    # Jan 27, 2014 4:40:02 PM - TaskEngine 1.5.4 / Disco 1.7.5
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task BindingsValueTest
+    User says "Let's achieve BindingsValueTest."
+    Agent says "Setting test to 1."
+  > next
+1
+    Agent execute BindingsValue on 1.0.
+2
+    Agent execute BindingsValue on 2.0.
+3
+    Agent execute BindingsValue on 3.0.
+    Agent says "Ok."
+  > task BindingsValueTestSubtasks
+    User says "Let's achieve BindingsValueTestSubtasks."
+    Agent says "Setting test to 1."
+  > next
+1
+    Agent execute BindingsValue on 1.0.
+2
+    Agent execute BindingsValue on 2.0.
+3
+    Agent execute BindingsValue on 3.0.
+    Agent says "Yup."
+  > quit
+    

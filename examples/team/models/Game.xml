@@ -1,0 +1,58 @@
+<taskModel about="urn:disco.wpi.edu:examples:Game"
+           xmlns="http://ce.org/cea-2018">
+
+  <!-- This loads in real definitions for connecting
+       with the game API in C#.
+       See Dummy.xml
+  -->
+
+  <script init="true">
+
+    // grounding for primitive tasks
+
+    function say (who, text) {
+      // code goes here to make text appear in game
+    }
+
+    function shoot (who, target) {
+      // code goes here for shooting in game
+    }
+
+    function setDestination (who, destination) {
+      // code goes here puts character into path following state
+    }
+
+    function findCover (who) {
+      // code here puts character into cover-finding state
+    }
+
+    // locations
+
+    function getLocation (character) {
+      // code goes here to return Vector3
+    }
+
+    function setLocation (character, location) {
+      // code goes here to assign transform
+    }
+
+    function equalLocation (location1, location2) {
+      // do appropriate comparison in C# code
+    }
+
+    function getHealer () { 
+      // code goes here to return currently active healer character
+    }
+
+    /* Note the following accessors need to be implemented on Character object:
+
+         String toString()
+         UnitEngine.Vector3 getLocation()
+         void setLocation(UnityEngine.Vector3)
+         int getHealth()
+         boolean isInCover()
+    */
+
+  </script>
+
+</taskModel>

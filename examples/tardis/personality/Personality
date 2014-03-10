@@ -1,0 +1,11 @@
+  > load TellMe.xml
+  > load Personality1.xml
+  > task Top
+  > say
+  >> 
+  > load Personality2.xml
+  > clear
+  > task Top
+  > say
+  >> 
+  > quit

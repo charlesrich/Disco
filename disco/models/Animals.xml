@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Animals">
+   <task id="_talk">
+      <subtasks id="__talk_subtasks">
+         <step name="__talk_step" task="disco:Say"/>
+         <step name="__talk_ref" task="__talk_tree"/>
+         <binding slot="$__talk_step.text" value="&#34;Let's talk about animals&#34;"/>
+         <binding slot="$__talk_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="__talk_tree">
+      <subtasks id="_d4e5_subtasks">
+         <step name="_d4e5_step" task="disco:Say"/>
+         <applicable>mentioned == 'dog'</applicable>
+         <binding slot="$_d4e5_step.text" value="&#34;Dogs are man's best friend!&#34;"/>
+         <binding slot="$_d4e5_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e6_subtasks">
+         <step name="_d4e6_step" task="disco:Say"/>
+         <applicable>mentioned == 'cat'</applicable>
+         <binding slot="$_d4e6_step.text" value="&#34;I like cats, too.&#34;"/>
+         <binding slot="$_d4e6_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e7_subtasks">
+         <step name="_d4e7_step" task="disco:Say"/>
+         <applicable>mentioned == 'turtle'</applicable>
+         <binding slot="$_d4e7_step.text" value="&#34;My turtles always died.&#34;"/>
+         <binding slot="$_d4e7_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="_talk"/>
+         <applicable>animals.indexOf(mentioned) &lt; 0</applicable>
+      </subtasks>
+   </task>
+   <script init="true">
+
+    // these variables are placeholders for any part of the Java system state
+    // all of which can be accessed from JavaScript via LiveConnect
+    var animals = new Array('dog', 'cat', 'turtle');
+    var mentioned;
+
+  </script>
+</taskModel>

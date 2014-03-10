@@ -1,0 +1,28 @@
+    # Nov 10, 2011 10:51:24 PM - TaskEngine 1.1.2 / Disco 1.3.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Mixed.xml
+  > say
+[1] Let's start up.
+  >> 1
+    User says "Let's start up."
+    Agent says "Hi."
+  > say
+[1] Good morning.
+[2] Hi.
+  >> 1
+    User says "Good morning."
+    Agent says "Good to see you!"
+  > next
+Done
+    Agent execute PrintDone.
+    Agent says "Ok."
+  > status
+
+[Start up] -accepted -done <-focus
+   User says "Let's start up."
+   [Achieve Greetings] -done
+   Agent execute PrintDone.
+   Agent says "Ok."
+
+  > quit
+    

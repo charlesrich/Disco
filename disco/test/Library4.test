@@ -1,0 +1,83 @@
+    # May 19, 2010 10:14:38 PM - TaskEngine 0.9.6 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Library.xml
+  > say
+[1] Let's borrow a library book.
+  >> 1
+    User says "Let's borrow a library book."
+    Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+  > done
+    User go to the library.
+    Agent says "What book are you looking for?"
+  > done / / / new Book("Brin","The Uplift War")
+    User says "I am looking for The Uplift War."
+    Agent look The Uplift War up in the catalog.
+    Agent says "Who should use the search engine?"
+  > history
+
+[Borrow The Uplift War] -accepted -live
+   User says "Let's borrow a library book."
+   [User go to the library] -done
+      Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+      User go to the library.
+   [Choose The Uplift War using the catalog] -failed
+      [User says I am looking for The Uplift War] -done
+         Agent says "What book are you looking for?"
+         User says "I am looking for The Uplift War."
+      [Agent look The Uplift War up in the catalog] -failed
+         Agent look The Uplift War up in the catalog. -failed
+   [Choose The Uplift War using a search engine] -live
+      [Use the search engine] -live
+         [User says propose who should use the search engine] -live <-focus
+            [User accept] -live
+               Agent says "Who should use the search engine?"
+      [User take a book from a shelf]
+   [Check out a book]
+
+  > say
+[1] I should use the search engine.
+[2] You should use the search engine.
+[3] Let's not use the search engine.
+[4] Let's not choose The Uplift War.
+  >> 2
+    User says "You should use the search engine."
+    Agent says "What is the search query?"
+  > done / / / "Heinlein"
+    User says "The search query is Heinlein."
+    Agent use the search engine.
+    Agent says "Please take Stranger in a Strange Land from Shelf 1."
+  > done
+    User take Stranger in a Strange Land from Shelf 1.
+[Stranger in a Strange Land checked out!]
+    Agent check out Stranger in a Strange Land.
+    Agent says "That's it."
+  > history
+
+[Borrow The Uplift War] -accepted -done <-focus
+   User says "Let's borrow a library book."
+   [User go to the library] -done
+      Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+      User go to the library.
+   [Choose The Uplift War using the catalog] -failed
+      [User says I am looking for The Uplift War] -done
+         Agent says "What book are you looking for?"
+         User says "I am looking for The Uplift War."
+      [Agent look The Uplift War up in the catalog] -failed
+         Agent look The Uplift War up in the catalog. -failed
+   [Choose The Uplift War using a search engine] -done
+      [Agent use the search engine] -accepted -succeeded
+         [User says you should use the search engine] -done
+            Agent says "Who should use the search engine?"
+            User says "You should use the search engine."
+         [User says the search query is Heinlein] -done
+            Agent says "What is the search query?"
+            User says "The search query is Heinlein."
+         Agent use the search engine. -succeeded
+      [User take Stranger in a Strange Land from Shelf 1] -done
+         Agent says "Please take Stranger in a Strange Land from Shelf 1."
+         User take Stranger in a Strange Land from Shelf 1.
+   Agent check out Stranger in a Strange Land.
+   Agent says "That's it."
+
+  > quit
+    

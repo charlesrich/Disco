@@ -1,0 +1,34 @@
+<taskModel about="urn:cetask.wpi.edu:examples:TailRecursion" xmlns="http://ce.org/cea-2018">
+  <!-- adapted from example in Section 9.2 of the CEA-2018 standard -->
+  <task id="openDrawerHarder">
+    <input name="device" type="string"/>
+    <postcondition sufficient="true"> isDrawerOpen($this.device) </postcondition>
+    <subtasks id="harder">
+      <step name="open" task="openDrawer"/>	
+      <step name="off" task="powerOff"/>	
+      <step name="on" task="powerOn"/>	
+      <step name="again" task="openDrawerHarder"/>
+      <binding slot="$open.device" value="$this.device"/>
+      <binding slot="$off.device" value="$this.device"/>
+      <binding slot="$on.device" value="$this.device"/>
+      <binding slot="$open.external" value="true"/>
+      <binding slot="$off.external" value="true"/>	
+      <binding slot="$on.external" value="true"/>
+      <binding slot="$again.device" value="$this.device"/>
+    </subtasks>
+  </task>
+  <task id="openDrawer">
+    <input name="device" type="string"/>
+  </task>
+  <task id="powerOff">
+    <input name="device" type="string"/>
+  </task>
+  <task id="powerOn">
+    <input name="device" type="string"/>
+  </task>
+  <script init="true">
+    // for interactive testing in Guide
+    var OPEN = false;
+    function isDrawerOpen (d) { return OPEN; }
+  </script>
+</taskModel>

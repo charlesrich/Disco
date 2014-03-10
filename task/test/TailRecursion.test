@@ -1,0 +1,101 @@
+    # Nov 25, 2011 4:49:58 PM - TaskEngine 1.1.3 / Guide 0.9.6 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/TailRecursion.xml
+CE> task openDrawerHarder / "x"
+    Let's start to achieve openDrawerHarder on x.
+CE> next
+    Please execute openDrawer on x.
+CE> done
+    Ok.
+CE> status
+
+[Achieve openDrawerHarder on x] -live <-focus
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -live
+   [User execute powerOn on x]
+   [Achieve openDrawerHarder on x]
+      [User execute openDrawer on x]
+      [User execute powerOff on x]
+      [User execute powerOn on x]
+      [Achieve openDrawerHarder on x]
+
+CE> next
+    Please execute powerOff on x.
+CE> done
+    Ok.
+CE> next
+    Please execute powerOn on x.
+CE> done
+    Ok.
+CE> next
+    Please execute openDrawer on x.
+CE> done
+    Ok.
+CE> next
+    Please execute powerOff on x.
+CE> done
+    Ok.
+CE> next
+    Please execute powerOn on x.
+CE> done
+    Ok.
+CE> next
+    Please execute openDrawer on x.
+CE> done
+    Ok.
+CE> status
+
+[Achieve openDrawerHarder on x] -live
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -done
+   [User execute powerOn on x] -done
+   [Achieve openDrawerHarder on x] -live
+      [User execute openDrawer on x] -done
+      [User execute powerOff on x] -done
+      [User execute powerOn on x] -done
+      [Achieve openDrawerHarder on x] -live <-focus
+         [User execute openDrawer on x] -done
+         [User execute powerOff on x] -live
+         [User execute powerOn on x]
+         [Achieve openDrawerHarder on x]
+            [User execute openDrawer on x]
+            [User execute powerOff on x]
+            [User execute powerOn on x]
+            [Achieve openDrawerHarder on x]
+
+CE> next
+    Please execute powerOff on x.
+CE> done
+    Ok.
+CE> next
+    Please execute powerOn on x.
+CE> done
+    Ok.
+CE> eval OPEN = true;
+    # Returned 'true'
+CE> next
+    Completed achieve openDrawerHarder on x.
+    We have not finished achieve openDrawerHarder on x.
+    I don't know what we're doing.
+CE> status
+
+[Achieve openDrawerHarder on x] -succeeded
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -done
+   [User execute powerOn on x] -done
+   [Achieve openDrawerHarder on x]
+      [User execute openDrawer on x] -done
+      [User execute powerOff on x] -done
+      [User execute powerOn on x] -done
+      [Achieve openDrawerHarder on x]
+         [User execute openDrawer on x] -done
+         [User execute powerOff on x] -done
+         [User execute powerOn on x] -done
+         [Achieve openDrawerHarder on x]
+            [User execute openDrawer on x]
+            [User execute powerOff on x]
+            [User execute powerOn on x]
+            [Achieve openDrawerHarder on x]
+
+CE> quit
+    Goodbye.

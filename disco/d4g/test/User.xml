@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           xmlns:test="Test"
+           about="urn:secrets.wpi.edu:models:test:D4g1">
+   <task id="_d4e2">
+      <subtasks id="_d4e2_subtasks">
+         <step name="_d4e2_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e3_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e4_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e5_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e6_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e7_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e2_step.text" value="&#34;1&#34;"/>
+         <binding slot="$_d4e3_step.text" value="&#34;2&#34;"/>
+         <binding slot="$_d4e3_step.external" value="true"/>
+         <binding slot="$_d4e4_step.text" value="&#34;2.5&#34;"/>
+         <binding slot="$_d4e4_step.external" value="true"/>
+         <binding slot="$_d4e5_step.text" value="&#34;3&#34;"/>
+         <binding slot="$_d4e5_step.external" value="false"/>
+         <binding slot="$_d4e6_step.text" value="&#34;3.5&#34;"/>
+         <binding slot="$_d4e6_step.external" value="false"/>
+         <binding slot="$_d4e7_step.text" value="&#34;3.75&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e8">
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e8_step.text" value="&#34;4&#34;"/>
+         <binding slot="$_d4e8_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e9">
+      <subtasks id="_d4e9_subtasks">
+         <step name="_d4e9_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e9_step.text" value="&#34;5&#34;"/>
+         <binding slot="$_d4e9_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="id6">
+      <subtasks id="_id6_subtasks">
+         <step name="_id6_step" task="disco:edu.wpi.disco.lang.Say$Expression"/>
+         <step name="_id6_ref" task="_id6_tree"/>
+         <binding slot="$_id6_step.text" value="&#34;(6)&#34;"/>
+         <binding slot="$_id6_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e13">
+      <subtasks id="_d4e13_subtasks">
+         <step name="_d4e13_step" task="a"/>
+         <step name="_d4e14_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e15_step" task="c"/>
+         <step name="_d4e16_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e17_step" task="e"/>
+         <binding slot="$_d4e14_step.text" value="&#34;b&#34;"/>
+         <binding slot="$_d4e14_step.external" value="true"/>
+         <binding slot="$_d4e16_step.text" value="&#34;d&#34;"/>
+         <binding slot="$_d4e16_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e18">
+      <subtasks id="_d4e18_subtasks">
+         <step name="_d4e18_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e19_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e18_step.text" value="&#34;i&#34;"/>
+         <binding slot="$_d4e18_step.external" value="false"/>
+         <binding slot="$_d4e19_step.text" value="&#34;ii&#34;"/>
+         <binding slot="$_d4e19_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e20">
+      <subtasks id="_d4e20_subtasks">
+         <step name="_d4e20_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e20_ref" task="_d4e20_tree"/>
+         <binding slot="$_d4e20_step.text" value="&#34;one&#34;"/>
+         <binding slot="$_d4e20_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e29">
+      <subtasks id="_d4e29_subtasks">
+         <step name="_d4e29_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e29_step.text" value="&#34;play&#34;"/>
+         <binding slot="$_d4e29_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e30">
+      <subtasks id="_d4e30_subtasks">
+         <step name="_d4e30_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e30_step.text" value="&#34;play&#34;"/>
+         <binding slot="$_d4e30_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e31">
+      <subtasks id="_d4e31_subtasks">
+         <step name="_d4e31_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e31_step.text" value="&#34;side&#34;"/>
+         <binding slot="$_d4e31_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e32">
+      <subtasks id="_d4e32_subtasks">
+         <step name="_d4e32_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e32_step.text" value="&#34;side&#34;"/>
+         <binding slot="$_d4e32_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="ref1">
+      <subtasks id="_ref1_subtasks">
+         <step name="_ref1_step" task="_ref2_tree"/>
+         <binding slot="$_ref1_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="ref2">
+      <subtasks id="_ref2_subtasks">
+         <step name="_ref2_step" task="_id7_tree"/>
+         <step name="_ref2_ref" task="_ref2_tree"/>
+         <binding slot="$_ref2_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e37">
+      <subtasks id="_d4e37_subtasks">
+         <step name="_d4e37_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e38_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e39_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e40_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e37_step.text" value="&#34;uno&#34;"/>
+         <binding slot="$_d4e37_step.eval" value="&#34;unoeval&#34;"/>
+         <binding slot="$_d4e37_step.external" value="true"/>
+         <binding slot="$_d4e38_step.text" value="&#34;dos&#34;"/>
+         <binding slot="$_d4e38_step.eval" value="&#34;doseval&#34;"/>
+         <binding slot="$_d4e38_step.external" value="true"/>
+         <binding slot="$_d4e39_step.text" value="&#34;tres&#34;"/>
+         <binding slot="$_d4e39_step.eval" value="&#34;treseval&#34;"/>
+         <binding slot="$_d4e39_step.external" value="true"/>
+         <binding slot="$_d4e40_step.text" value="&#34;quatro&#34;"/>
+         <binding slot="$_d4e40_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e41">
+      <subtasks id="_d4e41_subtasks">
+         <step name="_d4e41_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e42_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e43_step" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+         <step name="_d4e44_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e41_step.text" value="&#34;unus&#34;"/>
+         <binding slot="$_d4e41_step.eval" value="&#34;unuseval&#34;"/>
+         <binding slot="$_d4e41_step.external" value="false"/>
+         <binding slot="$_d4e42_step.text" value="&#34;duo&#34;"/>
+         <binding slot="$_d4e42_step.eval" value="&#34;duoeval&#34;"/>
+         <binding slot="$_d4e42_step.external" value="false"/>
+         <binding slot="$_d4e43_step.text" value="&#34;tres&#34;"/>
+         <binding slot="$_d4e43_step.eval" value="&#34;treseval&#34;"/>
+         <binding slot="$_d4e43_step.external" value="false"/>
+         <binding slot="$_d4e44_step.text" value="&#34;quartuor&#34;"/>
+         <binding slot="$_d4e44_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_id6_tree">
+      <subtasks id="_id7_subtasks">
+         <step name="_id7_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_id7_ref" task="_id7_tree"/>
+         <binding slot="$_id7_step.text" value="&#34;7&#34;"/>
+         <binding slot="$_id7_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_id7_tree">
+      <subtasks id="_id8_subtasks">
+         <step name="_id8_step" task="disco:edu.wpi.disco.lang.Say$Expression$Eval"/>
+         <binding slot="$_id8_step.text" value="&#34;\&#34;number\&#34;+(8)+\&#34;rebmun\&#34;&#34;"/>
+         <binding slot="$_id8_step.eval" value="&#34;6eval&#34;"/>
+         <binding slot="$_id8_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e20_tree">
+      <subtasks id="_d4e21_subtasks">
+         <step name="_d4e21_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e21_step.text" value="&#34;two&#34;"/>
+         <binding slot="$_d4e21_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e22_subtasks">
+         <step name="_d4e22_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e22_ref" task="_d4e22_tree"/>
+         <binding slot="$_d4e22_step.text" value="&#34;three&#34;"/>
+         <binding slot="$_d4e22_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e22_tree">
+      <subtasks id="_d4e23_subtasks">
+         <step name="_d4e23_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e23_ref" task="_d4e23_tree"/>
+         <binding slot="$_d4e23_step.text" value="&#34;four&#34;"/>
+         <binding slot="$_d4e23_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e28_subtasks">
+         <step name="_d4e28_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e28_step.text" value="&#34;nine&#34;"/>
+         <binding slot="$_d4e28_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e23_tree">
+      <subtasks id="_d4e24_subtasks">
+         <step name="_d4e24_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e24_step.text" value="&#34;five&#34;"/>
+         <binding slot="$_d4e24_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e25_subtasks">
+         <step name="_d4e25_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e25_ref" task="_d4e25_tree"/>
+         <binding slot="$_d4e25_step.text" value="&#34;six&#34;"/>
+         <binding slot="$_d4e25_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e25_tree">
+      <subtasks id="_d4e26_subtasks">
+         <step name="_d4e26_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e26_step.text" value="&#34;seven&#34;"/>
+         <binding slot="$_d4e26_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e27_subtasks">
+         <step name="_d4e27_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e27_step.text" value="&#34;eight&#34;"/>
+         <binding slot="$_d4e27_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_ref2_tree">
+      <subtasks id="_d4e36_subtasks">
+         <step name="_d4e36_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e36_step.text" value="&#34;text&#34;"/>
+         <binding slot="$_d4e36_step.external" value="false"/>
+      </subtasks>
+   </task>
+</taskModel>

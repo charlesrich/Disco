@@ -1,0 +1,52 @@
+<taskModel about="urn:disco.wpi.edu:DiscoUnity:MyDummy"
+           xmlns="http://ce.org/cea-2018">
+
+  <!-- This loads in dummy definitions for game API for use in model development
+       and testing of MyModel.d4g.xml outside of Unity.
+  -->
+
+  <script init="true">
+
+    // dummy class for UnityEngine
+
+    var UnityEngine = {
+        Vector3 : function (x, y, z) {  
+                     this.x = x;
+                     this.y = y;
+                     this.z = z; }
+    }
+
+    UnityEngine.Vector3.prototype.toString = 
+       // make printing consistent with Unity
+       function () { return "("+this.x.toFixed(1)+", "+this.y.toFixed(1)+", "
+                               +this.z.toFixed(1)+")"; }
+
+    // dummy for My.Game class
+
+    var My = { Game : {
+
+        PLAYER : MyEntity("MyPlayer", 0, 0, 0),
+        NPC : MyEntity("MyNPC", 0, 0, 20),
+        GREEN_CUBE : MyEntity("GreenCube", 0, 0, 200),
+        RED_CUBE : MyEntity("RedCube", 200, 0, 0),
+
+        ToString : function (entity) { return entity.myName; }
+    }}
+
+    function MyEntity (name, x, y, z) { 
+       return { 
+          myName : name,
+          myPosition : new UnityEngine.Vector3(x, y, z),
+          gameObject : { transform : { position : new UnityEngine.Vector3(x, y, z) }}
+       };
+    }
+
+    // For convenience to simulate movement in Disco shell using eval command
+
+    function setPosition (entity, to) {
+        entity.myPosition = getPosition(to);
+    }
+
+  </script>
+
+</taskModel>

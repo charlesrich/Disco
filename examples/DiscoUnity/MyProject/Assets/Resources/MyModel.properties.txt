@@ -1,0 +1,42 @@
+# Properties to accompany MyModel.d4g.xml
+
+# following required to make system wait and not ask
+
+Wait@authorized = false
+Wait@internal = true
+WaitForPlayer@authorized = false
+WaitForPlayer@internal = true
+
+# prevents spurious ok's in menu
+interaction@ok = false
+
+# following optional to make output look same as in game
+
+agent@name = NPC
+user@name = player
+
+# following optional to suppress menu items to cancel goals
+
+Propose.ShouldNot(MyTop)@generate = false
+Propose.ShouldNot(GoTo)@generate = false
+Propose.ShouldNot(SetDestination)@generate = false
+
+# following to suppress asking to continue rendezvous after 
+# Knock rejected
+
+Ask.Should(MyTop)@generate = false
+
+# following to override default heuristic for Propose.Stop's
+Propose.Stop(Knock)@generate = true
+
+# following optional to make Disco history nicer to read
+
+MyTop@format = rendezvous
+GoTo@format = go to %s
+GoTo.destination@indefinite = a destination
+SetDestination.destination@definite = the destination
+SetDestination@format = start toward %s
+Wait@format = wait
+WaitForPlayer@format = wait for player
+Knock@format = play knock-knock
+Propose.Stop(Knock)@format = I hate this stupid game!

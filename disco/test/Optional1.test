@@ -1,0 +1,43 @@
+    # Jun 8, 2011 7:17:24 PM - TaskEngine 1.1 / Disco 1.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task A
+    User says "Let's achieve A."
+    Agent says "Do you want to do B?"
+  > done
+    User says "One of us should execute B."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Should one of us execute D?"
+  > next
+    Agent says "Should one of us execute D?"
+  > next
+    Agent says "Should one of us execute D?"
+  > done
+    User says "One of us should execute D."
+    Agent execute D.
+    Agent says "Ok."
+  > next
+    Agent says "Yup."
+  > history
+
+[Achieve A] -accepted -done
+   User says "Let's achieve A."
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B] -done
+         Agent says "Do you want to do B?"
+         User says "One of us should execute B."
+      Agent execute B.
+   Agent execute C.
+   [Agent execute D] -optional -accepted -done <-focus
+      [User says please execute D] -done
+         Agent says "Should one of us execute D?"
+         Agent says "Should one of us execute D?"
+         Agent says "Should one of us execute D?"
+         User says "One of us should execute D."
+      Agent execute D.
+      Agent says "Ok."
+      Agent says "Yup."
+
+  > quit
+    

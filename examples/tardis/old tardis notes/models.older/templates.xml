@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<model about="urn:fr.telecom-paristech:models:NameOfModelFileHere"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+      <!--
+	  
+      -->
+
+  <t:task id=" ">
+    <t:output name=" " type="string"/>
+
+    <t:subtasks id=" ">
+      <t:step name=" " task=" "/>
+      <t:step name=" " task=" "/>
+      <t:step name=" " task=" "/>
+      <t:step name=" " task=" " />
+
+
+      <t:binding slot="$this.yyy" value=" "/>
+
+    </t:subtasks>
+  </t:task>
+
+ <t:script init="true"> var foo; var bing; </t:script>
+
+<agent id="_ " text=" ">
+    <user id="THING" text=" ">
+      <agent text=".">
+	<user text="">
+	  <do task="_" />
+	</user>
+      </agent>
+    </user>
+    <user text=" ">
+    </user>
+    <user text=" ">
+      <agent ref="THING"/>
+    </user>
+    <user text=" ">
+      <agent ref="THING"/>
+    </user>
+  </agent>
+
+
+  <agent id="_e"  text="">
+    <user text=" {foo } ">
+      <agent text=" "/>
+    </user>
+  </agent>
+
+  <task id="Lift">
+    <input name="x" type="hoist"/>
+    <input name="y" type="crate"/>
+    <input name="z" type="surface"/>
+    <input name="p" type="place"/>
+    <precondition> 
+      at($this.x, $this.p) &amp;&amp; available($this.x) &amp;&amp; 
+      at($this.y, $this.p) &amp;&amp; on($this.y, $this.z) &amp;&amp;
+      clear($this.y)
+    </precondition>
+    <postcondition> 
+      !at($this.y, $this.p) &amp;&amp; lifting($this.x, $this.y) &amp;&amp;
+      !clear($this.y) &amp;&amp; !available($this.x) &amp;&amp;
+      clear($this.z) &amp;&amp; !on($this.y, $this.z)
+    </postcondition>
+  </task>
+
+<agent id="_Greetings" text="Hi">
+    <user text="Good morning" 
+	  applicable="getHours() &gt;= 4 &amp;&amp; getHours() &lt; 12">
+      <do task="_Response"/>
+    </user>
+</agent>

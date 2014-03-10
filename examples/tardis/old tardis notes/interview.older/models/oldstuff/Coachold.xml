@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:fr.telecom-paristech:models:Coach">
+   <task id="CoachOpeningDialog">
+      <subtasks id="_CoachOpeningDialog_subtasks">
+         <step name="_CoachOpeningDialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachOpeningDialog_ref" task="_CoachOpeningDialog_tree"/>
+         <binding slot="$_CoachOpeningDialog_step.text"
+                  value="&#34;A better way to respond would be to say 'Good morning'.  It conveys respect. Ready to try again?&#34;"/>
+         <binding slot="$_CoachOpeningDialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachAltOpeningDialog">
+      <subtasks id="_CoachAltOpeningDialog_subtasks">
+         <step name="_CoachAltOpeningDialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachAltOpeningDialog_ref" task="_CoachAltOpeningDialog_tree"/>
+         <binding slot="$_CoachAltOpeningDialog_step.text"
+                  value="&#34;You seem a bit under the weather.  If you are nervous, don't be.  This is a chance to learn and get a job! Try again with good morning.&#34;"/>
+         <binding slot="$_CoachAltOpeningDialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachGreeting1Dialog">
+      <subtasks id="_CoachGreeting1Dialog_subtasks">
+         <step name="_CoachGreeting1Dialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachGreeting1Dialog_ref" task="_CoachGreeting1Dialog_tree"/>
+         <binding slot="$_CoachGreeting1Dialog_step.text"
+                  value="&#34;You could respond by telling the interviewer your name.  Ready to try again?&#34;"/>
+         <binding slot="$_CoachGreeting1Dialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachGreeting2Dialog">
+      <subtasks id="_CoachGreeting2Dialog_subtasks">
+         <step name="_CoachGreeting2Dialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachGreeting2Dialog_ref" task="_CoachGreeting2Dialog_tree"/>
+         <binding slot="$_CoachGreeting2Dialog_step.text"
+                  value="&#34;You could better respond with a greeting such as 'Hello' and your name. Ready to try again?&#34;"/>
+         <binding slot="$_CoachGreeting2Dialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachResumeDialog">
+      <subtasks id="_CoachResumeDialog_subtasks">
+         <step name="_CoachResumeDialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachResumeDialog_ref" task="_CoachResumeDialog_tree"/>
+         <binding slot="$_CoachResumeDialog_step.text"
+                  value="&#34;A resume tells your employer about your past experience, both your education and work experience if you have any.  You will need a resume for your employer.&#34;"/>
+         <binding slot="$_CoachResumeDialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachClosingDialog">
+      <subtasks id="_CoachClosingDialog_subtasks">
+         <step name="_CoachClosingDialog_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachClosingDialog_ref" task="_CoachClosingDialog_tree"/>
+         <binding slot="$_CoachClosingDialog_step.text"
+                  value="&#34;Try just saying thank you and good bye.&#34;"/>
+         <binding slot="$_CoachClosingDialog_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachExplainsCompanies">
+      <subtasks id="_CoachExplainsCompanies_subtasks">
+         <step name="_CoachExplainsCompanies_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_CoachExplainsCompanies_ref" task="_CoachExplainsCompanies_tree"/>
+         <binding slot="$_CoachExplainsCompanies_step.text"
+                  value="&#34;Companies generally do not offer jobs at interviews.  They interview lots of candidates and pick the most qualified people.&#34;"/>
+         <binding slot="$_CoachExplainsCompanies_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_CoachOpeningDialog_tree">
+      <subtasks id="_d4e13_subtasks">
+         <step name="_d4e13_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e13_step.text" value="&#34;Sure!&#34;"/>
+         <binding slot="$_d4e13_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e14_subtasks">
+         <step name="_d4e14_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e14_step.text" value="&#34;okay, I'll try again.&#34;"/>
+         <binding slot="$_d4e14_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachAltOpeningDialog_tree">
+      <subtasks id="_d4e16_subtasks">
+         <step name="_d4e16_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e16_step.text" value="&#34;Okay I will try that.&#34;"/>
+         <binding slot="$_d4e16_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachGreeting1Dialog_tree">
+      <subtasks id="_d4e23_subtasks">
+         <step name="_d4e23_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e23_step.text" value="&#34;Ok&#34;"/>
+         <binding slot="$_d4e23_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachGreeting2Dialog_tree">
+      <subtasks id="_d4e30_subtasks">
+         <step name="_d4e30_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e30_step.text" value="&#34;Ok&#34;"/>
+         <binding slot="$_d4e30_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachResumeDialog_tree">
+      <subtasks id="_d4e37_subtasks">
+         <step name="_d4e37_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e38_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e39_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e37_step.text" value="&#34;uh-huh&#34;"/>
+         <binding slot="$_d4e37_step.external" value="true"/>
+         <binding slot="$_d4e38_step.text"
+                  value="&#34;After this game, you can create a resume with the ResumeHelper game. For now, start again and tell the interviewer that you did not bring one.&#34;"/>
+         <binding slot="$_d4e38_step.external" value="false"/>
+         <binding slot="$_d4e39_step.text" value="&#34;Sure.&#34;"/>
+         <binding slot="$_d4e39_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachClosingDialog_tree">
+      <subtasks id="_d4e47_subtasks">
+         <step name="_d4e47_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e47_step.text" value="&#34;Sure&#34;"/>
+         <binding slot="$_d4e47_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_CoachExplainsCompanies_tree">
+      <subtasks id="_d4e54_subtasks">
+         <step name="_d4e54_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_maycall_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_maycall_ref" task="_maycall_tree"/>
+         <binding slot="$_d4e54_step.text" value="&#34;oh, so no job yet.&#34;"/>
+         <binding slot="$_d4e54_step.external" value="true"/>
+         <binding slot="$_maycall_step.text" value="&#34;Right. But they may call you.&#34;"/>
+         <binding slot="$_maycall_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e60_subtasks">
+         <step name="_d4e60_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_maychoose_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e60_step.text" value="&#34;oh, too bad. okay.&#34;"/>
+         <binding slot="$_d4e60_step.external" value="true"/>
+         <binding slot="$_maychoose_step.text"
+                  value="&#34;But they may choose you.  For now, just say thank you and good bye.&#34;"/>
+         <binding slot="$_maychoose_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_maycall_tree">
+      <subtasks id="_d4e56_subtasks">
+         <step name="_d4e56_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_d4e57_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e56_step.text" value="&#34;I sure hope so.&#34;"/>
+         <binding slot="$_d4e56_step.external" value="true"/>
+         <binding slot="$_d4e57_step.text"
+                  value="&#34;For now, please start again and just say thank you and good bye for now.&#34;"/>
+         <binding slot="$_d4e57_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e58_subtasks">
+         <step name="_d4e58_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <step name="_justthanks_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_d4e58_step.text" value="&#34;Seems like a lot of work for nothing.&#34;"/>
+         <binding slot="$_d4e58_step.external" value="true"/>
+         <binding slot="$_justthanks_step.text"
+                  value="&#34;Start again and just say thank you and good bye for now.&#34;"/>
+         <binding slot="$_justthanks_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="CoachOpening">
+      <precondition> isOtherChosen('correctOpening', 'Opening') </precondition>
+      <subtasks id="coachOpeningSubtasks">
+         <step name="coach" task="CoachOpeningDialog"/>
+      </subtasks>
+      <subtasks id="coachAltOpeningSubtasks">
+         <step name="coachalt" task="CoachAltOpeningDialog"/>
+      </subtasks>
+   </task>
+   <task id="CoachGreeting1">
+      <precondition> isChosen('hi', 'GreetInterviewee') </precondition>
+      <subtasks id="coachGreeting1Subtasks">
+         <step name="coach" task="CoachGreeting1Dialog"/>
+      </subtasks>
+   </task>
+   <task id="CoachGreeting2">
+      <precondition> isChosen('hey', 'GreetInterviewee') </precondition>
+      <subtasks id="coachGreeting2Subtasks">
+         <step name="coach" task="CoachGreeting2Dialog"/>
+      </subtasks>
+   </task>
+   <task id="CoachResume">
+      <precondition> isChosen('noResume', 'GetResume') </precondition>
+      <subtasks id="coachResumeSubtasks">
+         <step name="coach" task="CoachResumeDialog"/>
+      </subtasks>
+   </task>
+   <task id="CoachClosing">
+      <precondition> isChosen('justbye', 'Closing') </precondition>
+      <subtasks id="coachClosingSubtasks">
+         <step name="coach" task="CoachClosingDialog"/>
+      </subtasks>
+   </task>
+   <task id="CoachCompanies">
+      <precondition> isChosen('nojob', 'Closing') </precondition>
+      <subtasks id="coachCompanies">
+         <step name="coach" task="CoachExplainsCompanies"/>
+      </subtasks>
+   </task>
+   <script init="true">
+    var useremotion;
+    useremotion="sad";
+    // add coaching toplevel goals
+    // TODO: Once each of these has run, it does not run again
+
+    function addTop (task) { $disco.addTop($disco.getTaskClass(task)); }
+    addTop("CoachOpening"); 
+    addTop("CoachGreeting1");
+    addTop("CoachGreeting2");
+    addTop("CoachResume");
+    addTop("CoachCompanies");
+    addTop("CoachClosing");
+    
+    // remove plugin that adds cancel items to menu
+    $disco.removePlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin);
+    // remove plugin that will re-propose toplevel goals
+    $disco.removePlugin(Packages.edu.wpi.disco.plugin.TopsPlugin);
+
+    // get pointer for disco instance for interview
+    var $interview = $disco.getInteraction().getNWay().getActiveInteractions().get(1).getDisco();
+    if ( $interview == $disco || $interview == undefined )
+      println("WARNING: $interview not correctly defined. Check that Coach model loaded into proper configuration!");
+
+    // TODO: These utility functions should eventually be moved into Java for speed
+
+    // returns true iff given decomposition id chosen
+    function isChosen (decomp) {
+       return _chosen(decomp, null); 
+    }
+
+    // returns true iff a decomposition other than given id
+    // has been chosen for same task class
+    // TODO: task id can be removed by computing it from decomp
+    function isOtherChosen (decomp, task) {
+       return _chosen(decomp, "_"+task+"_tree"); 
+    }
+
+    function _chosen (decomp, task) {
+       if ( $interview == undefined ) return false; // for initialization
+       var focus = $interview.getFocus();
+       return focus != null &amp;&amp;
+              _checkDecomp(getRoot(focus), task, "_"+decomp+"_subtasks");
+    }
+
+    function _checkDecomp (plan, task, decomp) {
+       var planDecomp = plan.getDecompositionClass();
+       // TODO: check namespaces
+       if ( planDecomp != null ) {
+          if ( planDecomp.getId() == decomp ) {
+             if ( task == null ) return true;  
+          } else {
+             if ( plan.getGoal().getType().getId() == task )
+                return true;
+          }
+       }
+       var children = plan.children();
+       while (children.hasNext()) {
+         if ( _checkDecomp(children.next(), task, decomp) ) return true;
+       }
+       return false;
+    }
+
+    function getRoot (plan) {
+      var parent = plan.getParent();
+      return parent == null ? plan : getRoot(parent);
+    }
+
+  </script>
+</taskModel>

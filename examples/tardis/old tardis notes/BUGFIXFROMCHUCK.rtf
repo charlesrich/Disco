@@ -1,0 +1,56 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\ql\qnatural
+
+\f0\fs24 \cf0 Copying from the shell is fine.\'a0 However, you can always find the log file in the place announced at the start of every run, e.g.,\
+\
+\'a0\'a0\'a0 # Writing log to /tmp/GameConsole.test...\
+\
+That's the file you can copy to the test folder and rename as Bug.test.\'a0\'a0 To get the corresponding Bug (no extension) file, which contains only what *you* typed, you remove all the lines that do not include a >.\'a0 In Emacs you can do this easily by C-x H, M-x keep-linesCR>CR , where CR is a carriage return.\'a0 \
+\
+Your problem is that you did not load Coach.xml into the correct Disco instance.\'a0 If you notice at the start of CoachedInterview.test:\
+\
+player&sidekick\'a0 > source test/Interview.base\
+player&sidekick\'a0 > load models/Interview.xml\
+player&sidekick\'a0 > load models/InterviewTop.xml\
+player&sidekick\'a0 > next\
+interviewee&coach\'a0 > load models/Coach.xml\
+\
+whereas in your file:\
+\
+player&sidekick\'a0 > load models/Interview.xml\
+player&sidekick\'a0 > load models/InterviewTop.xml\
+player&sidekick\'a0 > load models/Coach.xml\
+\
+You are loading Coach.xml into the same Disco instance that the interviewer uses.\'a0\'a0 You are missing the 'next' above.\'a0 I am sorry if I made you think that 'next' doesn't matter.\'a0 You *do* need to pay attention to which Disco instance you are looking at, which is indicated in the prompt.\
+\
+However, there is also another problem, which is my fault not to have documented well.\'a0 At the start of Coach.d4g.xml, please *delete* the following obsolete comment:\
+\
+\'a0\'a0\'a0\'a0\'a0\'a0 See authorized keys in Coach.properties, which allow the toplevel\
+\'a0\'a0\'a0\'a0\'a0\'a0 goals to be stared without permission from user.\
+\
+And replace it with:\
+\
+\'a0\'a0\'a0\'a0\'a0\'a0 NB: There must be a call to addTop in the <script> block below for each toplevel goal.\
+\
+And add\
+\'a0 \
+\'a0\'a0\'a0\'a0\'a0 \'a0\'a0\'a0 addTop("CoachClosing");\
+\
+Also, I think your logic is wrong in the precondition for CoachClosing.\'a0\'a0\'a0 I think you mean to use isChosen, not isOtherChosen.\
+\
+Don't forget to recompile using d4g2018.\
+\
+It should work fine then, according to my testing.\
+\
+Oh, and delete models/Coach.properties.\'a0 It is obsolete.\
+\
+So in conclusion, this is still a research tool to be used only by well-trained professionals :-).\
+\
+-CR\
+\
+P.S. The interview folder is completely self-contained.\'a0 For example, you can leave a copy of that for Catherine and she does *not* also need a full Disco release.\
+}

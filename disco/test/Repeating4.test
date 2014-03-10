@@ -1,0 +1,82 @@
+    # Mar 31, 2013 3:55:31 PM - TaskEngine 1.4.4 / Disco 1.6.5
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task RepeatingMinMax
+    User says "Let's achieve RepeatingMinMax."
+    Agent execute B.
+    Agent execute B.
+    Agent says "Do you want to do B again?"
+  > history
+
+[Achieve RepeatingMinMax] -accepted -live
+   User says "Let's achieve RepeatingMinMax."
+   Agent execute B.
+   Agent execute B.
+   [Execute B] -optional -live
+      [User says one of us should execute B again] -live <-focus
+         [User accept] -live
+            Agent says "Do you want to do B again?"
+   [Execute C] -live
+   [Execute B] -optional
+   [Execute C]
+   [Execute C]
+
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve RepeatingMinMax.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent says "Do you want to do B again?"
+  > history
+
+[Achieve RepeatingMinMax] -accepted -live
+   User says "Let's achieve RepeatingMinMax."
+   Agent execute B.
+   Agent execute B.
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B again] -succeeded
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+      Agent execute B.
+   [Execute B] -optional -live
+      [User says one of us should execute B again] -live <-focus
+         [User accept] -live
+            Agent says "Do you want to do B again?"
+   [Execute C] -live
+   [Execute C]
+   [Execute C]
+
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve RepeatingMinMax.
+  >> 2
+    User says "No."
+    Agent execute C.
+    Agent execute C.
+    Agent execute C.
+    Agent says "Ok."
+  > history
+
+[Achieve RepeatingMinMax] -accepted -done <-focus
+   User says "Let's achieve RepeatingMinMax."
+   Agent execute B.
+   Agent execute B.
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B again] -succeeded
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+      Agent execute B.
+   [Execute B] -optional -rejected
+      [User says one of us should execute B again]
+         Agent says "Do you want to do B again?"
+         User says "No."
+   Agent execute C.
+   Agent execute C.
+   Agent execute C.
+   Agent says "Ok."
+
+  > quit
+    

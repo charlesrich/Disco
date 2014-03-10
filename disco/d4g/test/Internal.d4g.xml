@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:disco.wpi.edu:d4g:test:Internal"
+         xmlns="http://www.cs.wpi.edu/~rich/d4g"
+         xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- fixing bug wherein underscore nodes lose inputs and other elements -->
+  <t:task id="_Internal1">
+    <t:input name="input" type="string"/>
+    <t:output name="output" type="string"/>
+    <t:precondition> test </t:precondition>
+    <t:postcondition> test </t:postcondition>
+    <t:subtasks id="testSubtask">
+      <t:step name="test" task="_Internal2"/>
+      <t:applicable> test </t:applicable>
+      <t:binding slot="$test.input" value="'test'"/>
+    </t:subtasks>
+  </t:task>
+
+ <t:task id="_Internal2">
+    <t:script> script </t:script>
+ </t:task>
+</model>

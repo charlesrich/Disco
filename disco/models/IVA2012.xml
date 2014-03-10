@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:IVA2012">
+   <task id="RedSoxIntroDialogue">
+      <subtasks id="_RedSoxIntroDialogue_subtasks">
+         <step name="_RedSoxIntroDialogue_step" task="disco:Say"/>
+         <step name="_RedSoxIntroDialogue_ref" task="_RedSoxIntroDialogue_tree"/>
+         <binding slot="$_RedSoxIntroDialogue_step.text"
+                  value="&#34;Really? But they aren't so great at winning the World Series!&#34;"/>
+         <binding slot="$_RedSoxIntroDialogue_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="LastGameDialogue">
+      <subtasks id="_LastGameDialogue_subtasks">
+         <step name="_LastGameDialogue_step" task="disco:Say"/>
+         <step name="_LastGameDialogue_ref" task="_LastGameDialogue_tree"/>
+         <binding slot="$_LastGameDialogue_step.text" value="&#34;What did you think of it?&#34;"/>
+         <binding slot="$_LastGameDialogue_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="ClosingDialogue">
+      <subtasks id="_ClosingDialogue_subtasks">
+         <step name="_ClosingDialogue_step" task="disco:Say"/>
+         <step name="_ClosingDialogue_ref" task="_ClosingDialogue_tree"/>
+         <binding slot="$_ClosingDialogue_step.text"
+                  value="&#34;Well, that's about all.  I sure like talking about baseball with you!&#34;"/>
+         <binding slot="$_ClosingDialogue_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_RedSoxIntroDialogue_tree">
+      <subtasks id="_d4e23_subtasks">
+         <step name="_d4e23_step" task="disco:Say"/>
+         <step name="_d4e24_step" task="disco:Say"/>
+         <step name="_d4e24_ref" task="_d4e24_tree"/>
+         <binding slot="$_d4e23_step.text" value="&#34;I bet you are a Yankees fan.&#34;"/>
+         <binding slot="$_d4e23_step.external" value="true"/>
+         <binding slot="$_d4e24_step.text" value="&#34;No, I'm just joking with you.&#34;"/>
+         <binding slot="$_d4e24_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e29_subtasks">
+         <step name="_d4e29_step" task="disco:Say"/>
+         <binding slot="$_d4e29_step.text" value="&#34;Ah, but who cares? They play great ball!&#34;"/>
+         <binding slot="$_d4e29_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e24_tree">
+      <subtasks id="_d4e25_subtasks">
+         <step name="_d4e25_step" task="disco:Say"/>
+         <binding slot="$_d4e25_step.text" value="&#34;Oh.&#34;"/>
+         <binding slot="$_d4e25_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e26_subtasks">
+         <step name="_d4e26_step" task="disco:Say"/>
+         <step name="_d4e27_step" task="disco:Say"/>
+         <step name="_d4e28_step" task="disco:Say"/>
+         <binding slot="$_d4e26_step.text"
+                  value="&#34;That's too bad, it would be more fun if you were!&#34;"/>
+         <binding slot="$_d4e26_step.external" value="true"/>
+         <binding slot="$_d4e27_step.text" value="&#34;Ok, from now on I'm a Yankees fan.&#34;"/>
+         <binding slot="$_d4e27_step.external" value="false"/>
+         <binding slot="$_d4e28_step.text" value="&#34;Great!&#34;"/>
+         <binding slot="$_d4e28_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_LastGameDialogue_tree">
+      <subtasks id="_d4e31_subtasks">
+         <step name="_d4e31_step" task="disco:Say"/>
+         <step name="_d4e32_step" task="disco:Say"/>
+         <step name="_d4e33_step" task="disco:Say"/>
+         <binding slot="$_d4e31_step.text" value="&#34;Awesome game!&#34;"/>
+         <binding slot="$_d4e31_step.external" value="true"/>
+         <binding slot="$_d4e32_step.text" value="&#34;Yeah, it was very intense.  Great game.&#34;"/>
+         <binding slot="$_d4e32_step.external" value="false"/>
+         <binding slot="$_d4e33_step.text" value="&#34;Yeah.&#34;"/>
+         <binding slot="$_d4e33_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e34_subtasks">
+         <step name="_d4e34_step" task="disco:Say"/>
+         <binding slot="$_d4e34_step.text" value="&#34;It was boring.&#34;"/>
+         <binding slot="$_d4e34_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e35_subtasks">
+         <step name="_d4e35_step" task="disco:Say"/>
+         <binding slot="$_d4e35_step.text" value="&#34;We really needed that win.&#34;"/>
+         <binding slot="$_d4e35_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_ClosingDialogue_tree">
+      <subtasks id="_d4e45_subtasks">
+         <step name="_d4e45_step" task="disco:Say"/>
+         <binding slot="$_d4e45_step.text" value="&#34;Me, too.&#34;"/>
+         <binding slot="$_d4e45_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e46_subtasks">
+         <step name="_d4e46_step" task="disco:Say"/>
+         <binding slot="$_d4e46_step.text" value="&#34;Let's talk again tomorrow.&#34;"/>
+         <binding slot="$_d4e46_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="Omitted"/>
+   <task id="Baseball">
+      <input name="favoriteTeam" type="Team"/>
+      <input name="lastDay" type="Day"/>
+      <subtasks id="talk">
+         <step name="intro" task="BaseballIntro"/>
+         <step name="lastGame" task="LastGameDialogue" minOccurs="0"/>
+         <step name="body" task="BaseballBody" minOccurs="0"/>
+         <step name="closing" task="ClosingDialogue"/>
+      </subtasks>
+   </task>
+   <task id="BaseballIntro">
+      <subtasks id="redSox">
+         <step name="intro" task="RedSoxIntroDialogue"/>
+         <applicable> $Baseball.favoriteTeam==Team.ENUM.redSox </applicable>
+      </subtasks>
+      <subtasks id="yankees">
+         <step name="omitted" task="Omitted"/>
+         <applicable> $Baseball.favoriteTeam==Team.ENUM.yankees </applicable>
+      </subtasks>
+   </task>
+   <task id="BaseballBody">
+      <subtasks id="standings">
+         <step name="omitted" task="Omitted"/>
+      </subtasks>
+      <subtasks id="news">
+         <step name="item" task="BaseballNews" minOccurs="0" maxOccurs="3"/>
+      </subtasks>
+   </task>
+   <task id="BaseballNews">
+      <subtasks id="item">
+         <step name="omitted" task="Omitted"/>
+      </subtasks>
+   </task>
+   <script init="true">
+
+    // define Team datatype and enumeration
+
+    function Team (name) { this.name = name; }
+    
+    Team.ENUM = { redSox : new Team("Red Sox"), 
+                  yankees : new Team("Yankees") }
+    
+    Team.prototype.toString = function () { return this.name; }
+
+    // define Day datatype and enumeration
+
+    function Day (name) { this.name = name; }
+    
+    Day.ENUM = { Mon : new Day("Monday"), 
+                 Tue : new Day("Tuesday"), 
+                 Wed : new Day("Wednesday"), 
+                 Thu : new Day("Thursday"), 
+                 Fri : new Day("Friday"), 
+                 Sat : new Day("Saturday"), 
+                 Sun : new Day("Sunday") }
+    
+    Day.prototype.toString = function () { return this.name; }
+
+</script>
+</taskModel>

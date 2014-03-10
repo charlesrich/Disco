@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:secrets.wpi.edu:models:test:D4g1"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+       xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <!-- This tests the regex used in transforming embedded javascript
+       within <say>'s @text attribute.
+    -->
+  <say text=""/>
+  <say text="no js"/>
+  <say text="{}"/>
+  <say text="{ }"/>
+  <say text="\\ \{ \}"/>
+  <say text="some{javascript}"/>
+  <say text="and {more} and even {more}"/>
+  <say text="escaped \{not javascript\}"/>
+  <say text="non \\{escaped}"/>
+  <say text="{js at beginning} but not end"/>
+  <say text="{js only}"/>
+  <say text="not at beginning{but at end}"/>
+  <say text="\{normal text\}"/>
+  <say text="\\\\\\{is js\\\\\\\\}"/>
+  <say text="\\\\\\\{not js\\\\\\\}"/>
+  <say text="\\\{nor is this} or \{this}"/>
+  <say text="this is {javascript\}}"/>
+  <say text="as {\} is \\\} this \\\\}"/>
+  <say text="my name is {if (1) \{ write('test \} \\\}') \} else \{ var2 \}}"/>
+  <say text="before { /* comment \} \\\\\} */ // com2 \}} after"/>
+  <say text="\-=!@#$%^&amp;*()_+[]|;:'&quot;,./&lt;&gt;?"/>
+  <say text="{\-=!@#$%^&amp;*()_+[]|;:'&quot;,./&lt;&gt;?}"/>
+  <say text="{js}{js}{js} {js}\\\{not}"/>
+  <say text="{}{}{}{}"/>
+  <say text="{}{}{}{js}{}{js}{}{}"/>
+  <say text="{a}b{c}d{e}"/>
+  <say text="{}{\}}"/>
+  <say text="{}{}{\\}"/>
+  <say text="{}{}{}{\\\}}{}"/>
+  <say text="{\\\\}{}{\\\\}"/>
+</model>

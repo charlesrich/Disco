@@ -1,0 +1,79 @@
+<taskModel about="urn:disco.wpi.edu:examples:Dummy"
+           xmlns="http://ce.org/cea-2018">
+
+  <!-- This loads in dummy definitions for game API
+       for use in model development and testing.
+       See Game.xml
+  -->
+
+  <script init="true">
+
+    // grounding for primitive tasks
+
+    function say (who, text) {}
+    function shoot (who, target) {}
+    function setDestination (who, destination) {}
+    function findCover (who) {}
+
+    // define dummy for C# Character class in game with dummy
+    // accessors and constants for Kevin, Watson and Lily
+
+    function Character (name) { 
+      this.name = name; 
+      this.health = 0;
+      this.inCover = false;
+    }
+
+    Character.prototype.toString = function () { return this.name; }
+    Character.prototype.getLocation = function () { return this.location; }
+    Character.prototype.setLocation = function (location) { this.location = location; }
+    Character.prototype.getHealth = function () { return this.health; }
+    Character.prototype.isInCover = function () { return this.inCover; }
+
+    Character.KEVIN = new Character("Kevin");
+    Character.WATSON = new Character("Watson");
+    Character.LILY = new Character("Lily");
+ 
+    // define dummy for C# UnityEngine.Vector3 class
+
+    var UnityEngine = {
+        Vector3 : function (x, y, z) {  
+                     this.x = x;
+                     this.y = y;
+                     this.z = z; }
+
+       // other UnityEngine classes can go here
+    }
+
+    UnityEngine.Vector3.prototype.toString = 
+       // make printing consisent with Unity
+       function () { return "("+this.x.toFixed(1)+", "+this.y.toFixed(1)+", "
+                               +this.z.toFixed(1)+")"; }
+
+    // dummy for C# class in game with named locations
+
+    var Location = {
+        DOORWAY : new UnityEngine.Vector3(100, 200, 0),
+        ARCH : new UnityEngine.Vector3(100, 100, 0)
+    }
+
+    function equalLocation (location1, location2) {
+       // probably should add "fuzz factor"
+       return location1.x == location2.x &amp;&amp; location1.y == location2.y
+       &amp;&amp; location1.z == location2.z
+    }
+
+    // initial locations
+
+    Character.KEVIN.setLocation(new UnityEngine.Vector3(0, 10, 0));
+    Character.WATSON.setLocation(new UnityEngine.Vector3(10, 10, 0));
+    Character.LILY.setLocation(new UnityEngine.Vector3(-10, 10, 0));
+
+    // healer
+
+    var HEALER = Character.KEVIN;
+    function getHealer () { return HEALER; }
+
+  </script>
+
+</taskModel>

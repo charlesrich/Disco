@@ -1,0 +1,53 @@
+    # May 5, 2010 1:07:57 PM - TaskEngine 0.9.6 beta / Guide 0.9.6 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/GHIJ.xml
+CE> task G
+    Let's start to achieve G.
+CE> status
+
+[Achieve G] -live <-focus
+
+CE> next
+    Please execute I.
+CE> done
+    Failed execute I.
+CE> status
+
+[Achieve G] -live <-focus
+   [Achieve H] -failed
+      [User execute I] -failed
+   [Achieve H] -live
+
+CE> next
+    Please execute J.
+CE> done
+    Failed execute J.
+CE> status
+
+[Achieve G] -failed
+   [Achieve H] -failed
+      [User execute I] -failed
+   [Achieve H] -failed
+      [User execute J] -failed
+[Achieve G] -live
+
+CE> task G
+    Ok.
+CE> next
+    Please execute J.
+CE> done
+    Failed execute J.
+CE> status
+
+[Achieve G] -failed
+   [Achieve H] -failed
+      [User execute I] -failed
+   [Achieve H] -failed
+      [User execute J] -failed
+[Achieve G] -failed
+   [User execute J] -failed
+
+CE> next
+    I don't know what we're doing.
+CE> quit
+    Goodbye.

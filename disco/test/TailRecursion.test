@@ -1,0 +1,113 @@
+    # Aug 2, 2009 9:49:09 PM - TaskEngine 0.9.4 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > cd ../task
+  > source test/TailRecursion
+  > load models/TailRecursion.xml
+  > task openDrawerHarder / "x"
+    User says "Let's achieve openDrawerHarder on x."
+    Agent says "Please execute openDrawer on x."
+  > next
+    Agent says "Please execute openDrawer on x."
+  > done
+    User execute openDrawer on x.
+    Agent says "Please execute powerOff on x."
+  > status
+
+[Achieve openDrawerHarder on x] -accepted -live
+   User says "Let's achieve openDrawerHarder on x."
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -live <-focus
+      [User accept] -live
+         Agent says "Please execute powerOff on x."
+   [User execute powerOn on x]
+   [Achieve openDrawerHarder on x]
+
+  > next
+    Agent says "Please execute powerOff on x."
+  > done
+    User execute powerOff on x.
+    Agent says "Please execute powerOn on x."
+  > next
+    Agent says "Please execute powerOn on x."
+  > done
+    User execute powerOn on x.
+    Agent says "Please execute openDrawer on x."
+  > next
+    Agent says "Please execute openDrawer on x."
+  > done
+    User execute openDrawer on x.
+    Agent says "Please execute powerOff on x."
+  > next
+    Agent says "Please execute powerOff on x."
+  > done
+    User execute powerOff on x.
+    Agent says "Please execute powerOn on x."
+  > next
+    Agent says "Please execute powerOn on x."
+  > done
+    User execute powerOn on x.
+    Agent says "Please execute openDrawer on x."
+  > next
+    Agent says "Please execute openDrawer on x."
+  > done
+    User execute openDrawer on x.
+    Agent says "Please execute powerOff on x."
+  > status
+
+[Achieve openDrawerHarder on x] -accepted -live
+   User says "Let's achieve openDrawerHarder on x."
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -done
+   [User execute powerOn on x] -done
+   [Achieve openDrawerHarder on x] -live
+      [User execute openDrawer on x] -done
+      [User execute powerOff on x] -done
+      [User execute powerOn on x] -done
+      [Achieve openDrawerHarder on x] -live
+         [User execute openDrawer on x] -done
+         [User execute powerOff on x] -live <-focus
+            [User accept] -live
+               Agent says "Please execute powerOff on x."
+         [User execute powerOn on x]
+         [Achieve openDrawerHarder on x]
+
+  > next
+    Agent says "Please execute powerOff on x."
+  > done
+    User execute powerOff on x.
+    Agent says "Please execute powerOn on x."
+  > next
+    Agent says "Please execute powerOn on x."
+  > done
+    User execute powerOn on x.
+    Agent says "Please execute openDrawer on x."
+  > eval OPEN = true;
+    # Returned 'true'
+  > next
+    Agent says "Ok."
+  > status
+
+[Achieve openDrawerHarder on x] -accepted -succeeded
+   User says "Let's achieve openDrawerHarder on x."
+   [User execute openDrawer on x] -done
+   [User execute powerOff on x] -done
+   [User execute powerOn on x] -done
+   [Achieve openDrawerHarder on x]
+      [User execute openDrawer on x] -done
+      [User execute powerOff on x] -done
+      [User execute powerOn on x] -done
+      [Achieve openDrawerHarder on x]
+         [User execute openDrawer on x] -done
+         [User execute powerOff on x] -done
+         [User execute powerOn on x] -done
+         [Achieve openDrawerHarder on x]
+            [User execute openDrawer on x] <-focus
+               [User accept]
+                  Agent says "Please execute openDrawer on x."
+                  Agent says "Ok."
+            [User execute powerOff on x]
+            [User execute powerOn on x]
+            [Achieve openDrawerHarder on x]
+
+  > quit
+    

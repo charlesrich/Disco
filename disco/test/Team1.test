@@ -1,0 +1,34 @@
+    # Nov 10, 2011 10:37:58 PM - TaskEngine 1.1.2 / Disco 1.3.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Team.xml
+  > status
+
+[ ] -live
+
+  > eval setLocation(Character.KEVIN, Location.DOORWAY)
+    # Returned 'null'
+  > eval setLocation(Character.WATSON, Location.DOORWAY)
+    # Returned 'null'
+  > eval setLocation(Character.LILY, Location.ARCH)
+    # Returned 'null'
+  > next
+    Character Watson says "Ready!".
+    Character Kevin shoots monster1.
+    Character execute AddTop on _Strategy1.
+    Character Kevin starts toward (100.0, 200.0, 0.0).
+  > history
+
+[ ] -done
+   Character Watson says "Ready!".
+   Character Kevin shoots monster1.
+   Character execute AddTop on _Strategy1.
+[ ] -live
+   [Kevin goes to (100.0, 200.0, 0.0)] -live <-focus
+      Character Kevin starts toward (100.0, 200.0, 0.0).
+      [ ] -live
+   [Watson says "Ready!"]
+   [Kevin shoots monster1]
+   [Character execute AddTop on _Strategy1]
+
+  > quit 
+    

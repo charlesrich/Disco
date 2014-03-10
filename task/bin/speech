@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Usage: speech [ <filename> ]
+#
+# Runs the speech-enabled guide
+#
+dir="`dirname $0`"
+"$dir/_run" edu.wpi.cetask.guide.SpeechGuide "$1" class lib/msv-rng.jar speech/jsapi.jar speech/sphinx4.jar speech/tags.jar speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar speech/freetts.jar speech/cmu_us_kal.jar speech/cmulex.jar

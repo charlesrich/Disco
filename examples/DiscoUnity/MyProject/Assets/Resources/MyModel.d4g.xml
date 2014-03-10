@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<d:model about="urn:disco.wpi.edu:DiscoUnity:MyModel"
+       xmlns:d="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- A simple model that mixes ANSI/CEA-2018 and D4g notations.
+       See MyModel.properties.txt and also test/Dummy.xml -->
+ 
+  <task id="MyTop">
+    <subtasks id="top">
+      <step name="goto" task="GoTo"/>
+      <step name="wait" task="WaitForPlayer"/>
+      <step name="knock" task="Knock"/>
+    </subtasks>
+  </task>
+
+  <!-- simple navigation model -->
+
+  <task id="GoTo">
+    <input name="destination" type="Destination"/>
+    <postcondition sufficient="true">
+      $this.destination != undefined &amp;&amp; at($this.destination.entity)
+    </postcondition>
+
+    <subtasks id="goto">
+      <step name="set" task="SetDestination"/>
+      <step name="arrived" task="Wait"/>
+      <binding slot="$set.destination" value="$this.destination"/>
+    </subtasks>
+  </task>
+
+  <task id="SetDestination">
+    <input name="destination" type="Destination"/>
+    <binding slot="$this.external" value="false"/>
+    <script> setDestination($this.destination) </script>
+  </task>
+
+  <!-- These next two tasks will never actually be executed. 
+       See MyModel.properties for @authorized and @internal properties
+       prevent system from asking about them.  See @authorized
+       in MyModel.properties. -->
+
+  <task id="Wait"/>
+
+  <task id="WaitForPlayer">
+    <postcondition sufficient="true">
+      at(My.Game.PLAYER) 
+    </postcondition>
+  </task>
+
+  <!-- a simple dialogue tree -->
+
+  <d:agent id="Knock" text="Knock! Knock!">
+    <d:user text="Who's there?">
+      <d:agent text="Boo.">
+        <d:user text="Boo who?">
+          <d:agent text="Don't cry, little girl..."/>
+        </d:user>
+      </d:agent>
+    </d:user>
+    <d:user text="What?">
+      <d:agent text="You're supposed to say: Who's there!">
+        <d:user ref="Knock"/>
+      </d:agent>
+    </d:user>
+  </d:agent>
+
+  <script init="true"> 
+    
+    // game API for navigation
+
+    function at (entity) { // called from Disco thread
+       return getPosition(My.Game.NPC) != null &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).x - getPosition(entity).x) &lt; EPSILON &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).y - getPosition(entity).y) &lt; EPSILON &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).z - getPosition(entity).z) &lt; EPSILON;
+    }
+
+    EPSILON = 50;  // tolerance for position comparisons
+
+    function getPosition (entity) { return entity.myPosition; } // called from Disco thread
+    
+    function setDestination (destination) { // called from Unity thread
+       // example of debug printout
+       // note that toString below should not be needed, but is due to Jint
+       Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       My.Game.NPC.destination = destination.entity.gameObject.transform;
+    }
+
+    // define Destination as an enumerated type for use in Disco menus
+
+    function Destination (entity) { this.entity = entity; }
+
+    Destination.ENUM = { "red cube" : new Destination(My.Game.RED_CUBE),
+                         "green cube" : new Destination(My.Game.GREEN_CUBE) }
+
+    Destination.prototype.toString = function () { return My.Game.ToString(this.entity); } // Disco thread
+
+  </script>
+</d:model>

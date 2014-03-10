@@ -1,0 +1,231 @@
+    # Jan 3, 2014 4:13:56 PM - TaskEngine 1.5.2 / Disco 1.7.2
+    Welcome to Disco! (Type 'help' for command list)
+    Agent says "Please hold for the next operator."
+  > load models/CallCenter.xml
+  > task FixFreezeProblem
+    Caller says "Let's fix the freeze problem."
+    Agent says "How shall we fix the freeze problem?"
+  > say
+[1] Let's fix the freeze problem by trying a soft reset.
+[2] Let's fix the freeze problem by trying a hard reset.
+[3] Let's not fix the freeze problem.
+  >> 1
+    Caller says "Let's fix the freeze problem by trying a soft reset."
+    Agent says "Please remove the battery while the phone is on."
+  > say
+[1] Yes.
+[2] I'm going to remove the battery while the phone is on.
+[3] No.
+[4] Remove the battery while the phone is on succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Remove the battery while the phone is on succeeded."
+    Agent says "Please wait one full minute."
+  > say
+[1] Yes.
+[2] I'm going to wait one full minute.
+[3] No.
+[4] Wait one full minute succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Wait one full minute succeeded."
+    Agent says "Please replace the battery."
+  > say
+[1] Yes.
+[2] I'm going to replace the battery.
+[3] No.
+[4] Replace the battery succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Replace the battery succeeded."
+    Agent says "Please power on the device."
+  > say
+[1] Yes.
+[2] I'm going to power on the device.
+[3] No.
+[4] Power on the device succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Power on the device succeeded."
+    Agent says "Were we successful to fix the freeze problem?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not fix the freeze problem.
+  >> 2
+    Caller says "No."
+    Agent says "How shall we fix the freeze problem?"
+  > say
+[1] Let's fix the freeze problem by trying a soft reset.
+[2] Let's fix the freeze problem by trying a hard reset.
+[3] Let's not fix the freeze problem.
+  >> 2
+    Caller says "Let's fix the freeze problem by trying a hard reset."
+    Agent says "Please from the home screen, press the Menu key."
+  > say
+[1] Yes.
+[2] I'm going to from the home screen, press the Menu key.
+[3] No.
+[4] From the home screen, press the Menu key succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "From the home screen, press the Menu key succeeded."
+    Agent says "Please tap Settings."
+  > say
+[1] Yes.
+[2] I'm going to tap Settings.
+[3] No.
+[4] Tap Settings succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Tap Settings succeeded."
+    Agent says "Please scroll to and tap Privacy."
+  > say
+[1] Yes.
+[2] I'm going to scroll to and tap Privacy.
+[3] No.
+[4] Scroll to and tap Privacy succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Scroll to and tap Privacy succeeded."
+    Agent says "Please tap Factory data reset."
+  > say
+[1] Yes.
+[2] I'm going to tap Factory data reset.
+[3] No.
+[4] Tap Factory data reset succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Tap Factory data reset succeeded."
+    Agent says "Please tap Reset phone."
+  > say
+[1] Yes.
+[2] I'm going to tap Reset phone.
+[3] No.
+[4] Tap Reset phone succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Tap Reset phone succeeded."
+    Agent says "Please tap Erase everything."
+  > say
+[1] Yes.
+[2] I'm going to tap Erase everything.
+[3] No.
+[4] Tap Erase everything succeeded.
+[5] Let's not fix the freeze problem.
+  >> 4
+    Caller says "Tap Erase everything succeeded."
+    Agent says "Were we successful to fix the freeze problem?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not fix the freeze problem.
+  >> 1
+    Caller says "Yes."
+    Agent says "Ok."
+  > say
+[1] Ok.
+  >> 
+  > history
+
+Agent says "Please hold for the next operator."
+[Fix the freeze problem by trying a soft reset] -failed
+   Caller says "Let's fix the freeze problem."
+   [Caller says let's fix the freeze problem by trying a soft reset] -done
+      Agent says "How shall we fix the freeze problem?"
+      Caller says "Let's fix the freeze problem by trying a soft reset."
+   [Caller remove the battery while the phone is on] -succeeded
+      Agent says "Please remove the battery while the phone is on."
+      Caller says "Remove the battery while the phone is on succeeded."
+   [Caller wait one full minute] -succeeded
+      Agent says "Please wait one full minute."
+      Caller says "Wait one full minute succeeded."
+   [Caller replace the battery] -succeeded
+      Agent says "Please replace the battery."
+      Caller says "Replace the battery succeeded."
+   [Caller power on the device] -succeeded
+      Agent says "Please power on the device."
+      Caller says "Power on the device succeeded."
+   [Caller says fix the freeze problem succeeded] -rejected
+      Agent says "Were we successful to fix the freeze problem?"
+      Caller says "No."
+[Fix the freeze problem by trying a hard reset] -accepted -succeeded
+   [Caller says let's fix the freeze problem by trying a hard reset] -done
+      Agent says "How shall we fix the freeze problem?"
+      Caller says "Let's fix the freeze problem by trying a hard reset."
+   [Caller from the home screen, press the Menu key] -succeeded
+      Agent says "Please from the home screen, press the Menu key."
+      Caller says "From the home screen, press the Menu key succeeded."
+   [Caller tap Settings] -succeeded
+      Agent says "Please tap Settings."
+      Caller says "Tap Settings succeeded."
+   [Caller scroll to and tap Privacy] -succeeded
+      Agent says "Please scroll to and tap Privacy."
+      Caller says "Scroll to and tap Privacy succeeded."
+   [Caller tap Factory data reset] -succeeded
+      Agent says "Please tap Factory data reset."
+      Caller says "Tap Factory data reset succeeded."
+   [Caller tap Reset phone] -succeeded
+      Agent says "Please tap Reset phone."
+      Caller says "Tap Reset phone succeeded."
+   [Caller tap Erase everything] -succeeded
+      Agent says "Please tap Erase everything."
+      Caller says "Tap Erase everything succeeded."
+   [Caller says fix the freeze problem succeeded] <-focus
+      Agent says "Were we successful to fix the freeze problem?"
+      Caller says "Yes."
+      Agent says "Ok."
+
+  > debug
+  > history
+
+Agent: "Please hold for the next operator"
+[FixFreezeProblem by softReset] -failed
+   Caller: Propose.Should(FixFreezeProblem)
+   [Propose.How([FixFreezeProblem],softReset)] -done
+      Agent: Ask.How(FixFreezeProblem,softReset)
+      Caller: Propose.How([FixFreezeProblem],softReset)
+   [RemoveBattery] -succeeded
+      Agent: Propose.Should(RemoveBattery)
+      Caller: Propose.Succeeded(RemoveBattery)
+   [WaitOneMinute] -succeeded
+      Agent: Propose.Should(WaitOneMinute)
+      Caller: Propose.Succeeded(WaitOneMinute)
+   [ReplaceBattery] -succeeded
+      Agent: Propose.Should(ReplaceBattery)
+      Caller: Propose.Succeeded(ReplaceBattery)
+   [StartDevice] -succeeded
+      Agent: Propose.Should(StartDevice)
+      Caller: Propose.Succeeded(StartDevice)
+   [Propose.Succeeded(FixFreezeProblem)] -rejected
+      Agent: com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      Caller: Reject(Propose.Succeeded(FixFreezeProblem))
+[FixFreezeProblem by hardReset] -accepted -succeeded
+   [Propose.How([FixFreezeProblem],hardReset)] -done
+      Agent: Ask.How(FixFreezeProblem,hardReset)
+      Caller: Propose.How([FixFreezeProblem],hardReset)
+   [PressMenuKey] -succeeded
+      Agent: Propose.Should(PressMenuKey)
+      Caller: Propose.Succeeded(PressMenuKey)
+   [TapSettings] -succeeded
+      Agent: Propose.Should(TapSettings)
+      Caller: Propose.Succeeded(TapSettings)
+   [TapPrivacy] -succeeded
+      Agent: Propose.Should(TapPrivacy)
+      Caller: Propose.Succeeded(TapPrivacy)
+   [TapFactoryDataReset] -succeeded
+      Agent: Propose.Should(TapFactoryDataReset)
+      Caller: Propose.Succeeded(TapFactoryDataReset)
+   [TapResetPhone] -succeeded
+      Agent: Propose.Should(TapResetPhone)
+      Caller: Propose.Succeeded(TapResetPhone)
+   [TapEraseEverything] -succeeded
+      Agent: Propose.Should(TapEraseEverything)
+      Caller: Propose.Succeeded(TapEraseEverything)
+   [Propose.Succeeded(FixFreezeProblem)] <-focus
+      Agent: com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      Caller: Accept(Propose.Succeeded(FixFreezeProblem))
+      Agent: Ok
+
+  > quit
+    

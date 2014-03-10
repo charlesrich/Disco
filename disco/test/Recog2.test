@@ -1,0 +1,17 @@
+    # Apr 18, 2010 6:26:18 PM - TaskEngine 0.9.6 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > load ../task/models/ABC.xml
+  > done B / "foo"
+    User execute B on foo.
+    Agent says "What is the A input1?"
+  > history
+
+[Achieve A on a number and foo] -live
+   User execute B on foo.
+   [User says propose the A input1] -live <-focus
+      [User accept] -live
+         Agent says "What is the A input1?"
+   [Execute C] -live
+
+  > quit
+    

@@ -1,0 +1,32 @@
+{
+   "interviewee": "Daniel Blanc",
+   "work": [
+      {
+         "manager": "Paul Rogier",
+         "name": "McDonalds",
+         "status": "Sept 2010 a maintenant",
+         "cell": "0733 22224"
+      }
+   ],
+   "work-related": [
+      {
+         "addresse": "Rue de Paris 2, 75001",
+         "where": "Familie Andre",
+         "help": "childcare",
+         "phone": "0784 33335",
+         "status": "Aout 2009 a Mai 2010"
+      }
+   ],
+   "education": [
+      {
+         "level" : "12",
+         "name": "Lycee de Paris"
+      },
+      {
+         "level": "one term",
+         "name": "Paris-tech"
+      }
+   ],
+   "address": "Rue de Paris 1, 75001 Paris",
+   "phone": "0796 22224"
+}

@@ -1,0 +1,69 @@
+    # Jun 8, 2011 10:28:58 PM - TaskEngine 1.1 / Disco 1.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Knock.xml
+  > say
+[1] Let's play knock-knock.
+  >> 1
+    User says "Let's play knock-knock."
+    Agent says "Knock! Knock!"
+  > say
+[1] Who's there?
+[2] I hate this stupid game!
+  >> 1
+    User says "Who's there?"
+    Agent says "Boo."
+  > say
+[1] Boo who?
+[2] I hate this stupid game!
+  >> 1
+    User says "Boo who?"
+    Agent says "Don't cry... the game is over now.."
+  > history
+
+[Play knock-knock] -accepted -done
+   User says "Let's play knock-knock."
+   Agent says "Knock! Knock!"
+   [ ] -done <-focus
+      User says "Who's there?"
+      Agent says "Boo."
+      User says "Boo who?"
+      Agent says "Don't cry... the game is over now.."
+
+  > say
+[1] Let's play knock-knock.
+  >> 1
+    User says "Let's play knock-knock."
+    Agent says "Knick! Knick!"
+  > say
+[1] Qui est la?
+[2] I hate this stupid game!
+  >> 1
+    User says "Qui est la?"
+    Agent says "Boo."
+  > say
+[1] Boo who?
+[2] I hate this stupid game!
+  >> 1
+    User says "Boo who?"
+    Agent says "Don't cry... the game is over now.."
+  > history
+
+[Play knock-knock] -accepted -done
+   User says "Let's play knock-knock."
+   Agent says "Knock! Knock!"
+   [ ] -done
+      User says "Who's there?"
+      Agent says "Boo."
+      User says "Boo who?"
+      Agent says "Don't cry... the game is over now.."
+[Play knock-knock] -accepted -done
+   User says "Let's play knock-knock."
+   Agent says "Knick! Knick!"
+   [ ] -done <-focus
+      User says "Qui est la?"
+      Agent says "Boo."
+      User says "Boo who?"
+      Agent says "Don't cry... the game is over now.."
+
+  > quit
+    

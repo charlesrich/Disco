@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:d4g:test:Internal">
+   <task id="_Internal1">
+      <input name="input" type="string"/>
+      <output name="output" type="string"/>
+      <precondition> test </precondition>
+      <postcondition> test </postcondition>
+      <subtasks id="testSubtask">
+         <step name="test" task="_Internal2"/>
+         <applicable> test </applicable>
+         <binding slot="$test.input" value="'test'"/>
+      </subtasks>
+   </task>
+   <task id="_Internal2">
+      <script> script </script>
+   </task>
+</taskModel>

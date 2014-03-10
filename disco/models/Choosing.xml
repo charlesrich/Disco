@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Choosing">
+   <task id="Top">
+      <subtasks id="_Top_subtasks">
+         <step name="_Top_step" task="disco:Say"/>
+         <step name="_Top_ref" task="_Top_tree"/>
+         <binding slot="$_Top_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_Top_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="Weather">
+      <subtasks id="_Weather_subtasks">
+         <step name="_Weather_step" task="SetChoice"/>
+         <step name="_Weather_ref" task="_Weather_tree"/>
+         <binding slot="$_Weather_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Weather_tree">
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:Say"/>
+         <step name="_d4e8_ref" task="_d4e8_tree"/>
+         <binding slot="$_d4e8_step.text" value="&#34;Do you want the short or the long version?&#34;"/>
+         <binding slot="$_d4e8_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Top_tree">
+      <subtasks id="_d4e4_subtasks">
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_d4e5_step" task="Weather" minOccurs="0" maxOccurs="5"/>
+         <binding slot="$_d4e4_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_d4e4_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e8_tree">
+      <subtasks id="_d4e10_subtasks">
+         <step name="_d4e10_step" task="disco:Say"/>
+         <step name="_d4e11_step" task="disco:Say$Expression"/>
+         <binding slot="$_d4e10_step.text" value="&#34;Short&#34;"/>
+         <binding slot="$_d4e10_step.external" value="true"/>
+         <binding slot="$_d4e11_step.text"
+                  value="&#34;\&#34;The weather in \&#34;+($CHOICE.location)+\&#34; is \&#34;+($WEATHER[$CHOICE.location].brief)&#34;"/>
+         <binding slot="$_d4e11_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e12_subtasks">
+         <step name="_d4e12_step" task="disco:Say"/>
+         <step name="_d4e13_step" task="disco:Say$Expression"/>
+         <binding slot="$_d4e12_step.text" value="&#34;Long&#34;"/>
+         <binding slot="$_d4e12_step.external" value="true"/>
+         <binding slot="$_d4e13_step.text"
+                  value="&#34;\&#34;The weather in \&#34;+($CHOICE.location)+\&#34; is \&#34;+($WEATHER[$CHOICE.location].detailed)&#34;"/>
+         <binding slot="$_d4e13_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="SetChoice">
+      <input name="choice" type="Person"/>
+      <script> $CHOICE = $this.choice </script>
+   </task>
+   <script init="true"> 
+
+    var $CHOICE;
+
+    // a simple data base for testing
+
+    // define enumerated type
+
+    function Person (name, location) { 
+        this.name = name; 
+        this.location = location;
+    }
+    
+    Person.ENUM = { JOE : new Person("Joe", "Chicago"), 
+                    BILL : new Person("Bill", "Chicago"),
+                    SUZIE : new Person("Suzie", "Seattle") }
+    
+    Person.prototype.toString = function () { return this.name; }
+
+    var $WEATHER = 
+       { Chicago : { brief : "windy", detailed : "50 degrees, wind 25 mph" },
+         Seattle : { brief : "foggy", 
+                     detailed : "60 degrees, wind 5 mph, visibility 0.1 mi" } }
+
+  </script>
+</taskModel>

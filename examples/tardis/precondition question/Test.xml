@@ -1,0 +1,244 @@
+<taskModel about="urn:disco.wpi.edu:models:Test" 
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <!-- Misc definitions used for testing Disco -->
+
+  <!-- for optional steps Optional1 -->
+  
+  <task id="A">
+    <subtasks id="BC">
+      <step name="b" task ="B" minOccurs="0"/>
+      <step name="c" task="C"/>
+      <step name="d" task="D" minOccurs="0"/>
+    </subtasks>
+  </task>
+  
+  <task id="B"/>
+  <task id="C"/>
+  <task id="D"/>
+
+  <!-- unauthorized primitive for AskWho1; see properties -->
+  
+  <task id="UnauthTop">
+    <subtasks id="unauth">
+      <step name="a" task="Unauth"/>
+    </subtasks>
+  </task>
+  
+  <task id="Unauth"/>
+  
+  <!-- for plan recognition interpolation Recog1 -->
+  
+  <task id="IntA">
+    <subtasks id="IntBC" ordered="false">
+      <step name="b" task="IntB"/>
+      <step name="c" task="IntC"/>
+    </subtasks>	
+    <subtasks id="IntBD" ordered="false">
+      <step name="b" task="IntB"/>
+      <step name="d" task="IntD"/>
+    </subtasks>	
+  </task>
+  
+  <task id="IntB">
+    <subtasks id="IntEF" ordered="false">
+      <step name="e" task="IntE"/>
+      <step name="f" task="IntF"/>
+    </subtasks>	
+    <subtasks id="IntEG" ordered="false">
+      <step name="e" task="IntE"/>
+      <step name="g" task="IntG"/>
+    </subtasks>	
+  </task>
+  
+  <task id="IntC">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntD">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntE">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntF">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="IntG">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <task id="SayEval1">
+    <subtasks id="subtasks1">
+      <step name="step1" task="disco:edu.wpi.disco.lang.Say$Eval"/>
+      <binding slot="$step1.text" value="'SayEval1'"/>
+      <binding slot="$step1.eval" value="'print(&quot;SayEval1!&quot;)'"/>
+    </subtasks>
+  </task>
+  
+  <!-- for simple dialog tree for Dialog1 (starting with agent) -->
+  
+  <!-- note ok to use same step name as subtasks id -->
+  
+  <task id="_A1">
+    <subtasks id="a1"> 
+      <step name="a1" task="disco:edu.wpi.disco.lang.Say$Agent"/>
+      <step name="a1_u" task="_A1_U"/>
+      <binding slot="$a1.text" value="'Agent1'"/>
+    </subtasks>
+  </task>
+  
+  <task id="_A1_U">
+    <subtasks id="a1_u1">
+      <step name="a1_u1" task="disco:edu.wpi.disco.lang.Say$User"/>
+      <binding slot="$a1_u1.text" value="'Agent1_User1'"/>
+    </subtasks>
+    <subtasks id="_a1_u2">
+      <step name="a1_u2" task="disco:edu.wpi.disco.lang.Say$User"/>
+      <binding slot="$a1_u2.text" value="'Agent1_User2'"/>
+    </subtasks>
+  </task>
+  
+  <!-- adding actions to dialog tree for Dialog2  -->
+  
+  <task id="_A5">
+    <subtasks id="a5"> 
+      <step name="b" task="B"/> 
+      <step name="a5" task="disco:edu.wpi.disco.lang.Say$Agent"/>
+      <step name="a5_u" task="_A5_U"/>
+      <binding slot="$a5.text" value="'Agent5'"/>
+      <binding slot="$b.external" value="false"/>
+    </subtasks>
+  </task>
+  
+  <task id="_A5_U">
+    <subtasks id="a5_u1">
+      <step name="a5_u1" task="disco:edu.wpi.disco.lang.Say$User"/>
+      <step name="c" task="C"/>
+      <step name="a1" task="_A1"/>
+      <step name="b" task="IntB"/>
+      <binding slot="$a5_u1.text" value="'Agent5_User1'"/>
+      <binding slot="$c.external" value="true"/>    
+    </subtasks>
+    <subtasks id="a5_u2">
+      <step name="a5_u2" task="disco:edu.wpi.disco.lang.Say$User"/>
+      <binding slot="$a5_u2.text" value="'Agent5_User2'"/>
+    </subtasks>
+  </task>
+  
+  <task id="ChooseFlavor">
+    <input name="flavor" type="Flavor"/>
+    <script> println("["+$this.flavor+" chosen!]"); </script>
+  </task>
+  
+  <task id="TestBooleanInput">
+  	 <input name="input" type="boolean" />
+  </task>
+  
+  <!-- see Test.properties for alternative formatting -->
+  
+  <task id="Alt"/>
+    
+  <!-- recipe with only optional steps -->
+
+  <task id="Optional2">
+      <subtasks id="optional2">
+         <step name="s1" task="Optional2_1" minOccurs="0"/>
+         <step name="s2" task="Optional2_2" minOccurs="0"/>
+      </subtasks>
+   </task>
+
+   <task id="Optional2_1">
+      <subtasks id="optional2_1">
+         <step name="b" task="B"/>
+      </subtasks>
+   </task>
+
+   <task id="Optional2_2">
+      <subtasks id="optional2_2">
+         <step name="say" task="disco:edu.wpi.disco.lang.Say$Agent"/>
+         <binding slot="$say.text" value="'Test'"/>
+      </subtasks>
+   </task>
+
+   <task id="_How">
+     <subtasks id="how1">
+       <step name="a" task="A"/>
+     </subtasks>	
+     <subtasks id="how2">
+       <step name="b" task="B"/>
+     </subtasks>	
+     <subtasks id="how3">
+       <step name="C" task="C"/>
+     </subtasks>	
+   </task>
+   
+   <task id="HowPlus">
+     <subtasks id="plus">
+       <step name="how" task="_How" minOccurs="0"/>
+       <step name="a" task="A"/>
+     </subtasks>
+   </task>
+   
+   <task id="NonPrimitive"/>
+  
+   <task id="Repeating">
+     <subtasks id="repeating">
+       <step name="repeat" task="B" maxOccurs="4"/>
+       <step name="next" task="C"/>
+     </subtasks>
+   </task>
+
+   <task id="RepeatingAll">
+     <subtasks id="repeatingAll">
+       <step name="first" task="B" minOccurs="0" maxOccurs="4"/>
+     </subtasks>
+   </task>
+
+   <task id="PostA">
+     <binding slot="$this.external" value="false"/>
+     <postcondition> A == 0 </postcondition>
+     <script> A-- </script>
+   </task>
+
+   <task id="RetryA">
+     <subtasks id="retryA1">
+       <step name="a" task="PostA"/>
+     </subtasks>
+     <subtasks id="retryA2">
+       <step name="a" task="PostA"/>
+     </subtasks>
+     <subtasks id="retryA3">
+       <step name="a" task="PostA" minOccurs="0"/>
+     </subtasks>
+   </task>
+
+   <task id="Optional3">
+     <input name="input1" type="string"/>
+     <input name="input2" type="Flavor"/>
+     <input name="input3" type="string"/>
+   </task>
+
+   <script init="true">
+    
+    // number of times A needs to be done to succeed (-1 means never)
+    var A = -1;
+    var optional2 = false;
+
+    // enumerated type for use with Propose.What or Propose.Global
+
+    function Flavor (name) { this.name = name; }
+    
+    Flavor.ENUM = { chocolate : new Flavor("chocolate"), 
+                    vanilla : new Flavor("vanilla"),
+                    strawberry : new Flavor("strawberry") }
+    
+    Flavor.prototype.toString = function () { return this.name; }	
+    
+  </script>
+
+</taskModel>

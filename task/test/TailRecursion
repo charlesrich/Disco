@@ -1,0 +1,26 @@
+load models/TailRecursion.xml
+task openDrawerHarder / "x"
+next
+done
+status
+next
+done
+next
+done
+next
+done
+next
+done
+next
+done
+next
+done
+status
+next
+done
+next
+done
+eval OPEN = true;
+next
+status
+quit

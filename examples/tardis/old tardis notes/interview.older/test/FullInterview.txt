@@ -1,0 +1,212 @@
+~/tardis/interview> ./bin/game
+    # Writing log to /tmp/GameConsole.test...
+    # Nov 10, 2011 3:50:56 PM - TaskEngine 1.1.1 / Disco 1.3.1
+    Welcome to Disco! (Type 'help' for command list)
+player&sidekick  > load models/Interview.xml
+player&sidekick  > load models/InterviewTop.xml
+player&sidekick  > next
+interviewee&coach  > load models/Coach.xml
+interviewee&coach  > next
+interviewee&interviewer  > task Interview
+    Interviewee says "Let's start interview."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "Good morning.  Welcome to the XX Company."
+interviewee&interviewer  > say
+[1] Uh, hello.
+[2] Good morning.
+[3] Hi.
+[4] Hey.
+  >> 3
+    Interviewee says "Hi."
+interviewee&coach  > next
+    Coach says "A better way to respond would be to say 'Good morning'.  It conveys respect. Ready to try again?"
+interviewee&coach  > next
+    Interviewer says "Good morning.  Welcome to the XX Company."
+interviewee&interviewer  > say
+[1] Uh, hello.
+[2] Good morning.
+[3] Hi.
+[4] Hey.
+  >> 2
+    Interviewee says "Good morning."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewee says "Sure!"
+interviewee&coach  > next
+interviewee&interviewer  > say
+[1] Ok.
+  >> 1
+    Interviewee says "Ok."
+interviewee&coach  > next
+    Interviewer says "How may I help you?"
+interviewee&interviewer  > say
+[1] I'm here to see Mr. Marceau.
+  >> 1
+    Interviewee says "I'm here to see Mr. Marceau."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "Just a minute, please."
+interviewee&interviewer  > say
+[1] Ok.
+  >> 1
+    Interviewee says "Ok."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "What is your name?"
+interviewee&interviewer  > say
+[1] Daniel Blanc.
+  >> 1
+    Interviewee says "Daniel Blanc."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "Yes, please sit down and Mr. Marceau  will be with you shortly."
+interviewee&interviewer  > say
+[1] Ok.
+  >> 1
+    Interviewee says "Ok."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "Hello I am Mr. Marceau."
+interviewee&interviewer  > say
+[1] Hi.
+[2] Hello, I'm Daniel Blanc.
+[3] Hey man what's up?
+  >> 3
+    Interviewee says "Hey man what's up?"
+interviewee&coach  > next
+    Coach says "You could better respond with a greeting such as 'Hello' and your name. Ready to try again?"
+interviewee&coach  > next
+    Interviewer says "Hello I am Mr. Marceau."
+interviewee&interviewer  > say
+[1] Hi.
+[2] Hello, I'm Daniel Blanc.
+[3] Hey man what's up?
+  >> 2
+    Interviewee says "Hello, I'm Daniel Blanc."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewee says "Ok."
+interviewee&coach  > next
+interviewee&interviewer  > next
+interviewee&coach  > next
+    Interviewer says "Good to meet you."
+interviewee&interviewer  > next
+interviewee&coach  > next
+[Agent and User Shake Hands now]
+    Interviewer execute ShakeHands.
+interviewee&coach  > next
+    Interviewer says "May I have your resume?"
+interviewee&interviewer  > say
+[1] Sure here it is.
+[2] Uh, I don't have a resume.
+[3] I didn't bring one today.
+  >> 2
+    Interviewee says "Uh, I don't have a resume."
+interviewee&coach  > next
+    Coach says "A resume tells your employer about your past experience, both your education and work experience if you have any.  You will need a resume for your employer.  After this game, you can create a resume with the ResumeHelper game. For now, start again and tell the interviewer that you did not bring one."
+interviewee&coach  > next
+    Interviewer says "May I have your resume?"
+interviewee&interviewer  > say
+[1] Sure here it is.
+[2] Uh, I don't have a resume.
+[3] I didn't bring one today.
+  >> 3
+    Interviewee says "I didn't bring one today."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewee says "Sure."
+interviewee&coach  > next
+interviewee&interviewer  > next
+interviewee&coach  > next
+    Interviewer says "Well, we can continue but make sure to bring one tomorrow and leave it with the receptionist."
+interviewee&interviewer  > say
+[1] I guess so.
+[2] Okay, I'll bring it tomorrow.
+  >> 1
+    Interviewee says "I guess so."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "I see from your resume that you are in 12th grade at the Lycee de Paris, is that correct?"
+interviewee&interviewer  > say
+[1] I guess so.
+  >> 1
+    Interviewee says "I guess so."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "Can you tell me what you most liked that you learned in school?"
+interviewee&interviewer  > say
+[1] Computer technology.
+[2] Sports.
+[3] Science.
+[4] English.
+  >> 2
+    Interviewee says "Sports."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "I see."
+interviewee&interviewer  > say
+[1] Ok.
+  >> 1
+    Interviewee says "Ok."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewer says "I see from your resume that you have worked at Mcdonalds. What did you learn there ?"
+interviewee&interviewer  > say
+[1] Nothin' special.
+[2] Teamwork.
+[3] Responsibility.
+  >> 1
+    Interviewee says "Nothin' special."
+interviewee&coach  > next
+    Coach says "Try to think of some skill that you could have developed at your job, like teamwork, or resistance to pressure. These are called 'transferable skills' and are very important. Even if your previous job wasn't exactly in the company field, you should be able to point out something that experience gave you."
+interviewee&coach  > next
+    Interviewer says "I see from your resume that you have worked at Mcdonalds. What did you learn there ?"
+interviewee&interviewer  > say
+[1] Nothin' special.
+[2] Teamwork.
+[3] Responsibility.
+  >> 2
+    Interviewee says "Teamwork."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewee says "Sure."
+interviewee&coach  > next
+interviewee&interviewer  > say
+[1] Ok.
+  >> 1
+    Interviewee says "Ok."
+interviewee&coach  > next
+    Interviewer says "Well, Thank you for coming.  We will review your case further."
+interviewee&interviewer  > say
+[1] Thank you.
+[2] Yeh that was great.
+[3] You mean I don't have a job?
+  >> 3
+    Interviewee says "You mean I don't have a job?"
+interviewee&coach  > next
+    Coach says "Companies generally do not offer jobs at interviews.  They interview lots of candidates and pick the most qualified people. For now, please start again and just say thank you and good bye."
+interviewee&coach  > next
+    Interviewer says "Well, Thank you for coming.  We will review your case further."
+interviewee&interviewer  > say
+[1] Thank you.
+[2] Yeh that was great.
+[3] You mean I don't have a job?
+  >> 1
+    Interviewee says "Thank you."
+interviewee&coach  > next
+interviewee&interviewer  > next
+    Interviewee says "That's fine."
+interviewee&coach  > next
+interviewee&interviewer  > next
+interviewee&coach  > next
+    Interviewer says "You are welcome.  Good bye."
+interviewee&interviewer  > say
+[1] Good-bye.
+  >> 1
+    Interviewee says "Good-bye."
+interviewee&coach  > next
+interviewee&interviewer  > status
+interviewee&interviewer  > quit
+    
+~/tardis/interview> 

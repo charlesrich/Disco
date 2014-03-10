@@ -1,0 +1,56 @@
+    # Nov 23, 2011 7:18:19 PM - TaskEngine 1.1.2 / Disco 1.3.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load test/MyDummy.xml
+  > load Assets/Resources/MyModel.xml
+  > say
+[1] Let's rendezvous.
+  >> 1
+    Player says "Let's rendezvous."
+    NPC says "What is the destination?"
+  > say
+[1] RedCube.
+[2] GreenCube.
+  >> 1
+    Player says "RedCube."
+Setting NPC destination to: RedCube
+    NPC start toward RedCube.
+  > eval setPosition(My.Game.NPC, My.Game.RED_CUBE)
+    # Returned 'null'
+  > next
+  > eval setPosition(My.Game.PLAYER, My.Game.RED_CUBE)
+    # Returned 'null'
+  > next
+    NPC says "Knock! Knock!"
+  > say
+[1] Who's there?
+[2] What?
+[3] I hate this stupid game!
+  >> 1
+    Player says "Who's there?"
+    NPC says "Boo."
+  > say
+[1] Boo who?
+[2] I hate this stupid game!
+  >> 1
+    Player says "Boo who?"
+    NPC says "Don't cry, little girl..."
+  > history
+
+[Rendezvous] -accepted -done
+   Player says "Let's rendezvous."
+   [Go to RedCube] -succeeded
+      [NPC start toward RedCube] -done
+         [Player says the destination is RedCube] -done
+            NPC says "What is the destination?"
+            Player says "RedCube."
+         NPC start toward RedCube.
+   [Play knock-knock] -done
+      NPC says "Knock! Knock!"
+      [ ] -done <-focus
+         Player says "Who's there?"
+         NPC says "Boo."
+         Player says "Boo who?"
+         NPC says "Don't cry, little girl..."
+
+  > quit
+    

@@ -1,0 +1,73 @@
+    # May 5, 2010 1:48:29 PM - TaskEngine 0.9.6 beta / Guide 0.9.6 beta - Speech
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/Library.xml
+CE> debug
+CE> say let's borrow Mindscan
+    # task Borrow / mindscan
+    Let's start to Borrow(Mindscan).
+CE> debug false
+CE> next
+    Please go to the library.
+CE> done
+    Ok.
+CE> status
+
+[Borrow Mindscan] -live <-focus
+   [User go to the library] -done
+   [Choose Mindscan] -live
+   [Check out a book]
+
+CE> next
+    Shall I look Mindscan up in the catalog?
+CE> yes
+    Ok.
+    Done look Mindscan up in the catalog.
+CE> next
+    Please take Mindscan from Shelf 2.
+CE> done / / / false
+    Failed take Mindscan from Shelf 2.
+CE> status
+
+[Borrow Mindscan] -live <-focus
+   [User go to the library] -done
+   [Choose Mindscan using the catalog] -failed
+      [System look Mindscan up in the catalog] -succeeded
+      [User take Mindscan from Shelf 2] -failed
+   [Choose Mindscan] -live
+   [Check out a book]
+
+CE> next
+    Please use the search engine.
+CE> debug
+CE> say please use search engine on Vinge
+    # task UseSearchEngine / "Vinge"
+    Ok.
+    Shall I UseSearchEngine(Vinge)?
+CE> debug false
+CE> yes
+    Ok.
+    Done use the search engine.
+CE> next
+    Please take A Fire Upon the Deep from Shelf 3.
+CE> done
+    Ok.
+    Shall I check out A Fire Upon the Deep?
+CE> yes
+    Ok.
+[A Fire Upon the Deep checked out!]
+    Done check out A Fire Upon the Deep.
+    Completed borrow Mindscan.
+CE> status
+
+[Borrow Mindscan] -done
+   [User go to the library] -done
+   [Choose Mindscan using the catalog] -failed
+      [System look Mindscan up in the catalog] -succeeded
+      [User take Mindscan from Shelf 2] -failed
+   [Choose Mindscan using a search engine] -done
+      [System use the search engine] -succeeded
+      [User take A Fire Upon the Deep from Shelf 3] -done
+   [System check out A Fire Upon the Deep] -done
+
+CE> quit
+    Goodbye.

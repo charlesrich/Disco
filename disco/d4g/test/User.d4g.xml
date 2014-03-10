@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:secrets.wpi.edu:models:test:D4g1"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:g="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+       xmlns:test="Test">
+
+  <say text="1">
+    <user text="2">
+      <user text="2.5">
+	<agent text="3">
+	  <agent text="3.5">
+	    <say text="3.75"/>
+	  </agent>
+	</agent>
+      </user>
+    </user>
+  </say>
+
+  <user text="4"/>
+  <agent text="5"/>
+
+  <user id="id6" text="{6}">
+    <agent id="id7" text="7">
+      <agent id="id8" text="number{8}rebmun" eval="6eval"/>
+    </agent>
+  </user>
+
+  <do task="a">
+    <user text="b">
+      <do task="c">
+	<agent text="d">
+	  <do task="e"/>
+	</agent>
+      </do>
+    </user>
+  </do>
+
+  <agent text="i">
+    <user text="ii"/>
+  </agent>
+
+  <user text="one">
+    <agent text="two"/>
+    <agent text="three">
+      <user text="four">
+	<agent text="five"/>
+	<agent text="six">
+	  <user text="seven"/>
+	  <user text="eight"/>
+	</agent>
+      </user>
+      <user text="nine"/>
+    </agent>
+  </user>
+
+  <say text="play" actor="player"/>
+  <user text="play"/>
+  <say text="side" actor="sidekick"/>
+  <agent text="side"/>
+
+  <user id="ref1" ref="ref2"/>
+  <agent id="ref2" ref="id7">
+    <agent text="text"/>
+  </agent>
+
+  <user text="uno" eval="unoeval">
+    <user text="dos" eval="doseval">
+      <user text="tres" eval="treseval">
+	<user text="quatro"/>
+      </user>
+    </user>
+  </user>
+  <agent text="unus" eval="unuseval">
+    <agent text="duo" eval="duoeval">
+      <agent text="tres" eval="treseval">
+	<agent text="quartuor"/>
+      </agent>
+    </agent>
+  </agent>
+
+  <!--  <user text="test" actor="invalid"/>
+        <agent text="test" actor="invalid"/> -->
+</model>
+

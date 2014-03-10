@@ -1,0 +1,15 @@
+load models/GHIJ.xml
+task G
+status
+next
+done
+status
+next
+done
+status
+task G
+next
+done
+status
+next
+quit

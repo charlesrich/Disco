@@ -1,0 +1,138 @@
+<taskModel about="urn:disco.wpi.edu:examples:depots" xmlns="http://ce.org/cea-2018">
+  <!-- 
+       translation of the 'depots' PDDL domain description from into
+       ANSI/CEA 2018.  For testing JavaFF integration into Disco.
+
+      (define (domain Depot)
+      (:requirements :typing)
+      (:types place locatable - object
+	      depot distributor - place
+	      truck hoist surface - locatable
+	      pallet crate - surface)
+
+      (:predicates (at ?x - locatable ?y - place) 
+		   (on ?x - crate ?y - surface)
+		   (inside ?x - crate ?y - truck)  
+		   (lifting ?x - hoist ?y - crate)
+		   (available ?x - hoist)
+		   (clear ?x - surface))
+
+      Note: 'in' is reserved in Javascript (changed to 'inside')
+
+      See 'parseFF' set to true in depots.properties.
+  -->
+
+  <!--
+      (:action Drive
+      :parameters (?x - truck ?y - place ?z - place) 
+      :precondition (and (at ?x ?y))
+      :effect (and (not (at ?x ?y)) (at ?x ?z)))
+  -->
+
+  <task id="Drive">
+    <input name="x" type="truck"/>
+    <input name="y" type="place"/>
+    <input name="z" type="place"/>
+    <precondition> 
+       at($this.x, $this.y) 
+    </precondition>
+    <postcondition> 
+      !at($this.x, $this.y) &amp;&amp; at($this.x, $this.z)
+    </postcondition>
+  </task>
+
+  <!--
+      (:action Lift
+      :parameters (?x - hoist ?y - crate ?z - surface ?p - place)
+      :precondition (and (at ?x ?p) (available ?x) (at ?y ?p) (on ?y ?z) (clear ?y))
+      :effect (and (not (at ?y ?p)) (lifting ?x ?y) (not (clear ?y)) (not (available ?x)) 
+		   (clear ?z) (not (on ?y ?z))))
+   -->
+
+  <task id="Lift">
+    <input name="x" type="hoist"/>
+    <input name="y" type="crate"/>
+    <input name="z" type="surface"/>
+    <input name="p" type="place"/>
+    <precondition> 
+      at($this.x, $this.p) &amp;&amp; available($this.x) &amp;&amp; 
+      at($this.y, $this.p) &amp;&amp; on($this.y, $this.z) &amp;&amp;
+      clear($this.y)
+    </precondition>
+    <postcondition> 
+      !at($this.y, $this.p) &amp;&amp; lifting($this.x, $this.y) &amp;&amp;
+      !clear($this.y) &amp;&amp; !available($this.x) &amp;&amp;
+      clear($this.z) &amp;&amp; !on($this.y, $this.z)
+    </postcondition>
+  </task>
+
+   <!--
+      (:action Drop 
+      :parameters (?x - hoist ?y - crate ?z - surface ?p - place)
+      :precondition (and (at ?x ?p) (at ?z ?p) (clear ?z) (lifting ?x ?y))
+      :effect (and (available ?x) (not (lifting ?x ?y)) (at ?y ?p) (not (clear ?z)) (clear ?y)
+		      (on ?y ?z)))
+   -->
+
+  <task id="Drop">
+    <input name="x" type="hoist"/>
+    <input name="y" type="crate"/>
+    <input name="z" type="surface"/>
+    <input name="p" type="place"/>
+    <precondition> 
+      at($this.x, $this.p) &amp;&amp; at($this.z, $this.p) &amp;&amp; 
+      clear($this.z) &amp;&amp; lifting($this.x, $this.y)
+    </precondition>
+    <postcondition> 
+      !available($this.x) &amp;&amp; !lifting($this.x, $this.y) &amp;&amp;
+      at($this.y, $this.p) &amp;&amp; !clear($this.z) &amp;&amp; 
+      clear($this.y) &amp;&amp; on($this.y, $this.z)
+    </postcondition>
+  </task>
+
+   <!--
+      (:action Load
+      :parameters (?x - hoist ?y - crate ?z - truck ?p - place)
+      :precondition (and (at ?x ?p) (at ?z ?p) (lifting ?x ?y))
+      :effect (and (not (lifting ?x ?y)) (in ?y ?z) (available ?x)))
+   -->
+
+  <task id="Load">
+    <input name="x" type="hoist"/>
+    <input name="y" type="crate"/>
+    <input name="z" type="truck"/>
+    <input name="p" type="place"/>
+    <precondition> 
+      at($this.x, $this.p) &amp;&amp; at($this.z, $this.p) &amp;&amp; 
+      lifting($this.x, $this.y)
+    </precondition>
+    <postcondition>
+      !lifting($this.x, $this.y) &amp;&amp; inside($this.y, $this.z) &amp;&amp;
+      available($this.x)
+    </postcondition>
+  </task>
+
+   <!--
+      (:action Unload 
+      :parameters (?x - hoist ?y - crate ?z - truck ?p - place)
+      :precondition (and (at ?x ?p) (at ?z ?p) (available ?x) (in ?y ?z))
+      :effect (and (not (in ?y ?z)) (not (available ?x)) (lifting ?x ?y)))
+      )
+   -->
+
+  <task id="Unload">
+    <input name="x" type="hoist"/>
+    <input name="y" type="crate"/>
+    <input name="z" type="truck"/>
+    <input name="p" type="place"/>
+    <precondition> 
+      at($this.x, $this.p) &amp;&amp; at($this.z, $this.p) &amp;&amp; 
+      available($this.x) &amp;&amp; inside($this.y, $this.z)
+    </precondition>
+    <postcondition> 
+      !inside($this.y, $this.z) &amp;&amp; !available($this.x) &amp;&amp; 
+      lifting($this.x, $this.y) 
+    </postcondition>
+  </task>
+
+</taskModel>

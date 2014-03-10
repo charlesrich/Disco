@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Animals"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <t:script init="true">
+
+    // these variables are placeholders for any part of the Java system state
+    // all of which can be accessed from JavaScript via LiveConnect
+
+    var animals = new Array('dog', 'cat', 'turtle');
+    var mentioned;
+
+  </t:script>
+
+  <!-- note this is an unusual dialogue tree because it only contains
+       agent utterances.  The idea is that on the user turn, some other
+       system will analyze an unrestricted user utterance (e.g., keyword
+       spotting) and set the mentioned variable above.   
+     
+       See test/Animals1.test  -->
+    
+  <agent id="_talk" text="Let's talk about animals">
+
+    <agent text="Dogs are man's best friend!" 
+           applicable="mentioned == 'dog'"/>
+
+    <agent text="I like cats, too." 
+           applicable="mentioned == 'cat'"/>
+
+    <agent text="My turtles always died." 
+           applicable="mentioned == 'turtle'"/>
+
+    <do task="_talk"
+        applicable="animals.indexOf(mentioned) &lt; 0"/>
+
+  </agent>
+
+</model>

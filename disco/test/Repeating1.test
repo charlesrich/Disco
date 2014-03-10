@@ -1,0 +1,117 @@
+    # May 18, 2012 1:21:45 PM - TaskEngine 1.2.1 / Disco 1.4.3
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > verbose
+    # Writing new keys to /tmp/Repeating1.translate.properties
+  > next false
+  > task Repeating
+    User says "Let's achieve Repeating."
+  > history
+
+[Achieve Repeating by repeating] -accepted -live <-focus
+   User says "Let's achieve Repeating."
+   [repeat: Execute B] -live
+   [repeat$1: Execute B] -optional
+   [repeat$2: Execute B] -optional
+   [repeat$3: Execute B] -optional
+   [next: Execute C]
+
+  > done B
+    User execute B.
+  > history
+
+[Achieve Repeating by repeating] -accepted -live <-focus
+   User says "Let's achieve Repeating."
+   User execute B.
+   [repeat$1: Execute B] -optional -live
+   [next: Execute C] -live
+   [repeat$2: Execute B] -optional
+   [repeat$3: Execute B] -optional
+
+  > next
+    Agent says "Do you want to do B again?"
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve Repeating.
+  >> 1
+    User says "Yes."
+  > history
+
+[Achieve Repeating by repeating] -accepted -live
+   User says "Let's achieve Repeating."
+   User execute B.
+   [repeat$1: Execute B] -optional -accepted -live
+      [User says one of us should execute B again] -succeeded <-focus
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+   [next: Execute C] -live
+   [repeat$2: Execute B] -optional
+   [repeat$3: Execute B] -optional
+
+  > next
+    Agent execute B.
+    Agent says "Do you want to do B again?"
+  > history
+
+[Achieve Repeating by repeating] -accepted -live
+   User says "Let's achieve Repeating."
+   User execute B.
+   [repeat$1: Agent execute B] -optional -accepted -done
+      [User says please execute B again] -succeeded
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+      Agent execute B.
+   [repeat$2: Execute B] -optional -live
+      [User says one of us should execute B again] -live <-focus
+         [User accept do you want to do B again?] -live
+            Agent says "Do you want to do B again?"
+   [next: Execute C] -live
+   [repeat$3: Execute B] -optional
+
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve Repeating.
+  >> 2
+    User says "No."
+  > history
+
+[Achieve Repeating by repeating] -accepted -live
+   User says "Let's achieve Repeating."
+   User execute B.
+   [repeat$1: Agent execute B] -optional -accepted -done
+      [User says please execute B again] -succeeded
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+      Agent execute B.
+   [repeat$2: Execute B] -optional -rejected
+      [User says one of us should execute B again] <-focus
+         Agent says "Do you want to do B again?"
+         User says "No."
+   [next: Execute C] -live
+   [repeat$3: Execute B] -optional
+
+  > next
+    Agent execute C.
+    Agent says "Ok."
+  > history
+
+[Achieve Repeating by repeating] -accepted -done <-focus
+   User says "Let's achieve Repeating."
+   User execute B.
+   [repeat$1: Agent execute B] -optional -accepted -done
+      [User says please execute B again] -succeeded
+         Agent says "Do you want to do B again?"
+         User says "Yes."
+      Agent execute B.
+   [repeat$2: Execute B] -optional -rejected
+      [User says one of us should execute B again]
+         Agent says "Do you want to do B again?"
+         User says "No."
+   Agent execute C.
+   Agent says "Ok." -unexplained
+   [repeat$3: Execute B] -optional
+
+  > quit
+    

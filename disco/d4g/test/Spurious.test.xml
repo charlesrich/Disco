@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:secrets.wpi.edu:models:test:Spurious1">
+  <task id="ID1">
+    <subtasks id="_ID1_subtasks">
+      <step name="_ID1_step" task="disco:Say"/>
+      <step name="_ID1_ref" task="_ID1_tree"/>
+      <binding slot="$_ID1_step.text" value="&#34;text 1&#34;"/>
+      <binding slot="$_ID1_step.external" value="false"/>
+    </subtasks>
+  </task>
+  <task id="_TASK_tree">
+    <subtasks id="_ID8s3_subtasks">
+      <step name="_ID8s3_step" task="disco:Say"/>
+      <binding slot="$_ID8s3_step.text" value="&#34;text 8s3&#34;"/>
+      <binding slot="$_ID8s3_step.external" value="false"/>
+    </subtasks>
+  </task>
+  <task id="_ID1_tree">
+    <subtasks id="_ID2_subtasks">
+      <step name="_ID2_step" task="disco:Say"/>
+      <step name="_ID3_step" task="disco:Say"/>
+      <step name="_ID4_step" task="disco:Say"/>
+      <step name="_ID5_step" task="disco:Say"/>
+      <step name="_ID5_ref" task="_ID5_tree"/>
+      <binding slot="$_ID2_step.text" value="&#34;text 2&#34;"/>
+      <binding slot="$_ID2_step.external" value="true"/>
+      <binding slot="$_ID3_step.text" value="&#34;text 3&#34;"/>
+      <binding slot="$_ID3_step.external" value="false"/>
+      <binding slot="$_ID4_step.text" value="&#34;text 4&#34;"/>
+      <binding slot="$_ID4_step.external" value="true"/>
+      <binding slot="$_ID5_step.text" value="&#34;text 5&#34;"/>
+      <binding slot="$_ID5_step.external" value="false"/>
+    </subtasks>
+  </task>
+  <task id="_ID5_tree">
+    <subtasks id="_ID6s1_subtasks">
+      <step name="_ID6s1_step" task="disco:Say"/>
+      <step name="_REF_step" task="disco:Say"/>
+      <step name="_REF_ref" task="_REF_tree"/>
+      <binding slot="$_ID6s1_step.text" value="&#34;text 6s1&#34;"/>
+      <binding slot="$_ID6s1_step.external" value="true"/>
+      <binding slot="$_REF_step.text" value="&#34;text 7s1&#34;"/>
+      <binding slot="$_REF_step.external" value="false"/>
+    </subtasks>
+    <subtasks id="_ID6s2_subtasks">
+      <step name="_ID6s2_step" task="disco:Say"/>
+      <step name="_ID7s2_step" task="_REF_tree"/>
+      <binding slot="$_ID6s2_step.text" value="&#34;text 6s2&#34;"/>
+      <binding slot="$_ID6s2_step.external" value="true"/>
+    </subtasks>
+    <subtasks id="_ID6s3_subtasks">
+      <step name="_ID6s3_step" task="disco:Say"/>
+      <step name="_TASK_step" task="SomeRandomTask"/>
+      <step name="_TASK_ref" task="_TASK_tree"/>
+      <binding slot="$_ID6s3_step.text" value="&#34;text 6s3&#34;"/>
+      <binding slot="$_ID6s3_step.external" value="true"/>
+    </subtasks>
+  </task>
+  <task id="_REF_tree">
+    <subtasks id="_ID8s1_subtasks">
+      <step name="_ID8s1_step" task="disco:Say"/>
+      <step name="_ID9s1_step" task="_TASK_tree"/>
+      <binding slot="$_ID8s1_step.text" value="&#34;text 8s1&#34;"/>
+      <binding slot="$_ID8s1_step.external" value="true"/>
+    </subtasks>
+  </task>
+  <task id="ManuallyEnteredTask">
+    <input name="testInput" type="string"/>
+    <output name="testOutput" type="string"/>
+    <precondition>
+      ($this.external == undefined) || (!actor($this.external).isCarrying())
+    </precondition>
+    <postcondition sufficient="true">
+      world.get("shack").hasPillar($this.placement)
+    </postcondition>
+    <subtasks id="testSubtask">
+      <step name="testStep1" task="testTask1"/>
+      <step name="testStep2" task="testTask2"/>
+      <step name="testStep3" task="testTask3"/>
+      <applicable>
+	!world.get("shack").hasPillar("right")
+      </applicable>
+      <binding slot="$bind.ing" value="binding1"/>
+    </subtasks>
+  </task>
+  <task id="testTask2">
+    <subtasks id="testSubtask2">
+      <step name="testStep4" task="testTask4"/>
+    </subtasks>
+  </task>
+  <script>Well this is an easy test case.</script>
+  <script>Yep, it works.</script>
+  <subtasks id="aSubtask" goal="aGoal">
+    <step name="_a_step" task="disco:Say"/>
+    <step name="anotherStep" task="testTask2"/>
+    <applicable>app1</applicable>
+    <binding slot="$_a_step.text" value="'1'"/>
+  </subtasks>
+</taskModel>

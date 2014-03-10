@@ -1,0 +1,180 @@
+# Complete RelaxNG compact schema for CEA-2018 (no includes)
+#
+#	Document Title: RNC Schema for CEA-2018, Task Model Description
+#	Document URL: http://ce.org/cea-2018/rnc
+#	Contributors: 
+#		Charles Rich, Mitsubishi Electric Research Laboratories (MERL), rich@merl.com (co-chair of CEA r7wg12)
+#		Gottfried Zimmermann, Access Technologies Group, gzimmermann@acm.org (editor of CEA-2018)
+#	Publisher: Consumer Electronics Association, http://www.ce.org
+#	Date: December 24, 2007
+#
+#	Abstract: This is the complete RNC Schema file for the Task Model Description language, as specified by CEA-2018.  
+#	In case of any differences between this specification and CEA-2018, the normative CEA standard shall take precedence. 
+#
+#	MIME type: A document conforming to CEA-2018 should be served with a MIME type of application/cea-2018+xml.
+#
+#	Versioning: This RNC Schema file may be updated in the future to reflect new revisions of the Task Model 
+#	Description standard, if the new revision is backward compatible.  Otherwise a new RNC Schema file will be 
+#	created with a new namespace URL.
+#
+#	Disclaimer: THIS DOCUMENT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+#	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+#	AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS 
+#	INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, 
+#	OR ANY DAMAGES WHATSOEVER RESULTINGFROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF 
+#	CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF 
+#	THIS DOCUMENT.
+
+default namespace = "http://ce.org/cea-2018"
+
+namespace xsd = "http://www.w3.org/2001/XMLSchema"
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+namespace dc = "http://purl.org/dc/elements/1.1" 
+namespace dcterms = "http://purl.org/dc/terms"
+
+start = 
+	element taskModel { 
+		# about shall be non-empty and not contain fragment identifier          
+		attribute about { xsd:anyURI },
+		Description*,
+		( Task | Subtasks | Script )*
+	}
+
+Description =
+	element dc:* { attribute * { text }*, text? } |
+	element dcterms:* { attribute * { text }*, text? }
+	
+Script = 
+	element script {
+	   # note correct allowing model to be omitted
+		( ( attribute task { xsd:QName }+,
+		    attribute model { xsd:anyURI }* ) |
+		  [ a:defaultValue="false" ]
+		  attribute init { xsd:boolean }?
+		),
+		ScriptContent
+	}
+
+ScriptContent = 
+	attribute platform { token }?, 
+	attribute deviceType { token }?, 
+	# text shall be ECMAScript expression returning boolean or undefined
+	# and unless init may reference $this global variable
+	attribute applicable { text }?,
+	# text shall be ECMAScript program and unless init is true
+	# may reference $this, $platform and $deviceType global variables
+	text
+
+Task = 
+	element task {
+		attribute id { xsd:ID },
+		Description*,
+		Concept*,
+		Input*,
+		Output*,
+		element precondition { 
+			# text shall be ECMAScript expression returning boolean or undefined
+			# and may reference $this global variable
+			text
+		}?,
+		element postcondition { 
+			[ a:defaultValue="false" ]
+			attribute sufficient { xsd:boolean }?,
+			# text shall be ECMAScript expression returning boolean or undefined
+			# and may reference $this global variable
+			text
+		}?,
+		element subtasks { SubtasksContent }*,
+		element script { ScriptContent }*
+	}
+	
+Concept = 
+	element concept {
+		xsd:anyURI |
+		( attribute verb { xsd:QName },
+		  element role {
+			  attribute name { xsd:QName },
+			  # slot shall be the name of task input or output
+			  # type shall be a primitive ECMAScript type or a constructor
+			  # defined in the current ECMAScript execution environment
+			  (
+			   ( attribute type { DataType }, attribute slot { SlotName }? ) |
+			   ( attribute slot { SlotName }, attribute type { DataType }? )
+			  )
+		  }* 
+		) 
+	}
+
+Input = 
+	element input { 
+		Slot, 
+		# modified shall be the name of an output slot
+		attribute modified { SlotName }?
+	}
+
+Output = element output { Slot }
+
+Slot = 
+	# two slots within a given task shall not have the same name
+	attribute name { SlotName },
+	# type shall be primitive ECMAScript datatype or constructor defined
+	# in current ECMAScript execution environment
+	attribute type { DataType }
+
+SlotName = xsd:NCName { pattern = "[^.\-]*" } - ("external" | "when" | "success" | "task" | "model")
+
+DataType = "number" | "string" | "boolean" | xsd:token { pattern = "(\i|$)([\c-[:.\-]]|$)*" }
+
+Subtasks =
+	element subtasks {
+		attribute goal { xsd:QName },	 
+		SubtasksContent
+	}	 
+
+SubtasksContent = 
+	attribute id { xsd:ID },
+	(
+		( [a:defaultValue="true"]
+			attribute ordered { "true" }?,
+			element step { 
+				StepContent 
+			}+ ) 
+		|
+		( attribute ordered { "false" },
+			element step {
+				StepContent,
+				# requires shall contain only subtasks step names
+				attribute requires { list { StepName+ } }?
+			}+ )
+	),
+	element applicable {
+		# text shall be ECMAScript expression returning boolean or undefined
+		# and may reference $this global variable
+		text
+	}?,
+	element binding {
+		attribute slot { BindingSlot },
+		attribute value { 
+			# text shall be ECMAScript expression returning a value of same type as
+			# the slot corresponding to the 'slot' attribute and may reference $this
+			# or global variables corresponding to step names
+			text
+		}
+	}*
+
+BindingSlot = 
+	# token shall be ECMAScript object property expression starting with $this or 
+	# a global variable corresponding to a step name, followed by a property 
+	# corresponding to an input or output slot  
+	xsd:token { pattern = "$\i[\c-[:.\-]]*.\i[\c-[:.\-]]*" }
+
+StepContent = 
+	# two steps within a given subtasks shall not have the same name
+	attribute name { StepName },
+	attribute task { xsd:QName },
+	[ a:defaultValue="1" ]
+	attribute minOccurs { xsd:nonNegativeInteger }?,
+	[ a:defaultValue="1" ]
+	attribute maxOccurs { xsd:positiveInteger | "unbounded" }?
+
+StepName = xsd:NCName { pattern = "[^.\-]*" } - "this"

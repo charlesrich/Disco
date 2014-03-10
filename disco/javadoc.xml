@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="protected" additionalparam="-J-Xmx256m  " author="true" classpath="../task/speech/en_us.jar:../task/speech/cmulex.jar:../task/speech/freetts.jar:../task/lib/js.jar:../task/class:../task/speech/cmu_us_kal.jar:../task/speech/jsapi.jar:../task/lib/msv-rng.jar:../task/speech/tags.jar:../task/speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar:../task/speech/sphinx4.jar:../task/lib/mono/Jint.jar" destdir="docs/api" doctitle="DISCO - Collaborative Discourse Manager" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="edu.wpi.disco,edu.wpi.disco.game.actions,edu.wpi.cetask.guide,edu.wpi.cetask,edu.wpi.disco.plugin,edu.wpi.disco.game,edu.wpi.disco.lang" source="1.7" sourcefiles="../task/java/GuiExample.java" sourcepath="java:../task/java" splitindex="false" use="false" version="true"/>
+    </target>
+</project>

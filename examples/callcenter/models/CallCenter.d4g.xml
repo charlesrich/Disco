@@ -1,0 +1,76 @@
+<d4g:model about="urn:parc.com:CallCenter"   
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:d4g="http://www.cs.wpi.edu/~rich/d4g">
+  <!-- 
+       This is proof-of-concept system for a call center chatbot.    
+  -->
+
+  <task id="FixFreezeProblem">
+
+    <subtasks id="softReset">
+      <step name="performSoftResetA1" task="RemoveBattery"/>
+      <step name="performSoftResetA2" task="WaitOneMinute"/>
+      <step name="performSoftResetA3" task="ReplaceBattery"/>
+      <step name="performSoftResetA4" task="StartDevice"/>
+    </subtasks>
+
+    <subtasks id="hardReset">
+      <step name="performHardResetA1" task="PressMenuKey"/>
+      <step name="performHardResetA2" task="TapSettings"/>
+      <step name="performHardResetA3" task="TapPrivacy"/>
+      <step name="performHardResetA4" task="TapFactoryDataReset"/>
+      <step name="performHardResetA5" task="TapResetPhone"/>
+      <step name="performHardResetA6" task="TapEraseEverything"/>
+    </subtasks>
+  
+</task>
+  
+  <!-- all these primitive actions can be performed only by user -->
+
+  <task id="RemoveBattery">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="WaitOneMinute">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="ReplaceBattery">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="StartDevice">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="PressMenuKey">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="TapSettings">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="TapPrivacy">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="TapFactoryDataReset">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="TapResetPhone">
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="TapEraseEverything">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  
+  <!-- new builtin utterance type. see AskSucceededPlugin -->
+  
+  <task id="com.parc.callcenter.lang.AskSucceeded">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+
+</d4g:model>

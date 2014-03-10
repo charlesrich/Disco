@@ -1,0 +1,14 @@
+Comments on Example 2
+
+You will note that nothing interesting gets said by the coach when the interviewee initially offers the greeting "hey."  That's because I have not written any dialogue for the coach to say.  Feel free to do so if you like!
+
+Similarly for
+    Interviewer says "Thank you."
+interviewee&interviewer  > say
+[1] Yeh.
+[2] You are welcome.
+  >> 1
+    Interviewee says "Yeh."
+
+The coach could interject when the interviewee says "yeh" but again I haven't done that.
+

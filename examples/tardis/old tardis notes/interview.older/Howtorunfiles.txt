@@ -1,0 +1,42 @@
+How to run things in the tardis/Interview directory:
+
+1. Because there's a d4g2018.bat in the tardis/Interview/bin, type:
+
+~/tardis/interview> ./bin/d4g2018 models/Interview
+Validating models/Interview.d4g.xml...
+Transforming models/Interview.d4g.xml to models/Interview.xml...
+Validating models/Interview.xml...
+
+2. Next do same thing to Coach.d4g.xml:
+
+~/tardis/interview> ./bin/d4g2018 models/Coach
+Validating models/Coach.d4g.xml...
+Transforming models/Coach.d4g.xml to models/Coach.xml...
+Validating models/Coach.xml...
+
+3. Then, because disco is not in this directory, but elsewhere, you need ../ to get to it.
+
+~/tardis/Interview> ../disco
+    # Writing log to /tmp/Console.test...
+    # Oct 31, 2011 2:16:12 PM - TaskEngine 1.1 / Disco 1.3
+    Welcome to Disco! (Type 'help' for command list)
+
+4.  Now you must load in order (order is due to various declarations):  
+  Interview.xml -- dialog trees for the interview
+  InterviewTop.xml - toplevel goals for interview
+  Coach.xml - dialogue trees for interview coaching interventions
+
+but each of these is in the models subdir of Interview, so prefix with models!
+
+  > Load models/Interview.xml
+  > load models/InterviewTop.xml
+ > load models/Coach.xml
+
+5. However, to run the two different agents you need to use the game console loop, so use ./bin/game
+
+Note that in loading in game, you must type:
+
+interviewer&interviewee> next
+coach&interviewee > load models/Coach.xml
+
+

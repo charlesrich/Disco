@@ -1,0 +1,14 @@
+CE> load models/Library.xml
+CE> task Borrow 
+CE> next
+CE> done
+CE> status
+CE> next
+CE> task / new Book("Sawyer","Mindscan")
+CE> next
+CE> yes
+CE> next
+CE> done
+CE> yes
+CE> status
+CE> quit

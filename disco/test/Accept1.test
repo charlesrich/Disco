@@ -1,0 +1,40 @@
+    # Feb 5, 2012 9:27:29 AM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > eval var FOO
+    # Returned 'null'
+  > done edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / / false
+    Agent says "Propose.Global on FOO and Flavor and chocolate."
+  > eval FOO
+    # Returned 'null'
+  > say
+[1] Yes.
+[2] No.
+  >> 1
+    User says "Yes."
+    Agent says "Ok."
+  > eval FOO
+    # Returned 'chocolate'
+  > eval FOO=undefined
+    # Returned 'null'
+  > clear
+  > done edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / / false
+    Agent says "Propose.Global on FOO and Flavor and chocolate."
+  > eval FOO
+    # Returned 'null'
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > history
+
+Agent says "Propose.Global on FOO and Flavor and chocolate."
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -live <-focus
+      [User accept] -live
+         Agent says "How shall we achieve IntA?"
+
+  > eval FOO
+    # Returned 'chocolate'
+  > quit
+    

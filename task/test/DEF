@@ -1,0 +1,29 @@
+load models/DEF.xml
+task D
+next
+status
+no
+next
+done
+no
+next
+done E
+status
+no
+next
+done
+no
+next
+no
+status
+task D
+status
+yes
+next
+status
+clear
+task DD
+next
+eval TEST=true
+next
+quit

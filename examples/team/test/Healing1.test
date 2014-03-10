@@ -1,0 +1,105 @@
+    # Jan 21, 2012 2:02:29 PM - TaskEngine 1.1.4 / Disco 1.3.9
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Dummy.xml
+  > load models/Team.xml
+  > eval addLowHealth(Character.LILY);
+    # Returned 'null'
+  > status
+
+[ ]
+
+  > eval Character.LILY.health = -10
+    # Returned '-10.0'
+  > status
+
+[ ] -live
+
+  > next
+    Character healer is Kevin.
+    Character Lily starts toward (0.0, 10.0, 0.0).
+  > eval Character.LILY.setLocation(Character.KEVIN.getLocation())
+    # Returned 'null'
+  > next
+  > status
+
+[ ] -live
+   Character healer is Kevin.
+   [Lily goes to (0.0, 10.0, 0.0)] -succeeded <-focus
+      Character Lily starts toward (0.0, 10.0, 0.0).
+      [ ]
+   [ ] -live
+   [Character execute AddLowHealth on Lily]
+
+  > eval Character.LILY.health = 10
+    # Returned '10.0'
+  > status
+
+[ ] -live
+   Character healer is Kevin.
+   [Lily goes to (0.0, 10.0, 0.0)] -succeeded <-focus
+      Character Lily starts toward (0.0, 10.0, 0.0).
+      [ ]
+   [Character execute AddLowHealth on Lily] -live
+
+  > next
+    Character execute AddLowHealth on Lily.
+  > status
+
+[ ] -done <-focus
+   Character healer is Kevin.
+   [Lily goes to (0.0, 10.0, 0.0)] -succeeded
+   Character execute AddLowHealth on Lily.
+
+[ ]
+
+  > eval HEALER = null
+    # Returned 'null'
+  > eval Character.LILY.health = -10
+    # Returned '-10.0'
+  > status
+
+[ ] -done <-focus
+   Character healer is Kevin.
+   [Lily goes to (0.0, 10.0, 0.0)] -succeeded
+   Character execute AddLowHealth on Lily.
+
+[ ] -live
+
+  > next
+    Character Lily finds cover.
+  > status
+
+[ ] -live
+   [Lily goes to cover] -live <-focus
+      Character Lily finds cover.
+      [ ] -live
+   [Character execute AddLowHealth on Lily]
+
+  > eval Character.LILY.inCover = true
+    # Returned 'true'
+  > next
+    Character execute AddLowHealth on Lily.
+  > status
+
+[ ] -done <-focus
+   [Lily goes to cover] -succeeded
+   Character execute AddLowHealth on Lily.
+
+[ ]
+
+  > history
+
+[ ] -done
+   Character healer is Kevin.
+   [Lily goes to (0.0, 10.0, 0.0)] -succeeded
+      Character Lily starts toward (0.0, 10.0, 0.0).
+   Character execute AddLowHealth on Lily.
+[ ] -done <-focus
+   [Lily goes to cover] -succeeded
+      Character Lily finds cover.
+   Character execute AddLowHealth on Lily.
+
+[ ]
+
+  > quit
+    

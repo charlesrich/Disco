@@ -1,0 +1,37 @@
+<taskModel about="urn:cetask.wpi.edu:examples:DEF" xmlns="http://ce.org/cea-2018">
+  <task id="D"/>
+
+  <task id="E"/>
+
+  <task id="F">
+    <script>println("[Executing script for F]");</script>
+  </task>
+
+  <subtasks id="EF" goal="D" ordered="false">
+    <step name="e" task="E" maxOccurs="3"/>
+    <step name="f" task="F"/>
+    <binding slot="$e.external" value="true"/>
+    <binding slot="$f.external" value="false"/>
+  </subtasks>
+
+  <task id="DD"/>
+
+  <task id="EE"/>
+
+  <task id="FF">
+    <postcondition sufficient="true"> TEST </postcondition>
+  </task>
+  <task id="GG"/>
+
+  <subtasks id="DDEE" goal="DD">
+    <step name="ee" task="EE"/>
+  </subtasks>
+
+  <subtasks id="FFGG" goal="EE">
+    <step name="ff" task="FF"/>
+    <step name="gg" task="GG"/>
+    <binding slot="$ff.external" value="true"/>
+  </subtasks>
+
+  <script init="true"> var TEST; </script>
+</taskModel>
