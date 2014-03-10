@@ -1,4 +1,4 @@
-Copyright (c) 2010 Charles Rich and Worcester Polytechnic Institute
+Copyright (c) 2014 Charles Rich and Worcester Polytechnic Institute
 
 MIT License: Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files (the
