@@ -1,12 +1,0 @@
-~/games-for-jobs> ../Disco-projects/disco/bin/d4g2018 models/Interview
-Validating models/MyModel.d4g.xml...
-Transforming models/MyModel.d4g.xml to models/MyModel.xml...
-Validating models/MyModel.xml...
-
-~/games-for-jobs> ./disco test/Interview1Succeed Interview1 (14 sec)
-
-Remember status, debug, verbose!
-
-./disco
-
-load in order of reference!
