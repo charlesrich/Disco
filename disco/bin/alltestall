@@ -49,8 +49,8 @@ if [ -e callcenter ]; then
   result=`expr $result + $?`
   cd ..
 fi
-if [ -e ../always ]; then
-   ../git/always/core/agent/bin/always-alltestall
+if [ -e ../../always ]; then
+   ../../always/core/agent/bin/always-alltestall
    result=`expr $result + $?`
 fi
 #
