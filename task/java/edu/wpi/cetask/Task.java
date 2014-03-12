@@ -463,13 +463,25 @@ public class Task extends Instance {
    }
    
    protected Boolean checkAchieved () {
-      Boolean success = isAchieved();
-      if ( success != null ) {
-         // if condition is unknown, then respect existing value of 'success'
-         // slot, since it may come from communication
-         if ( Utils.isFalse(success) ) setSuccess(false);
-         else if ( getType().isSufficient() ) setSuccess(true);
-      }
+      Boolean condition = isAchieved();
+      // if condition is unknown, then don't change success slot
+      // since current value may come from communication or grounding script
+      if ( condition != null ) {
+         Boolean slot = getSuccess();
+         boolean sufficient = getType().isSufficient();
+         if ( slot == null ) {
+            if ( Utils.isFalse(condition) || sufficient )
+               setSuccess(condition);
+         } else if ( !condition.equals(slot) ) { // conflicting values
+            if ( Utils.isFalse(condition) ) {
+               // if condition indicates failure, then be conservative
+               setSuccess(condition);
+               getErr().println("WARNING: Ignoring true success slot in "+this);
+            } else if ( sufficient ) 
+               // if slot indicates failure, then be conservative
+               getErr().println("WARNING: Ignoring true sufficient postcondition in "+this);
+            }
+         }
       return getSuccess();
    }
    
