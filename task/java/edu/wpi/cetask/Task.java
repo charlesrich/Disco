@@ -480,11 +480,11 @@ public class Task extends Instance {
             } else if ( sufficient ) 
                // if slot indicates failure, then be conservative
                getErr().println("WARNING: Ignoring true sufficient postcondition in "+this);
-            }
          }
+      }
       return getSuccess();
    }
-   
+
    /**
     * Get the value of the predefined 'external' input slot.
     *  
