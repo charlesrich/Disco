@@ -6,52 +6,68 @@ cd $this/..
 #
 echo ">> disco/test"
 ./bin/testall
-result=`expr $result + $?`
+if [ $? != 0 ]; then
+  result=`expr $result + 1`
+fi
 #
 echo ">> task/test"
 cd ../task
 ../disco/bin/testall test bin/guide
-result=`expr $result + $?`
+if [ $? != 0 ]; then
+  result=`expr $result + 1`
+fi
 cd ../examples
 #
 if [ -e DiscoUnity ]; then
   echo ">> DiscoUnity/MyProject/test"
   cd DiscoUnity/MyProject
   ../../../disco/bin/testall test
-  result=`expr $result + $?`
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
   cd ../..
 fi
 if [ -e tardis ]; then
   echo ">> tardis/test"
   cd tardis
   ../../disco/bin/testall test ../../disco/bin/coach
-  result=`expr $result + $?`
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
   cd ..
 fi
 if [ -e team ]; then
   echo ">> team/test"
   cd team
   ../../disco/bin/testall test
-  result=`expr $result + $?`
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
   cd ..
 fi
 if [ -e secrets ]; then
   echo ">> secrets/test"
   cd secrets
   ../../disco/bin/testall test bin/secrets
-  result=`expr $result + $?`
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
   cd ..
 fi
 if [ -e callcenter ]; then
   echo ">> callcenter/test"
   cd callcenter
   ../../disco/bin/testall test bin/callcenter
-  result=`expr $result + $?`
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
   cd ..
 fi
 if [ -e ../../always ]; then
    ../../always/core/agent/bin/always-alltestall
-   result=`expr $result + $?`
+   if [ $? != 0 ]; then
+     result=`expr $result + 1`
+   fi
 fi
 #
 all_end=`date +%s`
