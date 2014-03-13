@@ -20,38 +20,19 @@ ________________________________________________________________
 
 README file for the toplevel directory of Disco.
 
-This is an implementation of a "collaboration manager" which is
-inspired by the same collaborative discourse theory as Collagen (see
-docs).  Disco uses the ANSI/CEA-2018 Task Model Description (CE TASK
-1.0) standard for its task representation and is built on top of the
-CETask reference implementation (see 'task' project packaged together
-with this).
-
-NB: This software requires JRE 1.7 (Java SE 7.0), which includes
-JavaScript.
-
-Disco is intended to be integrated with other systems, such as
-appliances, games, robots, etc.  However, for demonstration and
-development purposes, it also provides a simple command line
-interface, which is an extension of the shell in the CETask
-implementation.
-
-The system release archive (zip) file contains the following folder
-structure:
-
    java         Java source files directory
 
      edu/wpi/disco          Basic discourse engine
      edu/wpi/disco/lang     Lightweight language semantics [see docs]
      edu/wpi/disco/plugin   Plugins for discourse generation [see docs]
      edu/wpi/disco/game     Disco for Games (D4g) [see docs]
+     ComponentExample.java  Example for integrating Disco into larger system
 
    bin          Unix shell scripts directory [see README.txt]
                 (To use these scripts on Windows, install www.cygwin.com)
 
-   docs         Documentation
+   docs         Documentation [see also task/docs]
      api                    Javadoc for Disco
-     GTGE...zip             Javadoc for Golden T Game Engine
      *.pdf                  Relevant papers [see README.txt] 
         
    models       Task models directory [see README.txt]
@@ -66,53 +47,10 @@ structure:
      golden_0_2_3.jar       Golden T Game Engine class files   
      saxon9he.jar           Saxon XSLT class files
    
-   license.terms   Open source license terms
-   .classpath   Eclipse configuration file 
-   .project     Eclipse configuration file (for Eclipse 1.4.2 Juno)
+   license.terms   Open source MIT license terms
+   .classpath   Eclipse (Kepler) configuration file 
+   .project     Eclipse (Kepler) configuration file
 
-To simply run the precompiled version of the system, add lib/disco.jar
-to your classpath and invoke main class edu.wpi.disco.Disco.  You can
-also run the jar file directly as:
-
-     java -jar lib/disco.jar
-
-Note this jar file includes all the binary class files in both the
-disco and task projects (but not the libraries for disco/d4g or the speech
-libraries in task/lib).
-
-[Hint: to change the temporary directory where the log file is written
- to someplace more convenient, add a JRE argument, such as
- -Djava.io.tmpdir=/tmp ]
-
-*** The best way to familiarize yourself further with Disco
-    is to look next at test/README.txt ***    
-
-Please send bug reports to bug-disco@wpi.edu and make sure to
-include both the Console.test file (from directory indicated at
-system startup) and all task model files involved.
-
-For Eclipse Users:
-
-You can easily create the two Eclipse projects (called task and disco)
-containing the source by importing the system release archive (zip)
-file as follows:
-
-          File > Import > General > *Existing...* > Next 
-          > Select Archive > Browse > Select All > Finish
-          
-NB: If you are developing your own system in Eclipse using Disco it
-would be best to make your system be a *separate* project, rather than
-adding your code to this project.  You can simply add the task project
-to the project dependencies (see Build Path) of your new project.
-Note that the exports of the task project include all the necessary
-libraries, including those for speech, but assumes that the task
-source has been compiled.  If you cannot or do not build the disco
-project, then add the precompiled disco.jar as a library of your
-new project.
-
-rich@wpi.edu
-
-________________________________________________________________
 
 RELEASE NOTES FOR DISCO 1.6 - Released June, 2012
 
