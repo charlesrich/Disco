@@ -31,7 +31,7 @@ projects containing all of the source code for Disco.  The task
 project is the reference implementation for CETask; the disco project
 depends on it and adds the focus stack and utterances.  The folders
 under examples contain Eclipse Java projects for some examples built
-using Disco.
+using Disco.  You do not need to install these if you don't want to.
 
 To simply run the precompiled version of the system, add lib/disco.jar
 to your classpath and invoke main class edu.wpi.disco.Disco.  You can
