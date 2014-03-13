@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>9.0.21022</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{306B9622-6474-0D19-83D7-B08F35872B12}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_3_4_2;UNITY_3_4;UNITY_EDITOR;ENABLE_PROFILER;UNITY_STANDALONE_WIN;ENABLE_GENERICS;ENABLE_DUCK_TYPING;ENABLE_TERRAIN;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CLOTH;ENABLE_WWW</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+	<Reference Include="System" />
+    <Reference Include="System.XML" />
+	<Reference Include="System.Core" />
+	<Reference Include="UnityEngine">
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="Assets\DiscoUnity\Console\CommandHistory.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\DynamicStringReader.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\Program.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\ShellControl.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\ShellTextBox.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\StringWriterWithEvent.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\TextForm.Designer.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\TextForm.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\W32ClassBatchUnregisterer.cs" />
+     <Compile Include="Assets\DiscoUnity\Console\W32ClassUnregisterer.cs" />
+     <Compile Include="Assets\DiscoUnity\DiscoUnity.cs" />
+     <Compile Include="Assets\MyDisco.cs" />
+     <Compile Include="Assets\MyEntity.cs" />
+     <Compile Include="Assets\MyGame.cs" />
+     <None Include="Assets\Resources\MyModel.xml" />
+     <None Include="Assets\Resources\MyModel.properties.txt" />
+     <None Include="Assets\Resources\MyModel.d4g.xml" />
+ <Reference Include="IKVM.AWT.WinForms">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.AWT.WinForms.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Beans">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Beans.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Core">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Core.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Media">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Media.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Misc">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Misc.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Naming">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Naming.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Remoting">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Remoting.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Security">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Security.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.SwingAWT">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.SwingAWT.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Text">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Text.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.Util">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.Util.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.XML.API">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.XML.API.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.XML.Parse">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.XML.Parse.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.OpenJDK.XML.XPath">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.OpenJDK.XML.XPath.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.Reflection">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.Reflection.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.Runtime.JNI">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.Runtime.JNI.dll</HintPath>
+ </Reference>
+ <Reference Include="IKVM.Runtime">
+ <HintPath>Assets\DiscoUnity\IKVM\IKVM.Runtime.dll</HintPath>
+ </Reference>
+ <Reference Include="Antlr3.Runtime">
+ <HintPath>Assets\DiscoUnity\lib\Antlr3.Runtime.dll</HintPath>
+ </Reference>
+ <Reference Include="Jint">
+ <HintPath>Assets\DiscoUnity\lib\Jint.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Data">
+ <HintPath>Assets\DiscoUnity\lib\System.Data.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Drawing">
+ <HintPath>Assets\DiscoUnity\lib\System.Drawing.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Windows.Forms">
+ <HintPath>Assets\DiscoUnity\lib\System.Windows.Forms.dll</HintPath>
+ </Reference>
+ <Reference Include="disco">
+ <HintPath>Assets\DiscoUnity\lib\disco.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  
+</Project>
+	

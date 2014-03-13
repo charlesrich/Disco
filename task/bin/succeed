@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Usage: succeed <filename>
+#
+# Copies temporary log file resulting from execution of 'guide <filename>' to
+# <filename>.guide.   Useful for creating new log file.
+#
+cp -v /tmp/`basename $1`.guide `dirname $1`
+
+
+
+

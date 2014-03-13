@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:secrets.wpi.edu:models:IceWall">
+   <task id="IceWall">
+      <subtasks id="_IceWall_subtasks">
+         <step name="_IceWall_step" task="disco:Say"/>
+         <step name="_IceWall_ref" task="_IceWall_tree"/>
+         <binding slot="$_IceWall_step.text"
+                  value="&#34;Clearly. You destroyed at least twenty in Cape Town alone.&#34;"/>
+         <binding slot="$_IceWall_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_SC_Rest">
+      <subtasks id="__SC_Rest_subtasks">
+         <step name="__SC_Rest_step" task="disco:Say"/>
+         <step name="__SC_Rest_ref" task="__SC_Rest_tree"/>
+         <binding slot="$__SC_Rest_step.text" value="&#34;Yes. I want you to know that...&#34;"/>
+         <binding slot="$__SC_Rest_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_IceWall_tree">
+      <subtasks id="_d4e4_subtasks">
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_LeadIn_step" task="disco:Say"/>
+         <step name="_LeadIn_ref" task="_LeadIn_tree"/>
+         <binding slot="$_d4e4_step.text" value="&#34;So? It was easier to see them that way.&#34;"/>
+         <binding slot="$_d4e4_step.external" value="true"/>
+         <binding slot="$_LeadIn_step.text"
+                  value="&#34;No, it wasn't. And it was more difficult to follow them, too!&#34;"/>
+         <binding slot="$_LeadIn_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:Say"/>
+         <step name="_d4e9_step" task="disco:Say"/>
+         <step name="_d4e10_step" task="_LeadIn_tree"/>
+         <binding slot="$_d4e8_step.text"
+                  value="&#34;Whoah, whoah, whoah. That was an accident. There was no way to know that crane would malfunction.&#34;"/>
+         <binding slot="$_d4e8_step.external" value="true"/>
+         <binding slot="$_d4e9_step.text"
+                  value="&#34;And some nice, innocent walls had to suffer for it.&#34;"/>
+         <binding slot="$_d4e9_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_LeadIn_tree">
+      <subtasks id="_d4e6_subtasks">
+         <step name="_d4e6_step" task="disco:Say"/>
+         <step name="_d4e7_step" task="Escape"/>
+         <binding slot="$_d4e6_step.text" value="&#34;Whatever. We still have to get past this one.&#34;"/>
+         <binding slot="$_d4e6_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="__SC_Rest_tree">
+      <subtasks id="_d4e58_subtasks">
+         <step name="_d4e58_step" task="disco:Say"/>
+         <step name="_d4e59_step" task="disco:Say"/>
+         <step name="_d4e60_step" task="disco:Say"/>
+         <binding slot="$_d4e58_step.text" value="&#34;I'm the one who stole the diamonds.&#34;"/>
+         <binding slot="$_d4e58_step.external" value="true"/>
+         <binding slot="$_d4e59_step.text" value="&#34;Huh?&#34;"/>
+         <binding slot="$_d4e59_step.external" value="false"/>
+         <binding slot="$_d4e60_step.text" value="&#34;Uh... never mind.&#34;"/>
+         <binding slot="$_d4e60_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e61_subtasks">
+         <step name="_d4e61_step" task="disco:Say"/>
+         <step name="_d4e62_step" task="disco:Say"/>
+         <binding slot="$_d4e61_step.text" value="&#34;Umm... it's very cold out here.&#34;"/>
+         <binding slot="$_d4e61_step.external" value="true"/>
+         <binding slot="$_d4e62_step.text" value="&#34;How informative.&#34;"/>
+         <binding slot="$_d4e62_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="Escape">
+      <postcondition sufficient="true">
+      world.get("door").isOpen() &amp;&amp; (player() &gt;= walkToLocation.x)
+    </postcondition>
+      <subtasks id="over">
+         <step name="boost" task="Boost"/>
+         <step name="clamber" task="Clamber"/>
+         <step name="open" task="OpenDoor"/>
+         <step name="walk" task="Walk"/>
+         <binding slot="$clamber.external" value="!$boost.external"/>
+         <binding slot="$open.external" value="!$boost.external"/>
+         <binding slot="$walk.external" value="$boost.external"/>
+      </subtasks>
+      <subtasks id="under">
+         <step name="say" task="disco:Say$Agent"/>
+         <binding slot="$say.text"
+                  value="'Are you crazy? There\'s a reason it\'s called permafrost: it\'s permanent.'"/>
+      </subtasks>
+      <subtasks id="around">
+         <step name="say" task="disco:Say$Agent"/>
+         <binding slot="$say.text"
+                  value="'It stretches on to the horizons. I heard that a company called InfiniWall makes these.'"/>
+      </subtasks>
+      <subtasks id="through">
+         <step name="say" task="disco:Say$Agent"/>
+         <binding slot="$say.text" value="'Are you kidding? There\'s no kindling here!'"/>
+      </subtasks>
+   </task>
+   <task id="Boost">
+      <script>
+      actor($this.external).setMovable(false);
+      other($this.external).setMovable(false);
+      world.get("climbableWall").climb();
+      actor($this.external).getLocation().setLocation(boosterLocation);
+      other($this.external).getLocation().setLocation(boostedLocation);
+    </script>
+   </task>
+   <task id="Clamber">
+      <script>
+      world.get("clamberTrigger").clamber();
+      actor($this.external).getLocation().setLocation(clamberLocation);
+      actor($this.external).setMovable(true);
+      other($this.external).setMovable(true);
+    </script>
+   </task>
+   <task id="OpenDoor">
+      <script>
+      if ( !$this.external ) moveNPC("sidekick", walkToLocation);
+      if ( world.get("door") ) world.get("door").open();
+    </script>
+   </task>
+   <task id="Walk">
+      <postcondition>
+      actor($this.external) != undefined &amp;&amp;
+      actor($this.external).getLocation().x &gt;= walkToLocation.x
+    </postcondition>
+      <script>
+      if ( $this.external ) movePlayer(walkToLocation);
+      else moveNPC("sidekick", walkToLocation);
+    </script>
+   </task>
+   <task id="SillyConversation">
+      <precondition>
+      (player() &gt;= walkToLocation.x) &amp;&amp; (sidekick() &lt; walkToLocation.x)
+    </precondition>
+      <subtasks id="silly_subtasks">
+         <step name="say" task="disco:Say$Agent"/>
+         <step name="rest_of_conversation" task="_SC_Rest"/>
+         <binding slot="$say.text" value="'Really? Now is the time to do this?'"/>
+      </subtasks>
+   </task>
+   <script init="true">
+    function player () { return getX("player"); }
+    function sidekick () { return getX("sidekick"); }
+    function getX (actor) { return world.get(actor).getLocation().x; }
+    walkToLocation = new Packages.java.awt.Point(16, 10);    
+
+    function actor (external) {
+      if (external == undefined) return undefined;
+      if (external) return world.get("player");
+      return world.get("sidekick");
+    }
+    function other (external) {
+      if (external == undefined) return undefined;
+      if (external) return world.get("sidekick");
+      return world.get("player");
+    }
+    
+	function rel(object, offX, offY) {
+	  location = object.getLocation();
+	  return new Packages.java.awt.Point(location.x + offX, location.y + offY);
+	}
+	
+	boosterLocation = rel(world.get("climbableWall"), -1, 0);
+	boostedLocation = rel(world.get("clamberTrigger"), -1, 0);
+	clamberLocation = rel(world.get("clamberTrigger"), 1, 0);
+  </script>
+</taskModel>

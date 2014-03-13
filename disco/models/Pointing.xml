@@ -1,0 +1,59 @@
+<taskModel about="urn:disco.wpi.edu:examples:Pointing"
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <script init="true">
+
+    function Plate (color){
+      this.color = color;
+    }
+
+    Plate.prototype.toString = function () { return this.color +" plate"; }
+
+    var Red = new Plate("red"),
+        Blue = new Plate("blue");
+
+    donePlaying = false;
+
+  </script>
+
+
+  <task id="PointingGame">
+    <subtasks id="game">
+      <step name="greet" task="disco:edu.wpi.disco.lang.Say$Agent"/>
+      <step name="play" task="Play"/>
+      <step name="signoff" task="disco:edu.wpi.disco.lang.Say$Agent"/>
+      <binding slot="$greet.text" value="'%greeting%'"/>
+      <binding slot="$signoff.text" value="'%signoff%'"/>
+    </subtasks>
+  </task>
+
+  <task id="Play">
+    <postcondition sufficient="true">
+      donePlaying
+    </postcondition>
+    <subtasks id="play">
+      <step name="round" task="Round"/>
+      <step name="continue" task="Play"/>
+    </subtasks>
+  </task>
+
+  <task id="Round">
+    <subtasks id="round">
+      <step name="player" task="PlayerPoint"/>
+      <step name="robot" task="RobotPoint"/>
+      <binding slot="$robot.plate" value="$player.plate"/>
+    </subtasks>
+  </task>
+
+  <task id="PlayerPoint">
+    <output name="plate" type="Plate"/>
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <task id="RobotPoint">
+    <input name="plate" type="Plate"/>
+    <binding slot="$this.external" value="false"/>
+  </task>
+
+</taskModel>

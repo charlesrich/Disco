@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:secrets.wpi.edu:models:test:D4g1">
+   <task id="_d2e3" is-generated="true">
+      <subtasks id="_d2e3_subtasks">
+         <step name="_d2e3_step" task="disco:Say"/>
+         <binding slot="$_d2e3_step.text" value="&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e4" is-generated="true">
+      <subtasks id="_d2e4_subtasks">
+         <step name="_d2e4_step" task="disco:Say"/>
+         <binding slot="$_d2e4_step.text" value="&#34;no js&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e5" is-generated="true">
+      <subtasks id="_d2e5_subtasks">
+         <step name="_d2e5_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e5_step.text" value="&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e6" is-generated="true">
+      <subtasks id="_d2e6_subtasks">
+         <step name="_d2e6_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e6_step.text" value="&#34;( )&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e7" is-generated="true">
+      <subtasks id="_d2e7_subtasks">
+         <step name="_d2e7_step" task="disco:Say"/>
+         <binding slot="$_d2e7_step.text" value="&#34;\\ { }&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e8" is-generated="true">
+      <subtasks id="_d2e8_subtasks">
+         <step name="_d2e8_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e8_step.text" value="&#34;\&#34;some\&#34;+(javascript)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e9" is-generated="true">
+      <subtasks id="_d2e9_subtasks">
+         <step name="_d2e9_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e9_step.text" value="&#34;\&#34;and \&#34;+(more)+\&#34; and even \&#34;+(more)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e10" is-generated="true">
+      <subtasks id="_d2e10_subtasks">
+         <step name="_d2e10_step" task="disco:Say"/>
+         <binding slot="$_d2e10_step.text" value="&#34;escaped {not javascript}&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e11" is-generated="true">
+      <subtasks id="_d2e11_subtasks">
+         <step name="_d2e11_step" task="disco:Say"/>
+         <binding slot="$_d2e11_step.text" value="&#34;non \\\&#34;+(escaped)+\&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e12" is-generated="true">
+      <subtasks id="_d2e12_subtasks">
+         <step name="_d2e12_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e12_step.text" value="&#34;(js at beginning)+\&#34; but not end\&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e14" is-generated="true">
+      <subtasks id="_d2e14_subtasks">
+         <step name="_d2e14_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e14_step.text" value="&#34;(js only)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e15" is-generated="true">
+      <subtasks id="_d2e15_subtasks">
+         <step name="_d2e15_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e15_step.text" value="&#34;\&#34;not at beginning\&#34;+(but at end)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e16" is-generated="true">
+      <subtasks id="_d2e16_subtasks">
+         <step name="_d2e16_step" task="disco:Say"/>
+         <binding slot="$_d2e16_step.text" value="&#34;{normal text}&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e17" is-generated="true">
+      <subtasks id="_d2e17_subtasks">
+         <step name="_d2e17_step" task="disco:Say"/>
+         <binding slot="$_d2e17_step.text" value="&#34;\\\\\\\&#34;+(is js\\\\\\\\)+\&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e18" is-generated="true">
+      <subtasks id="_d2e18_subtasks">
+         <step name="_d2e18_step" task="disco:Say"/>
+         <binding slot="$_d2e18_step.text" value="&#34;\\\\\\{not js\\\\\\}&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e19" is-generated="true">
+      <subtasks id="_d2e19_subtasks">
+         <step name="_d2e19_step" task="disco:Say"/>
+         <binding slot="$_d2e19_step.text" value="&#34;\\{nor is this} or {this}&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e20" is-generated="true">
+      <subtasks id="_d2e20_subtasks">
+         <step name="_d2e20_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e20_step.text" value="&#34;\&#34;this is \&#34;+(javascript})&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e21" is-generated="true">
+      <subtasks id="_d2e21_subtasks">
+         <step name="_d2e21_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e21_step.text" value="&#34;\&#34;as \&#34;+(} is \\} this \\\\)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e22" is-generated="true">
+      <subtasks id="_d2e22_subtasks">
+         <step name="_d2e22_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e22_step.text"
+                  value="&#34;\&#34;my name is \&#34;+(if (1) { write('test } \\}') } else { var2 })&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e23" is-generated="true">
+      <subtasks id="_d2e23_subtasks">
+         <step name="_d2e23_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e23_step.text"
+                  value="&#34;\&#34;before \&#34;+( /* comment } \\\\} */ // com2 })+\&#34; after\&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e24" is-generated="true">
+      <subtasks id="_d2e24_subtasks">
+         <step name="_d2e24_step" task="disco:Say"/>
+         <binding slot="$_d2e24_step.text" value="&#34;\-=!@#$%^&amp;*()_+[]|;:'&#34;,./&lt;&gt;?&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e26" is-generated="true">
+      <subtasks id="_d2e26_subtasks">
+         <step name="_d2e26_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e26_step.text" value="&#34;(\-=!@#$%^&amp;*()_+[]|;:'&#34;,./&lt;&gt;?)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e27" is-generated="true">
+      <subtasks id="_d2e27_subtasks">
+         <step name="_d2e27_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e27_step.text" value="&#34;(js)+''+(js)+''+(js)+\&#34; \&#34;+(js)+\&#34;\\{not}\&#34;&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e28" is-generated="true">
+      <subtasks id="_d2e28_subtasks">
+         <step name="_d2e28_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e28_step.text" value="&#34;()+''+()&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e29" is-generated="true">
+      <subtasks id="_d2e29_subtasks">
+         <step name="_d2e29_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e29_step.text" value="&#34;()+''+(js)+''+(js)+''+()&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e30" is-generated="true">
+      <subtasks id="_d2e30_subtasks">
+         <step name="_d2e30_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e30_step.text" value="&#34;(a)+\&#34;b\&#34;+(c)+\&#34;d\&#34;+(e)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e31" is-generated="true">
+      <subtasks id="_d2e31_subtasks">
+         <step name="_d2e31_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e31_step.text" value="&#34;()+''+(})&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e32" is-generated="true">
+      <subtasks id="_d2e32_subtasks">
+         <step name="_d2e32_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e32_step.text" value="&#34;()+''+(\\)&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e33" is-generated="true">
+      <subtasks id="_d2e33_subtasks">
+         <step name="_d2e33_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e33_step.text" value="&#34;()+''+(\\})+''+()&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e34" is-generated="true">
+      <subtasks id="_d2e34_subtasks">
+         <step name="_d2e34_step" task="disco:Say$Expression"/>
+         <binding slot="$_d2e34_step.text" value="&#34;(\\\\)+''+(\\\\)&#34;"/>
+      </subtasks>
+   </task>
+</taskModel>

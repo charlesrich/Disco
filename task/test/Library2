@@ -1,0 +1,14 @@
+CE> load models/Library.xml
+CE> task Borrow / new Book("Brin","The Uplift War")
+CE> next
+CE> done
+CE> next
+CE> yes
+CE> status
+CE> next
+CE> task / "Heinlein"
+CE> yes
+CE> next
+CE> done
+CE> yes
+CE> quit

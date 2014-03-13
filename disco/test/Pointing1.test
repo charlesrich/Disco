@@ -1,0 +1,47 @@
+    # Oct 16, 2010 7:41:22 PM - TaskEngine 1.05 / Disco 1.1
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Pointing.xml
+  > say
+[1] Let's play the pointing game.
+  >> 1
+    User says "Let's play the pointing game."
+    Agent says "Hello, my name is Melvin. Let's play the pointing game."
+  > next
+    Agent says "Please point at a plate."
+  > done / Blue
+    User point at blue plate.
+    Agent point at blue plate.
+    Agent says "Please point at a plate."
+  > done / Red
+    User point at red plate.
+    Agent point at red plate.
+    Agent says "Please point at a plate."
+  > eval donePlaying = true
+    # Returned 'true'
+  > next
+    Agent says "Thanks for playing with me!"
+  > history
+
+[Play the pointing game] -accepted -done <-focus
+   User says "Let's play the pointing game."
+   Agent says "Hello, my name is Melvin. Let's play the pointing game."
+   [Play] -succeeded
+      [Play a round] -done
+         [User point at blue plate] -done
+            Agent says "Please point at a plate."
+            User point at blue plate.
+         Agent point at blue plate.
+      [Play]
+         [Play a round] -done
+            [User point at red plate] -done
+               Agent says "Please point at a plate."
+               User point at red plate.
+            Agent point at red plate.
+         [Play]
+            [Play a round]
+               [User point at a plate]
+                  Agent says "Please point at a plate."
+   Agent says "Thanks for playing with me!"
+
+  > quit
+    

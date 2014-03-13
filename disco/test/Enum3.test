@@ -1,0 +1,23 @@
+    # Oct 16, 2010 8:39:06 PM - TaskEngine 1.05 / Disco 1.1
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task TestBooleanInput
+    User says "One of us should execute TestBooleanInput."
+    Agent says "Who should execute TestBooleanInput?"
+  > say
+[1] I should execute TestBooleanInput.
+[2] You should execute TestBooleanInput.
+[3] Let's not execute TestBooleanInput.
+  >> 2
+    User says "You should execute TestBooleanInput."
+    Agent says "What is the TestBooleanInput input?"
+  > say
+[1] True.
+[2] False.
+[3] Please do not execute TestBooleanInput.
+  >> 1
+    User says "True."
+    Agent execute TestBooleanInput on true.
+    Agent says "Ok."
+  > quit
+    

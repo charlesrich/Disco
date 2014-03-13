@@ -1,0 +1,224 @@
+<taskModel about="urn:disco.wpi.edu:Disco" xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- Builtin utterance task classes (see source code for semantics) 
+  
+  	    Note: For convenience, we support an optional abbreviated notation for using
+  	    these task types in decompositions, e.g.,
+
+  	      task="disco:Say.Agent"  instead of
+  	      task="disco:edu.wpi.disco.lang.Say$Agent"
+
+       (where disco: is defined as a prefix for this namespace)
+       
+       See disco/java/edu/wpi/disco/lang for Java constructors.
+  -->
+  
+  <task id="edu.wpi.disco.lang.Propose$Global">   
+    <input name="variable" type="string" />
+    <input name="type" type="string" />
+    <input name="value" /> 
+    <postcondition sufficient="true">
+	    $this.variable != undefined &amp;&amp; 
+	    ( $this.value == undefined ? this[$this.variable] != undefined :
+	        this[$this.variable] == $this.value)
+   	</postcondition> 
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$Should">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+       $this.goal != undefined &amp;&amp; 
+       Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getShould())
+    </postcondition>
+  </task>
+   
+  <task id="edu.wpi.disco.lang.Propose$Should$Repeat">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+       $this.goal != undefined &amp;&amp; 
+       Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getShould())
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$ShouldNot">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+       $this.goal != undefined &amp;&amp; 
+       Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getShould())
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$Stop">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+       $this.goal != undefined &amp;&amp; 
+       Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getShould())
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$What">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <input name="slot" type="string" />
+    <input name="value" />	
+    <postcondition sufficient="true">
+      $this.goal != undefined &amp;&amp; $this.slot != undefined &amp;&amp; 
+      ( $this.value == undefined ? $this.goal.isDefinedSlot($this.slot) :
+         $this.goal.getSlotValue($this.slot) == $this.value )
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$Who">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <input name="value" type="boolean"/>	
+    <postcondition sufficient="true">
+      $this.goal != undefined &amp;&amp; 
+      $this.goal.isDefinedSlot("external") &amp;&amp; 
+      ( $this.value == undefined ? $this.goal.external != undefined :
+          $this.goal.external == $this.value )
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$How">
+    <input name="plan" type="Packages.edu.wpi.cetask.Plan" />
+    <input name="decomp" type="Packages.edu.wpi.cetask.DecompositionClass" />
+    <precondition>
+      $this.decomp == undefined || $this.plan == undefined ||
+      !$this.decomp.isRejected($this.plan.getGoal())
+    </precondition>
+    <postcondition sufficient="true">
+      $this.plan != undefined &amp;&amp; 
+      ( $this.decomp == undefined ? $this.plan.getDecompositionClass() != null : 
+         $this.plan.getDecompositionClass() == $this.decomp )
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$Succeeded">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+      $this.goal != undefined &amp;&amp; 
+      Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getSuccess())
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Propose$Failed">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <postcondition sufficient="true">
+      $this.goal != undefined &amp;&amp; 
+      Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getSuccess())
+    </postcondition>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Ask$Global">
+    <input name="variable" type="string"/>
+    <input name="type" type="string"/>
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Ask$Should">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+
+   <task id="edu.wpi.disco.lang.Ask$Should$Repeat">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Ask$What">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <input name="slot" type="string" />
+  </task>
+
+  <task id="edu.wpi.disco.lang.Ask$Who">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+
+  <task id="edu.wpi.disco.lang.Ask$How">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+
+  <task id="edu.wpi.disco.lang.Accept">
+    <input name="proposal" type="Packages.edu.wpi.disco.lang.Propose" />
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Reject">
+    <input name="proposal" type="Packages.edu.wpi.disco.lang.Propose" />
+  </task>
+  <task id="edu.wpi.disco.lang.Ok"/>
+
+  <task id="edu.wpi.disco.lang.Say">   
+    <input name="text" type="string" />
+  </task>
+
+  <task id="edu.wpi.disco.lang.Say$User">   
+    <input name="text" type="string" />
+    <binding slot="$this.external" value="true" />
+  </task>
+  
+  <task id="edu.wpi.disco.lang.Say$Agent">   
+    <input name="text" type="string" />
+    <binding slot="$this.external" value="false" />
+  </task>
+
+  <task id="edu.wpi.disco.lang.Say$Expression">   
+    <input name="text" type="string"/>
+  </task>
+
+  <task id="edu.wpi.disco.lang.Say$Expression$Eval">   
+    <input name="text" type="string"/>
+    <input name="eval" type="string"/>
+  </task>
+
+  <task id="edu.wpi.disco.lang.Say$Eval">   
+    <input name="text" type="string"/>
+    <input name="eval" type="string"/>
+  </task>
+ 
+  <!-- primitive action (not utterance!) for presentation of TTSay menu
+       -input is list of Agenda.Plugin.Item's
+       -output is item number (starting at 0) 
+       -only performed by system
+       -fails if no item chosen (output undefined)
+  -->
+  <task id="edu.wpi.disco.lang.TTSay">
+    <input name="items" type="java.util.List"/>
+    <output name="choice" type="number"/>
+    <binding slot="$this.external" value="false" />
+  </task>
+
+  <script init="true"> 
+  
+    // for convenience in console debugging with eval
+    edu.wpi.disco = Packages.edu.wpi.disco;
+     
+    edu.wpi.disco_helper = {
+   
+      // helper functions for enumerated types
+
+      values: 
+        function (type, list) {
+          if ( !((typeof type == "function") &amp;&amp; ("ENUM" in type)) ) 
+              return null;
+           for (p in type.ENUM) { list.add(type.ENUM[p]); }
+           return list;
+        },
+      
+      booleanValues:
+        function (list) { list.add(true); list.add(false); return list; },
+
+      toString:
+        function (format, type, name) {
+          if ( edu.wpi.cetask.TaskEngine.DEBUG ) {
+             var literal = "?"+format+"?";
+             for (p in type.ENUM) {
+                if ( type.ENUM[p].format == format ) {
+                   literal = p;
+                   break;
+                }
+             }
+             return name+".ENUM."+literal;
+          } else return format;
+      }
+        
+    }
+         
+   </script>
+  
+</taskModel>

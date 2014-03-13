@@ -1,0 +1,60 @@
+    # Dec 18, 2010 1:18:03 PM - TaskEngine 1.05 / Disco 1.1
+    Welcome to Disco! (Type 'help' for command list)
+  > cd ../task
+  > source test/ABC
+  > verbose
+    # Writing new keys to /tmp/ABC.translate.properties
+  > load models/ABC.xml
+    # Parsed and validated urn:cetask.wpi.edu:examples:ABC
+  > task A
+    User says "Let's achieve A."
+    Agent says "What is the A input1?"
+  > done B / "x" / 1 / "y" / true
+    User execute B on x producing 1.0 and y.
+    Agent says "What is the A input1?"
+  > status
+
+[Achieve A on a number and x producing a number and y by BC] -accepted -live
+   User says "Let's achieve A."
+   [User says propose the A input1] -live -stopped
+   User execute B on x producing 1.0 and y. -succeeded
+   [User says propose the A input1] -live <-focus
+      [User accept what is the A input1?] -live
+         Agent says "What is the A input1?"
+   [c: Execute C on a number and 1.0] -live
+
+  > done C / 2 / 1 / 3
+    User execute C on 2.0 and 1.0 producing 3.0.
+    Agent says "Ok."
+  > status
+
+[Achieve A on 2.0 and x producing 3.0 and y by BC] -accepted -done <-focus
+   User says "Let's achieve A."
+   [User says propose the A input1]
+   User execute B on x producing 1.0 and y. -succeeded
+   [User says propose the A input1]
+   User execute C on 2.0 and 1.0 producing 3.0.
+   Agent says "Ok." -unexplained
+
+  > task A
+    User says "Let's achieve A."
+    Agent says "What is the A input1?"
+  > done B / "x" / 1 / "y"
+    User execute B on x producing 1.0 and y.
+    Agent says "What is the A input1?"
+  > done C / 2 / 1 / 3 / false
+    User execute C on 2.0 and 1.0 producing 3.0.
+    Agent says "Ok."
+  > status
+
+[Achieve A on 2.0 and x producing 3.0 and y by BC] -accepted -failed
+   User says "Let's achieve A."
+   [User says propose the A input1] -succeeded
+   User execute B on x producing 1.0 and y.
+   [User says propose the A input1] -succeeded
+   [c: User execute C on 2.0 and 1.0 producing 3.0] -failed <-focus
+      User execute C on 2.0 and 1.0 producing 3.0. -failed
+      Agent says "Ok." -unexplained
+
+  > quit
+    

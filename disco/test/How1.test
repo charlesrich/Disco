@@ -1,0 +1,27 @@
+    # Feb 8, 2012 9:32:50 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > say
+[1] Let's achieve IntA by IntBC.
+[2] Let's achieve IntA by IntBD.
+[3] Let's not achieve IntA.
+  >> 1
+    User says "Let's achieve IntA by IntBC."
+    Agent says "Please execute IntC."
+  > history
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+      Agent says "How shall we achieve IntA?"
+      User says "Let's achieve IntA by IntBC."
+   [User execute IntC] -live <-focus
+      [User accept] -live
+         Agent says "Please execute IntC."
+   [Achieve IntB] -live
+
+  > quit
+    

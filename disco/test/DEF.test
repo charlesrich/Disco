@@ -1,0 +1,118 @@
+    # Jan 5, 2012 9:55:44 PM - TaskEngine 1.1.4 / Disco 1.3.9
+    Welcome to Disco! (Type 'help' for command list)
+  > cd ../task
+  > source test/DEF
+  > load models/DEF.xml
+  > task D
+    User says "Let's achieve D."
+[Executing script for F]
+    Agent execute F.
+    Agent says "Please execute E."
+  > next
+    Agent says "Please execute E."
+  > status
+
+[Achieve D] -accepted -live
+   User says "Let's achieve D."
+   Agent execute F.
+   [User execute E] -live <-focus
+      Agent says "Please execute E."
+      [User accept] -live
+         Agent says "Please execute E."
+   [User execute E] -optional
+   [User execute E] -optional
+
+  > no
+    Invalid command. Type 'help' for commands.
+  > next
+    Agent says "Please execute E."
+  > done
+    User execute E.
+    Agent says "Are you going to execute E again?"
+  > no
+    Invalid command. Type 'help' for commands.
+  > next
+    Agent says "Are you going to execute E again?"
+  > done E
+    User execute E.
+    Agent says "Are you going to execute E again?"
+  > status
+
+[Achieve D] -accepted -done
+   User says "Let's achieve D."
+   Agent execute F.
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -live
+      [User says I'm going to execute E again] -live <-focus
+         [User accept] -live
+            Agent says "Are you going to execute E again?"
+
+  > no
+    Invalid command. Type 'help' for commands.
+  > next
+    Agent says "Are you going to execute E again?"
+  > done
+    User says "I'm going to execute E again."
+    Agent says "Ok."
+  > no
+    Invalid command. Type 'help' for commands.
+  > next
+    Agent says "Ok."
+  > no
+    Invalid command. Type 'help' for commands.
+  > status
+
+[Achieve D] -accepted -done
+   User says "Let's achieve D."
+   Agent execute F.
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -accepted -live <-focus
+      [User says I'm going to execute E again] -done
+      Agent says "Ok."
+      Agent says "Ok."
+
+  > task D
+    User says "Let's achieve D."
+    Agent says "Ok."
+  > status
+
+[Achieve D] -accepted -done <-focus
+   User says "Let's achieve D."
+   Agent execute F.
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -accepted -live -stopped
+   User says "Let's achieve D."
+   Agent says "Ok."
+
+  > yes
+    Invalid command. Type 'help' for commands.
+  > next
+    Agent says "Ok."
+  > status
+
+[Achieve D] -accepted -done <-focus
+   User says "Let's achieve D."
+   Agent execute F.
+   [User execute E] -done
+   [User execute E] -optional -done
+   [User execute E] -optional -accepted -live -stopped
+   User says "Let's achieve D."
+   Agent says "Ok."
+   Agent says "Ok."
+
+  > clear
+  > task DD
+    User says "Let's achieve DD."
+    Agent says "Please execute FF."
+  > next
+    Agent says "Please execute FF."
+  > eval TEST=true
+    # Returned 'true'
+  > next
+    Agent execute GG.
+    Agent says "Ok."
+  > quit
+    

@@ -1,0 +1,79 @@
+#!/bin/bash
+this=`dirname $0`
+all_start=`date +%s`
+result=0
+cd $this/..
+#
+echo ">> disco/test"
+./bin/testall
+if [ $? != 0 ]; then
+  result=`expr $result + 1`
+fi
+#
+echo ">> task/test"
+cd ../task
+../disco/bin/testall test bin/guide
+if [ $? != 0 ]; then
+  result=`expr $result + 1`
+fi
+cd ../examples
+#
+if [ -e DiscoUnity ]; then
+  echo ">> DiscoUnity/MyProject/test"
+  cd DiscoUnity/MyProject
+  ../../../disco/bin/testall test
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
+  cd ../..
+fi
+if [ -e tardis ]; then
+  echo ">> tardis/test"
+  cd tardis
+  ../../disco/bin/testall test ../../disco/bin/coach
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
+  cd ..
+fi
+if [ -e team ]; then
+  echo ">> team/test"
+  cd team
+  ../../disco/bin/testall test
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
+  cd ..
+fi
+if [ -e secrets ]; then
+  echo ">> secrets/test"
+  cd secrets
+  ../../disco/bin/testall test bin/secrets
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
+  cd ..
+fi
+if [ -e callcenter ]; then
+  echo ">> callcenter/test"
+  cd callcenter
+  ../../disco/bin/testall test bin/callcenter
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  fi
+  cd ..
+fi
+if [ -e ../../always ]; then
+   ../../always/core/agent/bin/always-alltestall
+   if [ $? != 0 ]; then
+     result=`expr $result + 1`
+   fi
+fi
+#
+all_end=`date +%s`
+echo ">>"
+if [ $result = 0 ]; then
+  echo "All testall successful ("`expr $all_end - $all_start` "sec)"
+else
+  echo "Failed $result testall(s)!"
+fi

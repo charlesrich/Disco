@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Main-Class: edu/wpi/cetask/guide/Guide
+Class-Path: ../speech/jsapi.jar 
+  ../speech/sphinx4.jar ../speech/tags.jar 
+  ../speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar 
+  ../speech/freetts.jar ../speech/cmu_us_kal.jar ../speech/cmulex.jar

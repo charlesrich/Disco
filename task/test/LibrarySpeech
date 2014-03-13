@@ -1,0 +1,22 @@
+CE> load models/Library.xml
+CE> debug
+CE> say let's borrow Mindscan
+CE> debug false
+CE> next
+CE> done
+CE> status
+CE> next
+CE> yes
+CE> next
+CE> done / / / false
+CE> status
+CE> next
+CE> debug
+CE> say please use search engine on Vinge
+CE> debug false
+CE> yes
+CE> next
+CE> done
+CE> yes
+CE> status
+CE> quit

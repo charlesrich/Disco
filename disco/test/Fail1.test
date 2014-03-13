@@ -1,0 +1,92 @@
+    # Feb 9, 2012 6:16:59 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Mixed.xml
+  > say
+[1] Let's start up.
+  >> 1
+    User says "Let's start up."
+    Agent says "Hi."
+  > say
+[1] Good morning.
+[2] Hi.
+  >> 2
+    User says "Hi."
+    Agent says "Good to see you!"
+  > status
+
+[Start up] -accepted -live
+   User says "Let's start up."
+   [Achieve Greetings] -done
+      Agent says "Hi."
+      [ ] -done
+         User says "Hi."
+         [Achieve Response] -done <-focus
+            Agent says "Good to see you!"
+   [Agent execute PrintDone] -live
+
+  > eval $disco.getFocus().getParent().fail()
+    # Returned 'null'
+  > eval $disco.getFocus().getParent().retry()
+    # Returned '[_Greetings_tree]'
+  > eval $disco.pop();
+    # Returned 'null'
+  > status
+
+[Start up] -accepted -live
+   User says "Let's start up."
+   [Achieve Greetings] -live
+      Agent says "Hi."
+      [ ] -live <-focus
+         User says "Hi."
+         [Achieve Response] -done
+   [Agent execute PrintDone]
+
+  > say
+[1] Good morning.
+  >> 1
+    User says "Good morning."
+    Agent says "Good to see you!"
+  > status
+
+[Start up] -accepted -live
+   User says "Let's start up."
+   [Achieve Greetings] -done
+      Agent says "Hi."
+      [ ] -done
+         User says "Hi."
+         [Achieve Response] -done
+         User says "Good morning."
+         [Achieve Response] -done <-focus
+            Agent says "Good to see you!"
+   [Agent execute PrintDone] -live
+
+  > next
+Done
+    Agent execute PrintDone.
+    Agent says "Ok."
+  > status
+
+[Start up] -accepted -done <-focus
+   User says "Let's start up."
+   [Achieve Greetings] -done
+   Agent execute PrintDone.
+   Agent says "Ok."
+
+  > history
+
+[Start up] -accepted -done <-focus
+   User says "Let's start up."
+   [Achieve Greetings] -done
+      Agent says "Hi."
+      [ ] -done
+         User says "Hi."
+         [Achieve Response] -done
+            Agent says "Good to see you!"
+         User says "Good morning."
+         [Achieve Response] -done
+            Agent says "Good to see you!"
+   Agent execute PrintDone.
+   Agent says "Ok."
+
+  > quit
+    

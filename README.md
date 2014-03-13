@@ -1,4 +1,0 @@
-Disco
-=====
-
-Collaborative Discourse Manager

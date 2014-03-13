@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:IVA2012"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+<!--
+      This is the complete task model for the example in the following
+      paper (see docs/RichSidner2012_IVA.pdf):
+
+      Rich, C. and Sidner, C. "Using Collaborative Discourse Theory
+      to Partially Automate Dialogue Tree Authoring", in
+      12th Int. Conf. on Intelligent Virtual Agents, Santa Cruz, CA, Sept. 2012.
+
+      Also see IVA2012.properties.
+      
+      The file test/Baseball1.test contains a test case corresponding
+      almost exactly to Fig. 2 of paper.  The only difference is 
+      where "I don't want to talk about baseball anymore" appears in
+      menus, as the heuristic in ProposeShouldNotPlugin has changed a bit.
+-->
+
+<!-- this task used as placeholder for detail that is omitted in paper -->
+<t:task id="Omitted"/>
+
+<t:task id="Baseball">
+  <t:input name="favoriteTeam" type="Team"/>
+  <t:input name="lastDay" type="Day"/>
+  <t:subtasks id="talk">
+    <t:step name="intro" task="BaseballIntro"/>
+    <t:step name="lastGame" task="LastGameDialogue" minOccurs="0"/>
+    <t:step name="body" task="BaseballBody" minOccurs="0"/>
+    <t:step name="closing" task="ClosingDialogue"/>
+  </t:subtasks>
+</t:task>
+
+<t:task id="BaseballIntro">
+  <t:subtasks id="redSox">
+    <t:step name="intro" task="RedSoxIntroDialogue"/>
+    <t:applicable> $Baseball.favoriteTeam==Team.ENUM.redSox </t:applicable>
+  </t:subtasks>
+  <t:subtasks id="yankees">
+    <t:step name="omitted" task="Omitted"/>
+    <t:applicable> $Baseball.favoriteTeam==Team.ENUM.yankees </t:applicable>
+  </t:subtasks>
+</t:task>
+
+<agent id="RedSoxIntroDialogue" text="Really? But they aren't so great at winning the World Series!">
+  <user text="I bet you are a Yankees fan.">
+    <agent text="No, I'm just joking with you.">
+      <user text="Oh."/>
+      <user text="That's too bad, it would be more fun if you were!">
+        <agent text="Ok, from now on I'm a Yankees fan.">
+          <user text="Great!"/>
+        </agent>
+      </user>
+    </agent>
+  </user>
+  <user text="Ah, but who cares? They play great ball!"/>
+</agent>
+
+<agent id="LastGameDialogue" text="What did you think of it?">
+  <user text="Awesome game!">
+    <agent text="Yeah, it was very intense.  Great game.">
+      <user text="Yeah."/>
+    </agent>
+  </user>
+  <user text="It was boring."/>
+  <user text="We really needed that win."/>
+</agent>
+
+<t:task id="BaseballBody">
+  <t:subtasks id="standings">
+    <t:step name="omitted" task="Omitted"/>
+  </t:subtasks>
+  <t:subtasks id="news">
+    <t:step name="item" task="BaseballNews" minOccurs="0" maxOccurs="3"/>
+  </t:subtasks>
+</t:task>
+
+<t:task id="BaseballNews">
+  <t:subtasks id="item">
+    <t:step name="omitted" task="Omitted"/>
+  </t:subtasks>
+</t:task>
+
+<agent id="ClosingDialogue" text="Well, that's about all.  I sure like talking about baseball with you!">
+  <user text="Me, too."/>
+  <user text="Let's talk again tomorrow."/>
+</agent>
+
+<t:script init="true">
+
+    // define Team datatype and enumeration
+
+    function Team (name) { this.name = name; }
+    
+    Team.ENUM = { redSox : new Team("Red Sox"), 
+                  yankees : new Team("Yankees") }
+    
+    Team.prototype.toString = function () { return this.name; }
+
+    // define Day datatype and enumeration
+
+    function Day (name) { this.name = name; }
+    
+    Day.ENUM = { Mon : new Day("Monday"), 
+                 Tue : new Day("Tuesday"), 
+                 Wed : new Day("Wednesday"), 
+                 Thu : new Day("Thursday"), 
+                 Fri : new Day("Friday"), 
+                 Sat : new Day("Saturday"), 
+                 Sun : new Day("Sunday") }
+    
+    Day.prototype.toString = function () { return this.name; }
+
+</t:script>
+
+</model>

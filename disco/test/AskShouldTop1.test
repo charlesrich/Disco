@@ -1,0 +1,51 @@
+    # May 16, 2012 10:20:24 PM - TaskEngine 1.2.1 / Disco 1.4.3
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > eval $disco.addTop($disco.getTaskClass("A").newInstance())
+    # Returned '[A]'
+  > 
+  > 
+  > eval $disco.addTop($disco.getTaskClass("IntA").newInstance())
+    # Returned '[IntA]'
+  > next
+    Agent says "Should we achieve A?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Do you want to do IntA?"
+  > history
+
+[Achieve A] -rejected
+   [User says let's achieve A]
+      Agent says "Should we achieve A?"
+      User says "No."
+[Achieve IntA] -live
+   [User says let's achieve IntA] -live <-focus
+      [User accept] -live
+         Agent says "Do you want to do IntA?"
+
+  > next
+    Agent says "Do you want to do IntA?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Ok."
+  > history
+
+[Achieve A] -rejected
+   [User says let's achieve A]
+      Agent says "Should we achieve A?"
+      User says "No."
+[Achieve IntA] -rejected
+   [User says let's achieve IntA] <-focus
+      Agent says "Do you want to do IntA?"
+      Agent says "Do you want to do IntA?"
+      User says "No."
+      Agent says "Ok."
+
+  > quit
+    

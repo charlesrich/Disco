@@ -1,0 +1,52 @@
+    # Feb 11, 2008 9:52:18 PM - Version 0.8.2 beta
+    #
+    # This is the simplest example of using the Library.xml task
+    # model, in which nothing fails.  See Library2 and Library3.
+    #
+    # Also see models/Library.properties for formatted output strings,
+    #
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/Library.xml
+CE> task Borrow 
+    Let's start to borrow a library book.
+CE> next
+    Please go to the library.
+CE> done
+    Ok.
+CE> status
+
+[Borrow a library book] -live <-focus
+   [User go to the library] -done
+   [Choose a book] -live
+   [Check out a book]
+
+CE> next
+    What is the book to choose?
+CE> task / new Book("Sawyer","Mindscan")
+    Ok.
+CE> next
+    Shall I look Mindscan up in the catalog?
+CE> yes
+    Ok.
+    Done look Mindscan up in the catalog.
+CE> next
+    Please take Mindscan from Shelf 2.
+CE> done
+    Ok.
+    Shall I check out Mindscan?
+CE> yes
+    Ok.
+[Mindscan checked out!]
+    Done check out Mindscan.
+    Completed borrow Mindscan.
+CE> status
+
+[Borrow Mindscan] -done
+   [User go to the library] -done
+   [Choose Mindscan using the catalog] -done
+      [System look Mindscan up in the catalog] -succeeded
+      [User take Mindscan from Shelf 2] -done
+   [System check out Mindscan] -done
+
+CE> quit
+    Goodbye.

@@ -1,0 +1,147 @@
+    # Feb 18, 2012 2:33:32 PM - TaskEngine 1.2 / Disco 1.4
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > say
+[1] Let's achieve IntA by IntBC.
+[2] Let's achieve IntA by IntBD.
+[3] Let's not achieve IntA.
+  >> 1
+    User says "Let's achieve IntA by IntBC."
+    Agent says "Please execute IntC."
+  > done
+    User execute IntC.
+    Agent says "How shall we achieve IntB?"
+  > eval IntA = $disco.getTop($disco.getFocus())
+    # Returned '[IntA]'
+  > task A
+    User says "Let's achieve A."
+    Agent says "Do you want to do B?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve A.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Should one of us execute D?"
+  > eval A = $disco.getTop($disco.getFocus())
+    # Returned '[A]'
+  > eval $disco.popTo(IntA)
+    # Returned 'null'
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+   [User execute IntC] -done
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live <-focus
+         Agent says "How shall we achieve IntB?"
+
+  > eval $disco.push(A)
+    # Returned 'null'
+  > next
+    Agent says "Should one of us execute D?"
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+   [User execute IntC] -done
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live
+         Agent says "How shall we achieve IntB?"
+         [Achieve A] -accepted -done -continuation -interruption
+            [Execute D] -optional -live
+               [User says one of us should execute D] -live <-focus
+                  [User accept] -live
+                     Agent says "Should one of us execute D?"
+               [User says one of us should execute D] -live
+
+  > history
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+      Agent says "How shall we achieve IntA?"
+      User says "Let's achieve IntA by IntBC."
+   [User execute IntC] -done
+      Agent says "Please execute IntC."
+      User execute IntC.
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live
+         Agent says "How shall we achieve IntB?"
+         [Achieve A] -accepted -done -interruption
+            User says "Let's achieve A."
+            [Agent execute B] -optional -accepted -done
+               [User says please execute B] -succeeded
+                  Agent says "Do you want to do B?"
+                  User says "Yes."
+               Agent execute B.
+            Agent execute C.
+            [Execute D] -optional -live
+               [User says one of us should execute D] -live
+                  [User accept] -live
+                     Agent says "Should one of us execute D?"
+         [Achieve A] -accepted -done -continuation -interruption
+            [Execute D] -optional -live
+               [User says one of us should execute D] -live <-focus
+                  [User accept] -live
+                     Agent says "Should one of us execute D?"
+               [User says one of us should execute D] -live
+
+  > eval $disco.popTo(IntA)
+    # Returned 'null'
+  > next
+    Agent says "How shall we achieve IntB?"
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+   [User execute IntC] -done
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live <-focus
+         Agent says "How shall we achieve IntB?"
+         [User accept] -live
+            Agent says "How shall we achieve IntB?"
+
+  > history
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA by IntBC] -done
+      Agent says "How shall we achieve IntA?"
+      User says "Let's achieve IntA by IntBC."
+   [User execute IntC] -done
+      Agent says "Please execute IntC."
+      User execute IntC.
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live <-focus
+         Agent says "How shall we achieve IntB?"
+         [Achieve A] -accepted -done -interruption
+            User says "Let's achieve A."
+            [Agent execute B] -optional -accepted -done
+               [User says please execute B] -succeeded
+                  Agent says "Do you want to do B?"
+                  User says "Yes."
+               Agent execute B.
+            Agent execute C.
+            [Execute D] -optional -live
+               [User says one of us should execute D] -live
+                  [User accept] -live
+                     Agent says "Should one of us execute D?"
+         [Achieve A] -accepted -done -continuation -interruption
+            [Execute D] -optional -live
+               [User says one of us should execute D] -live
+                  [User accept] -live
+                     Agent says "Should one of us execute D?"
+         [User accept] -live
+            Agent says "How shall we achieve IntB?"
+
+  > quit
+    

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#
+# Usage: testd4g-fp
+#
+# The fp stands for first pass (that is, testing to make sure the first pass
+# of d4g.xslt transforms correctly)
+#
+# Calls 'd4g2018-fp' command on all -fp.d4g.xml files in nephew 'd4g/test'
+# directory. It then diffs the result of d4g2018-fp and the corresponding
+# -fp.fp.xml to ensure they are the same. Deletes result of d4g2018-fp on 
+# success.
+#
+
+this=`dirname $0`
+all_start=`date +%s`
+result=0
+
+# Takes a list of full -fp.d4g.xml filenames, runs them through
+# d4g2018-fp, and makes sure the output matches the test case.
+# Will remove generated -fp.xml file (or replace it with a backup
+# of one that already existed before transformation) on success.
+# Modifies $result by adding any errors
+transform() {
+  for f in $@
+    do
+      # The following is to trim the extension and path
+      len=${#f} # Find length of file
+      off=`expr $len - 8` # Find length of substr ('.d4g.xml' is 8 chars)
+      base=${f:0:$off} # Remove extension
+      trim=`basename $base` # Remove path
+      if [ -f $this/../d4g/test/$trim.fp.xml ]; then # If test file exists...
+        # Create backup of original .xml if applicable
+        if [ -f $base.xml ]; then
+          cp -p $base.xml $base.xml.bak
+        fi
+
+        $this/d4g2018-fp $base # Transform the file
+	
+        if [ -f $base.xml ]; then
+          mv $base.xml /tmp/$trim.fp.xml
+          if [ -f $base.xml.bak ]; then
+             mv $base.xml.bak $base.xml # return the original .xml
+          fi
+          diff -qw /tmp/$trim.fp.xml $this/../d4g/test/$trim.fp.xml
+          exitcode=$?
+          result=`expr $result + $exitcode`
+        fi
+      fi
+    done
+}
+
+# Test all files in test dir
+transform `find $this/../d4g/test -maxdepth 1 -name '*-fp.d4g.xml' -type f -print`
+
+all_end=`date +%s`
+if [ $result -eq 0 ]; then
+  echo "All successful ("`expr $all_end - $all_start` "sec)"
+else
+  echo "Failed $result test(s)!"
+fi
+exit $result

@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:secrets.wpi.edu:models:test:D4g1">
+   <task id="_d2e17" is-generated="true">
+      <subtasks id="_d2e17_subtasks">
+         <step name="_d2e17_step" task="disco:Say"/>
+         <binding slot="$_d2e17_step.text" value="&#34;say&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e18" is-generated="true">
+      <subtasks id="_d2e18_subtasks">
+         <step name="_d2e18_step" task="do"/>
+      </subtasks>
+   </task>
+   <task id="id">
+      <subtasks id="_id_subtasks">
+         <step name="_id_step" task="disco:Say"/>
+         <binding slot="$_id_step.text" value="&#34;say2&#34;"/>
+      </subtasks>
+   </task>
+   <task id="id2">
+      <subtasks id="_id2_subtasks">
+         <step name="_id2_step" task="do2"/>
+      </subtasks>
+   </task>
+   <task id="_d2e23" is-generated="true">
+      <subtasks id="_d2e23_subtasks">
+         <step name="_d2e23_step" task="disco:Say"/>
+         <step name="_d2e23_ref" task="_d2e23_tree"/>
+         <binding slot="$_d2e23_step.text" value="&#34;saya&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e27" is-generated="true">
+      <subtasks id="_d2e27_subtasks">
+         <step name="_d2e27_step" task="disco:Say"/>
+         <step name="_d2e27_ref" task="_d2e27_tree"/>
+         <binding slot="$_d2e27_step.text" value="&#34;say1&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e32" is-generated="true">
+      <subtasks id="_d2e32_subtasks">
+         <step name="_d2e32_step" task="disco:Say"/>
+         <step name="_d2e32_ref" task="_d2e32_tree"/>
+         <binding slot="$_d2e32_step.text" value="&#34;say3&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e41" is-generated="true">
+      <subtasks id="_d2e41_subtasks">
+         <step name="_d2e41_step" task="task4"/>
+         <step name="_d2e41_ref" task="_d2e41_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e45" is-generated="true">
+      <subtasks id="_d2e45_subtasks">
+         <step name="_d2e45_step" task="_refdsay_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e46" is-generated="true">
+      <subtasks id="_d2e46_subtasks">
+         <step name="_d2e46_step" task="disco:Say"/>
+         <step name="_d2e46_ref" task="_d2e46_tree"/>
+         <binding slot="$_d2e46_step.text" value="&#34;before refd say&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e49" is-generated="true">
+      <subtasks id="_d2e49_subtasks">
+         <step name="_d2e49_step" task="_refddo_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e50" is-generated="true">
+      <subtasks id="_d2e50_subtasks">
+         <step name="_d2e50_step" task="beforeRefdDo"/>
+         <step name="_d2e50_ref" task="_d2e50_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e53" is-generated="true">
+      <subtasks id="_d2e53_subtasks">
+         <step name="_d2e53_step" task="_refdsay2_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e54" is-generated="true">
+      <subtasks id="_d2e54_subtasks">
+         <step name="_d2e54_step" task="disco:Say"/>
+         <step name="_d2e54_ref" task="_d2e54_tree"/>
+         <binding slot="$_d2e54_step.text" value="&#34;before second refd say&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e58" is-generated="true">
+      <subtasks id="_d2e58_subtasks">
+         <step name="_d2e58_step" task="_refddo2_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e59" is-generated="true">
+      <subtasks id="_d2e59_subtasks">
+         <step name="_d2e59_step" task="beforeSecondRefdDo"/>
+         <step name="_d2e59_ref" task="_d2e59_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e62" is-generated="true">
+      <subtasks id="_d2e62_subtasks">
+         <step name="_d2e62_step" task="disco:Say"/>
+         <step name="_d2e62_ref" task="_d2e62_tree"/>
+         <binding slot="$_d2e62_step.text" value="&#34;1&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e65" is-generated="true">
+      <subtasks id="_d2e65_subtasks">
+         <step name="_d2e65_step" task="a"/>
+         <step name="_d2e65_ref" task="_d2e65_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e68" is-generated="true">
+      <subtasks id="_d2e68_subtasks">
+         <step name="_d2e68_step" task="disco:Say"/>
+         <step name="_d2e68_ref" task="_d2e68_tree"/>
+         <binding slot="$_d2e68_step.text" value="&#34;i&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e72" is-generated="true">
+      <subtasks id="_d2e72_subtasks">
+         <step name="_d2e72_step" task="A"/>
+         <step name="_d2e72_ref" task="_d2e72_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e79" is-generated="true">
+      <subtasks id="_d2e79_subtasks">
+         <step name="_d2e79_step" task="disco:Say$Eval"/>
+         <step name="_d2e79_ref" task="_d2e79_tree"/>
+         <binding slot="$_d2e79_step.text" value="&#34;text&#34;"/>
+         <binding slot="$_d2e79_step.eval" value="&#34;eval string&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e82" is-generated="true">
+      <subtasks id="_d2e82_subtasks">
+         <step name="_d2e82_step" task="disco:Say$Eval"/>
+         <binding slot="$_d2e82_step.text" value="&#34;text 4&#34;"/>
+         <binding slot="$_d2e82_step.eval" value="&#34;another eval string&#34;"/>
+      </subtasks>
+   </task>
+   <!--
+	Warning, 'do' element with a lone comment as a subchild.
+      --><task id="_d2e33_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e35_subtasks">
+         <step name="_d2e35_step" task="task3"/>
+      </subtasks>
+   </task>
+   <task id="_d2e41_tree" is-generated="true">
+      <subtasks id="_d2e42_subtasks">
+         <step name="_d2e42_step" task="disco:Say"/>
+         <binding slot="$_d2e42_step.text" value="&#34;say&#34;"/>
+      </subtasks>
+      <subtasks id="_d2e43_subtasks">
+         <step name="_d2e43_step" task="task5"/>
+         <binding slot="$_d2e43_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d2e50_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_refddo_subtasks">
+         <step name="_refddo_step" task="refdDo"/>
+         <step name="_refddo_ref" task="_refddo_tree"/>
+      </subtasks>
+   </task>
+   <task id="_refddo_tree" is-generated="true">
+      <subtasks id="_d2e52_subtasks">
+         <step name="_d2e52_step" task="RefdDoContent"/>
+      </subtasks>
+   </task>
+   <task id="_d2e59_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_refddo2_subtasks">
+         <step name="_refddo2_step" task="secondRefdDo"/>
+      </subtasks>
+   </task>
+   <task id="_refddo2_tree" is-generated="true"/>
+   <task id="_d2e65_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e66_subtasks">
+         <step name="_d2e66_step" task="b"/>
+         <step name="_d2e66_ref" task="_d2e66_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e66_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e67_subtasks">
+         <step name="_d2e67_step" task="c"/>
+      </subtasks>
+   </task>
+   <task id="_d2e69_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e70_subtasks">
+         <step name="_d2e70_step" task="disco:Say"/>
+         <step name="_d2e70_ref" task="_d2e70_tree"/>
+         <binding slot="$_d2e70_step.text" value="&#34;iii&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e72_tree" is-generated="true">
+      <subtasks id="_d2e73_subtasks">
+         <step name="_d2e73_step" task="disco:Say"/>
+         <step name="_d2e73_ref" task="_d2e73_tree"/>
+         <binding slot="$_d2e73_step.text" value="&#34;B&#34;"/>
+      </subtasks>
+      <subtasks id="_d2e77_subtasks">
+         <step name="_d2e77_step" task="disco:Say"/>
+         <binding slot="$_d2e77_step.text" value="&#34;B2&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e74_tree" is-generated="true">
+      <subtasks id="_d2e75_subtasks">
+         <step name="_d2e75_step" task="disco:Say"/>
+         <binding slot="$_d2e75_step.text" value="&#34;D&#34;"/>
+      </subtasks>
+      <subtasks id="_d2e76_subtasks">
+         <step name="_d2e76_step" task="D2"/>
+      </subtasks>
+   </task>
+   <task id="_d2e23_tree" is-generated="true">
+      <subtasks id="_d2e24_subtasks">
+         <step name="_d2e24_step" task="task"/>
+      </subtasks>
+      <subtasks id="_d2e25_subtasks">
+         <step name="_d2e25_step" task="disco:Say"/>
+         <step name="_d2e25_ref" task="_d2e25_tree"/>
+         <binding slot="$_d2e25_step.text" value="&#34;sayb&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e25_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e26_subtasks">
+         <step name="_d2e26_step" task="_anotherSay_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e27_tree" is-generated="true">
+      <subtasks id="_d2e28_subtasks">
+         <step name="_d2e28_step" task="task1"/>
+      </subtasks>
+      <subtasks id="_d2e30_subtasks">
+         <step name="_d2e30_step" task="disco:Say"/>
+         <binding slot="$_d2e30_step.text" value="&#34;say2&#34;"/>
+      </subtasks>
+   </task>
+   <!--
+	Warning, 'say' element with a lone comment as a subchild.
+      --><task id="_d2e32_tree" is-generated="true">
+      <subtasks id="_d2e33_subtasks">
+         <step name="_d2e33_step" task="task2"/>
+         <step name="_d2e33_ref" task="_d2e33_tree"/>
+      </subtasks>
+      <subtasks id="_d2e37_subtasks">
+         <step name="_d2e37_step" task="disco:Say"/>
+         <step name="_d2e37_ref" task="_d2e37_tree"/>
+         <binding slot="$_d2e37_step.text" value="&#34;say4&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e37_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e39_subtasks">
+         <step name="_d2e39_step" task="disco:Say"/>
+         <binding slot="$_d2e39_step.text" value="&#34;say5&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e46_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_refdsay_subtasks">
+         <step name="_refdsay_step" task="disco:Say"/>
+         <step name="_refdsay_ref" task="_refdsay_tree"/>
+         <binding slot="$_refdsay_step.text" value="&#34;refd say&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_refdsay_tree" is-generated="true">
+      <subtasks id="_d2e48_subtasks">
+         <step name="_d2e48_step" task="disco:Say"/>
+         <binding slot="$_d2e48_step.text" value="&#34;refd say content&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e54_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_refdsay2_subtasks">
+         <step name="_refdsay2_step" task="disco:Say"/>
+         <binding slot="$_refdsay2_step.text" value="&#34;second refd say&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_refdsay2_tree" is-generated="true"/>
+   <task id="_d2e62_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e63_subtasks">
+         <step name="_d2e63_step" task="disco:Say"/>
+         <step name="_d2e63_ref" task="_d2e63_tree"/>
+         <binding slot="$_d2e63_step.text" value="&#34;2&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e63_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e64_subtasks">
+         <step name="_d2e64_step" task="disco:Say"/>
+         <binding slot="$_d2e64_step.text" value="&#34;3&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e68_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e69_subtasks">
+         <step name="_d2e69_step" task="ii"/>
+         <step name="_d2e69_ref" task="_d2e69_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e70_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e71_subtasks">
+         <step name="_d2e71_step" task="iv"/>
+      </subtasks>
+   </task>
+   <task id="_d2e73_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e74_subtasks">
+         <step name="_d2e74_step" task="C"/>
+         <step name="_d2e74_ref" task="_d2e74_tree"/>
+      </subtasks>
+   </task>
+   <task id="_d2e79_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e80_subtasks">
+         <step name="_d2e80_step" task="disco:Say"/>
+         <step name="_d2e80_ref" task="_d2e80_tree"/>
+         <binding slot="$_d2e80_step.text" value="&#34;text 2&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d2e80_tree" is-generated="true" is-spurious="true">
+      <subtasks id="_d2e81_subtasks">
+         <step name="_d2e81_step" task="disco:Say$Eval"/>
+         <binding slot="$_d2e81_step.text" value="&#34;text 3&#34;"/>
+         <binding slot="$_d2e81_step.eval" value="&#34;eval string 2&#34;"/>
+      </subtasks>
+   </task>
+   <subtasks id="aSubtask" goal="aGoal">
+      <step name="_a_step" task="disco:edu.wpi.disco.lang.Say"/>
+      <step name="anotherStep" task="testTask"/>
+      <applicable>app1</applicable>
+      <binding slot="$_a_step.text" value="'1'"/>
+   </subtasks>
+   <script>script1</script>
+   <task id="aTask">
+      <subtasks id="anotherSubtask">
+         <step name="_another_step" task="disco:edu.wpi.disco.lang.Say"/>
+         <binding slot="$_another_step.text" value="'2'"/>
+      </subtasks>
+   </task>
+</taskModel>

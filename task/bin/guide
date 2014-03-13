@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Usage: guide [ <filename> ]
+#
+# Runs the given script file and compares resulting temporary test log with
+# corresponding test file <filename>.test, if it exists
+#
+dir="`dirname $0`"
+if [ "$1" ]; then
+  read line < $1.test
+  speech=`expr "$line" : ".*Speech"`
+  if [ $speech != 0 ]; then
+    ./bin/speech $1   
+    exit $? 
+  fi
+fi
+"$dir/_run" edu.wpi.cetask.guide.Guide "$1" class lib/msv-rng.jar

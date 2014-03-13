@@ -1,0 +1,29 @@
+    # Feb 12, 2012 6:53:54 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task UnauthTop
+    User says "Let's achieve UnauthTop."
+    Agent says "Who should execute Unauth?"
+  > say
+[1] I should execute Unauth.
+[2] You should execute Unauth.
+[3] No.
+[4] Let's not execute Unauth.
+[5] Let's not achieve UnauthTop.
+  >> 2
+    User says "You should execute Unauth."
+    Agent execute Unauth.
+    Agent says "Ok."
+  > history
+
+[Achieve UnauthTop] -accepted -done
+   User says "Let's achieve UnauthTop."
+   [Agent execute Unauth] -accepted -done <-focus
+      [User says you should execute Unauth] -done
+         Agent says "Who should execute Unauth?"
+         User says "You should execute Unauth."
+      Agent execute Unauth.
+      Agent says "Ok."
+
+  > quit
+    

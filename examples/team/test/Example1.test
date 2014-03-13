@@ -1,0 +1,45 @@
+    # Nov 1, 2011 10:19:54 PM - TaskEngine 1.1.2 / Disco 1.3.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Dummy.xml
+  > load models/Team.xml
+  > task _Strategy1
+    Player says "Let's achieve _Strategy1."
+    Character Kevin starts toward (100.0, 200.0, 0.0).
+    Character Watson starts toward (100.0, 200.0, 0.0).
+    Character Lily starts toward (100.0, 100.0, 0.0).
+  > status
+
+[ ] -accepted -live
+   Player says "Let's achieve _Strategy1."
+   [Kevin goes to (100.0, 200.0, 0.0)] -live -stopped
+   [Watson goes to (100.0, 200.0, 0.0)] -live -stopped
+   [Lily goes to (100.0, 100.0, 0.0)] -live <-focus
+      Character Lily starts toward (100.0, 100.0, 0.0).
+      [ ] -live
+   [Watson says "Ready!"]
+   [Kevin shoots monster1]
+
+  > eval Character.KEVIN.setLocation(Location.DOORWAY)
+    # Returned 'null'
+  > eval Character.WATSON.setLocation(Location.DOORWAY)
+    # Returned 'null'
+  > eval Character.LILY.setLocation(Location.ARCH)
+    # Returned 'null'
+  > next
+    Character Watson says "Ready!".
+    Character Kevin shoots monster1.
+  > history
+
+[ ] -accepted -done <-focus
+   Player says "Let's achieve _Strategy1."
+   [Kevin goes to (100.0, 200.0, 0.0)] -succeeded
+      Character Kevin starts toward (100.0, 200.0, 0.0).
+   [Watson goes to (100.0, 200.0, 0.0)] -succeeded
+      Character Watson starts toward (100.0, 200.0, 0.0).
+   [Lily goes to (100.0, 100.0, 0.0)] -succeeded
+      Character Lily starts toward (100.0, 100.0, 0.0).
+   Character Watson says "Ready!".
+   Character Kevin shoots monster1.
+
+  > quit
+    

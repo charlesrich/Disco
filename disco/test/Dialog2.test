@@ -1,0 +1,75 @@
+    # Jan 29, 2012 1:35:00 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task _A5
+    User says "Let's achieve _A5."
+    Agent execute B.
+    Agent says "Agent5."
+  > say
+[1] Agent5_User1.
+[2] Agent5_User2.
+  >> 1
+    User says "Agent5_User1."
+    Agent says "Please execute C."
+  > done
+    User execute C.
+    Agent says "Agent1."
+  > say
+[1] Agent1_User1.
+[2] Agent1_User2.
+  >> 2
+    User says "Agent1_User2."
+    Agent says "How shall we achieve IntB?"
+  > history
+
+[ ] -accepted -live
+   User says "Let's achieve _A5."
+   Agent execute B.
+   Agent says "Agent5."
+   [ ] -live
+      User says "Agent5_User1."
+      [User execute C] -done
+         Agent says "Please execute C."
+         User execute C.
+      [ ] -done
+         Agent says "Agent1."
+         [ ] -done
+            User says "Agent1_User2."
+      [Achieve IntB] -live
+         [User says let's achieve IntB somehow] -live <-focus
+            [User accept] -live
+               Agent says "How shall we achieve IntB?"
+
+  > say
+[1] Let's achieve IntB with great care and precision.
+[2] Let's achieve IntB the quickest and cheapest way possible.
+[3] Let's not achieve IntB.
+  >> 1
+    User says "Let's achieve IntB with great care and precision."
+    Agent says "Please execute IntE."
+  > history
+
+[ ] -accepted -live
+   User says "Let's achieve _A5."
+   Agent execute B.
+   Agent says "Agent5."
+   [ ] -live
+      User says "Agent5_User1."
+      [User execute C] -done
+         Agent says "Please execute C."
+         User execute C.
+      [ ] -done
+         Agent says "Agent1."
+         [ ] -done
+            User says "Agent1_User2."
+      [Achieve IntB with great care and precision] -live
+         [User says let's achieve IntB with great care and precision] -done
+            Agent says "How shall we achieve IntB?"
+            User says "Let's achieve IntB with great care and precision."
+         [User execute IntE] -live <-focus
+            [User accept] -live
+               Agent says "Please execute IntE."
+         [User execute IntF] -live
+
+  > quit
+    

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<model about="urn:disco.wpi.edu:models:Knock"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <agent id="Knock" text="Knock! Knock!|Knick! Knick!">
+    <user text="Who's there?|Qui est la?" eval="x='game'">
+      <agent text="Boo.">
+	<user text="Boo who?">
+	   <agent text="Don't cry... the {x} {'is'+' over'} now.."/>
+	</user>
+      </agent>
+    </user>
+  </agent>
+  <t:script init="true"> var x; </t:script>
+</model>

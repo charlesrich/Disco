@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           about="urn:telecom-paristech.fr:models:Meeting">
+
+  <!-- 
+       This task model illustrates how to formalize two equivalent
+       alternative methods for specifying a meeting time.  The user
+       always provides with start time first; she can then provide
+       either the end time or the duration.
+
+       The key idea is that the two alternatives are represented as
+       alternative *recipes* for the Meeting task below.  The Schedule
+       task then uses the information computed by the Meeting task to
+       actually enter the data in the calendar (in canonical form of
+       start/end times).
+
+       See Meeting.pdf for a dataflow diagram that helps visualize the
+       bindings below when the 'duration' recipe is chosen for Meeting.
+
+       Also see test/Meeting1.test which illustrates the *many*
+       different dialogue variations that can be generated from this
+       task model depending on the user and system initiative.
+  -->
+
+  <!-- _Meeting is a toplevel task to hold this example.  The
+       underscore in its name makes it "internal" so that it never
+       appears in menus. -->
+
+  <task id="_Meeting">
+    <subtasks id="_meeting">
+      <step name="meeting" task="Meeting"/>
+      <step name="schedule" task="Schedule"/>
+      <binding slot="$schedule.start" value="$meeting.start"/>
+      <binding slot="$schedule.end" value="$meeting.end"/>
+    </subtasks>
+  </task>
+
+  <!-- Meeting is the important task.  It has two recipes, one for
+       each way of specifying a meeting. -->
+
+  <task id="Meeting">
+    <input name="start" type="number"/>
+    <output name="end" type="number"/>
+
+    <subtasks id="end">
+      <step name="end" task="End"/>
+      <binding slot="$this.end" value="$end.time"/>
+    </subtasks>
+
+    <subtasks id="duration">
+      <step name="duration" task="Duration"/>
+      <binding slot="$duration.start" value="$this.start"/>
+      <binding slot="$this.end" value="$duration.end"/>
+    </subtasks>
+
+  </task>
+
+  <!-- The only function of the End task is to cause the system
+       to prompt for the end time. -->
+
+  <task id="End">
+    <input name="time" type="number"/>
+    <binding slot="$this.external" value="false"/>
+  </task>
+
+  <!-- The grounding script for the Duration task computes the end
+       time from the start time and duration.  This computation is
+       done in a grounding script rather than bindings, because it
+       should not occur until both the start and duration are
+       known. -->
+
+  <task id="Duration">
+    <input name="start" type="number"/>
+    <input name="duration" type="number"/>
+    <output name="end" type="number"/>
+    <binding slot="$this.external" value="false"/>
+    <script> $this.end = $this.start + $this.duration </script>
+  </task>
+
+  <task id="Schedule">
+    <input name="start" type="number"/>
+    <input name="end" type="number"/>
+    <binding slot="$this.external" value="false"/>
+    <script> 
+      // this is where code to add meeting to calendar would go
+      // using $this.start and $this.end
+    </script>
+  </task>
+
+</taskModel>
+

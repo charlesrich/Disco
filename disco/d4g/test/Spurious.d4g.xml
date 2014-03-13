@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:secrets.wpi.edu:models:test:Spurious1"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+       xmlns:disco="urn:disco.wpi.edu:Disco">
+
+<!-- do something about <applicable> -->
+
+  <!-- This tests:
+       - general lack of spurious nodes
+       - nodes that would be spurious aren't because they are being explicitly
+         referenced elsewhere (explicit meaning a @ref/@task attribute on say/do)
+       - a node whose parent is manually entered (doesn't start with _) is processed
+         as if it was not spurious (used for second level <say>/<do>)
+    --> 
+  <say id="ID1" actor="sidekick" text="text 1">
+    <say id="ID2" actor="player" text="text 2">
+      <say id="ID3" actor="sidekick" text="text 3">
+	<say id="ID4" actor="player" text="text 4">
+	  <say id="ID5" actor="sidekick" text="text 5">
+	    <say id="ID6s1" actor="player" text="text 6s1">
+	      <say id="REF" actor="sidekick" text="text 7s1">
+		<say id="ID8s1" actor="player" text="text 8s1">
+		  <do id="ID9s1" task="_TASK_tree"/>
+		</say>
+	      </say>
+	    </say>
+	    <say id="ID6s2" actor="player" text="text 6s2">
+	      <say id="ID7s2" ref="REF"/>
+	    </say>
+	    <say id="ID6s3" actor="player" text="text 6s3">
+	      <do id="TASK" task="SomeRandomTask">
+		<say id="ID8s3" actor="sidekick" text="text 8s3"/>
+	      </do>
+	    </say>
+	  </say>
+	</say>
+      </say>
+    </say>
+  </say>
+
+  <!-- This tests:
+       - NOTE: I am not sure if the behavior of the <applicable> is ok, because as it
+         stands now, an <applicable> in an inner, spurious <say> will be transformed
+         into one that affects everything in the spurious-node-chain, up to the top node.
+       - correctly copying and placing of applicables and bindings (everything in order)
+    
+  <say actor="sidekick" text="1">
+    <t:applicable>app1</t:applicable>
+    <say actor="player" text="2">
+      <do task ="testTask2">
+	<say actor="sidekick" text="3"/>
+      </do>
+    </say>
+  </say>
+  -->
+  <!-- This tests:
+       - manually entered tasks being copied over correctly
+         - including: pre/post conditions, applicables, bindings, scripts
+         - "correctly" means they should not be cleansed of spurious nodes
+    -->
+  <t:task id="ManuallyEnteredTask">
+    <t:input name="testInput" type="string"/>
+    <t:output name="testOutput" type="string"/>
+    <t:precondition>
+      ($this.external == undefined) || (!actor($this.external).isCarrying())
+    </t:precondition>
+    <t:postcondition sufficient="true">
+      world.get("shack").hasPillar($this.placement)
+    </t:postcondition>
+    <t:subtasks id="testSubtask">
+      <t:step name="testStep1" task="testTask1"/>
+      <t:step name="testStep2" task="testTask2"/>
+      <t:step name="testStep3" task="testTask3"/>
+      <t:applicable>
+	!world.get("shack").hasPillar("right")
+      </t:applicable>
+      <t:binding slot="$bind.ing" value="binding1"/>
+    </t:subtasks>
+  </t:task>
+
+  <t:task id="testTask2">
+    <t:subtasks id="testSubtask2">
+      <t:step name="testStep4" task="testTask4"/>
+    </t:subtasks>
+  </t:task>
+      
+  <!-- This tests:
+       - scripts passing through unscathed
+    -->
+  <t:script>Well this is an easy test case.</t:script>
+  <t:script>Yep, it works.</t:script>
+
+  <!-- This tests:
+       - subtasks directly under taskModel passing through unscathed and complete
+    -->
+  <t:subtasks id="aSubtask" goal="aGoal">
+    <t:step name="_a_step" task="disco:Say"/>
+    <t:step name="anotherStep" task="testTask2"/>
+    <t:applicable>app1</t:applicable>
+    <t:binding slot="$_a_step.text" value="'1'"/>
+  </t:subtasks>
+</model>

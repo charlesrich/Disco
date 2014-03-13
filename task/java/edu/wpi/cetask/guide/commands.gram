@@ -1,0 +1,65 @@
+#JSGF V1.0;
+
+/*
+ JSGF Grammar for subset of standard guide commands which it makes sense
+ to speech-enable.  Commands not included: load, eval, source.
+ 
+ See JSFG syntax documentation at 
+ http://java.sun.com/products/java-media/speech/forDevelopers/JSGF.
+ 
+ This is an extremely simple grammar for pedagogical purposes only.  Among other things,
+ it only allows the tag semantics in the same order as the spoken words.  For a more
+ powerful way to use tags, see the Sphinx4 FeatureValueDemo , which uses JavaScript tags.
+*/
+
+grammar commands;
+
+public <commands> =  <task> | <by> | <next> | <done> | <execute> | <yes> | <no> | <status> 
+                     | <clear> | <quit> | <verbose> | <debug>;
+
+<task> = ( ( Let's | I want to | Please ) [ perform ] ) { task } <task_name> [ <values> ];
+
+<by> = by { by } <decomp_name>;
+
+<values> = [ on | of ] <NULL> { / } <value> ( [ and ] <NULL> { / } <value> )*;  
+
+<value> = something | 
+          ( failed { false } | succeeded { true } | <digit> | <boolean> | <domain_value> );
+
+<digit> = zero { 0 } | one { 1 } | two { 2 } | three { 3 } | four { 4 } | five { 5 } 
+	       | six { 6 } | seven { 7 } | eight { 8 } | nine { 9 };
+
+/* note simple "failed" and "succeeded" only for proposed tasks with no declared slots */
+
+<done> = ( done { done } [ <task_name> [ <values> ] ] ) 
+         | failed { done / false } | succeeded { done / true };
+
+<execute> = execute { execute } [ <task_name> [ <values> ] ];
+
+<next> = [what] next { next };
+
+<yes> = ( yes | ok ) { yes };
+
+<no> = no { no };
+
+<status> = status { status };
+
+<clear> = clear { clear };
+
+<quit> = ( quit | exit | goodbye ) { quit };
+
+<verbose> = verbose { verbose } [ <boolean> ];
+
+<debug> = debug { debug } [ <boolean> ];
+
+<boolean> = ( true | on ) { true } | ( false | off ) { false };
+
+/* following are placeholders for task names and additional domain values defined
+   in .gram files associated with task models */
+
+<task_name> = <NULL>;
+
+<decomp_name> = <NULL>;
+
+<domain_value> = <NULL>;
+

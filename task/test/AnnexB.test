@@ -1,0 +1,20 @@
+    # Jul 31, 2009 2:07:19 PM - TaskEngine 0.9.4 beta / Guide 0.9.3 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> load models/AnnexB.xml
+CE> task playMusic
+    Let's start to achieve playMusic.
+CE> status
+
+[Achieve playMusic] -live <-focus
+   [Achieve selectMusic] -live
+      [Execute selectServer] -live
+      [Execute browse on * and +dc:title]
+      [Execute selectNode]
+   [Achieve configureRenderer] -live
+      [Execute selectRenderer] -live
+      [Execute selectPreset] -optional
+   [Execute connect on *]
+   [Execute play]
+
+CE> quit
+    Goodbye.

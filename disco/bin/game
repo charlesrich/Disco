@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Usage: game [ <filename> ] [ <path> ]
+#
+# Runs the given script file using GameConsole and compares resulting temporary log with
+# corresponding test log file <filename>.test, if it exists.
+# Optional <path> is added to class path (can only be used when first argument provided)
+#
+dir="`dirname $0`"
+"$dir/../../task/bin/_run" edu.wpi.disco.game.GameConsole "$1" class ../disco/class lib/msv-rng.jar "$2"

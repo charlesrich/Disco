@@ -1,0 +1,57 @@
+    # Apr 18, 2010 6:14:24 PM - TaskEngine 0.9.6 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > task A
+    User says "Let's achieve A."
+    Agent says "Do you want to do B?"
+  > history
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -live
+      Agent says "How shall we achieve IntA?"
+      [Achieve A] -accepted -live -interruption
+         User says "Let's achieve A."
+         [Execute B] -optional -live
+            [User says one of us should execute B] -live <-focus
+               [User accept] -live
+                  Agent says "Do you want to do B?"
+         [Execute C] -live
+         [Execute D] -optional
+
+  > done
+    User says "One of us should execute B."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Should one of us execute D?"
+  > done
+    User says "One of us should execute D."
+    Agent execute D.
+    Agent says "How shall we achieve IntA?"
+  > history
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -live <-focus
+      Agent says "How shall we achieve IntA?"
+      [Achieve A] -accepted -done -interruption
+         User says "Let's achieve A."
+         [Agent execute B] -optional -accepted -done
+            [User says please execute B] -done
+               Agent says "Do you want to do B?"
+               User says "One of us should execute B."
+            Agent execute B.
+         Agent execute C.
+         [Agent execute D] -optional -accepted -done
+            [User says please execute D] -done
+               Agent says "Should one of us execute D?"
+               User says "One of us should execute D."
+            Agent execute D.
+      [User accept] -live
+         Agent says "How shall we achieve IntA?"
+
+  > quit
+    

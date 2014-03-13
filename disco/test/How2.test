@@ -1,0 +1,112 @@
+    # Apr 18, 2012 7:13:17 PM - TaskEngine 1.2.1 / Disco 1.4.3
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task _How
+    User says "Let's achieve _How."
+    Agent says "Shall we achieve _How by how1?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Shall we achieve _How by how2?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Shall we achieve _How by how3?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Ok."
+  > clear
+  > task _How
+    User says "Let's achieve _How."
+    Agent says "Shall we achieve _How by how1?"
+  > say
+[1] Yes.
+[2] No.
+  >> 2
+    User says "No."
+    Agent says "Shall we achieve _How by how2?"
+  > say
+[1] Yes.
+[2] No.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent says "Yup."
+  > status
+
+[ ] -accepted -done <-focus
+   User says "Let's achieve _How."
+   [User says let's achieve _How by how1]
+   [User says let's achieve _How by how2] -succeeded
+   Agent execute B.
+   Agent says "Yup."
+
+  > task HowPlus
+    User says "Let's achieve HowPlus."
+    Agent says "Shall we achieve _How by how1?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve HowPlus.
+  >> 2
+    User says "No."
+    Agent says "Shall we achieve _How by how2?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve HowPlus.
+  >> 2
+    User says "No."
+    Agent says "Shall we achieve _How by how3?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve HowPlus.
+  >> 2
+    User says "No."
+    Agent says "Do you want to do B?"
+  > status
+
+[Achieve HowPlus] -accepted -live
+   User says "Let's achieve HowPlus."
+   [ ] -optional -live -stopped
+   [Achieve A] -live
+      [Execute B] -optional -live
+         [User says one of us should execute B] -live <-focus
+            [User accept] -live
+               Agent says "Do you want to do B?"
+      [Execute C] -live
+      [Execute D] -optional
+
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve A.
+[4] Let's not achieve HowPlus.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Should one of us execute D?"
+  > status
+
+[Achieve HowPlus] -accepted -done
+   User says "Let's achieve HowPlus."
+   [ ] -optional
+   [Achieve A] -done
+      [Agent execute B] -optional -accepted -done
+      Agent execute C.
+      [Execute D] -optional -live
+         [User says one of us should execute D] -live <-focus
+            [User accept] -live
+               Agent says "Should one of us execute D?"
+
+  > quit
+    

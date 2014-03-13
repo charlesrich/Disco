@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:secrets.wpi.edu:models:test:D4g1">
+   <task id="_d4e3">
+      <subtasks id="_d4e3_subtasks">
+         <step name="_d4e3_step" task="disco:Say"/>
+         <step name="_d4e3_ref" task="_d4e3_tree"/>
+         <binding slot="$_d4e3_step.text" value="&#34;text1&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e13">
+      <subtasks id="_d4e13_subtasks">
+         <step name="_d4e13_step" task="disco:Say"/>
+         <step name="_d4e13_ref" task="_d4e13_tree"/>
+         <binding slot="$_d4e13_step.text" value="&#34;t0&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e19">
+      <precondition>app0</precondition>
+      <subtasks id="_d4e19_subtasks">
+         <step name="_d4e19_step" task="disco:Say"/>
+         <binding slot="$_d4e19_step.text" value="&#34;0&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e20">
+      <subtasks id="_d4e20_subtasks">
+         <step name="_d4e20_step" task="disco:Say"/>
+         <step name="_d4e20_ref" task="_d4e20_tree"/>
+         <binding slot="$_d4e20_step.text" value="&#34;a&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e3_tree">
+      <subtasks id="_d4e4_subtasks">
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_d4e4_ref" task="_d4e4_tree"/>
+         <applicable>app2</applicable>
+         <binding slot="$_d4e4_step.text" value="&#34;text2&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e11_subtasks">
+         <step name="_d4e11_step" task="disco:Say"/>
+         <binding slot="$_d4e11_step.text" value="&#34;text2a&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e4_tree">
+      <subtasks id="_d4e5_subtasks">
+         <step name="_d4e5_step" task="disco:Say"/>
+         <step name="_d4e5_ref" task="_d4e5_tree"/>
+         <applicable>app3</applicable>
+         <binding slot="$_d4e5_step.text" value="&#34;text3&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e10_subtasks">
+         <step name="_d4e10_step" task="disco:Say"/>
+         <binding slot="$_d4e10_step.text" value="&#34;text3a&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e5_tree">
+      <subtasks id="_d4e6_subtasks">
+         <step name="_d4e6_step" task="disco:Say"/>
+         <step name="_d4e6_ref" task="_d4e6_tree"/>
+         <applicable>text4</applicable>
+         <binding slot="$_d4e6_step.text" value="&#34;text4&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e9_subtasks">
+         <step name="_d4e9_step" task="disco:Say"/>
+         <binding slot="$_d4e9_step.text" value="&#34;text4a&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e6_tree">
+      <subtasks id="_d4e7_subtasks">
+         <step name="_d4e7_step" task="disco:Say"/>
+         <applicable>app5</applicable>
+         <binding slot="$_d4e7_step.text" value="&#34;text5&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:Say"/>
+         <applicable>app6</applicable>
+         <binding slot="$_d4e8_step.text" value="&#34;text6&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e13_tree">
+      <subtasks id="_d4e14_subtasks">
+         <step name="_d4e14_step" task="disco:Say$Eval"/>
+         <step name="_d4e14_ref" task="_d4e14_tree"/>
+         <applicable>app1</applicable>
+         <binding slot="$_d4e14_step.text" value="&#34;t1&#34;"/>
+         <binding slot="$_d4e14_step.eval" value="&#34;e1&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e17_subtasks">
+         <step name="_d4e17_step" task="disco:Say"/>
+         <applicable>app4</applicable>
+         <binding slot="$_d4e17_step.text" value="&#34;t4&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e14_tree">
+      <subtasks id="_d4e15_subtasks">
+         <step name="_d4e15_step" task="disco:Say$Eval"/>
+         <applicable>app2</applicable>
+         <binding slot="$_d4e15_step.text" value="&#34;t2&#34;"/>
+         <binding slot="$_d4e15_step.eval" value="&#34;e2&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e16_subtasks">
+         <step name="_d4e16_step" task="disco:Say"/>
+         <applicable>app3</applicable>
+         <binding slot="$_d4e16_step.text" value="&#34;t3&#34;"/>
+         <binding slot="$_d4e16_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e20_tree">
+      <subtasks id="_d4e21_subtasks">
+         <step name="_d4e21_step" task="disco:Say"/>
+         <step name="_d4e21_ref" task="_d4e21_tree"/>
+         <applicable>a</applicable>
+         <binding slot="$_d4e21_step.text" value="&#34;b&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e34_subtasks">
+         <step name="_d4e34_step" task="disco:Say"/>
+         <binding slot="$_d4e34_step.text" value="&#34;o&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e21_tree">
+      <subtasks id="_d4e22_subtasks">
+         <step name="_d4e22_step" task="disco:Say"/>
+         <step name="_d4e22_ref" task="_d4e22_tree"/>
+         <applicable>b</applicable>
+         <binding slot="$_d4e22_step.text" value="&#34;c&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e31_subtasks">
+         <step name="_d4e31_step" task="disco:Say"/>
+         <applicable>g</applicable>
+         <binding slot="$_d4e31_step.text" value="&#34;l&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e32_subtasks">
+         <step name="_d4e32_step" task="disco:Say"/>
+         <step name="_d4e33_step" task="disco:Say"/>
+         <applicable>h</applicable>
+         <binding slot="$_d4e32_step.text" value="&#34;m&#34;"/>
+         <binding slot="$_d4e33_step.text" value="&#34;n&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e22_tree">
+      <subtasks id="_d4e23_subtasks">
+         <step name="_d4e23_step" task="disco:Say"/>
+         <binding slot="$_d4e23_step.text" value="&#34;d&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e24_subtasks">
+         <step name="_d4e24_step" task="disco:Say"/>
+         <applicable>c</applicable>
+         <binding slot="$_d4e24_step.text" value="&#34;e&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e25_subtasks">
+         <step name="_d4e25_step" task="disco:Say"/>
+         <step name="_d4e25_ref" task="_d4e25_tree"/>
+         <applicable>d</applicable>
+         <binding slot="$_d4e25_step.text" value="&#34;f&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e25_tree">
+      <subtasks id="_d4e26_subtasks">
+         <step name="_d4e26_step" task="disco:Say"/>
+         <binding slot="$_d4e26_step.text" value="&#34;g&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e27_subtasks">
+         <step name="_d4e27_step" task="disco:Say"/>
+         <binding slot="$_d4e27_step.text" value="&#34;h&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e28_subtasks">
+         <step name="_d4e28_step" task="disco:Say"/>
+         <step name="_d4e28_ref" task="_d4e28_tree"/>
+         <applicable>e</applicable>
+         <binding slot="$_d4e28_step.text" value="&#34;i&#34;"/>
+      </subtasks>
+   </task>
+   <task id="_d4e28_tree">
+      <subtasks id="_d4e29_subtasks">
+         <step name="_d4e29_step" task="disco:Say"/>
+         <binding slot="$_d4e29_step.text" value="&#34;j&#34;"/>
+      </subtasks>
+      <subtasks id="_d4e30_subtasks">
+         <step name="_d4e30_step" task="disco:Say"/>
+         <applicable>f</applicable>
+         <binding slot="$_d4e30_step.text" value="&#34;k&#34;"/>
+      </subtasks>
+   </task>
+</taskModel>

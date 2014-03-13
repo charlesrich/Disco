@@ -1,0 +1,42 @@
+    # Sep 25, 2013 4:58:59 PM - TaskEngine 1.4.8 / Disco 1.6.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task ModifiedC
+    User says "Let's achieve ModifiedC."
+    Agent says "Who should execute ModifiedA on a mutable (null) and a number producing a mutable?"
+  > say
+[1] I should execute ModifiedA on a mutable (null) and a number producing a mutable.
+[2] You should execute ModifiedA on a mutable (null) and a number producing a mutable.
+[3] Let's not execute ModifiedA on a mutable (null) and a number producing a mutable.
+[4] Let's not achieve ModifiedC.
+  >> 2
+    User says "You should execute ModifiedA on a mutable (null) and a number producing a mutable."
+    Agent says "What is the ModifiedA input1?"
+  > done / / / new Mutable(3)
+    User says "The ModifiedA input1 is [3]."
+    Agent says "What is the ModifiedA input2?"
+  > done / / / 2
+    User says "The ModifiedA input2 is 2.0."
+    Agent execute ModifiedA on [3] ([3]) and 2.0 producing [5].
+    Agent execute ModifiedB on [5].
+    Agent says "Ok."
+  > history
+
+[Achieve ModifiedC] -accepted -done <-focus
+   User says "Let's achieve ModifiedC."
+   [Agent execute ModifiedA on [3] ([3]) and 2.0 producing [5]] -accepted -succeeded
+      [User says you should execute ModifiedA on [3] ([3]) and 2.0 producing [5]] -done
+         Agent says "Who should execute ModifiedA on a mutable (null) and a number producing a mutable?"
+         User says "You should execute ModifiedA on a mutable (null) and a number producing a mutable."
+      [User says the ModifiedA input1 is [5]] -done
+         Agent says "What is the ModifiedA input1?"
+         User says "The ModifiedA input1 is [3]."
+      [User says the ModifiedA input2 is 2.0] -done
+         Agent says "What is the ModifiedA input2?"
+         User says "The ModifiedA input2 is 2.0."
+      Agent execute ModifiedA on [3] ([3]) and 2.0 producing [5]. -succeeded
+   Agent execute ModifiedB on [5].
+   Agent says "Ok."
+
+  > quit
+    

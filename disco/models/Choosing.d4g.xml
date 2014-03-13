@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Choosing"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!--
+      This is a sample model that illustrates the mixing of D4g syntax
+      with ANSI/CEA-2018 syntax (note xmlns:t above) in order to take
+      advantage of Disco's automatic generation of menu options for
+      enumerated types (see script below) to let the user make a choice
+      and then stash it away for later use.  
+
+      This file also illustrates how to handle repetition.
+
+      See test/Choosing1.test for example of using this model.
+
+      Also see Choosing.properties.
+-->
+
+  <agent id="Top" text="Good morning">
+    <user text="Good morning">
+      <do task="Weather" minOccurs="0" maxOccurs="5"/>
+    </user>
+  </agent>
+
+  <!-- Note agent element nested within do agent element below!  This
+       is ok because SetChoice is not an utterance and therefore will
+       not end the agent's turn when it is executed. -->
+
+  <do id="Weather" actor="agent" task="SetChoice">
+    <agent text="Do you want the short or the long version?">
+      <!-- Short/long could have been done with an enumeration -->
+      <user text="Short">
+        <agent text="The weather in {$CHOICE.location} is {$WEATHER[$CHOICE.location].brief}"/>
+      </user>
+      <user text="Long">
+        <agent text="The weather in {$CHOICE.location} is {$WEATHER[$CHOICE.location].detailed}"/>
+      </user>
+    </agent>
+  </do>
+
+  <t:task id="SetChoice">
+    <t:input name="choice" type="Person"/>
+    <t:script> $CHOICE = $this.choice </t:script>
+  </t:task>
+
+  <t:script init="true"> 
+
+    var $CHOICE;
+
+    // a simple data base for testing
+
+    // define enumerated type
+
+    function Person (name, location) { 
+        this.name = name; 
+        this.location = location;
+    }
+    
+    Person.ENUM = { JOE : new Person("Joe", "Chicago"), 
+                    BILL : new Person("Bill", "Chicago"),
+                    SUZIE : new Person("Suzie", "Seattle") }
+    
+    Person.prototype.toString = function () { return this.name; }
+
+    var $WEATHER = 
+       { Chicago : { brief : "windy", detailed : "50 degrees, wind 25 mph" },
+         Seattle : { brief : "foggy", 
+                     detailed : "60 degrees, wind 5 mph, visibility 0.1 mi" } }
+
+  </t:script>
+</model>

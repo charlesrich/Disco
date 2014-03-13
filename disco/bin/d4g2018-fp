@@ -1,0 +1,26 @@
+#!/bin/bash
+# 
+# Usage: d4g2018-fp <basename> [ <external> ]
+#
+# The fp stands for first pass (that is, testing from -fp.d4g.xml -> -fp.xml)
+# 
+# Transforms file  <basename>.d4g.xml in D4g format to <basename>.xml in ANSI/CEA-2018 format, but does *not* have the spurious nodes removed to allow for first pass unit testing. Does not validate because the result after the first pass should not be valid yet.
+# Optional argument is name of actor that will be 'external' (defaults to player).
+# 
+dir=`dirname $0`/..
+
+if [ $# -le 0 ]
+then
+	echo "Usage: d4g2018-fp <basename> [ <external> ]"
+	exit 0;
+fi
+
+echo "Validating $1.d4g.xml..."
+$dir/bin/validate "$1.d4g.xml" "http://www.cs.wpi.edu/~rich/d4g"
+
+if [ $? != 0 ]; then exit 1; fi
+
+if [ $# -ge 2 ]; then param="external=$2"; fi
+
+echo "Transforming $1.d4g.xml to $1.xml..."
+java -jar $dir/d4g/saxon9he.jar -o:$1.xml $1.d4g.xml $dir/d4g/d4g-fp.xslt $param

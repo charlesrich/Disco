@@ -1,0 +1,23 @@
+    # Jul 7, 2010 8:23:29 PM - TaskEngine 1.0 / Disco 1.1
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task _A1
+    User says "Let's achieve _A1."
+    Agent says "Agent1."
+  > say
+[1] Agent1_User1.
+[2] Agent1_User2.
+  >> 2
+    User says "Agent1_User2."
+    Agent says "Ok."
+  > history
+
+[ ] -accepted -done
+   User says "Let's achieve _A1."
+   Agent says "Agent1."
+   [ ] -done <-focus
+      User says "Agent1_User2."
+      Agent says "Ok."
+
+  > quit
+    

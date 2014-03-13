@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Complete RelaxNG compact schema for CEA-2018 (no includes)
+  
+  	Document Title: RNC Schema for CEA-2018, Task Model Description
+  	Document URL: http://ce.org/cea-2018/rnc
+  	Contributors: 
+  		Charles Rich, Mitsubishi Electric Research Laboratories (MERL), rich@merl.com (co-chair of CEA r7wg12)
+  		Gottfried Zimmermann, Access Technologies Group, gzimmermann@acm.org (editor of CEA-2018)
+  	Publisher: Consumer Electronics Association, http://www.ce.org
+  	Date: December 24, 2007
+  
+  	Abstract: This is the complete RNC Schema file for the Task Model Description language, as specified by CEA-2018.  
+  	In case of any differences between this specification and CEA-2018, the normative CEA standard shall take precedence. 
+  
+  	MIME type: A document conforming to CEA-2018 should be served with a MIME type of application/cea-2018+xml.
+  
+  	Versioning: This RNC Schema file may be updated in the future to reflect new revisions of the Task Model 
+  	Description standard, if the new revision is backward compatible.  Otherwise a new RNC Schema file will be 
+  	created with a new namespace URL.
+  
+  	Disclaimer: THIS DOCUMENT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+  	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+  	AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS 
+  	INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, 
+  	OR ANY DAMAGES WHATSOEVER RESULTINGFROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF 
+  	CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF 
+  	THIS DOCUMENT.
+-->
+<grammar xmlns:dc="http://purl.org/dc/elements/1.1" ns="http://ce.org/cea-2018" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <element name="taskModel">
+      <!-- about shall be non-empty and not contain fragment identifier          -->
+      <attribute name="about">
+        <data type="anyURI"/>
+      </attribute>
+      <zeroOrMore>
+        <ref name="Description"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="Task"/>
+          <ref name="Subtasks"/>
+          <ref name="Script"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </start>
+  <define name="Description">
+    <choice>
+      <element>
+        <nsName ns="http://purl.org/dc/elements/1.1"/>
+        <zeroOrMore>
+          <attribute>
+            <anyName/>
+          </attribute>
+        </zeroOrMore>
+        <optional>
+          <text/>
+        </optional>
+      </element>
+      <element>
+        <nsName ns="http://purl.org/dc/terms"/>
+        <zeroOrMore>
+          <attribute>
+            <anyName/>
+          </attribute>
+        </zeroOrMore>
+        <optional>
+          <text/>
+        </optional>
+      </element>
+    </choice>
+  </define>
+  <define name="Script">
+    <element name="script">
+      <!-- note correct allowing model to be omitted -->
+      <choice>
+        <group>
+          <oneOrMore>
+            <attribute name="task">
+              <data type="QName"/>
+            </attribute>
+          </oneOrMore>
+          <zeroOrMore>
+            <attribute name="model">
+              <data type="anyURI"/>
+            </attribute>
+          </zeroOrMore>
+        </group>
+        <optional>
+          <attribute name="init" a:defaultValue="false">
+            <data type="boolean"/>
+          </attribute>
+        </optional>
+      </choice>
+      <ref name="ScriptContent"/>
+    </element>
+  </define>
+  <define name="ScriptContent">
+    <optional>
+      <attribute name="platform">
+        <data type="token" datatypeLibrary=""/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="deviceType">
+        <data type="token" datatypeLibrary=""/>
+      </attribute>
+    </optional>
+    <optional>
+      <!--
+        text shall be ECMAScript expression returning boolean or undefined
+        and unless init may reference $this global variable
+      -->
+      <attribute name="applicable"/>
+    </optional>
+    <!--
+      text shall be ECMAScript program and unless init is true
+      may reference $this, $platform and $deviceType global variables
+    -->
+    <text/>
+  </define>
+  <define name="Task">
+    <element name="task">
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+      <zeroOrMore>
+        <ref name="Description"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="Concept"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="Input"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="Output"/>
+      </zeroOrMore>
+      <optional>
+        <element name="precondition">
+          <!--
+            text shall be ECMAScript expression returning boolean or undefined
+            and may reference $this global variable
+          -->
+          <text/>
+        </element>
+      </optional>
+      <optional>
+        <element name="postcondition">
+          <optional>
+            <attribute name="sufficient" a:defaultValue="false">
+              <data type="boolean"/>
+            </attribute>
+          </optional>
+          <!--
+            text shall be ECMAScript expression returning boolean or undefined
+            and may reference $this global variable
+          -->
+          <text/>
+        </element>
+      </optional>
+      <zeroOrMore>
+        <element name="subtasks">
+          <ref name="SubtasksContent"/>
+        </element>
+      </zeroOrMore>
+      <zeroOrMore>
+        <element name="script">
+          <ref name="ScriptContent"/>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="Concept">
+    <element name="concept">
+      <choice>
+        <data type="anyURI"/>
+        <group>
+          <attribute name="verb">
+            <data type="QName"/>
+          </attribute>
+          <zeroOrMore>
+            <element name="role">
+              <attribute name="name">
+                <data type="QName"/>
+              </attribute>
+              <!--
+                slot shall be the name of task input or output
+                type shall be a primitive ECMAScript type or a constructor
+                defined in the current ECMAScript execution environment
+              -->
+              <choice>
+                <group>
+                  <attribute name="type">
+                    <ref name="DataType"/>
+                  </attribute>
+                  <optional>
+                    <attribute name="slot">
+                      <ref name="SlotName"/>
+                    </attribute>
+                  </optional>
+                </group>
+                <group>
+                  <attribute name="slot">
+                    <ref name="SlotName"/>
+                  </attribute>
+                  <optional>
+                    <attribute name="type">
+                      <ref name="DataType"/>
+                    </attribute>
+                  </optional>
+                </group>
+              </choice>
+            </element>
+          </zeroOrMore>
+        </group>
+      </choice>
+    </element>
+  </define>
+  <define name="Input">
+    <element name="input">
+      <ref name="Slot"/>
+      <optional>
+        <!-- modified shall be the name of an output slot -->
+        <attribute name="modified">
+          <ref name="SlotName"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="Output">
+    <element name="output">
+      <ref name="Slot"/>
+    </element>
+  </define>
+  <define name="Slot">
+    <!-- two slots within a given task shall not have the same name -->
+    <attribute name="name">
+      <ref name="SlotName"/>
+    </attribute>
+    <!--
+      type shall be primitive ECMAScript datatype or constructor defined
+      in current ECMAScript execution environment
+    -->
+    <attribute name="type">
+      <ref name="DataType"/>
+    </attribute>
+  </define>
+  <define name="SlotName">
+    <data type="NCName">
+      <param name="pattern">[^.\-]*</param>
+      <except>
+        <value>external</value>
+        <value>when</value>
+        <value>success</value>
+        <value>task</value>
+        <value>model</value>
+      </except>
+    </data>
+  </define>
+  <define name="DataType">
+    <choice>
+      <value>number</value>
+      <value>string</value>
+      <value>boolean</value>
+      <data type="token">
+        <param name="pattern">(\i|$)([\c-[:.\-]]|$)*</param>
+      </data>
+    </choice>
+  </define>
+  <define name="Subtasks">
+    <element name="subtasks">
+      <attribute name="goal">
+        <data type="QName"/>
+      </attribute>
+      <ref name="SubtasksContent"/>
+    </element>
+  </define>
+  <define name="SubtasksContent">
+    <attribute name="id">
+      <data type="ID"/>
+    </attribute>
+    <choice>
+      <group>
+        <optional>
+          <attribute name="ordered" a:defaultValue="true">
+            <value>true</value>
+          </attribute>
+        </optional>
+        <oneOrMore>
+          <element name="step">
+            <ref name="StepContent"/>
+          </element>
+        </oneOrMore>
+      </group>
+      <group>
+        <attribute name="ordered">
+          <value>false</value>
+        </attribute>
+        <oneOrMore>
+          <element name="step">
+            <ref name="StepContent"/>
+            <optional>
+              <!-- requires shall contain only subtasks step names -->
+              <attribute name="requires">
+                <list>
+                  <oneOrMore>
+                    <ref name="StepName"/>
+                  </oneOrMore>
+                </list>
+              </attribute>
+            </optional>
+          </element>
+        </oneOrMore>
+      </group>
+    </choice>
+    <optional>
+      <element name="applicable">
+        <!--
+          text shall be ECMAScript expression returning boolean or undefined
+          and may reference $this global variable
+        -->
+        <text/>
+      </element>
+    </optional>
+    <zeroOrMore>
+      <element name="binding">
+        <attribute name="slot">
+          <ref name="BindingSlot"/>
+        </attribute>
+        <attribute name="value">
+          <!--
+            text shall be ECMAScript expression returning a value of same type as
+            the slot corresponding to the 'slot' attribute and may reference $this
+            or global variables corresponding to step names
+          -->
+          <text/>
+        </attribute>
+      </element>
+    </zeroOrMore>
+  </define>
+  <define name="BindingSlot">
+    <!--
+      token shall be ECMAScript object property expression starting with $this or 
+      a global variable corresponding to a step name, followed by a property 
+      corresponding to an input or output slot  
+    -->
+    <data type="token">
+      <param name="pattern">$\i[\c-[:.\-]]*.\i[\c-[:.\-]]*</param>
+    </data>
+  </define>
+  <define name="StepContent">
+    <!-- two steps within a given subtasks shall not have the same name -->
+    <attribute name="name">
+      <ref name="StepName"/>
+    </attribute>
+    <attribute name="task">
+      <data type="QName"/>
+    </attribute>
+    <optional>
+      <attribute name="minOccurs" a:defaultValue="1">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="maxOccurs" a:defaultValue="1">
+        <choice>
+          <data type="positiveInteger"/>
+          <value>unbounded</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="StepName">
+    <data type="NCName">
+      <param name="pattern">[^.\-]*</param>
+      <except>
+        <value>this</value>
+      </except>
+    </data>
+  </define>
+</grammar>

@@ -1,0 +1,134 @@
+<taskModel about="urn:disco.wpi.edu:examples:Library" xmlns="http://ce.org/cea-2018">
+  <!-- 
+       This is exercise done in CS 525U class, adapted from
+       Chapter 10 of Interactive Design by Preece, Rogers & Sharp.
+       See cetask/models/Library.pdf for graphical presentations of this model.
+       
+       NB: Only difference from version in cetask is that explicit bindings
+       have been added on external for user-only tasks (GoToLibrary, TakeFromShelf),
+       because unlike CETask Guide, Disco agent plugins allow agent to execute
+       task with no grounding script.    
+  -->
+
+  <task id="Borrow">
+    <input name="book" type="Book"/>
+
+    <subtasks id="borrowing">
+      <step name="go" task="GoToLibrary"/>
+      <step name="choose" task="ChooseBook"/>
+      <step name="check" task="CheckOut"/>
+      <binding slot="$go.external" value="true"/>
+      <binding slot="$choose.input" value="$this.book"/>
+      <binding slot="$check.book" value="$choose.output"/>
+    </subtasks>
+  </task>
+
+  <task id="GoToLibrary"/>
+
+  <!-- There are two conditions that can lead to replanning in ChooseBook:  either
+       the book you initially wanted is not in the catalog, or else it is in
+       the catalog, but not on the shelf. In both cases, you use the search
+       engine to look for another book. -->
+
+  <task id="ChooseBook">
+    <input name="input" type="Book"/>
+    <output name="output" type="Book"/>
+
+    <subtasks id="initial">
+      <step name="lookup" task="LookupInCatalog"/>
+      <step name="take" task="TakeFromShelf"/>
+      <binding slot="$take.external" value="true"/>
+      <binding slot="$lookup.book" value="$this.input"/>
+      <binding slot="$take.book" value="$this.input"/>
+      <binding slot="$take.location" value="$lookup.location"/>
+      <!-- unusual "through" binding from input to output -->
+      <binding slot="$this.output" value="$this.input"/>
+    </subtasks>
+
+    <subtasks id="alternative">
+      <step name="search" task="UseSearchEngine"/>
+      <step name="take" task="TakeFromShelf"/>
+      <!-- note $search.query provided during execution -->
+      <binding slot="$take.external" value="true"/>
+      <binding slot="$take.book" value="$search.book"/>
+      <binding slot="$take.location" value="$search.location"/>
+      <binding slot="$this.output" value="$search.book"/>
+    </subtasks>
+  </task>
+
+  <task id="LookupInCatalog">
+    <input name="book" type="Book"/>
+    <output name="location" type="string"/>
+    <!-- succeeds if book in catalog -->
+    <postcondition  sufficient="true"> $this.location != undefined </postcondition>
+    <!-- grounding script so system can execute this task -->
+    <script> $this.location = lookup($this.book); </script>
+  </task>
+  
+  <task id="TakeFromShelf">
+    <input name="book" type="Book"/>
+    <input name="location" type="string"/>
+    <!-- user reports success or failure of primitive task -->
+  </task>
+
+  <task id="UseSearchEngine">
+    <input name="query" type="string"/>
+    <!-- gives book and location in one action -->
+    <output name="book" type="Book"/>
+    <output name="location" type="string"/>
+    <postcondition sufficient="true"> $this.book != undefined </postcondition>
+    <!-- grounding script so system can execute this task -->
+    <script> 
+      $this.book = search($this.query);
+      if ( $this.book != undefined ) $this.location = lookup($this.book); 
+    </script>
+  </task>
+
+  <task id="CheckOut">
+    <input name="book" type="Book"/>
+    <script> println("["+$this.book.title+" checked out!]"); </script>
+  </task>
+
+  <script init="true">
+
+    // define Book class
+ 
+    function Book (author, title) {
+       this.author = author;
+       this.title = title;
+    }
+
+    Book.prototype.toString = function () { return this.title; }
+
+    // model of library catalog and search engine
+
+    var stranger = new Book("Heinlein", "Stranger in a Strange Land"),
+        mindscan = new Book("Sawyer", "Mindscan"),
+        fire = new Book("Vinge", "A Fire Upon the Deep");
+
+    var catalog = [
+       { book: stranger, location: "Shelf 1" },
+       { book: mindscan, location: "Shelf 2" },
+       { book: fire, location: "Shelf 3" } ];
+    
+    var queries = [
+       { query: "Heinlein", book: stranger },
+       { query: "Sawyer", book: mindscan },
+       { query: "Vinge", book: fire } ];
+
+    function lookup (book) { 
+       for (i = 0; i &lt; 3; i++)
+          if ( catalog[i].book.author == book.author &amp;&amp; 
+               catalog[i].book.title == book.title ) 
+	     return catalog[i].location;
+    }
+
+    function search (query) { 
+       for (i = 0; i &lt; 3; i++)
+          if ( queries[i].query == query ) 
+	     return queries[i].book;
+    }
+
+  </script>
+
+</taskModel>

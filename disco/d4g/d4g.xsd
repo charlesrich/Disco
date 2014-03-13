@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.cs.wpi.edu/~rich/d4g" xmlns:d4g="http://www.cs.wpi.edu/~rich/d4g" xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+  <xsd:import namespace="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext" schemaLocation="cea-2018-ext.xsd"/>
+  <!-- unfortunately, this requires a file reference -->
+  <xsd:element name="model">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:group minOccurs="0" maxOccurs="unbounded" ref="t:Description"/>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+          <xsd:element ref="t:task"/>
+          <xsd:element ref="t:subtasks"/>
+          <xsd:element ref="t:script"/>
+          <xsd:group ref="d4g:Top"/>
+          <xsd:element ref="d4g:do"/>
+        </xsd:choice>
+      </xsd:sequence>
+      <xsd:attribute name="about" use="required" type="xsd:anyURI"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:group name="Top">
+    <xsd:choice>
+      <xsd:element name="say">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="d4g:TopBody">
+              <xsd:attribute name="actor" type="xsd:NCName"/>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="agent" type="d4g:TopBody"/>
+      <xsd:element name="user" type="d4g:TopBody"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:complexType name="TopBody">
+    <xsd:complexContent>
+      <xsd:extension base="d4g:Choices">
+        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="precondition"/>
+        <xsd:attributeGroup ref="d4g:SayAttributes"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:group name="Say">
+    <xsd:sequence>
+      <xsd:element name="say">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="d4g:SayBody">
+              <xsd:attribute name="actor" type="xsd:NCName"/>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:element name="do">
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="d4g:Choices">
+          <xsd:attribute name="id" type="xsd:ID"/>
+          <xsd:attribute name="actor" type="xsd:NCName"/>
+          <xsd:attribute name="task" use="required" type="xsd:QName"/>
+          <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger"/>
+          <xsd:attribute name="maxOccurs">
+            <xsd:simpleType>
+              <xsd:union memberTypes="xsd:positiveInteger">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:token">
+                    <xsd:enumeration value="unbounded"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:union>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="applicable"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="Choices">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element ref="d4g:do"/>
+      <xsd:group ref="d4g:Say"/>
+      <xsd:group ref="d4g:User"/>
+      <xsd:group ref="d4g:Agent"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:attributeGroup name="SayAttributes">
+    <xsd:attribute name="ref" type="xsd:NCName"/>
+    <xsd:attribute name="text"/>
+    <xsd:attribute name="eval"/>
+    <xsd:attribute name="alt"/>
+    <xsd:attribute name="alt2"/>
+  </xsd:attributeGroup>
+  <xsd:group name="User">
+    <xsd:sequence>
+      <xsd:element name="user" type="d4g:SayBody"/>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:group name="Agent">
+    <xsd:sequence>
+      <xsd:element name="agent" type="d4g:SayBody"/>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:complexType name="SayBody">
+    <xsd:complexContent>
+      <xsd:extension base="d4g:Choices">
+        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="applicable"/>
+        <xsd:attributeGroup ref="d4g:SayAttributes"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

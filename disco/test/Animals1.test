@@ -1,0 +1,51 @@
+    # Jan 9, 2014 12:45:20 PM - TaskEngine 1.5.3 / Disco 1.7.4
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Animals.xml
+  > task _talk
+    User says "Let's achieve _talk."
+    Agent says "Let's talk about animals."
+  > eval mentioned = 'cat'
+    # Returned 'cat'
+  > next
+    Agent says "I like cats, too."
+  > task _talk
+    User says "Let's achieve _talk."
+    Agent says "Let's talk about animals."
+  > eval mentioned = 'dog'
+    # Returned 'dog'
+  > next
+    Agent says "Dogs are man's best friend!"
+  > task _talk
+    User says "Let's achieve _talk."
+    Agent says "Let's talk about animals."
+  > eval mentioned = 'horse'
+    # Returned 'horse'
+  > next
+    Agent says "Let's talk about animals."
+  > eval mentioned = 'turtle'
+    # Returned 'turtle'
+  > next
+    Agent says "My turtles always died."
+  > history
+
+[ ] -accepted -done
+   User says "Let's achieve _talk."
+   Agent says "Let's talk about animals."
+   [ ] -done
+      Agent says "I like cats, too."
+[ ] -accepted -done
+   User says "Let's achieve _talk."
+   Agent says "Let's talk about animals."
+   [ ] -done
+      Agent says "Dogs are man's best friend!"
+[ ] -accepted -done
+   User says "Let's achieve _talk."
+   Agent says "Let's talk about animals."
+   [ ] -done
+      [ ] -done
+         Agent says "Let's talk about animals."
+         [ ] -done <-focus
+            Agent says "My turtles always died."
+
+  > quit
+    

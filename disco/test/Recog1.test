@@ -1,0 +1,70 @@
+    # Jan 29, 2012 4:15:06 PM - TaskEngine 1.1.5 / Disco 1.3.10
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -live <-focus
+      [User accept] -live
+         Agent says "How shall we achieve IntA?"
+
+  > done IntE
+Ignoring ambiguity of 4
+    User execute IntE.
+    Agent says "Please execute IntF."
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -succeeded
+   [Achieve IntB with great care and precision] -live
+      User execute IntE.
+      [User execute IntF] -live <-focus
+         [User accept] -live
+            Agent says "Please execute IntF."
+   [User execute IntC] -live
+
+  > clear
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > done IntG
+Ignoring ambiguity of 2
+    User execute IntG.
+    Agent says "Please execute IntE."
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -succeeded
+   [Achieve IntB the quickest and cheapest way possible] -live
+      User execute IntG.
+      [User execute IntE] -live <-focus
+         [User accept] -live
+            Agent says "Please execute IntE."
+   [User execute IntC] -live
+
+  > clear
+  > task IntA
+    User says "Let's achieve IntA."
+    Agent says "How shall we achieve IntA?"
+  > done IntD
+    User execute IntD.
+    Agent says "How shall we achieve IntB?"
+  > status
+
+[Achieve IntA] -accepted -live
+   User says "Let's achieve IntA."
+   [User says let's achieve IntA somehow] -succeeded
+   User execute IntD.
+   [Achieve IntB] -live
+      [User says let's achieve IntB somehow] -live <-focus
+         [User accept] -live
+            Agent says "How shall we achieve IntB?"
+
+  > quit
+    

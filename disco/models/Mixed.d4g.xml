@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Mixed"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!--
+      This is a sample model that illustrates the mixing of D4g syntax
+      with ANSI/CEA-2018 syntax (note xmlns:t above).  Note that the
+      toplevel task, Startup, is specified in 2018 and has two
+      steps, the first of which refers to a task tree, Greetings, 
+      defined in D4g.
+
+      This file also illustrates how to "join" two D4g dialogue trees:
+      Note how the Response task is referred to in three places.
+      Note that Response could alternatively have been a 2018 task
+      definition, rather than another D4g dialogue tree fragment.
+
+      See test/Mixed1.test for example of using this model.
+
+      Also see Mixed.properties.
+-->
+
+  <t:task id="Startup">
+    <t:subtasks id="startingUp">
+      <t:step name="greet" task="Greetings"/>
+      <t:step name="print" task="PrintDone"/>
+    </t:subtasks>
+  </t:task>
+
+  <agent id="Greetings" text="Hi">
+    <user text="Good morning" 
+          applicable="getHours() &gt;= 4 &amp;&amp; getHours() &lt; 12">
+      <do task="Response"/>
+    </user>
+    <user text="Good afternoon" 
+          applicable="getHours() &gt;= 12 &amp;&amp; getHours() &lt; 17">
+      <do task="Response"/>
+    </user>
+    <user text="Hi">
+      <do task="Response"/>
+    </user>
+  </agent>
+
+  <agent id="Response" text="Good to see you!"/>
+
+  <t:task id="PrintDone">
+    <t:binding slot="$this.external" value="false"/>
+    <t:script> println("Done") </t:script>
+  </t:task>
+
+  <t:script init="true"> 
+     // for testing, return constant instead of 'new Date().getHours()' 
+     function getHours () { return 8; }  
+  </t:script>
+</model>

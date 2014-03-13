@@ -1,0 +1,61 @@
+    # Oct 12, 2012 11:14:52 AM - TaskEngine 1.4 / Disco 1.6
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > eval var A = -1;
+    # Returned 'null'
+  > task RetryA
+    User says "Let's achieve RetryA."
+    Agent execute PostA.
+    Agent execute PostA.
+    Agent says "Should I execute PostA?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve RetryA.
+  >> 1
+    User says "Yes."
+    Agent execute PostA.
+    Agent says "Ok."
+  > eval var A = 1;
+    # Returned 'null'
+  > task RetryA
+    User says "Let's achieve RetryA."
+    Agent execute PostA.
+    Agent says "Yup."
+  > eval var A = 2;
+    # Returned 'null'
+  > task RetryA
+    User says "Let's achieve RetryA."
+    Agent execute PostA.
+    Agent execute PostA.
+    Agent says "Sure."
+  > history
+
+[Achieve RetryA] -failed
+   User says "Let's achieve RetryA."
+   [Agent execute PostA] -failed
+      Agent execute PostA. -failed
+[Achieve RetryA] -failed
+   [Agent execute PostA] -failed
+      Agent execute PostA. -failed
+[Achieve RetryA] -accepted -failed
+   [Agent execute PostA] -optional -accepted -failed
+      [User says please execute PostA]
+         Agent says "Should I execute PostA?"
+         User says "Yes."
+      Agent execute PostA. -failed
+      Agent says "Ok."
+[Achieve RetryA] -accepted -done
+   User says "Let's achieve RetryA."
+   Agent execute PostA.
+   Agent says "Yup."
+[Achieve RetryA] -failed
+   User says "Let's achieve RetryA."
+   [Agent execute PostA] -failed
+      Agent execute PostA. -failed
+[Achieve RetryA] -accepted -done <-focus
+   Agent execute PostA.
+   Agent says "Sure."
+
+  > quit
+    

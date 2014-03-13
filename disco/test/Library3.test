@@ -1,0 +1,80 @@
+    # May 19, 2010 10:12:57 PM - TaskEngine 0.9.6 beta / Disco 0.8 beta
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Library.xml
+  > say
+[1] Let's borrow a library book.
+  >> 1
+    User says "Let's borrow a library book."
+    Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+  > history
+
+[Borrow a library book] -accepted -live
+   User says "Let's borrow a library book."
+   [User go to the library] -live <-focus
+      [User accept] -live
+         Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+   [Choose a book]
+   [Check out a book]
+
+  > done
+    User go to the library.
+    Agent says "What book are you looking for?"
+  > history
+
+[Borrow a library book] -accepted -live
+   User says "Let's borrow a library book."
+   [User go to the library] -done
+      Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+      User go to the library.
+   [Choose a book using the catalog] -live
+      [User says I am looking for a book] -live <-focus
+         [User accept] -live
+            Agent says "What book are you looking for?"
+      [Look a book up in the catalog] -live
+      [User take a book from a shelf]
+   [Check out a book]
+
+  > done / / / new Book("Sawyer","Mindscan")
+    User says "I am looking for Mindscan."
+    Agent look Mindscan up in the catalog.
+    Agent says "Please take Mindscan from Shelf 2."
+  > status
+
+[Borrow Mindscan] -accepted -live
+   User says "Let's borrow a library book."
+   [User go to the library] -done
+   [Choose Mindscan using the catalog] -live
+      [User says I am looking for Mindscan] -done
+      Agent look Mindscan up in the catalog. -succeeded
+      [User take Mindscan from Shelf 2] -live <-focus
+         [User accept] -live
+            Agent says "Please take Mindscan from Shelf 2."
+   [Check out Mindscan]
+
+  > done
+    User take Mindscan from Shelf 2.
+[Mindscan checked out!]
+    Agent check out Mindscan.
+    Agent says "That's it."
+  > history
+
+[Borrow Mindscan] -accepted -done <-focus
+   User says "Let's borrow a library book."
+   [User go to the library] -done
+      Agent says "Dude, better get to the library quick, it closes in a half-hour!"
+      User go to the library.
+   [Choose Mindscan using the catalog] -done
+      [User says I am looking for Mindscan] -done
+         Agent says "What book are you looking for?"
+         User says "I am looking for Mindscan."
+      Agent look Mindscan up in the catalog. -succeeded
+      [User take Mindscan from Shelf 2] -done
+         Agent says "Please take Mindscan from Shelf 2."
+         User take Mindscan from Shelf 2.
+   Agent check out Mindscan.
+   Agent says "That's it."
+
+  > next
+    Agent says "That's it."
+  > quit
+    

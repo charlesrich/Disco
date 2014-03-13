@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model about="urn:secrets.wpi.edu:models:test:D4g1"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+       xmlns:disco="urn:disco.wpi.edu:Disco">
+
+  <!-- Test cases for the first pass of d4g.xslt (aka d4g-fp.xslt)
+       Note: When you run this, expect warning's to appear for they
+       are being tested
+    -->
+
+  <!-- This tests:
+       - subtasks, scripts, and tasks directly under taskModel
+         passing through unscathed and complete (and moved to the bottom)
+    -->
+  <t:subtasks id="aSubtask" goal="aGoal">
+    <t:step name="_a_step" task="disco:edu.wpi.disco.lang.Say"/>
+    <t:step name="anotherStep" task="testTask"/>
+    <t:applicable>app1</t:applicable>
+    <t:binding slot="$_a_step.text" value="'1'"/>
+  </t:subtasks>
+  
+  <t:script>script1</t:script>
+  
+  <t:task id="aTask">
+    <t:subtasks id="anotherSubtask">
+      <t:step name="_another_step" task="disco:edu.wpi.disco.lang.Say"/>
+      <t:binding slot="$_another_step.text" value="'2'"/>
+    </t:subtasks>
+  </t:task>
+
+  <!-- This tests:
+       - top level say/do nodes with and without ids
+    -->
+  <say text="say"/>
+  <do task="do"/>
+  <say id="id" text="say2"/>
+  <do id="id2" task="do2"/>
+
+  <!-- This tests:
+       - correct generation of tasks and subtasks:
+         - say
+           - inclusion of rest of tree if applicable
+           - test to make sure it doesn't happen if only comment, etc
+           - NO collection of applicables
+             - ignored for now
+           - external modifiers if actors present
+           - referencing another node (if @ref/not if @ref)
+           - displaying text if not @ref
+           - test="./* | $refs" statement
+             - sending message if necessary
+           - labelling is-spurious correctly
+         - do
+           - same things mostly
+     -->
+  <say text="saya">
+    <do task="task"/>
+    <say text="sayb">
+      <say actor="actor" ref="anotherSay"/>
+    </say>
+  </say>
+  <say text="say1">
+    <do task="task1">
+      <!-- Make sure no subtasks created with only this comment present -->
+    </do>
+    <say text="say2">
+      <!-- Same as above -->
+    </say>
+  </say>
+  <say text="say3">
+    <do task="task2">
+      <!-- Make sure subtasks are created with this comment present -->
+      <do task="task3"/> <!-- this can be any node, not just a do -->
+    </do>
+    <say text="say4">
+      <!-- Same as above -->
+      <say text="say5"/> <!-- Same as above -->
+    </say>
+  </say>
+  <do task="task4">
+    <say text="say"/>
+    <do task="task5" actor="actor"/>
+  </do>
+  <!-- test for explicit references (also $refs) -->
+  <say ref="refdsay"/>
+  <say text="before refd say">
+    <say id="refdsay" text="refd say">
+      <say text="refd say content"/>
+    </say>
+  </say>
+  <do task="_refddo_tree"/>
+  <do task="beforeRefdDo">
+    <do id="refddo" task="refdDo">
+      <do task="RefdDoContent"/>
+    </do>
+  </do>
+  <say ref="refdsay2"/>
+  <say text="before second refd say">
+    <say id="refdsay2" text="second refd say"/> <!-- no content to be refd -->
+  </say>
+  <do task="_refddo2_tree"/>
+  <do task="beforeSecondRefdDo">
+    <do id="refddo2" task="secondRefdDo"/> <!-- no content to be refd -->
+  </do>
+  <say text="1">
+    <say text="2">
+      <say text="3"/>
+    </say>
+  </say>
+  <do task="a">
+    <do task="b">
+      <do task="c"/>
+    </do>
+  </do>
+  <say text="i">
+    <do task="ii">
+      <say text="iii">
+	<do task="iv"/>
+      </say>
+    </do>
+  </say>
+  <do task="A">
+    <say text="B">
+      <do task="C">
+	<say text="D"/>
+	<do task="D2"/>
+      </do>
+    </say>
+    <say text="B2"/>
+  </do>
+		   
+  <!-- This tests:
+       - optional @eval attribute to <say>
+    -->
+  <say text="text" eval="eval string">
+    <say text="text 2">
+      <say text="text 3" eval="eval string 2"/>
+    </say>
+  </say>
+  <say text="text 4" eval="another eval string"/>
+</model>

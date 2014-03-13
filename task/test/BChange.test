@@ -1,0 +1,31 @@
+    # Jul 31, 2009 2:07:21 PM - TaskEngine 0.9.4 beta / Guide 0.9.3 beta
+    Welcome to CE Task Engine! (Type 'help' for command list)
+CE> verbose
+CE> load models/BChange.xml
+    # Parsed and validated urn:cs.neu.edu:BChange
+CE> task top
+    Let's start to achieve top.
+CE> execute Login / "John Smith" / "exercise"
+    Ok.
+CE> next
+    Please execute TellHomework on a boolean and exercise and search web.
+CE> status
+
+[Achieve top by toplevel] -live
+   [login: User execute Login on John Smith and exercise producing search web] -done
+   [recent: Achieve RecentHFollowup on exercise and search web by followingup] -live
+      [tell: User execute TellHomework on a boolean and exercise and search web] -live <-focus
+      [doneness: Achieve HomeworkAssignment on exercise and search web]
+
+CE> execute TellHomework / true / "exercise" / "search web" /
+    Ok.
+CE> status
+
+[Achieve top by toplevel] -live
+   [login: User execute Login on John Smith and exercise producing search web] -done
+   [recent: Achieve RecentHFollowup on exercise and search web by followingup] -live <-focus
+      [tell: User execute TellHomework on true and exercise and search web] -done
+      [doneness: Achieve HomeworkAssignment on exercise and search web] -live
+
+CE> quit
+    Goodbye.

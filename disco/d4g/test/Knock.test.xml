@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Knock">
+   <task id="Knock">
+      <subtasks id="_Knock_subtasks">
+         <step name="_Knock_step" task="disco:Say"/>
+         <step name="_Knock_ref" task="_Knock_tree"/>
+         <binding slot="$_Knock_step.text" value="&#34;Knock! Knock!|Knick! Knick!&#34;"/>
+         <binding slot="$_Knock_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Knock_tree">
+      <subtasks id="_d4e3_subtasks">
+         <step name="_d4e3_step" task="disco:Say$Eval"/>
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_d4e5_step" task="disco:Say"/>
+         <step name="_d4e6_step" task="disco:Say$Expression"/>
+         <binding slot="$_d4e3_step.text" value="&#34;Who's there?|Qui est la?&#34;"/>
+         <binding slot="$_d4e3_step.external" value="true"/>
+         <binding slot="$_d4e3_step.eval" value="&#34;x='game'&#34;"/>
+         <binding slot="$_d4e4_step.text" value="&#34;Boo.&#34;"/>
+         <binding slot="$_d4e4_step.external" value="false"/>
+         <binding slot="$_d4e5_step.text" value="&#34;Boo who?&#34;"/>
+         <binding slot="$_d4e5_step.external" value="true"/>
+         <binding slot="$_d4e6_step.text"
+                  value="&#34;\&#34;Don't cry... the \&#34;+(x)+\&#34; \&#34;+('is'+' over')+\&#34; now..\&#34;&#34;"/>
+         <binding slot="$_d4e6_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <script init="true"> var x; </script>
+</taskModel>

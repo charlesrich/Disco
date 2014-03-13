@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<taskModel about="urn:fr.telecom-paristech:tardis:InterviewTop"
+	   xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+	   xmlns:i="urn:fr.telecom-paristech:tardis:Interview">
+
+  <!-- Toplevel goals for Interview model.  
+
+       Note this file does not contain
+       any locale-specific information (e.g., natural language).
+
+       See Interview.d4g.xml for dialogue trees for steps.
+       See Coach.d4g.xml for coaching interventions
+
+       Note that for development and debugging, this model and Interview.xml
+       can be run in a regular Disco console (rather than GameConsole).
+  -->
+
+  <task id="Interview">
+
+    <subtasks id="interviewSteps">
+      <step name="open" task="i:Opening"/>
+      <step name="who" task="i:WhoToSee"/>
+      <step name="name" task="i:ApplicantName"/>
+      <step name="interview" task="InterviewPerson" />
+
+    </subtasks>
+
+  </task>
+
+  <task id="InterviewPerson">
+
+    <subtasks id="interviewPersonSteps">
+      <step name="greet" task="i:GreetInterviewee"/>
+      <step name="resume" task="i:GetResume"/>
+      <step name="discusse" task="i:DiscussEducation" />
+      <step name="discussj" task="i:DiscussLearn" />
+    <!--  <step name="discussu" task="i:DiscussUsefulActivity" />  
+       add when conditionals work -->
+      <step name="close" task="i:Closing" />
+    </subtasks>
+  </task>
+
+  <script init="true"> 
+     var userEmotion = "sad";
+
+     var interviewer="Marceau"; 
+     var companyBusiness="computer technology"; 
+
+     // remove plugin that adds cancel items to menu 
+     $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin);
+
+     function toStream (file) {
+        file = java.lang.System.getProperty("user.dir")
+               +java.lang.System.getProperty("file.separator")+file;
+        return new java.io.FileInputStream(file);   
+     }
+
+     /* Note you can retrieve information from nested fields of resume with
+        JS expressions, such as $resume.education[0].name .  You can also 
+        write a JS function to "massage" the information in the resume as
+        needed and then call this function inside { ... } in an utterance text.
+     */
+
+     // initialize current version of resume from file in test directory
+     // Note: there is no comment character for JSON files!
+     var $resume = JSON.parse(Packages.edu.wpi.cetask.Utils.toString(toStream("test/resume.json")));
+          
+     // function to write out a new resume to given file
+     function outputResume (file) {
+        var output = new java.io.FileWriter(file);
+        try { output.write(JSON.stringify($resume, null, 3)); }
+        finally { output.close(); }
+     }
+ </script>
+
+</taskModel>
+
+ 

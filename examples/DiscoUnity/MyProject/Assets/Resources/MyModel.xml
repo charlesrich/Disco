@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:DiscoUnity:MyModel">
+   <task id="Knock">
+      <subtasks id="_Knock_subtasks">
+         <step name="_Knock_step" task="disco:Say"/>
+         <step name="_Knock_ref" task="_Knock_tree"/>
+         <binding slot="$_Knock_step.text" value="&#34;Knock! Knock!&#34;"/>
+         <binding slot="$_Knock_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Knock_tree">
+      <subtasks id="_d4e29_subtasks">
+         <step name="_d4e29_step" task="disco:Say"/>
+         <step name="_d4e30_step" task="disco:Say"/>
+         <step name="_d4e31_step" task="disco:Say"/>
+         <step name="_d4e32_step" task="disco:Say"/>
+         <binding slot="$_d4e29_step.text" value="&#34;Who's there?&#34;"/>
+         <binding slot="$_d4e29_step.external" value="true"/>
+         <binding slot="$_d4e30_step.text" value="&#34;Boo.&#34;"/>
+         <binding slot="$_d4e30_step.external" value="false"/>
+         <binding slot="$_d4e31_step.text" value="&#34;Boo who?&#34;"/>
+         <binding slot="$_d4e31_step.external" value="true"/>
+         <binding slot="$_d4e32_step.text" value="&#34;Don't cry, little girl...&#34;"/>
+         <binding slot="$_d4e32_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e33_subtasks">
+         <step name="_d4e33_step" task="disco:Say"/>
+         <step name="_d4e34_step" task="disco:Say"/>
+         <step name="_d4e35_step" task="_Knock_tree"/>
+         <binding slot="$_d4e33_step.text" value="&#34;What?&#34;"/>
+         <binding slot="$_d4e33_step.external" value="true"/>
+         <binding slot="$_d4e34_step.text" value="&#34;You're supposed to say: Who's there!&#34;"/>
+         <binding slot="$_d4e34_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="MyTop">
+      <subtasks id="top">
+         <step name="goto" task="GoTo"/>
+         <step name="wait" task="WaitForPlayer"/>
+         <step name="knock" task="Knock"/>
+      </subtasks>
+   </task>
+   <task id="GoTo">
+      <input name="destination" type="Destination"/>
+      <postcondition sufficient="true">
+      $this.destination != undefined &amp;&amp; at($this.destination.entity)
+    </postcondition>
+      <subtasks id="goto">
+         <step name="set" task="SetDestination"/>
+         <step name="arrived" task="Wait"/>
+         <binding slot="$set.destination" value="$this.destination"/>
+      </subtasks>
+   </task>
+   <task id="SetDestination">
+      <input name="destination" type="Destination"/>
+      <binding slot="$this.external" value="false"/>
+      <script> setDestination($this.destination) </script>
+   </task>
+   <task id="Wait"/>
+   <task id="WaitForPlayer">
+      <postcondition sufficient="true">
+      at(My.Game.PLAYER) 
+    </postcondition>
+   </task>
+   <script init="true"> 
+    
+    // game API for navigation
+
+    function at (entity) { // called from Disco thread
+       return getPosition(My.Game.NPC) != null &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).x - getPosition(entity).x) &lt; EPSILON &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).y - getPosition(entity).y) &lt; EPSILON &amp;&amp;
+         Math.abs(getPosition(My.Game.NPC).z - getPosition(entity).z) &lt; EPSILON;
+    }
+
+    EPSILON = 50;  // tolerance for position comparisons
+
+    function getPosition (entity) { return entity.myPosition; } // called from Disco thread
+    
+    function setDestination (destination) { // called from Unity thread
+       // example of debug printout
+       // note that toString below should not be needed, but is due to Jint
+       Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       My.Game.NPC.destination = destination.entity.gameObject.transform;
+    }
+
+    // define Destination as an enumerated type for use in Disco menus
+
+    function Destination (entity) { this.entity = entity; }
+
+    Destination.ENUM = { "red cube" : new Destination(My.Game.RED_CUBE),
+                         "green cube" : new Destination(My.Game.GREEN_CUBE) }
+
+    Destination.prototype.toString = function () { return My.Game.ToString(this.entity); } // Disco thread
+
+  </script>
+</taskModel>

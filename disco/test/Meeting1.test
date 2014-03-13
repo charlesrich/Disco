@@ -1,0 +1,152 @@
+    # Oct 28, 2012 10:54:39 AM - TaskEngine 1.4 / Disco 1.6.1
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Meeting.xml
+
+# This test file illustrates seven different interaction dialogues
+# from the same task model, depending on the user and system
+# initiative.  Think about how complex this would be to do with, for
+# example, a state machine approach.
+
+# First, with the default console turn-taking model, in which
+# the user only gets to make one utterance per turn.  NB: this
+# turn-taking model is not built into Disco; it is just the default
+# for the console tool and can be changed (see below).
+
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+    Agent says "What is the Meeting start?"
+  > done / / / 1200
+    User says "The Meeting start is 1200.0."
+    Agent says "How shall we achieve Meeting on 1200.0?"
+
+# The "Let's not..." below can be suppressed by Meeting.properties
+# with Propose.ShouldNot(Meeting)@generate=false
+
+  > say
+[1] Let's achieve Meeting on 1200.0 by end.
+[2] Let's achieve Meeting on 1200.0 by duration.
+[3] Let's not achieve Meeting on 1200.0.
+  >> 1
+    User says "Let's achieve Meeting on 1200.0 by end."
+    Agent says "What is the End time?"
+  > done / / / 1300
+    User says "The End time is 1300.0."
+    Agent execute End on 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+
+# This time the user chooses the duration option.
+
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+    Agent says "What is the Meeting start?"
+  > done / / / 1200
+    User says "The Meeting start is 1200.0."
+    Agent says "How shall we achieve Meeting on 1200.0?"
+  > say
+[1] Let's achieve Meeting on 1200.0 by end.
+[2] Let's achieve Meeting on 1200.0 by duration.
+[3] Let's not achieve Meeting on 1200.0.
+  >> 2
+    User says "Let's achieve Meeting on 1200.0 by duration."
+    Agent says "What is the Duration duration?"
+  > done / / / 100
+    User says "The Duration duration is 100.0."
+    Agent execute Duration on 1200.0 and 100.0 producing 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+
+# Having the system ask which method of specification is desired isn't
+# stupid, but if you don't like that behavior, you can suppress it by
+# Meeting.properties with Ask.How(Meeting)@generate=false.  Following
+# eval adds this property dynamically and then we try again.
+
+  > eval $disco.getTaskClass("Meeting").getModel().setProperty("Ask.How(Meeting)@generate", "false");
+    # Returned 'null'
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+    Agent says "What is the Meeting start?"
+  > done / / / 1200
+    User says "The Meeting start is 1200.0."
+
+# Notice that if the agent cannot ask about a recipe choice and it has
+# nothing else to do on its turn, it guesses the first recipe by
+# default (this guessing behavior can be turned off).
+
+    Agent says "What is the End time?"
+  > done / / / 1300
+    User says "The End time is 1300.0."
+    Agent execute End on 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+
+# Now we change the turn-taking model in the console.  The "next
+# false" command changes the turn-taking mode so that the user can say
+# as many things as she wishes on her turn and must indicate the end of
+# her turn explicitly by "next".
+
+  > next false
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+  > next
+    Agent says "What is the Meeting start?"
+  > done / / / 1200
+    User says "The Meeting start is 1200.0."
+
+# This Propose.What is the semantics of an utterance such as "The end
+#  time is ...".
+
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("End").newInstance() / "time" / 1300
+    User says "The End time is 1300.0."
+
+# Plan recognition automatically chooses the "end" recipe.
+
+  > next
+    Agent execute End on 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+
+# Now the user similarly volunteers both the duration after being
+# prompted for the start.
+
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+  > next
+    Agent says "What is the Meeting start?"
+  > done / / / 1200
+    User says "The Meeting start is 1200.0."
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Duration").newInstance() / "duration" / 100
+    User says "The Duration duration is 100.0."
+  > next
+    Agent execute Duration on 1200.0 and 100.0 producing 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+
+# Here the user here takes complete initiative and volunteers both the
+# start and end times.
+
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Meeting").newInstance() / "start" / 1200
+    User says "The Meeting start is 1200.0."
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("End").newInstance() / "time" / 1200
+    User says "The End time is 1200.0."
+  > next
+    Agent execute End on 1200.0.
+    Agent execute Schedule on 1200.0 and 1200.0.
+    Agent says "Ok."
+
+# Or similarly volunteers the start time and duration.
+
+  > task _Meeting
+    User says "Let's achieve _Meeting."
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Meeting").newInstance() / "start" / 1200
+    User says "The Meeting start is 1200.0."
+  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Duration").newInstance() / "duration" / 100
+    User says "The Duration duration is 100.0."
+  > next
+    Agent execute Duration on 1200.0 and 100.0 producing 1300.0.
+    Agent execute Schedule on 1200.0 and 1300.0.
+    Agent says "Ok."
+  > quit
+    

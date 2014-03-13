@@ -1,0 +1,116 @@
+<taskModel 
+		about="urn:cetask.wpi.edu:examples:AnnexB"
+		xmlns="http://ce.org/cea-2018" 
+		xmlns:dc="http://purl.org/dc/elements/1.1"
+		xmlns:dcterms="http://purl.org/dc/terms">
+	<!-- This is example from Annex B of the CEA-2018 standard 
+             with last binding of selectMusicSteps moved to playMusicSteps -->
+	<dc:title xml:lang="en">Playing Music</dc:title>
+	<dc:description xml:lang="en">CEA-2018 conformant sample task model description for 
+		playing music with UPnP AV devices and URC grounding.</dc:description>
+	<dc:creator>Gottfried Zimmermann</dc:creator>
+	<dc:contributor>Charles Rich</dc:contributor>
+	<dcterms:issued>2007-08-25</dcterms:issued>
+	<dcterms:modified>2007-09-10</dcterms:modified>
+
+	<task id="playMusic">
+		<subtasks id="playMusicSteps" ordered="false">
+			<step name="select" task="selectMusic"/>
+			<step name="configure" task="configureRenderer"/>
+			<step name="connect" task="connect" requires="select configure"/>
+			<step name="play" task="play" requires="connect"/>
+			<binding slot="$connect.preferredConnectionProtocol" value="'*'"/>
+			<binding slot="$play.connectionId" value="$connect.newConnectionId"/>
+		</subtasks>
+	</task>
+
+	<task id="selectMusic">
+		<subtasks id="selectMusicSteps">
+			<step name="server" task="selectServer"/>
+			<step name="browse" task="browse"/>
+			<step name="node" task="selectNode"/>
+			<binding slot="$browse.browseFilter" value="'*'"/>
+			<binding slot="$browse.browseSortCriteria" value="'+dc:title'"/>
+		</subtasks>
+	</task>
+
+	<task id="configureRenderer">
+		<subtasks id="configureRendererSteps">
+			<step name="select" task="selectRenderer"/>
+			<step name="preset" task="selectPreset" minOccurs="0" maxOccurs="1"/>
+		</subtasks>
+	</task>
+	
+	<!-- primitive tasks and grounding -->
+
+	<script platform="URC">
+		// Default grounding script goes here, which executes primitive tasks below by:
+		// (1) setting socket variables from values of same-named $this input slots
+		// (2) invoking same-named URC command (if any)
+		// (3) setting $this output slots from same-named socket variables
+		// (4) setting $this.success to reflect success or failure of command (if any)
+	</script>
+
+	<script platform="URC" init="true">
+		// Initialization script goes here to:
+		// (1) define PlayMode, PlaySpeed and ErrorDescription types used below
+		// (2) install URC notification listener which creates same-named external task
+		//     occurrence below and invokes $occurred
+	</script>
+
+	<task id="selectServer">
+		<input name="selectedMediaServer" type="string"/>
+	</task>
+
+	<task id="browse">
+		<input name="browseFilter" type="string"/>
+		<input name="browseSortCriteria" type="string"/>
+	</task>
+
+	<task id="selectNode">
+		<input name="selectedNodeId" type="string"/>
+	</task>
+
+	<task id="selectRenderer">
+		<input name="selectedMediaRenderer" type="string"/>
+	</task>
+
+	<task id="selectPreset">
+		<input name="presetName" type="string"/>
+	</task>
+
+	<task id="connect">
+		<input name="preferredConnectionProtocol" type="string"/>
+		<output name="newConnectionId" type="string"/>
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+	<task id="play">
+		<input name="connectionId" type="string"/>
+		<input name="playCurrentPlayMode" type="PlayMode"/>
+		<input name="playTransportPlaySpeed" type="PlaySpeed"/>
+	</task>
+
+	<!-- external events -->
+
+	<task id="transportStatusError">
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+	<task id="conNotifyContentFormatMismatch">
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+	<task id="conNotifyInsufficientNetworkResources">
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+	<task id="conNotifyUnreliableChannel">
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+	<task id="conNotifyUnknownConnectionError">
+		<output name="error" type="ErrorDescription"/>
+	</task>
+
+</taskModel>

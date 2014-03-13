@@ -1,0 +1,32 @@
+<taskModel about="urn:cetask.wpi.edu:examples:ABC" xmlns="http://ce.org/cea-2018">
+	<!-- This is example from Section 9.4 of the CEA-2018 standard 
+             with type of input2 of C corrected to be 'number' -->
+	<task id="A">
+		<input name="input1" type="number"/>
+		<input name="input2" type="string"/>
+		<output name="output1" type="number"/>
+		<output name="output2" type="string"/>
+	</task>
+
+	<task id="B">
+		<input name="input" type="string"/>
+		<output name="output1" type="number"/>
+		<output name="output2" type="string"/>
+	</task>
+
+	<task id="C">
+		<input name="input1" type="number"/>
+		<input name="input2" type="number"/>
+		<output name="output" type="number"/>
+	</task>
+
+	<subtasks id="BC" goal="A">
+		<step name="b" task="B"/>
+		<step name="c" task="C"/>
+		<binding slot="$c.input1" value="$this.input1"/>
+		<binding slot="$b.input" value="$this.input2"/>
+		<binding slot="$c.input2" value="$b.output1"/>
+		<binding slot="$this.output1" value="$c.output"/>
+		<binding slot="$this.output2" value="$b.output2"/>
+	</subtasks>
+</taskModel>

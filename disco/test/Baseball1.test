@@ -1,0 +1,73 @@
+    # Jun 20, 2012 4:15:39 PM - TaskEngine 1.3 / Disco 1.5
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/IVA2012.xml
+  > eval $disco.addTop("Baseball"); $Baseball.lastDay = Day.ENUM.Thu;
+    # Returned 'Thursday'
+  > next
+    Agent says "Which team are you rooting for?"
+  > say
+[1] Red Sox.
+[2] Yankees.
+  >> 1
+    User says "Red Sox."
+    Agent says "Really? But they aren't so great at winning the World Series!"
+  > say
+[1] I bet you are a Yankees fan.
+[2] Ah, but who cares? They play great ball!
+  >> 1
+    User says "I bet you are a Yankees fan."
+    Agent says "No, I'm just joking with you."
+  > say
+[1] Oh.
+[2] That's too bad, it would be more fun if you were!
+  >> 1
+    User says "Oh."
+    Agent says "Did you catch Thursday's game?"
+  > say
+[1] Yes.
+[2] No.
+[3] I don't want to talk about baseball anymore.
+  >> 1
+    User says "Yes."
+    Agent says "What did you think of it?"
+  > say
+[1] Awesome game!
+[2] It was boring.
+[3] We really needed that win.
+  >> 1
+    User says "Awesome game!"
+    Agent says "Yeah, it was very intense.  Great game."
+  > say
+[1] Yeah.
+  >> 1
+    User says "Yeah."
+    Agent says "I wonder how the Red Sox are doing in the standings. Should I check?"
+  > say
+[1] Yes.
+[2] No.
+[3] I don't want to talk about baseball anymore.
+  >> 2
+    User says "No."
+    Agent says "Ok, I have several interesting stories here. The first one is about injuries.  Would you like to hear it?"
+  > say
+[1] Yes.
+[2] No.
+[3] I don't want to talk about baseball anymore.
+  >> 1
+    User says "Yes."
+    Agent execute Omitted.
+    Agent says "Got time for another story?"
+  > say
+[1] Yes.
+[2] No.
+[3] I don't want to talk about baseball anymore.
+  >> 2
+    User says "No."
+    Agent says "Well, that's about all.  I sure like talking about baseball with you!"
+  > say
+[1] Me, too.
+[2] Let's talk again tomorrow.
+  >> 1
+    User says "Me, too."
+  > quit
+    

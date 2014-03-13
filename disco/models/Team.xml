@@ -1,0 +1,154 @@
+<taskModel about="urn:disco.wpi.edu:examples:Team"
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- Novel modeling approach developed by Bishop Myers et al. in MQP
+       for collaboration with a team of characters.
+       See Dummy.xml game API definitions -->
+
+  <task id="Say">
+    <input name="who" type="Character"/>
+    <input name="text" type="string"/>
+    <script> say($this.who, $this.text) </script>
+  </task>
+
+  <task id="Shoot">
+    <input name="who" type="Character"/>
+    <input name="target" type="string"/>
+    <script> 
+      shoot($this.who, $this.target)
+      // following is just to make this example work 
+      setLocation($this.who, new UnityEngine.Vector3(0,0,0));
+    </script>
+  </task>
+
+  <task id="GoTo">
+    <input name="who" type="Character"/>
+    <input name="destination" type="UnityEngine.Vector3"/>
+    <postcondition sufficient="true">
+      $this.who != undefined &amp;&amp; $this.destination != undefined 
+      &amp;&amp; equalLocation(getLocation($this.who), $this.destination)
+    </postcondition>
+
+    <subtasks id="goto">
+      <step name="set" task="SetDestination"/>
+      <step name="arrived" task="_Arrived"/>
+      <binding slot="$set.who" value="$this.who"/>
+      <binding slot="$arrived.who" value="$this.who"/>
+      <binding slot="$set.destination" value="$this.destination"/>
+      <binding slot="$arrived.destination" value="$this.destination"/>
+    </subtasks>
+  </task>
+
+  <task id="SetDestination">
+    <input name="who" type="Character"/>
+    <input name="destination" type="Unity3d.Vector3"/>
+    <script> setDestination($this.who, $this.destination) </script>
+  </task>
+    
+  <task id="_Arrived">
+    <input name="who" type="Character"/>
+    <input name="destination" type="Unity3d.Vector3"/>
+  </task>
+
+  <!-- a simple example strategy: all three characters go to 
+       designated locations (in parallel), then Watson yells 
+       Ready!, then Kevin shoots.
+  -->
+  <task id="_Strategy1">
+    <subtasks id="subtasks1" ordered="false">
+      <step name="kevinGo" task="GoTo"/>
+      <step name="watsonGo" task="GoTo"/>
+      <step name="lilyGo" task="GoTo"/>
+      <step name="watsonSay" task="Say" requires="kevinGo watsonGo lilyGo"/>
+      <step name="kevinShoot" task="Shoot" requires="watsonSay"/>
+      <step name="add" task="AddTop" requires="watsonSay"/>
+      <binding slot="$kevinGo.who" value="Character.KEVIN"/>
+      <binding slot="$kevinGo.destination" value="Location.DOORWAY"/>
+      <binding slot="$watsonGo.who" value="Character.WATSON"/>
+      <binding slot="$watsonGo.destination" value="Location.DOORWAY"/>
+      <binding slot="$lilyGo.who" value="Character.LILY"/>
+      <binding slot="$lilyGo.destination" value="Location.ARCH"/>
+      <binding slot="$watsonSay.who" value="Character.WATSON"/>
+      <binding slot="$watsonSay.text" value="'Ready!'"/>
+      <binding slot="$kevinShoot.who" value="Character.KEVIN"/>
+      <binding slot="$kevinShoot.target" value="'monster1'"/>
+      <binding slot="$add.goal" value="'_Strategy1'"/>
+    </subtasks>
+  </task>
+
+  <task id="AddTop">
+    <input name="goal" type="string"/>
+    <binding slot="$this.external" value="false"/>
+    <script> $disco.addTop($disco.getTaskClass($this.goal)) </script>
+  </task>
+
+  <script init="true"> 
+
+    // dummy API 
+
+    function say (who, text) {}
+    function shoot (who, target) {}
+    function setDestination (who, destination) {}
+
+    // define dummy for C# Character class in game with public
+    // static fields for Kevin, Watson and Lily
+
+    function Character (name) { this.name = name; };
+
+    Character.prototype.toString = function () { return this.name; }
+
+    Character.KEVIN = new Character("Kevin");
+    Character.WATSON = new Character("Watson");
+    Character.LILY = new Character("Lily");
+ 
+    // define dummy for C# UnityEngine.Vector3 class
+
+    var UnityEngine = {
+        Vector3 : function (x, y, z) {  
+                     this.x = x;
+                     this.y = y;
+                     this.z = z; }
+
+       // other UnityEngine classes can go here
+    }
+
+    UnityEngine.Vector3.prototype.toString = 
+       // make printing consisent with Unity
+       function () { return "("+this.x.toFixed(1)+", "+this.y.toFixed(1)+", "
+                               +this.z.toFixed(1)+")"; }
+
+    // dummy for C# class in game with named locations
+
+    var Location = {
+        DOORWAY : new UnityEngine.Vector3(100, 200, 0),
+        ARCH : new UnityEngine.Vector3(100, 100, 0)
+    }
+
+    // dummy accessors for character location
+
+    function getLocation (character) {
+      return character.location;
+    }
+
+    function setLocation (character, location) {
+      character.location = location;
+    }
+
+    function equalLocation (location1, location2) {
+       // probably should add "fuzz factor"
+       return location1.x == location2.x &amp;&amp; location1.y == location2.y
+       &amp;&amp; location1.z == location2.z
+     
+    }
+
+    // initial locations
+    setLocation(Character.KEVIN, new UnityEngine.Vector3(0, 10, 0));
+    setLocation(Character.WATSON, new UnityEngine.Vector3(10, 10, 0));
+    setLocation(Character.LILY, new UnityEngine.Vector3(-10, 10, 0));
+
+    // make default toplevel goal
+    $disco.addTop($disco.getTaskClass("_Strategy1"))
+
+ </script>
+
+</taskModel>

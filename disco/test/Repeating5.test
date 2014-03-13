@@ -1,0 +1,70 @@
+    # Jan 7, 2014 10:41:08 AM - TaskEngine 1.5.2 / Disco 1.7.3
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task RepeatingBug
+    User says "Let's achieve RepeatingBug."
+    Agent execute _B.
+    Agent execute C.
+    Agent says "Should one of us execute C again?"
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve RepeatingBug.
+  >> 1
+    User says "Yes."
+    Agent execute C.
+    Agent execute D.
+    Agent says "Ok."
+  > history
+
+[Achieve RepeatingBug] -accepted -done <-focus
+   User says "Let's achieve RepeatingBug."
+   Agent execute _B.
+   Agent execute C.
+   [Agent execute C] -optional -accepted -done
+      [User says please execute C again] -succeeded
+         Agent says "Should one of us execute C again?"
+         User says "Yes."
+      Agent execute C.
+   Agent execute D.
+   Agent says "Ok."
+
+  > task RepeatingBug
+    User says "Let's achieve RepeatingBug."
+    Agent execute _B.
+    Agent execute C.
+    Agent says "Should one of us execute C again?"
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve RepeatingBug.
+  >> 2
+    User says "No."
+    Agent execute D.
+    Agent says "Yup."
+  > history
+
+[Achieve RepeatingBug] -accepted -done
+   User says "Let's achieve RepeatingBug."
+   Agent execute _B.
+   Agent execute C.
+   [Agent execute C] -optional -accepted -done
+      [User says please execute C again] -succeeded
+         Agent says "Should one of us execute C again?"
+         User says "Yes."
+      Agent execute C.
+   Agent execute D.
+   Agent says "Ok."
+[Achieve RepeatingBug] -accepted -done <-focus
+   User says "Let's achieve RepeatingBug."
+   Agent execute _B.
+   Agent execute C.
+   [Execute C] -optional -rejected
+      [User says one of us should execute C again]
+         Agent says "Should one of us execute C again?"
+         User says "No."
+   Agent execute D.
+   Agent says "Yup."
+
+  > quit
+    

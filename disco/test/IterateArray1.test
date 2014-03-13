@@ -1,0 +1,48 @@
+    # Dec 20, 2012 3:17:57 PM - TaskEngine 1.4.1 / Disco 1.6.2
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task IterateArray
+    User says "Let's talk about cities you love."
+    Agent says "Do you want to know a city that I love?"
+  > say
+[1] Yes.
+[2] No.
+  >> 1
+    User says "Yes."
+    Agent execute _GetCity producing Chicago.
+    Agent says "I love Chicago."
+  > say
+[1] Another city.
+[2] No more cities.
+  >> 1
+    User says "Another city."
+    Agent execute _GetCity producing Detroit.
+    Agent says "I love Detroit."
+  > say
+[1] Another city.
+[2] No more cities.
+  >> 2
+    User says "No more cities."
+    Agent says "Ok."
+  > history
+
+[Talk about cities you love] -accepted -done
+   User says "Let's talk about cities you love."
+   [Achieve IteratedTask] -optional -accepted -done
+      [User says let's achieve IteratedTask]
+         Agent says "Do you want to know a city that I love?"
+         User says "Yes."
+      Agent execute _GetCity producing Chicago.
+      Agent says "I love Chicago."
+   [Achieve IteratedTask] -optional -accepted -done
+      User says "Another city."
+      Agent execute _GetCity producing Detroit.
+      Agent says "I love Detroit."
+   [Achieve IteratedTask] -optional -rejected <-focus
+      User says "No more cities."
+      Agent says "Ok."
+      [ ]
+      [Agent says "..."]
+
+  > quit
+    
