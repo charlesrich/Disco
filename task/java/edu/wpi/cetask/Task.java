@@ -880,6 +880,11 @@ public class Task extends Instance {
    public String toString () {
       if ( TaskEngine.VERBOSE ) return toStringVerbose();
       StringBuilder buffer = argListBuilder(getDeclaredSlotValues());
+      if ( isPrimitive() ) {
+         Boolean external = getExternal();
+         if ( buffer.length() > 0 ) buffer.insert(0, ',');
+         if ( external != null ) buffer.insert(0, external ? "user" : "agent" );
+      }
       String id = getType().getPropertyId();
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
    }
@@ -915,9 +920,13 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined || arg == modifiedOutput ) buffer.append(engine.toString(arg));
+         if ( arg != undefined || arg == modifiedOutput ) buffer.append(toString(arg));
       }
       return buffer;
+   }
+   
+   private String toString (Object value) {
+      return value instanceof String ? ( "\""+value+"\"" ) : engine.toString(value);
    }
    
    @Override
@@ -944,7 +953,7 @@ public class Task extends Instance {
 
    private boolean appendSlot (StringBuilder buffer, String name, boolean first) {
       return isDefinedSlot(name) ? 
-         appendSlot(buffer, name, getSlotValueToString(name), first) :
+         appendSlot(buffer, name, toString(getSlotValue(name)), first) :
             first;
    }
    

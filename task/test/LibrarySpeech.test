@@ -42,7 +42,7 @@ CE> debug
 CE> say please use search engine on Vinge
     # task UseSearchEngine / "Vinge"
     Ok.
-    Shall I UseSearchEngine(Vinge)?
+    Shall I UseSearchEngine(,"Vinge")?
 CE> debug false
 CE> yes
     Ok.

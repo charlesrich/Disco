@@ -77,7 +77,7 @@ public class Segment {
       this.continuation = continuation;
    }
    
-   // used for removing implicit Accept goals, see Disco.pop()
+   // used for removing implicit Accept goals, see Disco.reconcileStack()
    void remove () {
       int index = parent.children.indexOf(this);
       parent.children.remove(this);
