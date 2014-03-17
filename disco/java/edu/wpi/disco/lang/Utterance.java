@@ -85,6 +85,7 @@ public abstract class Utterance extends Decomposition.Step {
   
    @Override
    public final String toString () {
+      if ( TaskEngine.VERBOSE ) return toStringVerbose();
       if ( !occurred() ) return toStringUtterance();
       String string = getDisco().getToString(this);
       if ( string != null ) return string;

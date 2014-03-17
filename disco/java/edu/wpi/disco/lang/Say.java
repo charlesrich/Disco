@@ -61,13 +61,7 @@ public class Say extends Utterance {
       buffer.insert(0, engine.getProperty("says@word"));
       return buffer.toString();
    }
-   
-   @Override
-   protected String toStringUtterance () {
-      String text = getText();
-      return text == null ? super.toString() : ('"'+text+'"');
-   }
-   
+      
    // Say.User: utterance by user 
    //           (for convenience -- does not support other options!)
 
@@ -144,12 +138,6 @@ public class Say extends Utterance {
          return text == null ? "..." : text; 
       }
 
-      @Override
-      protected String toStringUtterance () {
-         String text = getText();
-         return text == null ? super.toString() : ('`'+text+'`');
-      }
-      
       // Say.Expression.Eval
 
       public static class Eval extends Expression {

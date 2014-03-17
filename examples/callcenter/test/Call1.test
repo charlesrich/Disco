@@ -179,53 +179,53 @@ Agent says "Please hold for the next operator."
   > debug
   > history
 
-Agent: "Please hold for the next operator"
+Say(agent,"Please hold for the next operator")
 [FixFreezeProblem by softReset] -failed
-   Caller: Propose.Should(FixFreezeProblem)
-   [Propose.How([FixFreezeProblem],softReset)] -done
-      Agent: Ask.How(FixFreezeProblem,softReset)
-      Caller: Propose.How([FixFreezeProblem],softReset)
-   [RemoveBattery] -succeeded
-      Agent: Propose.Should(RemoveBattery)
-      Caller: Propose.Succeeded(RemoveBattery)
-   [WaitOneMinute] -succeeded
-      Agent: Propose.Should(WaitOneMinute)
-      Caller: Propose.Succeeded(WaitOneMinute)
-   [ReplaceBattery] -succeeded
-      Agent: Propose.Should(ReplaceBattery)
-      Caller: Propose.Succeeded(ReplaceBattery)
-   [StartDevice] -succeeded
-      Agent: Propose.Should(StartDevice)
-      Caller: Propose.Succeeded(StartDevice)
-   [Propose.Succeeded(FixFreezeProblem)] -rejected
-      Agent: com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
-      Caller: Reject(Propose.Succeeded(FixFreezeProblem))
+   Propose.Should(user,FixFreezeProblem)
+   [Propose.How(user,[FixFreezeProblem],softReset)] -done
+      Ask.How(FixFreezeProblem,softReset)
+      Propose.How(user,[FixFreezeProblem],softReset)
+   [RemoveBattery(user)] -succeeded
+      Propose.Should(agent,RemoveBattery(user))
+      Propose.Succeeded(user,RemoveBattery(user))
+   [WaitOneMinute(user)] -succeeded
+      Propose.Should(agent,WaitOneMinute(user))
+      Propose.Succeeded(user,WaitOneMinute(user))
+   [ReplaceBattery(user)] -succeeded
+      Propose.Should(agent,ReplaceBattery(user))
+      Propose.Succeeded(user,ReplaceBattery(user))
+   [StartDevice(user)] -succeeded
+      Propose.Should(agent,StartDevice(user))
+      Propose.Succeeded(user,StartDevice(user))
+   [Propose.Succeeded(user,FixFreezeProblem)] -rejected
+      com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      Reject(user,Propose.Succeeded(user,FixFreezeProblem))
 [FixFreezeProblem by hardReset] -accepted -succeeded
-   [Propose.How([FixFreezeProblem],hardReset)] -done
-      Agent: Ask.How(FixFreezeProblem,hardReset)
-      Caller: Propose.How([FixFreezeProblem],hardReset)
-   [PressMenuKey] -succeeded
-      Agent: Propose.Should(PressMenuKey)
-      Caller: Propose.Succeeded(PressMenuKey)
-   [TapSettings] -succeeded
-      Agent: Propose.Should(TapSettings)
-      Caller: Propose.Succeeded(TapSettings)
-   [TapPrivacy] -succeeded
-      Agent: Propose.Should(TapPrivacy)
-      Caller: Propose.Succeeded(TapPrivacy)
-   [TapFactoryDataReset] -succeeded
-      Agent: Propose.Should(TapFactoryDataReset)
-      Caller: Propose.Succeeded(TapFactoryDataReset)
-   [TapResetPhone] -succeeded
-      Agent: Propose.Should(TapResetPhone)
-      Caller: Propose.Succeeded(TapResetPhone)
-   [TapEraseEverything] -succeeded
-      Agent: Propose.Should(TapEraseEverything)
-      Caller: Propose.Succeeded(TapEraseEverything)
-   [Propose.Succeeded(FixFreezeProblem)] <-focus
-      Agent: com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
-      Caller: Accept(Propose.Succeeded(FixFreezeProblem))
-      Agent: Ok
+   [Propose.How(user,[FixFreezeProblem],hardReset)] -done
+      Ask.How(FixFreezeProblem,hardReset)
+      Propose.How(user,[FixFreezeProblem],hardReset)
+   [PressMenuKey(user)] -succeeded
+      Propose.Should(agent,PressMenuKey(user))
+      Propose.Succeeded(user,PressMenuKey(user))
+   [TapSettings(user)] -succeeded
+      Propose.Should(agent,TapSettings(user))
+      Propose.Succeeded(user,TapSettings(user))
+   [TapPrivacy(user)] -succeeded
+      Propose.Should(agent,TapPrivacy(user))
+      Propose.Succeeded(user,TapPrivacy(user))
+   [TapFactoryDataReset(user)] -succeeded
+      Propose.Should(agent,TapFactoryDataReset(user))
+      Propose.Succeeded(user,TapFactoryDataReset(user))
+   [TapResetPhone(user)] -succeeded
+      Propose.Should(agent,TapResetPhone(user))
+      Propose.Succeeded(user,TapResetPhone(user))
+   [TapEraseEverything(user)] -succeeded
+      Propose.Should(agent,TapEraseEverything(user))
+      Propose.Succeeded(user,TapEraseEverything(user))
+   [Propose.Succeeded(user,FixFreezeProblem)] <-focus
+      com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      Accept(user,Propose.Succeeded(user,FixFreezeProblem))
+      Ok(agent)
 
   > quit
     

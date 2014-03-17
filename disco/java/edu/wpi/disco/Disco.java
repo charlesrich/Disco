@@ -314,14 +314,7 @@ public class Disco extends TaskEngine {
       Segment segment = stack.pop();
       if ( TRACE ) getOut().println("Pop: "+segment);
       Plan plan = segment.getPlan();
-      if ( !(plan.isDone() || plan.isFailed()) ) {
-         // remove Accept segment and implicitly accept proposal
-         if ( plan.getGoal() instanceof Accept ) {
-            ((Accept) plan.getGoal()).getProposal().accept(plan.getParent(), true);
-            clearLiveAchieved();
-            segment.remove();
-         } else segment.stop();
-      }
+      if ( !(plan.isDone() || plan.isFailed()) ) segment.stop();
    }
    
    /**
@@ -522,7 +515,7 @@ public class Disco extends TaskEngine {
       Plan target = getTop(contributes);
       if ( !isEmpty() ) {
          // (virtually) pop interruption and poppable segments which do not 
-         // have same toplevel plan as match
+         // have same toplevel plan as contributes
          int pop = 0;
          int max = stack.size()-1;
          Segment segment = getSegment();
@@ -546,16 +539,30 @@ public class Disco extends TaskEngine {
     }
    
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
-                                boolean continuation) {
+         boolean continuation) {
       if ( focus != contributes ) {
          Stack<Plan> path = focus.pathToDescendant(contributes);
          if ( path == null ) {
+            Segment popped = getSegment();
             pop();
-            // recursion must end since focus and match have same top
+            if ( popped.getPlan().getGoal() instanceof Accept ) {
+               // implicitly accept proposal and remove segment
+               // iff occurrence consistent with proposal
+               Propose proposal = ((Accept) focus.getGoal()).getProposal();
+               if ( proposal instanceof Propose.Should ) {
+                  Plan parent = focus.getParent().getParent();
+                  if ( parent.pathToDescendant(contributes) != null ) {
+                     proposal.accept(parent, true);
+                     clearLiveAchieved();
+                     popped.remove();
+                  }
+               } // TODO extend for other types of proposals
+            }
+            // recursion must end since focus and contributes have same top
             reconcileStack(occurrence, getFocus(), contributes, continuation);
          } else {
-            // push to match
-            // if match is continuation, then so are all parents
+            // push to contributes
+            // if contributes is continuation, then so are all parents
             while ( !path.isEmpty() ) push(path.pop(), continuation);
             // suppress singleton segments
             if ( contributes.getType() != occurrence.getType()
@@ -773,11 +780,8 @@ public class Disco extends TaskEngine {
    
    public void print (Task task, PrintStream stream, int indent) {
       for (int i = indent; i-- > 0;) stream.print("   ");
-      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
-         stream.print(Utils.capitalize(interaction.getActor(task).getName()));
-         stream.print(": ");
-         stream.print(task);
-      } else stream.print(toHistoryString(task));
+      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) stream.print(task);
+      else stream.print(toHistoryString(task));
    }
    
    private void print (Plan plan, PrintStream stream, int indent) {
