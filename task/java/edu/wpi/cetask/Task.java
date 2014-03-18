@@ -883,7 +883,8 @@ public class Task extends Instance {
       if ( isPrimitive() ) {
          Boolean external = getExternal();
          if ( buffer.length() > 0 ) buffer.insert(0, ',');
-         if ( external != null ) buffer.insert(0, external ? "user" : "agent" );
+         if ( external != null ) buffer.insert(0, external ? 
+            engine.getExternalName() : engine.getSystemName() );
       }
       String id = getType().getPropertyId();
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
