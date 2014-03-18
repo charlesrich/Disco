@@ -28,7 +28,6 @@
   > history
 
 Agent says "Propose.Global on FOO and Flavor and chocolate."
-[User accept] -live -stopped
 [Achieve IntA] -accepted -live
    User says "Let's achieve IntA."
    [User says let's achieve IntA somehow] -live <-focus

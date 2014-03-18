@@ -314,7 +314,11 @@ public class Disco extends TaskEngine {
       Segment segment = stack.pop();
       if ( TRACE ) getOut().println("Pop: "+segment);
       Plan plan = segment.getPlan();
-      if ( !(plan.isDone() || plan.isFailed()) ) segment.stop();
+      if ( !(plan.isDone() || plan.isFailed()) ) {
+         // see reconcileStack for implicit acceptance
+         if ( plan.getGoal() instanceof Accept ) segment.remove();
+         else segment.stop();
+      }
    }
    
    /**
@@ -543,21 +547,18 @@ public class Disco extends TaskEngine {
       if ( focus != contributes ) {
          Stack<Plan> path = focus.pathToDescendant(contributes);
          if ( path == null ) {
-            Segment popped = getSegment();
-            pop();
-            if ( popped.getPlan().getGoal() instanceof Accept ) {
-               // implicitly accept proposal and remove segment
-               // iff occurrence consistent with proposal
+            if ( focus.getGoal() instanceof Accept ) {
+               // implicitly accept proposal iff occurrence consistent with proposal
                Propose proposal = ((Accept) focus.getGoal()).getProposal();
                if ( proposal instanceof Propose.Should ) {
                   Plan parent = focus.getParent().getParent();
                   if ( parent.pathToDescendant(contributes) != null ) {
                      proposal.accept(parent, true);
                      clearLiveAchieved();
-                     popped.remove();
                   }
                } // TODO extend for other types of proposals
             }
+            pop();
             // recursion must end since focus and contributes have same top
             reconcileStack(occurrence, getFocus(), contributes, continuation);
          } else {
