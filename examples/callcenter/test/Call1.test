@@ -183,7 +183,7 @@ Say(agent,"Please hold for the next operator")
 [FixFreezeProblem by softReset] -failed
    Propose.Should(caller,FixFreezeProblem)
    [Propose.How(caller,[FixFreezeProblem],softReset)] -done
-      Ask.How(FixFreezeProblem,softReset)
+      Ask.How(agent,FixFreezeProblem)
       Propose.How(caller,[FixFreezeProblem],softReset)
    [RemoveBattery(caller)] -succeeded
       Propose.Should(agent,RemoveBattery(caller))
@@ -198,11 +198,11 @@ Say(agent,"Please hold for the next operator")
       Propose.Should(agent,StartDevice(caller))
       Propose.Succeeded(caller,StartDevice(caller))
    [Propose.Succeeded(caller,FixFreezeProblem)] -rejected
-      com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      com.parc.callcenter.lang.AskSucceeded(agent,FixFreezeProblem)
       Reject(caller,Propose.Succeeded(caller,FixFreezeProblem))
 [FixFreezeProblem by hardReset] -accepted -succeeded
    [Propose.How(caller,[FixFreezeProblem],hardReset)] -done
-      Ask.How(FixFreezeProblem,hardReset)
+      Ask.How(agent,FixFreezeProblem)
       Propose.How(caller,[FixFreezeProblem],hardReset)
    [PressMenuKey(caller)] -succeeded
       Propose.Should(agent,PressMenuKey(caller))
@@ -223,7 +223,7 @@ Say(agent,"Please hold for the next operator")
       Propose.Should(agent,TapEraseEverything(caller))
       Propose.Succeeded(caller,TapEraseEverything(caller))
    [Propose.Succeeded(caller,FixFreezeProblem)] <-focus
-      com.parc.callcenter.lang.AskSucceeded(FixFreezeProblem)
+      com.parc.callcenter.lang.AskSucceeded(agent,FixFreezeProblem)
       Accept(caller,Propose.Succeeded(caller,FixFreezeProblem))
       Ok(agent)
 
