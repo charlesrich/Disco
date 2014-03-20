@@ -178,7 +178,7 @@ public abstract class Actor {
     * Always return false for non-primitive tasks.
     * 
     * @see Task#canUser()
-    * @see Task#canUser()
+    * @see Task#canSystem()
     */
    public boolean canOther (Task task, Interaction interaction) {
       return interaction.getSystem() == this ? task.canUser() : task.canSystem();
