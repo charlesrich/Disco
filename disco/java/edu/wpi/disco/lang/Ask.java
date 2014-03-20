@@ -119,19 +119,6 @@ public abstract class Ask extends Propose.Should {
       
       @Override  // skip nested Propose.Should and Propose
       protected Task getPropertyNested () { return getNestedGoal(); }
-
-      @Override
-      protected String toStringUtterance () {
-         if ( TaskEngine.VERBOSE ) return toStringVerbose();
-         Task goal = getNestedGoal();
-         if ( goal == null ) return super.toString();
-         List<Object> args = getNested().getDeclaredSlotValues();
-         args.remove(0); // remove Propose.Should
-         StringBuilder buffer = argListBuilder(args);
-         if ( buffer.length() > 0 ) buffer.insert(0, ',');
-         buffer.insert(0, engine.toString(goal));
-         return buffer.insert(0, '(').insert(0, getType().getPropertyId()).append(')').toString();
-      }
    }
    
    /**
