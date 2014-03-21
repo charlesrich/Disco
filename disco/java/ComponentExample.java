@@ -89,7 +89,7 @@ public class ComponentExample {
          user(item.task, item.contributes);
 
          // if optional Disco console window used, go to window now and try typing in 
-         // comands, such as 'history'
+         // commands, such as 'history'
       
          // next line is here only to keep optional Disco console window open in 
          // this demo until you type 'quit' or close it
