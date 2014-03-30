@@ -5,7 +5,6 @@
  */
 package edu.wpi.disco.lang;
 
-import java.util.List;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Disco;
 
