@@ -760,6 +760,7 @@ public class Task extends Instance {
       synchronized (engine.synchronizer) {
          setWhen(System.currentTimeMillis());
          engine.tick();
+         engine.setLastOccurrence(this);
       }
    }
 

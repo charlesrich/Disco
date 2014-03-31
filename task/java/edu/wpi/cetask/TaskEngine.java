@@ -194,6 +194,15 @@ public class TaskEngine {
       }
    }
 
+   private Task last;
+   
+   void setLastOccurrence (Task last) {
+      if ( !last.isPrimitive() ) throw new IllegalArgumentException("Occurrence is not primitive: "+last);
+      this.last = last;
+   }
+   
+   public Task GetLastOccurrence () { return last; }
+   
    /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
     * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
     */
