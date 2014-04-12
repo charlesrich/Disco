@@ -176,6 +176,15 @@ public class Plan {
    }
    
    /**
+    * Return child of this plan with given goal, or null if none.
+    */
+   public Plan getChild (Task goal) {
+      for (Plan child : children)
+         if ( child.goal == goal ) return child;
+      return null;
+   }
+   
+   /**
     * Remove given child of this plan.
     * 
     * @param child - must be child of this plan
