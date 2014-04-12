@@ -108,6 +108,16 @@ public class Plan {
    private boolean contributes = true;
 
    /**
+    * Tests whether this plan contributes to its parent.
+    */
+   public boolean contributes () { return contributes; }
+   
+   /**
+    * Sets whether this plan contributes to its parent.
+    */
+   public void setContributes (boolean contributes) { this.contributes = contributes; }
+   
+   /**
     * Test whether given plan can be reached from this plan by following parents.
     * Note plan is <em>not</em> its own ancestor.
     */
@@ -239,9 +249,8 @@ public class Plan {
     */
    public void splice (Plan plan) {
       if ( parent == null ) throw new UnsupportedOperationException("No parent: "+this);
-      Plan parent = plan.getParent();
       if ( plan.parent != parent ) throw new IllegalArgumentException("Not same parent: "+plan);
-      for (Plan child : children)
+      for (Plan child : parent.children)
          if ( child.isRequired(this) ) {
             child.unrequires(this);
             child.requires(plan);
@@ -401,8 +410,9 @@ public class Plan {
          for (Plan child : children) // procedural decomposition
             if ( !isComplete(child) ) return false;
       } else if ( !failed.contains(decomp) ) { 
-         for (Plan step : decomp.getSteps()) 
-            if ( !isComplete(step) ) return false;
+         for (Plan step : decomp.getSteps())
+            // check contributes to allow recovery
+            if ( step.contributes() && !isComplete(step) ) return false;
       }
       return true;
    }
@@ -730,7 +740,7 @@ public class Plan {
       goal.engine.clearLiveAchieved();
    }
   
-   private void unFail () {
+   public void unFail () {
       if ( isFailed() ) {
          goal.deleteSlotValue("success");
          failed.clear();
