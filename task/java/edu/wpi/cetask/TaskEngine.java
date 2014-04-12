@@ -201,7 +201,7 @@ public class TaskEngine {
       this.last = last;
    }
    
-   public Task GetLastOccurrence () { return last; }
+   public Task getLastOccurrence () { return last; }
    
    /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
     * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
