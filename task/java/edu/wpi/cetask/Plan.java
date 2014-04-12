@@ -197,6 +197,9 @@ public class Plan {
    final private List<Plan> required = new ArrayList<Plan>();
    final List<Plan> requiredBy = new ArrayList<Plan>(); // package access for Decomposition
    
+   /**
+    * Make this plan require given plan.
+    */
    public void requires (Plan plan) {
       if ( plan == this ) 
          throw new IllegalArgumentException("Circular dependency: "+plan);
@@ -205,8 +208,35 @@ public class Plan {
       isRequired(this, null); // check for cycles
    }
    
+   /**
+    * Remove the dependency of this plan on given plan.
+    */
+   public void unrequires (Plan plan) {
+      if ( !required.remove(plan) ) throw new IllegalArgumentException("Does not require: "+plan);
+      plan.requiredBy.remove(this);
+   }
+   
+   /**
+    * Test if this plan requires given plan.
+    */
    public boolean isRequired (Plan plan) {
       return required.contains(plan);
+   }
+   
+   /**
+    * Modify the dependencies in parent of this plan such
+    * that all siblings that require this plan will require given plan
+    * instead.  Assumes given plan already a child of same parent.
+    */
+   public void splice (Plan plan) {
+      if ( parent == null ) throw new UnsupportedOperationException("No parent: "+this);
+      Plan parent = plan.getParent();
+      if ( plan.parent != parent ) throw new IllegalArgumentException("Not same parent: "+plan);
+      for (Plan child : children)
+         if ( child.isRequired(this) ) {
+            child.unrequires(this);
+            child.requires(plan);
+         }
    }
 
    /**
