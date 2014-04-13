@@ -468,33 +468,6 @@ public class TaskClass extends TaskModel.Member {
    public boolean isPathFrom (TaskClass task) { 
       return task.explains.contains(this);   
    }
-   
-   /**
-    * Comparator to be used, for example, with @link{Collections#sort(List,Comparator)}
-    * to sort a list of task classes relative to how "high" they are in decomposition
-    * hierarchy of currently loaded libraries.  Using this comparator will sort
-    * the list so that the primitives are at the start and so on.
-    * 
-    * Note: This comparator imposes orderings that are inconsistent with equals. Do
-    * {\em not} use to implement sorted sets (or maps) containing task classes.
-    */
-   public final static Comparator<TaskClass> COMPARATOR =
-         new Comparator<TaskClass> () {
-
-            /**
-             * Returns 0 if two classes are equal or if there is no decomposition
-             * path from task1 to task2 or vice versa, i.e., if task1 and task2
-             * are in the same {\em equivalence class}.  Returns -1 if task1
-             * can appear in the decomposition (recursively) of task2 or +1
-             * if the reverse.
-             */
-            @Override
-            public int compare (TaskClass task1, TaskClass task2) {
-               return task1.equals(task2) ? 0 :
-                  task1.isPathFrom(task2) ? -1 :
-                     task2.isPathFrom(task1) ? 1 : 0;
-            }
-   };
 
    void contributes (TaskClass task) {
       if ( task != this && (contributes == null || !contributes.contains(task)) ) {
