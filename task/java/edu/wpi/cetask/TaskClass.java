@@ -276,7 +276,14 @@ public class TaskClass extends TaskModel.Member {
     * Thread-safe method to create new instance of this task class.
     */
    public Task newInstance () { 
-      return isBuiltin() ? newStep(null, null, false) : new Task(this, engine);
+      try { return isBuiltin() ? newStep(null, null, false) : new Task(this, engine); }
+      catch (RuntimeException e) {
+         // special case for ambiguous constructors (e.g., Propose.Who)
+         try { return (Decomposition.Step) new Expression(builtin, "new", 
+               new Object[]{engine}).getValue();
+         } catch (RuntimeException f) { throw f; }
+           catch (Exception f) { throw new RuntimeException(f); }
+      }
    }
 
    Decomposition.Step newStep (Decomposition decomp, String step, boolean repeat) {
