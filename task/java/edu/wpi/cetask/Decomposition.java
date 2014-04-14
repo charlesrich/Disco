@@ -92,9 +92,11 @@ public class Decomposition extends Instance {
    
    private Plan addStep (TaskClass type, String name,
                          boolean optional, boolean repeat) {
-      Decomposition.Step step = type.isBuiltin() ?
-         type.newStep(Decomposition.this, name, repeat) :
-            new Step(type, engine, this, name);
+      Decomposition.Step step;
+      try { step = type.isBuiltin() ?
+               type.newStep(Decomposition.this, name, repeat) :
+               new Step(type, engine, this, name);
+      } catch (NoSuchMethodException e) { throw new RuntimeException(e); }
       Plan plan = new Plan(step);
       plan.setOptionalStep(optional);
       putStep(name, plan);

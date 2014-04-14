@@ -277,21 +277,22 @@ public class TaskClass extends TaskModel.Member {
     */
    public Task newInstance () { 
       try { return isBuiltin() ? newStep(null, null, false) : new Task(this, engine); }
-      catch (RuntimeException e) {
+      catch (NoSuchMethodException e) {
          // special case for ambiguous constructors (e.g., Propose.Who)
          try { return (Decomposition.Step) new Expression(builtin, "new", 
-               new Object[]{engine}).getValue();
+                  new Object[]{engine}).getValue();
          } catch (RuntimeException f) { throw f; }
            catch (Exception f) { throw new RuntimeException(f); }
       }
    }
 
-   Decomposition.Step newStep (Decomposition decomp, String step, boolean repeat) {
+   Decomposition.Step newStep (Decomposition decomp, String step, boolean repeat)
+                              throws NoSuchMethodException {
       // if id corresponds to subclass of Task, then instantiate 
       // that "builtin" class instead
       try { return (Decomposition.Step) new Expression(builtin, "new", 
-            new Object[]{engine, decomp, step, repeat}).getValue();
-      } catch (RuntimeException e) { throw e; }
+               new Object[]{engine, decomp, step, repeat}).getValue();
+      } catch (RuntimeException|NoSuchMethodException e) { throw e; }
         catch (Exception e) { throw new RuntimeException(e); }
    }
    
