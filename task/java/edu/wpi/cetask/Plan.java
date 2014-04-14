@@ -255,6 +255,7 @@ public class Plan {
             child.unrequires(this);
             child.requires(plan);
          }
+      goal.engine.clearLiveAchieved();
    }
 
    /**
@@ -731,6 +732,7 @@ public class Plan {
          retryOf.parent = parent;
          // insert copy in parent before this plan 
          parent.children.add(parent.children.indexOf(this), retryOf);
+         retryOf.splice(this);
          parent.unFail();
       }
       // remove all output values (including success and when)
