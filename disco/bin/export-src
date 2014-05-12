@@ -4,12 +4,11 @@
 
 # Create src.zip with disco and task sources in given path (defaults to /tmp)
 #
-ws="`dirname $0`/../.."
-cd /tmp
-rm -fR edu
-svn export -q $ws/disco/java/edu edu
-svn export -q $ws/task/java/edu/wpi/cetask edu/wpi/cetask
-zip -qr src.zip edu
+cd "`dirname $0`/../.."
+cd disco/java
+zip -qr /tmp/src.zip .
+cd ../../task/java
+zip -qrg /tmp/src.zip .
 if [ "$1" ]; then
   cp -v /tmp/src.zip $1
 fi
