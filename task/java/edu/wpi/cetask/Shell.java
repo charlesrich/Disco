@@ -287,7 +287,7 @@ public class Shell {
       setErr(new PrintStream(new Utils.CopyOutputStream(err, logStream), true));
    }
    
-     protected void println (Object object) {
+   public void println (Object object) {
       out.print("    "); out.println(object);
    }
    
