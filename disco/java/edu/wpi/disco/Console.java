@@ -280,7 +280,7 @@ public class Console extends Shell {
                if ( line == null ) { command = null; break; }
                if ( line.startsWith(sayPrompt) ) 
                   line = line.substring(sayPrompt.length());
-               (source == null || out == logStream ? logStream : out).println(line);
+               (source == null || out == getLogStream() ? getLogStream() : out).println(line);
                if ( line.length() == 0 ) { 
                   command = null; 
                   if (TTSay) 

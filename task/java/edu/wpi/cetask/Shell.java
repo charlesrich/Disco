@@ -63,7 +63,9 @@ public class Shell {
    
    public String getPrompt () { return prompt; }
    
-   protected PrintStream logStream;
+   private PrintStream logStream;
+   
+   public PrintStream getLogStream () { return logStream; }
 
    protected Reader input; // current input
    protected URL source;   // current alternative input source (or null)
@@ -165,35 +167,26 @@ public class Shell {
       out.print(" - TaskEngine "+TaskEngine.VERSION);
    }
   
-   // following is support (for DiscoRT) to have multiple instances (threads)
-   // of Disco write to the same log file
-   
-   private static PrintStream appendLogStream; 
    private boolean append;
    
-   public void setAppend (boolean append) { this.append = append; }
-   public boolean isAppend () { return append; }
+   public void setAppend (PrintStream logStream) { 
+      this.logStream = logStream;
+      setErrOut(logStream);
+      append = true;
+   }
    
    protected void init (TaskEngine engine) {
       prompt = engine.getProperty("shell@prompt");
-      if ( append && appendLogStream != null ) logStream = appendLogStream;
-      else {
-         logStream = null;
-         try {
-            logStream = new PrintStream(new BufferedOutputStream(
-                  new FileOutputStream(log, append)), true);
-            if ( source == null ) {
-               println("# Writing log to " +log+ "...");
-               copyOutput(logStream);
-            } else { 
-               setOut(logStream); 
-               // errors also go to console
-               setErr(new PrintStream(new Utils.CopyOutputStream(err, logStream), true));
-            }
-         } catch (FileNotFoundException e) { 
-            getErr().println("Cannot open log file: "+e);
-         }
-         appendLogStream = logStream;
+      logStream = null;
+      try {
+         logStream = new PrintStream(new BufferedOutputStream(
+               new FileOutputStream(log, append)), true);
+         if ( source == null ) {
+            println("# Writing log to " +log+ "...");
+            copyOutput(logStream);
+         } else setErrOut(logStream);
+      } catch (FileNotFoundException e) { 
+         getErr().println("Cannot open log file: "+e);
       }
       long now = System.currentTimeMillis();
       out.print("    # "+
@@ -210,6 +203,12 @@ public class Shell {
          " does not use (sun.)org.mozilla.javascript.(internal.)Scriptable and will run slower.");
    }         
    
+   private void setErrOut (PrintStream stream) {
+      setOut(stream); 
+      // errors also go to console
+      setErr(new PrintStream(new Utils.CopyOutputStream(err, stream), true));
+   }
+
    protected void cleanup () {
       setOut(System.out); setErr(System.err);
       if ( logStream != null && !append ) logStream.close();
