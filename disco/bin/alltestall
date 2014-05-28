@@ -63,12 +63,13 @@ if [ -e callcenter ]; then
   fi
   cd ..
 fi
-if [ -e ../../always ]; then
-   ../../always/core/agent/bin/always-alltestall
-   if [ $? != 0 ]; then
-     result=`expr $result + 1`
-   fi
-fi
+# test cases no longer maintained
+# if [ -e ../../always ]; then
+#   ../../always/core/agent/bin/always-alltestall
+#   if [ $? != 0 ]; then
+#     result=`expr $result + 1`
+#   fi
+# fi
 #
 all_end=`date +%s`
 echo ">>"

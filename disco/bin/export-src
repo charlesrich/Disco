@@ -8,6 +8,7 @@ cd "`dirname $0`/../.."
 cd disco/java
 zip -qr /tmp/src.zip .
 cd ../../task/java
+echo Writing /tmp/src.zip...
 zip -qrg /tmp/src.zip .
 if [ "$1" ]; then
   cp -v /tmp/src.zip $1

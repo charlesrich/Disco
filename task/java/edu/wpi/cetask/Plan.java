@@ -579,7 +579,8 @@ public class Plan {
     */
    public boolean isExhausted () {
       // may be done but have live optional trailing steps
-      if ( goal.getSuccess() != null || isMoot() || isBlocked() 
+      if ( goal.getSuccess() != null || isMoot() || isBlocked()
+            || Utils.isFalse(isApplicable())
             || Utils.isFalse(goal.getShould()) )
          return true;
       if ( isPrimitive() ) return !isLive();
