@@ -404,9 +404,10 @@ public class Interaction extends Thread {
    }
 
    /**
-    * Clear any discourse state information stored in this interaction.  
+    * Clear any discourse state information stored in this interaction.
+    * Thread-safe.  
     */
-   public void clear () { 
+   public synchronized void clear () { 
       disco.clear();
       system.clear(this); 
       external.clear(this); 
