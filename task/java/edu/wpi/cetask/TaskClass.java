@@ -308,6 +308,17 @@ public class TaskClass extends TaskModel.Member {
    }
    
    /**
+    * Test whether this class can serve as root of plan recognition. Typically 
+    * this is because they do not contribute to any other
+    * task classes. However, this can be overridden by @top property in library.
+    * 
+    * @see TaskEngine#getTopClasses()
+    */
+   public boolean isTop () {
+      return engine.topClasses.contains(this);
+   }
+   
+   /**
     * Force this task class to be treated as primitive or not, regardless
     * of whether decompositions are known.  Usually used to make a task
     * class non-primitive even though decompositions not (yet) known.

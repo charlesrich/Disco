@@ -1082,6 +1082,8 @@ public class TaskEngine {
     * Returns unmodifiable list of task classes which can serve as root of plan
     * recognition. Typically this is because they do not contribute to any other
     * task classes. However, this can be overridden by @top property in library.
+    * 
+    * @see TaskClass#isTop()
     */
    public List<TaskClass> getTopClasses () { 
       return Collections.unmodifiableList(topClasses); 
