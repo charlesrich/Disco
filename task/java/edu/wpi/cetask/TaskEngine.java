@@ -296,9 +296,7 @@ public class TaskEngine {
    public Properties getProperties () { return properties; }
    
    public String getProperty (String key) { 
-      String value = properties.getProperty(key);
-      if ( value == null && DEBUG ) return key;
-      return value;
+      return properties.getProperty(key);
    }
    
    public boolean hasProperty (String key) {
