@@ -377,7 +377,7 @@
     
     Mutable.prototype.toString = function () { return '['+this.loc+']'; }
 
-    // see Procedural@decomposition = decomposeA($plan)
+    // see ProceduralA@decomposition = decomposeA($plan)
 
     function decomposeA (plan) {
       // note calling Plan.addPlan(Plan) Java method below
