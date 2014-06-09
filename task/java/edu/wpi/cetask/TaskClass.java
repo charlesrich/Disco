@@ -299,12 +299,13 @@ public class TaskClass extends TaskModel.Member {
    /**
     * Test whether this task class is primitive (relative to models in current
     * task engine). A task class is primitive iff there are no known
-    * decomposition types with this task as goal.  Overridden by value
-    * of @primitive, if any.
+    * decomposition classes (or a decomposition script) with this task as goal.
+    * Overridden by value of @primitive, if any.
     */
    public boolean isPrimitive () { 
       Boolean property = getProperty("@primitive", (Boolean) null);
-      return property == null ? getDecompositions().isEmpty() : property;
+      return property != null ? property :
+         getDecompositions().isEmpty() && getDecompositionScript() == null;
    }
    
    /**
@@ -431,14 +432,14 @@ public class TaskClass extends TaskModel.Member {
    List<DecompositionClass> decompositions = Collections.emptyList();
          
    /**
-    * Return non-modifiable list of <em>known</em> decomposition classes for this 
+    * Return unmodifiable list of <em>known</em> decomposition classes for this 
     * task class.
     * 
     * @see Task#getDecompositions()
     * @see Plan#getDecompositions()
     */
    public List<DecompositionClass> getDecompositions () {
-      return decompositions;
+      return Collections.unmodifiableList(decompositions);
    }
    
    /**
@@ -449,7 +450,28 @@ public class TaskClass extends TaskModel.Member {
          if ( decomp.getId().equals(id) ) return decomp;
       return null;
    }
-    
+
+   /**
+    * Return the decomposition script ("procedural decomposition") for this task
+    * class or null. The script is a JavaScript expression that, when evaluated,
+    * returns true if it is applicable (false otherwise) and as a side effect
+    * adds subplans (and constraints) to the current value of '$plan'.
+    * <p>
+    * Note that if there is a decomposition script for this task class, then
+    * there are not allowed to be any decomposition classes with this goal. This
+    * means the script will be called in {@link Plan#decomposeAll()}.
+    * <p>
+    * The script is stored as the value of the '@decomposition' property of this
+    * task class.
+    */
+   public String getDecompositionScript () {
+      String script = engine.getProperty(getPropertyId()+"@decomposition");
+      // check for decomposition script added later
+      if ( script != null && !decompositions.isEmpty() )
+         throw new IllegalStateException(this+" has both a decomposition script and class(es)");
+      return script;
+   }
+   
    // useful for CoachedInteraction
    private Decomposition lastDecomp;
    

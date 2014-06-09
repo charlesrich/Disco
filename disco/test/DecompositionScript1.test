@@ -1,0 +1,18 @@
+    # Jun 9, 2014 6:27:30 PM - TaskEngine 1.6 / Disco 1.8
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task ProceduralA
+    User says "Let's achieve ProceduralA."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Ok."
+  > history
+
+[Achieve ProceduralA] -accepted -done <-focus
+   User says "Let's achieve ProceduralA."
+   Agent execute B.
+   Agent execute C.
+   Agent says "Ok."
+
+  > quit
+    

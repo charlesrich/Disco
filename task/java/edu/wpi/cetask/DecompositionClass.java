@@ -127,6 +127,7 @@ public class DecompositionClass extends TaskModel.Member {
       if ( this.goal.decompositions.isEmpty() ) 
          this.goal.decompositions = new ArrayList<DecompositionClass>(5);
       this.goal.decompositions.add(this);
+      this.goal.getDecompositionScript(); // for error check
       // cache ordered (default true)
       String ordered = xpath("./@ordered");
       this.ordered =  ordered.length() == 0 || Utils.parseBoolean(ordered);
