@@ -132,9 +132,7 @@ public class Interaction extends Thread {
    /**  
     * Thread-safe method to test whether given plan is at toplevel in current tree.
     */
-   public synchronized boolean isTop (Plan plan) {
-      return disco.isTop(plan);
-   }
+   public synchronized boolean isTop (Plan plan) { return disco.isTop(plan); }
    
    /**
     * Thread-safe method to push plan onto discourse stack (make it the current focus);
@@ -142,6 +140,13 @@ public class Interaction extends Thread {
     * @see Disco#push(Plan)
     */
    public synchronized void push (Plan plan) { disco.push(plan); }
+   
+   /**
+    * Thread-safe method to pop discourse stack 
+    * 
+    * @see Disco#pop()
+    */
+   public synchronized void pop () { disco.pop(); }
    
    /**
     * Thread-safe method to load specified task model.
