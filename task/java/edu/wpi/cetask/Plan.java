@@ -579,17 +579,18 @@ public class Plan {
     */
    public boolean isExhausted () {
       // may be done but have live optional trailing steps
-      if ( goal.getSuccess() != null || isMoot() || isBlocked()
-            || Utils.isFalse(isApplicable())
-            || Utils.isFalse(goal.getShould()) )
-         return true;
+      if ( goal.getSuccess() != null || isMoot() ) return true;
       if ( isPrimitive() ) return !isLive();
       else if ( isDecomposed() ) {
          if ( decomp == null && decompClass != null ) return false; // not expanded yet
          for (Plan child : children) // procedural decomposition
             if ( child.contributes && !child.isExhausted() ) return false;
          return true;
-      } else return isDone() && !hasLive();
+      } else // non-primitive, not decomposed but may have children 
+         return 
+            ( !isStarted() && // conditions only required before starting
+                  (isBlocked() || Utils.isFalse(isApplicable()) || Utils.isFalse(goal.getShould())) )
+            || (isDone() && !hasLive());
    }
    
    /**
