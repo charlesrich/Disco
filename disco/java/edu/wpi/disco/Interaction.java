@@ -228,9 +228,9 @@ public class Interaction extends Thread {
     /**
     * Thread-safe method to get specified property.
     * 
-    * @see Disco#getProperty(String,boolean)
+    * @see Disco#getProperty(String,Boolean)
     */
-   public synchronized boolean getProperty (String key, boolean defaultValue) {
+   public synchronized boolean getProperty (String key, Boolean defaultValue) {
       return disco.getProperty(key, defaultValue);
    }
    

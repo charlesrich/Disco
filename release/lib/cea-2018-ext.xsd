@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Complete RelaxNG compact schema for CEA-2018 (no includes)
+  
+  	Extended by Charles Rich:
+          August 3, 2009 to make slot type optional and to support <binding>'s for tasks.
+          Oct 23, 2009 to allow dots in DataType and to allow dot and dollar in task id and step type.
+          Dec 28, 2011 to prohibit tasks with both scripts and nested subtasks
+  
+  	Document URL: http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext/rnc
+  
+  	Document Title: RNC Schema for CEA-2018, Task Model Description
+  	Document URL: http://ce.org/cea-2018/rnc
+  	Contributors: 
+  		Charles Rich, Mitsubishi Electric Research Laboratories (MERL), rich@merl.com (co-chair of CEA r7wg12)
+  		Gottfried Zimmermann, Access Technologies Group, gzimmermann@acm.org (editor of CEA-2018)
+  	Publisher: Consumer Electronics Association, http://www.ce.org
+  	Date: December 24, 2007
+  
+  	Abstract: This is the complete RNC Schema file for the Task Model Description language, as specified by CEA-2018.  
+  	In case of any differences between this specification and CEA-2018, the normative CEA standard shall take precedence. 
+  
+  	MIME type: A document conforming to CEA-2018 should be served with a MIME type of application/cea-2018+xml.
+  
+  	Versioning: This RNC Schema file may be updated in the future to reflect new revisions of the Task Model 
+  	Description standard, if the new revision is backward compatible.  Otherwise a new RNC Schema file will be 
+  	created with a new namespace URL.
+  
+  	Disclaimer: THIS DOCUMENT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+  	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+  	AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS 
+  	INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, 
+  	OR ANY DAMAGES WHATSOEVER RESULTINGFROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF 
+  	CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF 
+  	THIS DOCUMENT.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext" xmlns:c="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+  <xsd:element name="taskModel">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:group minOccurs="0" maxOccurs="unbounded" ref="c:Description"/>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+          <xsd:element ref="c:task"/>
+          <xsd:element ref="c:subtasks"/>
+          <xsd:element ref="c:script"/>
+        </xsd:choice>
+      </xsd:sequence>
+      <xsd:attribute name="about" use="required" type="xsd:anyURI"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:group name="Description">
+    <xsd:choice>
+      <xsd:any namespace="http://purl.org/dc/elements/1.1" processContents="skip"/>
+      <xsd:any namespace="http://purl.org/dc/terms" processContents="skip"/>
+    </xsd:choice>
+  </xsd:group>
+  <xsd:element name="script">
+    <xsd:complexType mixed="true">
+      <xsd:attribute name="task" type="xsd:QName"/>
+      <xsd:attribute name="model" type="xsd:anyURI"/>
+      <xsd:attribute name="init" default="false" type="xsd:boolean"/>
+      <xsd:attributeGroup ref="c:ScriptContent"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:attributeGroup name="ScriptContent">
+    <xsd:attribute name="platform" type="xsd:token"/>
+    <xsd:attribute name="deviceType" type="xsd:token"/>
+    <xsd:attribute name="applicable"/>
+  </xsd:attributeGroup>
+  <xsd:element name="task">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:group minOccurs="0" maxOccurs="unbounded" ref="c:Description"/>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:concept"/>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:input"/>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:output"/>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:binding"/>
+        <xsd:element minOccurs="0" ref="c:precondition"/>
+        <xsd:element minOccurs="0" ref="c:postcondition"/>
+        <xsd:choice minOccurs="0">
+          <xsd:element maxOccurs="unbounded" name="subtasks" type="c:SubtasksContent"/>
+          <xsd:element maxOccurs="unbounded" name="script">
+            <xsd:complexType mixed="true">
+              <xsd:attributeGroup ref="c:ScriptContent"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:sequence>
+      <xsd:attribute name="id" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:token">
+            <xsd:pattern value="\i([\c-[:\-]]|$)*"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="precondition" type="xsd:string"/>
+  <xsd:element name="postcondition">
+    <xsd:complexType mixed="true">
+      <xsd:attribute name="sufficient" default="false" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="concept">
+    <xsd:complexType mixed="true">
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:role"/>
+      </xsd:sequence>
+      <xsd:attribute name="verb" type="xsd:QName"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="role">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:QName"/>
+      <xsd:attribute name="type" type="c:DataType"/>
+      <xsd:attribute name="slot" type="c:SlotName"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="input">
+    <xsd:complexType>
+      <xsd:attributeGroup ref="c:Slot"/>
+      <xsd:attribute name="modified" type="c:SlotName"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="output">
+    <xsd:complexType>
+      <xsd:attributeGroup ref="c:Slot"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:attributeGroup name="Slot">
+    <xsd:attribute name="name" use="required" type="c:SlotName"/>
+    <xsd:attribute name="type" type="c:DataType"/>
+  </xsd:attributeGroup>
+  <xsd:simpleType name="SlotName">
+    <xsd:restriction base="xsd:NCName">
+      <xsd:pattern value="[^.\-]*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DataType">
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="number"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="string"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="boolean"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:pattern value="(\i|$)([\c-[:\-]]|$)*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+  <xsd:element name="subtasks">
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="c:SubtasksContent">
+          <xsd:attribute name="goal" use="required" type="xsd:QName"/>
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  <!--
+    Note on the definition of SubtasksContent (below):
+    The original RNC definition of SubtasksContent in CEA-2018 contains two alternative definitions
+    of element step which generates an invalid XSD file.  Therefore the definition of
+    SubtasksContent below deviates from the original by merging the two step definitions into one.
+    The resulting XSD file will therefore erroneously validate Task Model Descriptions with attribute
+    'requires' on a <step> element that is contained in a <subtasks> element with
+    attribute ordered="true".
+  -->
+  <xsd:complexType name="SubtasksContent">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" ref="c:step"/>
+      <xsd:element minOccurs="0" ref="c:applicable"/>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" ref="c:binding"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" use="required" type="xsd:ID"/>
+    <xsd:attribute name="ordered" default="true" type="xsd:boolean"/>
+  </xsd:complexType>
+  <xsd:element name="step">
+    <xsd:complexType>
+      <xsd:attributeGroup ref="c:StepContent"/>
+      <xsd:attribute name="requires">
+        <xsd:simpleType>
+          <xsd:restriction>
+            <xsd:simpleType>
+              <xsd:list itemType="c:StepName"/>
+            </xsd:simpleType>
+            <xsd:minLength value="1"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="applicable" type="xsd:string"/>
+  <xsd:element name="binding">
+    <xsd:complexType>
+      <xsd:attribute name="slot" use="required" type="c:BindingSlot"/>
+      <xsd:attribute name="value" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:simpleType name="BindingSlot">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="$\i[\c-[:.\-]]*.\i[\c-[:.\-]]*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:attributeGroup name="StepContent">
+    <xsd:attribute name="name" use="required" type="c:StepName"/>
+    <xsd:attribute name="task" use="required">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:token">
+          <xsd:pattern value="(\i[\c-[:\-]]*:)?\i([\c-[:\-]]|$)*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="minOccurs" default="1" type="xsd:nonNegativeInteger"/>
+    <xsd:attribute name="maxOccurs" default="1">
+      <xsd:simpleType>
+        <xsd:union memberTypes="xsd:positiveInteger">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:token">
+              <xsd:enumeration value="unbounded"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:union>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:attributeGroup>
+  <xsd:simpleType name="StepName">
+    <xsd:restriction base="xsd:NCName">
+      <xsd:pattern value="[^.\-]*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

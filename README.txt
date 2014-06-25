@@ -25,6 +25,8 @@ implementation.
       secrets
       tardis
       team
+   release
+     
 
 The two main toplevel folders, task and disco, are Eclipse Java
 projects containing all of the source code for Disco.  The task
@@ -33,17 +35,28 @@ depends on it and adds the focus stack and utterances.  The folders
 under examples contain Eclipse Java projects for some examples built
 using Disco.  You do not need to install these if you don't want to.
 
-To simply run the precompiled version of the system, add lib/disco.jar
-to your classpath and invoke main class edu.wpi.disco.Disco.  You can
-also run the jar file directly as:
+The release folder contains a precompiled version of Disco plus other
+useful tools (see release/bin) for developing systems using Disco.
 
-NB: This software requires JRE 1.7 (Java SE 7.0), which includes JavaScript.
+**NB** You do NOT need to build Disco to use it!
 
-     java -jar lib/disco.jar
+To simply run the precompiled version of the system, add
+release/lib/disco.jar to your classpath and invoke main class
+edu.wpi.disco.Disco.  You can also run the jar file directly as:
+
+     java -jar release/lib/disco.jar
+
+NB: This software requires JRE 1.7 (Java SE 7.0), which includes
+JavaScript.
 
 Note this jar file includes all the binary class files in both the
-disco and task projects (but not the libraries for disco/d4g or the speech
-libraries in task/lib).
+disco and task projects (but not the libraries for disco/d4g or the
+speech libraries in task/lib).
+
+If you are using an IDE such as Eclipse or Netbeans, I highly
+recommend adding release/lib/disco-src.zip and disco-api.zip as the
+source and Javadoc attachments for disco.jar.  This will greatly aid
+development and debugging.
 
 [Hint: to change the temporary directory where the log file is written
  to someplace more convenient, add a JRE argument, such as
@@ -69,6 +82,7 @@ NB: If you are developing your own system in Eclipse using Disco it
 would be best to make your system be a *separate* project, rather than
 adding your code to this project.  You can simply add the task project
 to the project dependencies (see Build Path) of your new project.
+
 Note that the exports of the task project include all the necessary
 libraries, including those for speech, but assumes that the task
 source has been compiled.  If you cannot or do not build the disco
