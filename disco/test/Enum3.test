@@ -12,8 +12,8 @@
     User says "You should execute TestBooleanInput."
     Agent says "What is the TestBooleanInput input?"
   > say
-[1] True.
-[2] False.
+[1] true
+[2] false
 [3] Please do not execute TestBooleanInput.
   >> 1
     User says "True."

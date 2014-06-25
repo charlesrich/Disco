@@ -26,8 +26,8 @@ public class NPC extends Agent {
 	}
 
 	@Override
-	public void say (Utterance utterance) { 
-	   buffer.say(utterance.getDisco().formatUtterance(utterance));
+	public void say (Interaction interaction, Utterance utterance) { 
+	   buffer.say(interaction.format(utterance));
 	}
 
 	public String getUtterance () {

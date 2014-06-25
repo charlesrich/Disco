@@ -83,7 +83,7 @@ public class ComponentExample {
          // print out formatted choices on system console
          System.out.println();
          for (Plugin.Item item : items) 
-            System.out.println("MENU: "+interaction.format(item, true));
+            System.out.println("MENU: "+interaction.format(item, true, true));
          // choose second utterance from menu
          Plugin.Item item = items.get(1);
          user(item.task, item.contributes);
@@ -116,12 +116,12 @@ public class ComponentExample {
       private MyAgent (String name) { super(name); }
       
       @Override
-      public void say (Utterance utterance) {
+      public void say (Interaction interaction, Utterance utterance) {
          // here is where you would put natural language generation
          // and/or pass utterance string to TTS or GUI
          // for now we just call Disco's default formatting and print
          // out result on system console
-         System.out.println("AGENT: "+interaction.format(utterance, true));
+         System.out.println("AGENT: "+interaction.format(utterance));
       }
    }
 }

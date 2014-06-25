@@ -8,8 +8,8 @@
     Player says "Let's rendezvous."
     NPC says "What is the destination?"
   > say
-[1] RedCube.
-[2] GreenCube.
+[1] RedCube
+[2] GreenCube
   >> 1
     Player says "RedCube."
 Setting NPC destination to: RedCube

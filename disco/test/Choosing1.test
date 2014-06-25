@@ -16,9 +16,9 @@
     User says "Yes."
     Agent says "Which friend?"
   > say
-[1] Joe.
-[2] Bill.
-[3] Suzie.
+[1] Joe
+[2] Bill
+[3] Suzie
 [4] No more weather.
   >> 1
     User says "Joe."
@@ -37,9 +37,9 @@
     User says "More weather."
     Agent says "Which friend?"
   > say
-[1] Joe.
-[2] Bill.
-[3] Suzie.
+[1] Joe
+[2] Bill
+[3] Suzie
 [4] No more weather.
   >> 2
     User says "Bill."

@@ -385,7 +385,7 @@ public class Disco extends TaskEngine {
    }
    
    public void putUtterance (Utterance utterance, String formatted) {
-      if ( utteranceFormat.get(utterance) == null ) // in case copied or set in TTSay
+      if ( utteranceFormat.get(utterance) == null ) // in case copied or set in menu
          // cache translation and history formatting at occurrence time
          utteranceFormat.put(utterance, 
                toHistoryString(utterance, 
@@ -839,24 +839,33 @@ public class Disco extends TaskEngine {
    /**
     * Format given utterance as human-readable string.
     *
+    * @param capitalize controls whether to capitalize string
     * @param endSentence controls whether to call {@link Utils#endSentence(StringBuilder)}
+    * @param freeze controls whether to cache (freeze) the formatted string for this utterance.  This is done
+    *        automatically for occurrences, but should also be used in menus if there are formatting
+    *        rules with alternative choices or other properties that change.
     */
-   public String formatUtterance (Utterance utterance, boolean endSentence) {
-      StringBuilder buffer = new StringBuilder(Utils.capitalize(
-            utterance.occurred() ? translate(utterance.formatTask(), utterance) 
-               : translate(utterance)));
-      if ( endSentence) Utils.endSentence(buffer);
-      return buffer.toString();
+   public String formatUtterance (Utterance utterance, boolean capitalize, boolean endSentence, boolean freeze) {
+      String formatted = utterance.occurred() ? translate(utterance.formatTask(), utterance) 
+               : translate(utterance);
+      if ( capitalize || endSentence ) {
+         StringBuilder buffer = new StringBuilder(formatted);
+         if ( capitalize ) Utils.capitalize(buffer);
+         if ( endSentence ) Utils.endSentence(buffer);
+         formatted = buffer.toString();
+      }
+      if ( freeze || utterance.occurred() ) putUtterance(utterance, formatted);
+      return formatted;
    }
    
    /**
-    * Format given utterance as human-readable string.  Equivalent to 
-    * <code>formatUtterance(utterance, false)</code>
+    * Format given utterance as default human-readable string.  Equivalent to 
+    * <code>formatUtterance(utterance, true, true, false)</code>
     * 
-    * @see #formatUtterance(Utterance,boolean)
+    * @see #formatUtterance(Utterance,boolean,boolean,boolean)
     */
    public String formatUtterance (Utterance utterance) {
-       return formatUtterance(utterance, true);
+       return formatUtterance(utterance, true, true, false);
    }
    
    // alternative formatting options for a task

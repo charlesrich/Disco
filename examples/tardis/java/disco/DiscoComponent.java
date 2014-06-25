@@ -37,9 +37,9 @@ public class DiscoComponent extends eu.semaine.components.Component {
         }
         
         @Override
-        public void say (Utterance utterance) { 
+        public void say (Interaction interaction, Utterance utterance) { 
            setCharacter(this);
-           sendSentence(utterance.getDisco().formatUtterance(utterance));
+           sendSentence(interaction.format(utterance));
         }
     };
 

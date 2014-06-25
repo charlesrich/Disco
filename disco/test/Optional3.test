@@ -15,9 +15,9 @@
     User says "The Optional3 input1 is foo."
     Agent says "What is the Optional3 input2?"
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
 [4] I don't want to specify input2 for Optional3.
 [5] I don't want to specify any more values for Optional3.
 [6] Please do not execute Optional3 on foo.
@@ -45,9 +45,9 @@
     User says "The Optional3 input1 is foo."
     Agent says "What is the Optional3 input2?"
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
 [4] I don't want to specify input2 for Optional3.
 [5] I don't want to specify any more values for Optional3.
 [6] Please do not execute Optional3 on foo.

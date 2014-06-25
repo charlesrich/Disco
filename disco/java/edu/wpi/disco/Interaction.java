@@ -192,22 +192,37 @@ public class Interaction extends Thread {
    }
    
    /**
-    * Thread-safe method to produce human-readable string for given utterance.
+    * Thread-safe method to produce default human-readable string for given utterance.
     * 
-    * @see Disco#formatUtterance(Utterance,boolean)
+    * @see Disco#formatUtterance(Utterance)
     */
-   public synchronized String format (Utterance utterance, boolean endSentence) {
-      return disco.formatUtterance(utterance, endSentence);
+   public synchronized String format (Utterance utterance) {
+      return disco.formatUtterance(utterance);
    }
    
    /**
-    * Thread-safe method to produce human-readable string for given agenda plugin item.
+    * Thread-safe method to produce human-readable string for given utterance.
     * 
-    * @see Disco#formatUtterance(Utterance,boolean)
+    * @see Disco#formatUtterance(Utterance,boolean,boolean,boolean)
     */
-   public synchronized String format (Plugin.Item item, boolean endSentence) {
-      return item.formatted != null ? item.formatted : 
-         format((Utterance) item.task, endSentence);
+   public synchronized String format (Utterance utterance, boolean capitalize,
+         boolean endSentence, boolean freeze) {
+      return disco.formatUtterance(utterance, capitalize, endSentence, freeze);
+   }
+   
+   /**
+    * Thread-safe method to produce human-readable string for given utterance
+    * menu agenda plugin item.  Note this always freezes the formatted utterance.
+    * 
+    * @see Disco#formatUtterance(Utterance,boolean,boolean,boolean)
+    */
+   public synchronized String format (Plugin.Item item, boolean capitalize, 
+         boolean endSentence) {
+      Utterance utterance = (Utterance) item.task;
+      String formatted = item.formatted != null ? item.formatted : 
+         format((Utterance) item.task, capitalize, endSentence, false); 
+      getDisco().putUtterance(utterance, formatted);
+      return formatted;
    }
    
     /**
