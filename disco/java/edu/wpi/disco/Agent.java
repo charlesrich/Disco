@@ -164,10 +164,9 @@ public class Agent extends Actor {
     * natural language generation and/or pass the utterance to TTS or GUI.  
     * Empty definition by default.
     * 
-    * To get default Disco text translation use 
-    * {@link Interaction#format(Utterance,boolean)}
+    * To get default Disco text translation use {@link Interaction#format(Utterance)}
     */
-   public void say (Utterance utterance) {}
+   public void say (Interaction interaction, Utterance utterance) {}
 
    protected Utterance lastUtterance;
    
@@ -189,7 +188,7 @@ public class Agent extends Actor {
                item.task, item.contributes);
          if ( item.task instanceof Utterance ) { // after occurred
             lastUtterance = (Utterance) item.task;
-            say((Utterance) item.task);
+            say(interaction, (Utterance) item.task);
          }
          retry(interaction.getDisco());  // see also in respond
       }

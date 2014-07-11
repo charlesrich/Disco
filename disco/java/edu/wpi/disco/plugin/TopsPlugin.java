@@ -52,7 +52,7 @@ public class TopsPlugin extends DefaultPlugin {
             // filter out inappropriate instances
             if ( Utils.isFalse(instance.isApplicable()) || 
                   (type.isSufficient() && Utils.isTrue(instance.isAchieved())) )
-               break;
+               continue;
             items.add(
                new Plugin.Item(Propose.Should.newInstance(disco, self(), instance), null));
          }

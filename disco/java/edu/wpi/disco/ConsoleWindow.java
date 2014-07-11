@@ -9,13 +9,15 @@ public class ConsoleWindow extends ShellWindow {
 
    private final Interaction interaction;
    
+   public Interaction getInteraction () { return interaction; }
+   
    public ConsoleWindow (final Interaction interaction, int width, int height, int fontSize) {
-      this(interaction, width, height, fontSize, false, null);
+      this(interaction, width, height, fontSize, null);
    }
 
    public ConsoleWindow (final Interaction interaction, int width, int height, int fontSize,
-                         boolean append, File log) {
-      super(new Console(null, interaction, log), width, height, fontSize, append);
+                         File log) {
+      super(new Console(null, interaction, log), width, height, fontSize);
       this.interaction = interaction;
       setTitle("Disco");
       appendOutput(System.lineSeparator());

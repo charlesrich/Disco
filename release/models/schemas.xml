@@ -1,0 +1,10 @@
+<!-- This file is not a task model.  It is a file to support Emacs nXML mode
+     locating the CEA-2018-ext rnc schema file to validate the models in this directory.
+     nXML mode is bundled with Aquamacs version 22.1.0 and above.  For other Emacs
+     see http://www.thaiopensource.com/nxml-mode.  Do M-x info<cr> and look for
+     nXML mode for more info.-->
+<locatingRules xmlns="http://thaiopensource.com/ns/locating-rules/1.0">
+   <namespace ns="http://ce.org/cea-2018" uri="../lib/cea-2018.rnc"/>
+   <namespace ns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext" uri="../lib/cea-2018-ext.rnc"/>
+   <namespace ns="http://www.cs.wpi.edu/~rich/d4g" uri="../d4g/d4g.rnc"/>
+</locatingRules>

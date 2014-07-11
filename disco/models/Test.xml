@@ -342,6 +342,9 @@
     <input name="input" type="number"/>
     <script> println($this.input); test++; </script>
   </task>
+
+  <!-- see decomposeA below -->
+  <task id="ProceduralA"/>
     
   <script init="true">
   
@@ -374,6 +377,20 @@
     
     Mutable.prototype.toString = function () { return '['+this.loc+']'; }
 
+    // see ProceduralA@decomposition = decomposeA($plan)
+
+    function decomposeA (plan) {
+      // note calling Plan.addPlan(Plan) Java method below
+      plan.add(newPlan("B"));
+      plan.add(newPlan("C"));
+      // could also add code here to set ordering requirements
+      return true;
+    }
+
+    // helper
+    function newPlan (id) {
+      return new edu.wpi.cetask.Plan($disco.getTaskClass(id).newInstance())
+    }
   </script>
 
 </taskModel>

@@ -194,6 +194,15 @@ public class TaskEngine {
       }
    }
 
+   private Task last;
+   
+   void setLastOccurrence (Task last) {
+      if ( !last.isPrimitive() ) throw new IllegalArgumentException("Occurrence is not primitive: "+last);
+      this.last = last;
+   }
+   
+   public Task getLastOccurrence () { return last; }
+   
    /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
     * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
     */
@@ -287,9 +296,7 @@ public class TaskEngine {
    public Properties getProperties () { return properties; }
    
    public String getProperty (String key) { 
-      String value = properties.getProperty(key);
-      if ( value == null && DEBUG ) return key;
-      return value;
+      return properties.getProperty(key);
    }
    
    public boolean hasProperty (String key) {
@@ -1073,6 +1080,8 @@ public class TaskEngine {
     * Returns unmodifiable list of task classes which can serve as root of plan
     * recognition. Typically this is because they do not contribute to any other
     * task classes. However, this can be overridden by @top property in library.
+    * 
+    * @see TaskClass#isTop()
     */
    public List<TaskClass> getTopClasses () { 
       return Collections.unmodifiableList(topClasses); 

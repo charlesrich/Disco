@@ -280,7 +280,7 @@ public class Console extends Shell {
                if ( line == null ) { command = null; break; }
                if ( line.startsWith(sayPrompt) ) 
                   line = line.substring(sayPrompt.length());
-               (source == null || out == logStream ? logStream : out).println(line);
+               (source == null || out == getLogStream() ? getLogStream() : out).println(line);
                if ( line.length() == 0 ) { 
                   command = null; 
                   if (TTSay) 
@@ -306,19 +306,11 @@ public class Console extends Shell {
       buffer.append('[').append(i);
       if ( Disco.TRACE ) buffer.append(':').append(item.getPlugin());
       buffer.append("] ");
-      // note utterance is not an occurrence
-      Utterance utterance = (Utterance) item.task;
-      printTranslateKeys(utterance);
-      String formatted = item.formatted;
-      if ( TaskEngine.DEBUG ) buffer.append(utterance);
-      else {
-         formatted = formatted == null ? 
-               ( utterance.occurred() ? utterance.formatTask() :
-                     getEngine().translate(utterance) ) :
-               getEngine().translate(formatted, utterance);
-         buffer.append(Utils.capitalize(formatted));
-         Utils.endSentence(buffer);
-      }
+      // note item.task is not an occurrence
+      printTranslateKeys((Utterance) item.task);
+      String formatted = TaskEngine.DEBUG ? item.task.toString() :
+         interaction.format(item, true, true);
+      buffer.append(formatted);
       out.println(buffer);
       return formatted;
    }

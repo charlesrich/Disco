@@ -1,0 +1,39 @@
+#!/bin/bash
+# 
+# Usage: d4g2018 <basename> [ <external> ]
+# 
+# Transforms file  <basename>.d4g.xml in D4g format to <basename>.xml in ANSI/CEA-2018 format.
+# Also validates syntax of source file.
+# Optional argument is name of actor that will be 'external' (defaults to player).
+# 
+dir="`dirname $0`/.."
+
+if [ $# -le 0 ]
+then
+	echo "Usage: d4g2018 <basename> [ <external> ]"
+	exit 0;
+fi
+
+# to avoid confusion
+rm -f "$1.xml"
+
+echo "Validating $1.d4g.xml..."
+$dir/bin/validate "$1.d4g.xml" "http://www.cs.wpi.edu/~rich/d4g"
+
+if [ $? != 0 ]; then exit 1; fi
+
+if [ $# -ge 2 ]; then param="external=$2"; fi
+
+echo "Transforming $1.d4g.xml to $1.xml..."
+case `uname -s` in
+  CYGWIN* ) 
+    java -jar "$(cygpath -w "$dir/d4g/saxon9he.jar")" -o:"$1.xml" "$(cygpath -w "$1.d4g.xml")" "$(cygpath -w "$dir/d4g/d4g.xslt")" $param
+    ;;
+  *)
+    java -jar "$dir/d4g/saxon9he.jar" -o:"$1.xml" "$1.d4g.xml" "$dir/d4g/d4g.xslt" $param
+    ;;
+esac
+
+echo "Validating $1.xml..."
+$dir/bin/validate "$1.xml" "http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+

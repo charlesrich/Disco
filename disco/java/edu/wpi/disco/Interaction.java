@@ -132,9 +132,7 @@ public class Interaction extends Thread {
    /**  
     * Thread-safe method to test whether given plan is at toplevel in current tree.
     */
-   public synchronized boolean isTop (Plan plan) {
-      return disco.isTop(plan);
-   }
+   public synchronized boolean isTop (Plan plan) { return disco.isTop(plan); }
    
    /**
     * Thread-safe method to push plan onto discourse stack (make it the current focus);
@@ -142,6 +140,13 @@ public class Interaction extends Thread {
     * @see Disco#push(Plan)
     */
    public synchronized void push (Plan plan) { disco.push(plan); }
+   
+   /**
+    * Thread-safe method to pop discourse stack 
+    * 
+    * @see Disco#pop()
+    */
+   public synchronized void pop () { disco.pop(); }
    
    /**
     * Thread-safe method to load specified task model.
@@ -187,30 +192,45 @@ public class Interaction extends Thread {
    }
    
    /**
-    * Thread-safe method to produce human-readable string for given utterance.
+    * Thread-safe method to produce default human-readable string for given utterance.
     * 
-    * @see Disco#formatUtterance(Utterance,boolean)
+    * @see Disco#formatUtterance(Utterance)
     */
-   public synchronized String format (Utterance utterance, boolean endSentence) {
-      return disco.formatUtterance(utterance, endSentence);
+   public synchronized String format (Utterance utterance) {
+      return disco.formatUtterance(utterance);
    }
    
    /**
-    * Thread-safe method to produce human-readable string for given agenda plugin item.
+    * Thread-safe method to produce human-readable string for given utterance.
     * 
-    * @see Disco#formatUtterance(Utterance,boolean)
+    * @see Disco#formatUtterance(Utterance,boolean,boolean,boolean)
     */
-   public synchronized String format (Plugin.Item item, boolean endSentence) {
-      return item.formatted != null ? item.formatted : 
-         format((Utterance) item.task, endSentence);
+   public synchronized String format (Utterance utterance, boolean capitalize,
+         boolean endSentence, boolean freeze) {
+      return disco.formatUtterance(utterance, capitalize, endSentence, freeze);
+   }
+   
+   /**
+    * Thread-safe method to produce human-readable string for given utterance
+    * menu agenda plugin item.  Note this always freezes the formatted utterance.
+    * 
+    * @see Disco#formatUtterance(Utterance,boolean,boolean,boolean)
+    */
+   public synchronized String format (Plugin.Item item, boolean capitalize, 
+         boolean endSentence) {
+      Utterance utterance = (Utterance) item.task;
+      String formatted = item.formatted != null ? item.formatted : 
+         format((Utterance) item.task, capitalize, endSentence, false); 
+      getDisco().putUtterance(utterance, formatted);
+      return formatted;
    }
    
     /**
     * Thread-safe method to get specified property.
     * 
-    * @see Disco#getProperty(String,boolean)
+    * @see Disco#getProperty(String,Boolean)
     */
-   public synchronized boolean getProperty (String key, boolean defaultValue) {
+   public synchronized boolean getProperty (String key, Boolean defaultValue) {
       return disco.getProperty(key, defaultValue);
    }
    
@@ -404,9 +424,10 @@ public class Interaction extends Thread {
    }
 
    /**
-    * Clear any discourse state information stored in this interaction.  
+    * Clear any discourse state information stored in this interaction.
+    * Thread-safe.  
     */
-   public void clear () { 
+   public synchronized void clear () { 
       disco.clear();
       system.clear(this); 
       external.clear(this); 

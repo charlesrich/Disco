@@ -1,7 +1,8 @@
 This is the documentation directory for Disco.  
 
-In addition to Javadoc API documentation, it various papers which
-provide background.  (See also task/docs).  
+See release/lib/disco-api.zip for Javadoc API documention.
+
+Also see task/docs for additional papers.  
 
 If you are trying to learn how to use Disco for writing dialogues,
 we recommend starting with the first two papers below (in this order).

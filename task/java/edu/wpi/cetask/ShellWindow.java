@@ -15,17 +15,12 @@ public class ShellWindow extends JFrame implements AutoCloseable {
    private final Panel panel;
    
    // note need to call setVisible(true) after construction
-   public ShellWindow (Shell shell, int width, int height, int fontSize, boolean append) {
-      shell.setAppend(append);
-      panel = new Panel(shell, fontSize, append);
+   public ShellWindow (Shell shell, int width, int height, int fontSize) {
+      panel = new Panel(shell, fontSize);
       add(panel);
       setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       setSize(width, height);
       setTitle("CETask");  
-   }
-   
-   public ShellWindow (Shell shell, int width, int height, int fontSize) {
-      this(shell, width, height, fontSize, false);
    }
 
    protected void appendOutput (String text) { panel.appendOutput(text); }
@@ -59,7 +54,7 @@ public class ShellWindow extends JFrame implements AutoCloseable {
          }
       };
 
-      public Panel (Shell shell, int fontSize, boolean append) {
+      public Panel (Shell shell, int fontSize) {
          this.shell = shell;
          TaskEngine engine = shell.getEngine();
          engine.setProperty("shell@prompt", "");
@@ -76,11 +71,9 @@ public class ShellWindow extends JFrame implements AutoCloseable {
          shell.setOut(print);
          shell.setErr(print);
          shell.init(engine); // to set logStream
-         if ( !append ) {
-            OutputStream logOutputStream = new Utils.CopyOutputStream(shell.logStream, outputStream);
-            System.setOut(new PrintStream(new Utils.CopyOutputStream(System.out, logOutputStream), true));
-            System.setErr(new PrintStream(new Utils.CopyOutputStream(System.err, logOutputStream), true));
-         }
+         OutputStream logOutputStream = new Utils.CopyOutputStream(shell.getLogStream(), outputStream);
+         System.setOut(new PrintStream(new Utils.CopyOutputStream(System.out, logOutputStream), true));
+         System.setErr(new PrintStream(new Utils.CopyOutputStream(System.err, logOutputStream), true));
          shell.setReader(new Shell.Reader() {
 
             @Override

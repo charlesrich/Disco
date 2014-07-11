@@ -120,7 +120,7 @@ public class SpeechGuide extends Guide {
    }
    
    @Override
-   protected void println (Object object) {
+   public void println (Object object) {
       super.println(object);
       if ( !mute ) {
          String string = object.toString();

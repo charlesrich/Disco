@@ -15,9 +15,9 @@
     User says "The Optional3 input1 is foo."
     Agent says "What is the Optional3 input2?"
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
 [4] I don't want to specify input2 for Optional3.
 [5] I don't want to specify any more values for Optional3.
 [6] Please do not execute Optional3 on foo.
@@ -45,9 +45,9 @@
     User says "The Optional3 input1 is foo."
     Agent says "What is the Optional3 input2?"
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
 [4] I don't want to specify input2 for Optional3.
 [5] I don't want to specify any more values for Optional3.
 [6] Please do not execute Optional3 on foo.
@@ -78,13 +78,13 @@
 [Optional3(agent,"foo",null,null)] -accepted -done
    Propose.Should(user,Optional3(agent,"foo",null,null))
    [Propose.Who(user,Optional3(agent,"foo",null,null),false)] -done
-      Ask.Who(Optional3(agent,"foo",null,null),false)
+      Ask.Who(agent,Optional3(agent,"foo",null,null))
       Propose.Who(user,Optional3(agent,"foo",null,null),false)
    [Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")] -done
-      Ask.What(Optional3(agent,"foo",null,null),"input1","foo")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input1")
       Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")
    [Propose.What(user,Optional3(agent,"foo",null,null),"input2")] -succeeded
-      Ask.What(Optional3(agent,"foo",null,null),"input2")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(user,Optional3(agent,"foo",null,null),"input2"))
       Ok(agent)
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
@@ -93,26 +93,26 @@
 [Optional3(agent,"foo",null,null)] -accepted -done
    Propose.Should(user,Optional3(agent,"foo",null,null))
    [Propose.Who(user,Optional3(agent,"foo",null,null),false)] -done
-      Ask.Who(Optional3(agent,"foo",null,null),false)
+      Ask.Who(agent,Optional3(agent,"foo",null,null))
       Propose.Who(user,Optional3(agent,"foo",null,null),false)
    [Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")] -done
-      Ask.What(Optional3(agent,"foo",null,null),"input1","foo")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input1")
       Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")
    [Propose.What(user,Optional3(agent,"foo",null,null),"input2")] -succeeded
-      Ask.What(Optional3(agent,"foo",null,null),"input2")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
    Optional3(agent,"foo",null,null)
    Ok(agent)
 [Optional3(agent,"foo",null,null)] -accepted -done <-focus
    Propose.Should(user,Optional3(agent,"foo",null,null))
    [Propose.Who(user,Optional3(agent,"foo",null,null),false)] -done
-      Ask.Who(Optional3(agent,"foo",null,null),false)
+      Ask.Who(agent,Optional3(agent,"foo",null,null))
       Propose.Who(user,Optional3(agent,"foo",null,null),false)
    [Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")] -done
-      Ask.What(Optional3(agent,"foo",null,null),"input1","foo")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input1")
       Propose.What(user,Optional3(agent,"foo",null,null),"input1","foo")
    [Propose.What(user,Optional3(agent,"foo",null,null),"input2")] -succeeded
-      Ask.What(Optional3(agent,"foo",null,null),"input2")
+      Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
    Optional3(agent,"foo",null,null)
    Ok(agent)

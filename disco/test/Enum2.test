@@ -12,9 +12,9 @@
     User says "You should execute ChooseFlavor."
     Agent says "What is the ChooseFlavor flavor?"
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
 [4] Please do not execute ChooseFlavor.
   >> 2
     User says "Vanilla."

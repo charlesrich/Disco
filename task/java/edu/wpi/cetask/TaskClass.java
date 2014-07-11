@@ -12,7 +12,7 @@ import org.w3c.dom.*;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class TaskClass extends TaskModel.Member {
-   
+  
    // TODO check for duplicate slot names
    
    final public String precondition, postcondition; 
@@ -276,27 +276,47 @@ public class TaskClass extends TaskModel.Member {
     * Thread-safe method to create new instance of this task class.
     */
    public Task newInstance () { 
-      return isBuiltin() ? newStep(null, null, false) : new Task(this, engine);
+      try { return isBuiltin() ? newStep(null, null, false) : new Task(this, engine); }
+      catch (NoSuchMethodException e) {
+         // special case for ambiguous constructors (e.g., Propose.Who)
+         try { return (Decomposition.Step) new Expression(builtin, "new", 
+                  new Object[]{engine}).getValue();
+         } catch (RuntimeException f) { throw f; }
+           catch (Exception f) { throw new RuntimeException(f); }
+      }
    }
 
-   Decomposition.Step newStep (Decomposition decomp, String step, boolean repeat) {
+   Decomposition.Step newStep (Decomposition decomp, String step, boolean repeat)
+                              throws NoSuchMethodException {
       // if id corresponds to subclass of Task, then instantiate 
       // that "builtin" class instead
       try { return (Decomposition.Step) new Expression(builtin, "new", 
-            new Object[]{engine, decomp, step, repeat}).getValue();
-      } catch (RuntimeException e) { throw e; }
+               new Object[]{engine, decomp, step, repeat}).getValue();
+      } catch (RuntimeException|NoSuchMethodException e) { throw e; }
         catch (Exception e) { throw new RuntimeException(e); }
    }
    
    /**
     * Test whether this task class is primitive (relative to models in current
     * task engine). A task class is primitive iff there are no known
-    * decomposition types with this task as goal.  Overridden by value
-    * of @primitive, if any.
+    * decomposition classes (or a decomposition script) with this task as goal.
+    * Overridden by value of @primitive, if any.
     */
    public boolean isPrimitive () { 
       Boolean property = getProperty("@primitive", (Boolean) null);
-      return property == null ? getDecompositions().isEmpty() : property;
+      return property != null ? property :
+         getDecompositions().isEmpty() && getDecompositionScript() == null;
+   }
+   
+   /**
+    * Test whether this class can serve as root of plan recognition. Typically 
+    * this is because they do not contribute to any other
+    * task classes. However, this can be overridden by @top property in library.
+    * 
+    * @see TaskEngine#getTopClasses()
+    */
+   public boolean isTop () {
+      return engine.topClasses.contains(this);
    }
    
    /**
@@ -412,14 +432,14 @@ public class TaskClass extends TaskModel.Member {
    List<DecompositionClass> decompositions = Collections.emptyList();
          
    /**
-    * Return non-modifiable list of <em>known</em> decomposition classes for this 
+    * Return unmodifiable list of <em>known</em> decomposition classes for this 
     * task class.
     * 
     * @see Task#getDecompositions()
     * @see Plan#getDecompositions()
     */
    public List<DecompositionClass> getDecompositions () {
-      return decompositions;
+      return Collections.unmodifiableList(decompositions);
    }
    
    /**
@@ -430,7 +450,28 @@ public class TaskClass extends TaskModel.Member {
          if ( decomp.getId().equals(id) ) return decomp;
       return null;
    }
-    
+
+   /**
+    * Return the decomposition script ("procedural decomposition") for this task
+    * class or null. The script is a JavaScript expression that, when evaluated,
+    * returns true if it is applicable (false otherwise) and as a side effect
+    * adds subplans (and constraints) to the current value of '$plan'.
+    * <p>
+    * Note that if there is a decomposition script for this task class, then
+    * there are not allowed to be any decomposition classes with this goal. This
+    * means the script will be called in {@link Plan#decomposeAll()}.
+    * <p>
+    * The script is stored as the value of the '@decomposition' property of this
+    * task class.
+    */
+   public String getDecompositionScript () {
+      String script = engine.getProperty(getPropertyId()+"@decomposition");
+      // check for decomposition script added later
+      if ( script != null && !decompositions.isEmpty() )
+         throw new IllegalStateException(this+" has both a decomposition script and class(es)");
+      return script;
+   }
+   
    // useful for CoachedInteraction
    private Decomposition lastDecomp;
    
@@ -468,7 +509,7 @@ public class TaskClass extends TaskModel.Member {
    public boolean isPathFrom (TaskClass task) { 
       return task.explains.contains(this);   
    }
-   
+
    void contributes (TaskClass task) {
       if ( task != this && (contributes == null || !contributes.contains(task)) ) {
          if ( contributes == null )
@@ -541,5 +582,6 @@ public class TaskClass extends TaskModel.Member {
       @Override
       public String toString () { return slot; }
    }
+
 }
 

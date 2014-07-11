@@ -545,6 +545,11 @@ public interface Propose {
          if ( value != null ) setSlotValue("value", value);
       }
       
+      // to resolve ambiguity between constructors above for TaskClass.newStep(null,null,false)
+      public Who (Disco disco) {
+         super(Who.class, disco, null, null);
+      }
+
       public Boolean getValue () { return (Boolean) getSlotValue("value"); }
       
       @Override

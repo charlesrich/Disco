@@ -108,6 +108,16 @@ public class Plan {
    private boolean contributes = true;
 
    /**
+    * Tests whether this plan contributes to its parent.
+    */
+   public boolean contributes () { return contributes; }
+   
+   /**
+    * Sets whether this plan contributes to its parent.
+    */
+   public void setContributes (boolean contributes) { this.contributes = contributes; }
+   
+   /**
     * Test whether given plan can be reached from this plan by following parents.
     * Note plan is <em>not</em> its own ancestor.
     */
@@ -176,6 +186,15 @@ public class Plan {
    }
    
    /**
+    * Return child of this plan with given goal, or null if none.
+    */
+   public Plan getChild (Task goal) {
+      for (Plan child : children)
+         if ( child.goal == goal ) return child;
+      return null;
+   }
+   
+   /**
     * Remove given child of this plan.
     * 
     * @param child - must be child of this plan
@@ -197,6 +216,9 @@ public class Plan {
    final private List<Plan> required = new ArrayList<Plan>();
    final List<Plan> requiredBy = new ArrayList<Plan>(); // package access for Decomposition
    
+   /**
+    * Make this plan require given plan.
+    */
    public void requires (Plan plan) {
       if ( plan == this ) 
          throw new IllegalArgumentException("Circular dependency: "+plan);
@@ -205,8 +227,35 @@ public class Plan {
       isRequired(this, null); // check for cycles
    }
    
+   /**
+    * Remove the dependency of this plan on given plan.
+    */
+   public void unrequires (Plan plan) {
+      if ( !required.remove(plan) ) throw new IllegalArgumentException("Does not require: "+plan);
+      plan.requiredBy.remove(this);
+   }
+   
+   /**
+    * Test if this plan requires given plan.
+    */
    public boolean isRequired (Plan plan) {
       return required.contains(plan);
+   }
+   
+   /**
+    * Modify the dependencies in parent of this plan such
+    * that all siblings that require this plan will require given plan
+    * instead.  Assumes given plan already a child of same parent.
+    */
+   public void splice (Plan plan) {
+      if ( parent == null ) throw new UnsupportedOperationException("No parent: "+this);
+      if ( plan.parent != parent ) throw new IllegalArgumentException("Not same parent: "+plan);
+      for (Plan child : parent.children)
+         if ( child.isRequired(this) ) {
+            child.unrequires(this);
+            child.requires(plan);
+         }
+      goal.engine.clearLiveAchieved();
    }
 
    /**
@@ -362,8 +411,9 @@ public class Plan {
          for (Plan child : children) // procedural decomposition
             if ( !isComplete(child) ) return false;
       } else if ( !failed.contains(decomp) ) { 
-         for (Plan step : decomp.getSteps()) 
-            if ( !isComplete(step) ) return false;
+         for (Plan step : decomp.getSteps())
+            // check contributes to allow recovery
+            if ( step.contributes() && !isComplete(step) ) return false;
       }
       return true;
    }
@@ -529,8 +579,10 @@ public class Plan {
     */
    public boolean isExhausted () {
       // may be done but have live optional trailing steps
-      if ( goal.getSuccess() != null || isMoot() || isBlocked() 
-            || Utils.isFalse(goal.getShould()) )
+      if ( goal.getSuccess() != null || isMoot() 
+            || isBlocked() || Utils.isFalse(goal.getShould())
+            // precondition only required before starting               
+            || ( !isStarted() && Utils.isFalse(isApplicable()) ))
          return true;
       if ( isPrimitive() ) return !isLive();
       else if ( isDecomposed() ) {
@@ -538,7 +590,8 @@ public class Plan {
          for (Plan child : children) // procedural decomposition
             if ( child.contributes && !child.isExhausted() ) return false;
          return true;
-      } else return isDone() && !hasLive();
+      } else // non-primitive, not decomposed but may have children 
+         return isDone() && !hasLive();
    }
    
    /**
@@ -682,6 +735,7 @@ public class Plan {
          retryOf.parent = parent;
          // insert copy in parent before this plan 
          parent.children.add(parent.children.indexOf(this), retryOf);
+         retryOf.splice(this);
          parent.unFail();
       }
       // remove all output values (including success and when)
@@ -691,7 +745,7 @@ public class Plan {
       goal.engine.clearLiveAchieved();
    }
   
-   private void unFail () {
+   public void unFail () {
       if ( isFailed() ) {
          goal.deleteSlotValue("success");
          failed.clear();
@@ -836,6 +890,21 @@ public class Plan {
       return decomp;
    }       
  
+   boolean applyDecompositionScript () {
+      String script = getType().getDecompositionScript();
+      if ( script != null ) 
+         try {
+            goal.bindings.put("$plan", this);
+            Object result = goal.eval(script, "Decomposition script for "+getType());
+            if ( result instanceof Boolean ) {
+               if (((Boolean) result)) setPlanned(true);
+               return (Boolean) result;
+            } else throw new RuntimeException("Decomposition script for "+getType()
+                  +" returned non-boolean: "+result);
+         } finally { goal.bindings.remove("$plan"); }
+      else return false;
+   }
+   
    private List<Decomposition> failed = Collections.emptyList();
    
    private boolean planned; // for procedural decomposition
@@ -891,27 +960,31 @@ public class Plan {
    private boolean decomposeAll (Stack<DecompositionClass> stack) {
       boolean applied = false;
       if ( !(isPrimitive() || isDecomposed() || isDone()) ) {
-         List<DecompositionClass> decomps = goal.getType().getDecompositions();
-         // if only one *known* decomposition for goal type and not
-         // de-authorized, apply it now if applicable
-         if ( decomps.size() == 1 ) {
-            DecompositionClass only = decomps.get(0);
-            if ( only.getProperty("@authorized", true) ) {
-               synchronized (goal.bindings) {
-                  try { 
-                     goal.bindings.put("$plan", this);
-                     if ( !Utils.isFalse(only.isApplicable(goal)) ) {
-                        Plan focus = goal.engine.getFocus();
-                        // inhibit infinite recursion, but allow incremental expansion
-                        // if live (and recursive parent started) or if focus or child 
-                        // of focus 
-                        if ( !stack.contains(only) 
-                              || (focus != null && 
-                              (focus == this || focus.children.contains(this))) 
-                              || (isLive() && recursiveParent(only).isStarted()) ) 
-                        { apply(only); applied = true; }
-                     }
-                  } finally { goal.bindings.remove("$plan"); }
+         // always try script first
+         boolean decomposed = applyDecompositionScript();
+         if ( !decomposed ) {
+            List<DecompositionClass> decomps = goal.getType().getDecompositions();
+            // if only one *known* decomposition for goal type and not
+            // de-authorized, apply it now if applicable
+            if ( decomps.size() == 1 ) {
+               DecompositionClass only = decomps.get(0);
+               if ( only.getProperty("@authorized", true) ) {
+                  synchronized (goal.bindings) {
+                     try { 
+                        goal.bindings.put("$plan", this);
+                        if ( !Utils.isFalse(only.isApplicable(goal)) ) {
+                           Plan focus = goal.engine.getFocus();
+                           // inhibit infinite recursion, but allow incremental expansion
+                           // if live (and recursive parent started) or if focus or child 
+                           // of focus 
+                           if ( !stack.contains(only) 
+                                 || (focus != null && 
+                                 (focus == this || focus.children.contains(this))) 
+                                 || (isLive() && recursiveParent(only).isStarted()) ) 
+                           { apply(only); applied = true; }
+                        }
+                     } finally { goal.bindings.remove("$plan"); }
+                  }
                }
             }
          }

@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Document Title: XML Schema for CEA-2018, Task Model Description
+	Document URL: http://ce.org/cea-2018/xsd
+	Contributors: 
+		Charles Rich, Mitsubishi Electric Research Laboratories (MERL), rich@merl.com (co-chair of CEA r7wg12)
+		Gottfried Zimmermann, Access Technologies Group, gzimmermann@acm.org (editor of CEA-2018)
+	Publisher: Consumer Electronics Association, http://www.ce.org
+	Date: December 24, 2007
+
+	Abstract: This is the XML Schema Definition file for the Task Model Description language, as specified by CEA-2018.  
+	In case of any differences between this specification and CEA-2018, the normative CEA standard shall take precedence. 
+
+	MIME type: A document conforming to CEA-2018 should be served with a MIME type of application/cea-2018+xml.
+
+	Versioning: This XML Schema Definition file may be updated in the future to reflect new revisions of the Task Model 
+	Description standard, if the new revision is backward compatible.  Otherwise a new XML Schema Definition file will be 
+	created with a new namespace URL.
+
+	Disclaimer: THIS DOCUMENT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE 
+	AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS 
+	INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, 
+	OR ANY DAMAGES WHATSOEVER RESULTINGFROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF 
+	CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF 
+	THIS DOCUMENT.
+-->
+
+<!-- 
+Note: This XML Schema file was automatically generated from the following Compact RelaxNG specification, using the Trang
+schema converter from Thai Open Source Software Center Ltd:
+	
+	# Complete RelaxNG compact schema for CEA-2018 (no includes)
+	
+	default namespace = "http://ce.org/cea-2018"
+	
+	namespace xsd = "http://www.w3.org/2001/XMLSchema"
+	namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+	namespace dc = "http://purl.org/dc/elements/1.1" 
+	namespace dcterms = "http://purl.org/dc/terms"
+	
+	start = 
+		element taskModel { 
+			# about shall be non-empty and not contain fragment identifier          
+			attribute about { xsd:anyURI },
+			Description*,
+			( Task | Subtasks | Script )*
+		}
+	
+	Description =
+		element dc:* { attribute * { text }*, text? } |
+		element dcterms:* { attribute * { text }*, text? }
+		
+	Script = 
+		element script {
+			( ( attribute task { xsd:QName }+,
+			    attribute model { xsd:anyURI }+ ) |
+			  [ a:defaultValue="false" ]
+			  attribute init { xsd:boolean }?
+			),
+			ScriptContent
+		}
+	
+	ScriptContent = 
+		attribute platform { token }?, 
+		attribute deviceType { token }?, 
+		# text shall be ECMAScript expression returning boolean or undefined
+		# and unless init may reference $this global variable
+		attribute applicable { text }?,
+		# text shall be ECMAScript program and unless init is true
+		# may reference $this, $platform and $deviceType global variables
+		text
+	
+	Task = 
+		element task {
+			attribute id { xsd:ID },
+			Description*,
+			Concept*,
+			Input*,
+			Output*,
+			element precondition { 
+				# text shall be ECMAScript expression returning boolean or undefined
+				# and may reference $this global variable
+				text
+			}?,
+			element postcondition { 
+				[ a:defaultValue="false" ]
+				attribute sufficient { xsd:boolean }?,
+				# text shall be ECMAScript expression returning boolean or undefined
+				# and may reference $this global variable
+				text
+			}?,
+			element subtasks { SubtasksContent }*,
+			element script { ScriptContent }*
+		}
+		
+	Concept = 
+		element concept {
+			xsd:anyURI |
+			( attribute verb { xsd:QName },
+			  element role {
+				  attribute name { xsd:QName },
+				  # slot shall be the name of task input or output
+				  # type shall be a primitive ECMAScript type or a constructor
+				  # defined in the current ECMAScript execution environment
+				  (
+				   ( attribute type { DataType }, attribute slot { SlotName }? ) |
+				   ( attribute slot { SlotName }, attribute type { DataType }? )
+				  )
+			  }* 
+			) 
+		}
+	
+	Input = 
+		element input { 
+			Slot, 
+			# modified shall be the name of an output slot
+			attribute modified { SlotName }?
+		}
+	
+	Output = element output { Slot }
+	
+	Slot = 
+		# two slots within a given task shall not have the same name
+		attribute name { SlotName },
+		# type shall be primitive ECMAScript datatype or constructor defined
+		# in current ECMAScript execution environment
+		attribute type { DataType }
+	
+	SlotName = xsd:NCName { pattern = "[^.\-]*" } - ("external" | "when" | "success" | "task" | "model")
+	
+	DataType = "number" | "string" | "boolean" | xsd:token { pattern = "(\i|$)([\c-[:.\-]]|$)*" }
+	
+	Subtasks = 
+		element subtasks {
+			attribute goal { xsd:QName },	 
+			SubtasksContent
+		}	 
+	
+	# Note on the definition of SubtasksContent (below):
+	# The original RNC definition of SubtasksContent in CEA-2018 contains two alternative definitions
+	# of element step which generates an invalid XSD file.  Therefore the definition of
+	# SubtasksContent below deviates from the original by merging the two step definitions into one.
+	# The resulting XSD file will therefore erroneously validate Task Model Descriptions with attribute
+	# 'requires' on a <step> element that is contained in a <subtasks> element with
+	# attribute ordered="true".
+	
+	SubtasksContent = 
+		attribute id { xsd:ID },
+		( [a:defaultValue="true"]
+			attribute ordered { xsd:boolean }?,
+			element step { 
+				StepContent,
+				# requires shall contain only subtasks step names
+				attribute requires { list { StepName+ } }?
+			}+ ), 
+		element applicable {
+			# text shall be ECMAScript expression returning boolean or undefined
+			# and may reference $this global variable
+			text
+		}?,
+		element binding {
+			attribute slot { BindingSlot },
+			attribute value { 
+				# text shall be ECMAScript expression returning a value of same type as
+				# the slot corresponding to the 'slot' attribute and may reference $this
+				# or global variables corresponding to step names
+				text
+			}
+		}*
+	
+	BindingSlot = 
+		# token shall be ECMAScript object property expression starting with $this or 
+		# a global variable corresponding to a step name, followed by a property 
+		# corresponding to an input or output slot  
+		xsd:token { pattern = "$\i[\c-[:.\-]]*.\i[\c-[:.\-]]*" }
+	
+	StepContent = 
+		# two steps within a given subtasks shall not have the same name
+		attribute name { StepName },
+		attribute task { xsd:QName },
+		[ a:defaultValue="1" ]
+		attribute minOccurs { xsd:nonNegativeInteger }?,
+		[ a:defaultValue="1" ]
+		attribute maxOccurs { xsd:positiveInteger | "unbounded" }?
+	
+	StepName = xsd:NCName { pattern = "[^.\-]*" } - "this"
+	
+-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://ce.org/cea-2018" xmlns:cea-2018="http://ce.org/cea-2018">
+	<xsd:element name="taskModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group minOccurs="0" maxOccurs="unbounded" ref="cea-2018:Description"/>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="cea-2018:task"/>
+					<xsd:element ref="cea-2018:subtasks"/>
+					<xsd:element ref="cea-2018:script"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="about" use="required" type="xsd:anyURI"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="Description">
+		<xsd:choice>
+			<xsd:any namespace="http://purl.org/dc/elements/1.1" processContents="skip"/>
+			<xsd:any namespace="http://purl.org/dc/terms" processContents="skip"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="script">
+		<xsd:complexType mixed="true">
+			<xsd:attribute name="task" type="xsd:QName"/>
+			<xsd:attribute name="model" type="xsd:anyURI"/>
+			<xsd:attribute name="init" default="false" type="xsd:boolean"/>
+			<xsd:attributeGroup ref="cea-2018:ScriptContent"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:attributeGroup name="ScriptContent">
+		<xsd:attribute name="platform" type="xsd:token"/>
+		<xsd:attribute name="deviceType" type="xsd:token"/>
+		<xsd:attribute name="applicable"/>
+	</xsd:attributeGroup>
+	<xsd:element name="task">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group minOccurs="0" maxOccurs="unbounded" ref="cea-2018:Description"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="cea-2018:concept"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="cea-2018:input"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="cea-2018:output"/>
+				<xsd:element minOccurs="0" ref="cea-2018:precondition"/>
+				<xsd:element minOccurs="0" ref="cea-2018:postcondition"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" name="subtasks" type="cea-2018:SubtasksContent"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" name="script">
+					<xsd:complexType mixed="true">
+						<xsd:attributeGroup ref="cea-2018:ScriptContent"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" use="required" type="xsd:ID"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="precondition" type="xsd:string"/>
+	<xsd:element name="postcondition">
+		<xsd:complexType mixed="true">
+			<xsd:attribute name="sufficient" default="false" type="xsd:boolean"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="concept">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="cea-2018:role"/>
+			</xsd:sequence>
+			<xsd:attribute name="verb" type="xsd:QName"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="role">
+		<xsd:complexType>
+			<xsd:attribute name="name" use="required" type="xsd:QName"/>
+			<xsd:attribute name="type" type="cea-2018:DataType"/>
+			<xsd:attribute name="slot" type="cea-2018:SlotName"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="input">
+		<xsd:complexType>
+			<xsd:attributeGroup ref="cea-2018:Slot"/>
+			<xsd:attribute name="modified" type="cea-2018:SlotName"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="output">
+		<xsd:complexType>
+			<xsd:attributeGroup ref="cea-2018:Slot"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:attributeGroup name="Slot">
+		<xsd:attribute name="name" use="required" type="cea-2018:SlotName"/>
+		<xsd:attribute name="type" use="required" type="cea-2018:DataType"/>
+	</xsd:attributeGroup>
+	<xsd:simpleType name="SlotName">
+		<xsd:restriction base="xsd:NCName">
+			<xsd:pattern value="[^.\-]*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DataType">
+		<xsd:union>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:enumeration value="number"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:enumeration value="string"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:enumeration value="boolean"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:pattern value="(\i|$)([\c-[:.\-]]|$)*"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+	<xsd:element name="subtasks">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="cea-2018:SubtasksContent">
+					<xsd:attribute name="goal" use="required" type="xsd:QName"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+		Note:
+		The original RNC definition of SubtasksContent in CEA-2018 contains two alternative definitions
+		of element step which generates an invalid XSD file.  Therefore the definition of
+		SubtasksContent below deviates from the original by merging the two step definitions into one.
+		The resulting XSD file will therefore erroneously validate Task Model Descriptions with attribute
+		'requires' on a <step> element that is contained in a <subtasks> element with
+		attribute ordered="true".
+	-->
+	<xsd:complexType name="SubtasksContent">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" ref="cea-2018:step"/>
+			<xsd:element minOccurs="0" ref="cea-2018:applicable"/>
+			<xsd:element minOccurs="0" maxOccurs="unbounded" ref="cea-2018:binding"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" use="required" type="xsd:ID"/>
+		<xsd:attribute name="ordered" default="true" type="xsd:boolean"/>
+	</xsd:complexType>
+	<xsd:element name="step">
+		<xsd:complexType>
+			<xsd:attributeGroup ref="cea-2018:StepContent"/>
+			<xsd:attribute name="requires">
+				<xsd:simpleType>
+					<xsd:restriction>
+						<xsd:simpleType>
+							<xsd:list itemType="cea-2018:StepName"/>
+						</xsd:simpleType>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="applicable" type="xsd:string"/>
+	<xsd:element name="binding">
+		<xsd:complexType>
+			<xsd:attribute name="slot" use="required" type="cea-2018:BindingSlot"/>
+			<xsd:attribute name="value" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="BindingSlot">
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="$\i[\c-[:.\-]]*.\i[\c-[:.\-]]*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:attributeGroup name="StepContent">
+		<xsd:attribute name="name" use="required" type="cea-2018:StepName"/>
+		<xsd:attribute name="task" use="required" type="xsd:QName"/>
+		<xsd:attribute name="minOccurs" default="1" type="xsd:nonNegativeInteger"/>
+		<xsd:attribute name="maxOccurs" default="1">
+			<xsd:simpleType>
+				<xsd:union memberTypes="xsd:positiveInteger">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:enumeration value="unbounded"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:union>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:simpleType name="StepName">
+		<xsd:restriction base="xsd:NCName">
+			<xsd:pattern value="[^.\-]*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

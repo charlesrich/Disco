@@ -6,8 +6,8 @@
   > next
     Agent says "Which team are you rooting for?"
   > say
-[1] Red Sox.
-[2] Yankees.
+[1] Red Sox
+[2] Yankees
   >> 1
     User says "Red Sox."
     Agent says "Really? But they aren't so great at winning the World Series!"

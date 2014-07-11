@@ -5,9 +5,9 @@
     User says "One of us should Propose.Global on FOO and Flavor."
     Agent says "Ok."
   > say
-[1] Chocolate.
-[2] Vanilla.
-[3] Strawberry.
+[1] chocolate
+[2] vanilla
+[3] strawberry
   >> 2
     User says "Vanilla."
     Agent says "Yup."

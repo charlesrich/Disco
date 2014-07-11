@@ -159,6 +159,17 @@ public abstract class Utils {
    }
    
    /**
+    * Change first character of given string buffer to upper case.
+    */
+   public static void capitalize (StringBuilder buffer) {
+      if ( buffer.length() > 0 ) {
+         char first = buffer.charAt(0);
+         if ( !Character.isUpperCase(first) ) 
+            buffer.setCharAt(0, Character.toUpperCase(first));
+      }
+   }
+   
+   /**
     * Add period to end of given string buffer if doesn't already end in ! or ?.
     */
    public static void endSentence (StringBuilder buffer) {
