@@ -43,7 +43,7 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.8";
+   public static String VERSION = "1.9";
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
