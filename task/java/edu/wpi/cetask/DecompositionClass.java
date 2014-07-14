@@ -42,10 +42,9 @@ public class DecompositionClass extends TaskModel.Member {
       
       @Override
       protected boolean check (String slot) {
-         if ( !goal.getInputNames().contains(slot) ) {
-            System.out.println("WARNING: $this."+slot+" not a valid goal input in "+where);
-            return false;
-         } else return true;
+         if ( goal.getInputNames().contains(slot) ) return true;
+         System.out.println("WARNING: $this."+slot+" not a valid goal input in "+where);
+         return false;
       }
       
       @Override

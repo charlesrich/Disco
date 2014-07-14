@@ -26,10 +26,9 @@ public class TaskClass extends TaskModel.Member {
       
       @Override
       protected boolean check (String slot) {
-         if ( !inputNames.contains(slot) ) {
-            System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
-            return false;
-         } else return true;
+         if ( inputNames.contains(slot) ) return true;
+         System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+         return false;
       }
       
       @Override
@@ -44,10 +43,9 @@ public class TaskClass extends TaskModel.Member {
       
       @Override
       protected boolean check (String slot) {
-         if ( !(inputNames.contains(slot) || outputNames.contains(slot)) ) {
-            System.out.println("WARNING: $this."+slot+" not a valid input or output in "+where);
-            return false;
-         } else return true;
+         if ( inputNames.contains(slot) || outputNames.contains(slot) ) return true;
+         System.out.println("WARNING: $this."+slot+" not a valid input or output in "+where);
+         return false;
       }
        
       @Override
