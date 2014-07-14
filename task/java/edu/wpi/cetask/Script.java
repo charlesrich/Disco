@@ -26,6 +26,14 @@ public class Script extends Description {
       private GroundingApplicability (String script, String where) {
          super(script, where, task.isStrict());
       }
+      
+      @Override
+      protected boolean check (String slot) {
+         if ( !task.getInputNames().contains(slot) ) {
+            System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+            return false;
+         } else return true;
+      }
    }
    
    public Boolean isApplicable (Task occurrence) {
@@ -48,9 +56,9 @@ public class Script extends Description {
       this.task = task;
       String where = task == null ? getModel() : task.toString();
       script = getText(); 
-      compiled = TaskEngine.isCompilable() ? engine.compile(getText(), where) : null;
+      compiled = TaskEngine.isCompilable() ? engine.compile(script, where) : null;
       String condition = xpath("./@applicable"); 
-      applicable = condition.isEmpty() ? null : new GroundingApplicability(condition, where+" applicable");
+      applicable = condition.isEmpty() ? null : new GroundingApplicability(condition, where+" grounding applicable");
    }  
    
    public String getPlatform () {

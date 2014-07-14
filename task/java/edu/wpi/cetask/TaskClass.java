@@ -25,6 +25,14 @@ public class TaskClass extends TaskModel.Member {
       }
       
       @Override
+      protected boolean check (String slot) {
+         if ( !inputNames.contains(slot) ) {
+            System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+            return false;
+         } else return true;
+      }
+      
+      @Override
       public TaskClass getType () { return (TaskClass) super.getType(); }
    }
    
@@ -34,6 +42,14 @@ public class TaskClass extends TaskModel.Member {
          super(script, where, TaskClass.this.isStrict());
       }
       
+      @Override
+      protected boolean check (String slot) {
+         if ( !(inputNames.contains(slot) || outputNames.contains(slot)) ) {
+            System.out.println("WARNING: $this."+slot+" not a valid input or output in "+where);
+            return false;
+         } else return true;
+      }
+       
       @Override
       public TaskClass getType () { return (TaskClass) super.getType(); }
    }
@@ -214,9 +230,6 @@ public class TaskClass extends TaskModel.Member {
       try { simple = Utils.getSimpleName(Class.forName(getId()), true); }
       catch (ClassNotFoundException e) {}
       simpleName = simple;
-      String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
-      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
-      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
       String attribute = xpath("./n:postcondition/@sufficient");
       // default false;
       sufficient = attribute.length() > 0 && Utils.parseBoolean(attribute);
@@ -236,6 +249,10 @@ public class TaskClass extends TaskModel.Member {
             throw new DuplicateSlotNameException(name);
       outputNames =  new ArrayList<String>(declaredOutputNames);
       outputNames.add("success"); outputNames.add("when");
+      // after inputs and outputs for error checking
+      String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
+      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
+      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
       // cache slot types
       slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
       for (String name : outputNames) slots.put(name, new Output(name));
