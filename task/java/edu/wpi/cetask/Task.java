@@ -5,12 +5,13 @@
  */
 package edu.wpi.cetask;
 
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Slot;
-
 import java.text.DateFormat;
 import java.util.*;
-import javax.script.*;
+import javax.script.Bindings;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Postcondition;
+import edu.wpi.cetask.TaskClass.Precondition;
+import edu.wpi.cetask.TaskClass.Slot;
 
 /**
  * Representation for instances of a task class.
@@ -311,9 +312,8 @@ public class Task extends Instance {
    }
    
    public Boolean isApplicable () {
-      TaskClass type = getType();
-      return evalCondition(type.precondition, type.compiledPrecondition, 
-            type+" precondition");
+      Precondition condition = getType().getPrecondition();
+      return condition == null ? null : condition.eval(this);
    }
    
    private Boolean achieved;
@@ -328,12 +328,11 @@ public class Task extends Instance {
       if ( achieved != null ) return achieved; // overrides condition
       if ( engine.containsAchieved(this) )  // check cached value
          return engine.isAchieved(this);
-      TaskClass type = getType();
-      if ( type.getPostcondition() == null ) return null;
+      Postcondition condition = getType().getPostcondition();
+      if ( condition == null ) return null;
       Boolean achieved;
-      if ( !type.hasModifiedInputs() || !occurred() )
-         achieved = evalCondition(type.postcondition, type.compiledPostcondition, 
-               type+" postcondition");
+      if ( !getType().hasModifiedInputs() || !occurred() )
+         achieved = condition.eval(this);
       else {
          if ( clonedInputs == null ) // not checking each modified inputs
             throw new IllegalStateException("Modified inputs have not been cloned: "+this);
@@ -341,8 +340,7 @@ public class Task extends Instance {
             Object old = bindings.get("$this");
             try {
                bindings.put("$this", clonedInputs);
-               achieved = evalCondition(type.postcondition, type.compiledPostcondition, 
-                     type+" postcondition");
+               achieved = condition.eval(this);
             } finally { bindings.put("$this", old); } 
          }
       }

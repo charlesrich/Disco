@@ -9,7 +9,8 @@ This is an implementation of a collaborative discourse manager
 inspired by the same collaborative discourse theory as Collagen (see
 docs).  Disco uses the ANSI/CEA-2018 Task Model Description (CETask
 1.0) standard for its task representation and is built on top of the
-CETask reference implementation (see 'task' project below).
+CETask reference implementation (see 'task' project below). This is
+an open-source project under the MIT License (see LICENSE file).
 
 Disco is intended to be integrated with other systems, such as
 appliances, games, robots, etc.  However, for demonstration and

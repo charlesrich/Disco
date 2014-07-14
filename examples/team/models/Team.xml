@@ -19,8 +19,7 @@
     <input name="who" type="Character"/>
     <input name="destination" type="UnityEngine.Vector3"/>
     <postcondition sufficient="true">
-      $this.who != undefined &amp;&amp; $this.destination != undefined 
-      &amp;&amp; equalLocation($this.who.getLocation(), $this.destination)
+       equalLocation($this.who.getLocation(), $this.destination)
     </postcondition>
 
     <subtasks id="goto">
@@ -52,7 +51,7 @@
  <task id="GoToCover">
     <input name="who" type="Character"/>
     <postcondition sufficient="true">
-      $this.who != undefined &amp;&amp; $this.who.isInCover()
+       $this.who.isInCover()
     </postcondition>
 
     <subtasks id="cover">
@@ -104,8 +103,7 @@
   <task id="_LowHealthStrategy">
     <input name="who" type="Character"/>
     <precondition> 
-       $this.who != undefined 
-       &amp;&amp; $this.who.getHealth() &lt; LOW_HEALTH
+       $this.who.getHealth() &lt; LOW_HEALTH
        &amp;&amp; !$this.who.isInCover()
     </precondition>
 
@@ -151,8 +149,7 @@
   <task id="_WaitForHealing">
     <input name="who" type="Character"/>
     <postcondition sufficient="true">
-      $this.who != undefined
-      &amp;&amp; $this.who.getHealth() &gt;= LOW_HEALTH
+       $this.who.getHealth() &gt;= LOW_HEALTH
     </postcondition>
   </task>
 

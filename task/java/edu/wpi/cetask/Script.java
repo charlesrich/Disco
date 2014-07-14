@@ -5,27 +5,38 @@
  */
 package edu.wpi.cetask;
 
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-
-import org.w3c.dom.Node;
-
-import javax.script.*;
+import javax.script.ScriptException;
 import javax.xml.xpath.XPath;
+import org.w3c.dom.Node;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class Script extends Description {
    
    private final TaskClass task;
-   
    public TaskClass getTask () { return task; }
    
-   private final String script, applicable, model; 
-   private final Compiled compiled, compiledApplicable;
+   private final String script, model;
+   private final GroundingApplicability applicable;
+   private final Compiled compiled;
    
    public String getModel () { return model; }
 
+   public class GroundingApplicability extends Condition {
+      
+      private GroundingApplicability (String script, String where) {
+         super(script, where, task.isStrict());
+      }
+      
+      @Override
+      protected boolean check (String slot) {
+         if ( task.getInputNames().contains(slot) ) return true;
+         System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+         return false;
+      }
+   }
+   
    public Boolean isApplicable (Task occurrence) {
-      return occurrence.evalCondition(applicable, compiledApplicable, 
-            task+" applicable");
+      return applicable == null ? null : applicable.eval(occurrence);
    }
 
    private final boolean init;
@@ -44,11 +55,9 @@ public class Script extends Description {
       this.task = task;
       String where = task == null ? getModel() : task.toString();
       script = getText(); 
-      applicable = xpath("./@applicable"); 
-      compiled = TaskEngine.isCompilable() ?
-         engine.compile(getText(), where) : null;
-      compiledApplicable = TaskEngine.isCompilable() ?
-         engine.compile(applicable, where+" applicable") : null;
+      compiled = TaskEngine.isCompilable() ? engine.compile(script, where) : null;
+      String condition = xpath("./@applicable"); 
+      applicable = condition.isEmpty() ? null : new GroundingApplicability(condition, where+" grounding applicable");
    }  
    
    public String getPlatform () {

@@ -27,7 +27,6 @@
   <task id="edu.wpi.disco.lang.Propose$Should">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-       $this.goal != undefined &amp;&amp; 
        Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getShould())
     </postcondition>
   </task>
@@ -35,7 +34,6 @@
   <task id="edu.wpi.disco.lang.Propose$Should$Repeat">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-       $this.goal != undefined &amp;&amp; 
        Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getShould())
     </postcondition>
   </task>
@@ -43,7 +41,6 @@
   <task id="edu.wpi.disco.lang.Propose$ShouldNot">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-       $this.goal != undefined &amp;&amp; 
        Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getShould())
     </postcondition>
   </task>
@@ -51,7 +48,6 @@
   <task id="edu.wpi.disco.lang.Propose$Stop">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-       $this.goal != undefined &amp;&amp; 
        Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getShould())
     </postcondition>
   </task>
@@ -95,7 +91,6 @@
   <task id="edu.wpi.disco.lang.Propose$Succeeded">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-      $this.goal != undefined &amp;&amp; 
       Packages.edu.wpi.cetask.Utils.isTrue($this.goal.getSuccess())
     </postcondition>
   </task>
@@ -103,7 +98,6 @@
   <task id="edu.wpi.disco.lang.Propose$Failed">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">
-      $this.goal != undefined &amp;&amp; 
       Packages.edu.wpi.cetask.Utils.isFalse($this.goal.getSuccess())
     </postcondition>
   </task>

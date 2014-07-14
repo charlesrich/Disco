@@ -25,8 +25,7 @@
     <input name="who" type="Character"/>
     <input name="destination" type="UnityEngine.Vector3"/>
     <postcondition sufficient="true">
-      $this.who != undefined &amp;&amp; $this.destination != undefined 
-      &amp;&amp; equalLocation(getLocation($this.who), $this.destination)
+      equalLocation(getLocation($this.who), $this.destination)
     </postcondition>
 
     <subtasks id="goto">

@@ -18,7 +18,7 @@ CE> status
    [User go to the library] -done
    [Choose The Uplift War using the catalog] -failed
       [System look The Uplift War up in the catalog] -failed
-      [Take The Uplift War from a shelf]
+      [Take The Uplift War from Unknown]
    [Choose The Uplift War] -live
    [Check out a book]
 

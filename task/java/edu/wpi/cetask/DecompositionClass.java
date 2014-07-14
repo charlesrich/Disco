@@ -5,13 +5,11 @@
  */
 package edu.wpi.cetask;
 
-import org.w3c.dom.*;
-
 import java.util.*;
 import java.util.regex.*;
-
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 import javax.xml.xpath.*;
+import org.w3c.dom.*;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class DecompositionClass extends TaskModel.Member {  
    
@@ -34,17 +32,32 @@ public class DecompositionClass extends TaskModel.Member {
    
    public TaskClass getGoal () { return goal; } 
    
-   private final String applicable;
-   private final Compiled compiledApplicable;   
+   private final Applicability applicable;
+   
+   public class Applicability extends Condition {
+      
+      private Applicability (String script, String where) {
+         super(script, where, goal.isStrict());
+      }
+      
+      @Override
+      protected boolean check (String slot) {
+         if ( goal.getInputNames().contains(slot) ) return true;
+         System.out.println("WARNING: $this."+slot+" not a valid goal input in "+where);
+         return false;
+      }
+      
+      @Override
+      public DecompositionClass getType () { return (DecompositionClass) super.getType(); }
+   }
    
    /**
     * @return applicable condition of this task class (or null if none defined)
-    * (Javascript expression that evaluates to true, false or null)
     */
-   public String getApplicable () { return applicable; }
+   public Applicability getApplicable () { return applicable; }
    
    public Boolean isApplicable (Task goal) {
-      return goal.evalCondition(applicable, compiledApplicable, this+" applicable");
+      return applicable == null ? null : applicable.eval(goal);
    }
    
    private final boolean ordered;
@@ -203,10 +216,8 @@ public class DecompositionClass extends TaskModel.Member {
             }
          }
       } catch (Exception e) { Utils.rethrow(e); } 
-      String app = xpath("./n:applicable");
-      applicable = Utils.emptyNull(app);
-      compiledApplicable = TaskEngine.isCompilable() ?
-         engine.compile(app, this+" applicable") : null;
+      String script = xpath("./n:applicable");
+      applicable = script.isEmpty() ? null : new Applicability(script, this+" applicable");
    }
    
    /**

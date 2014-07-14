@@ -287,9 +287,8 @@
     <input name="input1" type="Mutable" modified="output"/>
     <input name="input2" type="number"/>
     <output name="output" type="Mutable"/>
-    <precondition> $this.input2 == undefined || $this.input2 &gt; 0 </precondition>
+    <precondition> $this.input2 &gt; 0 </precondition>
     <postcondition sufficient="true">
-      $this.output != undefined &amp;&amp;
       $this.output.loc &gt; $this.input1.loc 
     </postcondition>
     <script> $this.output.loc = $this.input1.loc + $this.input2; </script>

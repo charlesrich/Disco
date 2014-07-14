@@ -5,16 +5,16 @@
  */
 package edu.wpi.cetask;
 
-import org.w3c.dom.*;
-
 import java.io.PrintStream;
 import java.util.*;
-
+import java.util.regex.*;
 import javax.xml.namespace.QName;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
+import org.w3c.dom.*;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 /**
  * Base class for parts of a Task Model Description
@@ -109,5 +109,42 @@ public abstract class Description { //TODO: temporarily public for Anahita
       } else // default namespace is from 'about', not xmlns
          return new QName(getNamespace(), qname);  
    }
- 
+   
+   private final static Pattern pattern = // to match $this.slot
+         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+
+   protected abstract class Condition {
+      
+      protected final String script, where;
+      private final boolean strict;
+      private final Compiled compiled;
+      private final List<String> slots = new ArrayList<String>();
+     
+      protected Condition (String script, String where, boolean strict) {
+         this.script = script;
+         this.where = where;
+         this.strict = strict;
+         compiled =  TaskEngine.isCompilable() ? engine.compile(script, where) : null;
+         Matcher matcher = pattern.matcher(script);
+         while ( matcher.find() ) {
+            String slot = matcher.group().substring(6);
+            if ( check(slot) ) slots.add(slot);
+         }
+      }
+      
+      protected abstract boolean check (String slot);
+      
+      public boolean isStrict () { return strict; }
+      public String getScript () { return script; }
+      public Description getType () { return Description.this; }
+      
+      public Boolean eval (Task task) {
+         if ( strict ) {
+            for (String slot : slots)
+               if ( !task.isDefinedSlot(slot) ) return null;
+         } 
+         return task.evalCondition(script, compiled, where);
+      }
+   }
+
 }
