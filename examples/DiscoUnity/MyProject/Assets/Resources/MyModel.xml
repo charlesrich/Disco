@@ -45,8 +45,8 @@
    <task id="GoTo">
       <input name="destination" type="Destination"/>
       <postcondition sufficient="true">
-      $this.destination != undefined &amp;&amp; at($this.destination.entity)
-    </postcondition>
+        at($this.destination.entity)
+      </postcondition>
       <subtasks id="goto">
          <step name="set" task="SetDestination"/>
          <step name="arrived" task="Wait"/>

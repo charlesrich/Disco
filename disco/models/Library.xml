@@ -60,7 +60,7 @@
     <input name="book" type="Book"/>
     <output name="location" type="string"/>
     <!-- succeeds if book in catalog -->
-    <postcondition  sufficient="true"> $this.location !== null </postcondition>
+    <postcondition  sufficient="true"> $this.location != "Unknown" </postcondition>
     <!-- grounding script so system can execute this task -->
     <script> $this.location = lookup($this.book); </script>
   </task>
@@ -76,7 +76,7 @@
     <!-- gives book and location in one action -->
     <output name="book" type="Book"/>
     <output name="location" type="string"/>
-    <postcondition sufficient="true"> $this.book !== null </postcondition>
+    <postcondition sufficient="true"> $this.book != "Unknown" </postcondition>
     <!-- grounding script so system can execute this task -->
     <script> 
       $this.book = search($this.query);
@@ -115,10 +115,6 @@
        { query: "Heinlein", book: stranger },
        { query: "Sawyer", book: mindscan },
        { query: "Vinge", book: fire } ];
-       
-    // NB: following two functions return null, which means that
-    //     x !== null must be used for testing in conditions
-    //     above because undefined == null in JavaScript!
 
     function lookup (book) { 
        for (i = 0; i &lt; 3; i++) {
@@ -126,7 +122,7 @@
                catalog[i].book.title == book.title ) 
           return catalog[i].location;
        }
-       return null;
+       return "Unknown";
     }
 
     function search (query) { 
@@ -134,7 +130,7 @@
          if ( queries[i].query == query ) 
          return queries[i].book;
        }
-       return null;
+       return "Unknown";
     }
 
   </script>

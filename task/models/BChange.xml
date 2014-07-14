@@ -26,6 +26,7 @@
   <task id="RecentHFollowup" >
     <input name="activity" type="string"/>
     <input name="homework" type="string"/>
+    <!-- note this condition is non-strict, see BChange.properties -->
     <precondition> $this.homework != undefined </precondition>
 
     <subtasks id="followingup">

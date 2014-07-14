@@ -19,7 +19,7 @@
   <task id="GoTo">
     <input name="destination" type="Destination"/>
     <postcondition sufficient="true">
-      $this.destination != undefined &amp;&amp; at($this.destination.entity)
+       at($this.destination.entity)
     </postcondition>
 
     <subtasks id="goto">
