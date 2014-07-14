@@ -6,10 +6,11 @@
 package edu.wpi.cetask;
 
 import org.w3c.dom.*;
-
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Slot;
+import edu.wpi.cetask.TaskModel.Member;
 import java.io.PrintStream;
 import java.util.*;
-
 import javax.xml.namespace.QName;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -109,5 +110,30 @@ public abstract class Description { //TODO: temporarily public for Anahita
       } else // default namespace is from 'about', not xmlns
          return new QName(getNamespace(), qname);  
    }
- 
+   
+   protected abstract class Condition {
+      
+      private final String script;
+      private final String where;
+      private final boolean strict;
+      private final List<Slot> slots;
+      private final Compiled compiled;
+     
+      protected Condition (String script, String where, boolean strict) {
+         this.script = script;
+         this.where = where;
+         this.strict = strict;
+         compiled =  TaskEngine.isCompilable() ? engine.compile(script, where) : null;
+         slots = null;//////
+      }
+      
+      public boolean isStrict () { return strict; }
+      public String getScript () { return script; }
+      public Description getType () { return Description.this; }
+      
+      public Boolean eval (Task task) {
+         return task.evalCondition(script, compiled, where);
+      }
+   }
+
 }

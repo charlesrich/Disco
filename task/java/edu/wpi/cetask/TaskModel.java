@@ -5,14 +5,12 @@
  */
 package edu.wpi.cetask;
 
-import org.w3c.dom.Node;
-
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-
 import javax.xml.namespace.QName;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import org.w3c.dom.Node;
 
 public class TaskModel extends Description {
    

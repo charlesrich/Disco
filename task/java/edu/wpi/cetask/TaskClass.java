@@ -15,20 +15,49 @@ public class TaskClass extends TaskModel.Member {
   
    // TODO check for duplicate slot names
    
-   final public String precondition, postcondition; 
-   final Compiled compiledPrecondition, compiledPostcondition;
+   private final Precondition precondition;
+   private final Postcondition postcondition; 
+   
+   public class Precondition extends Condition {
+      
+      private Precondition (String script, String where) {
+         super(script, where, TaskClass.this.isStrict());
+      }
+      
+      @Override
+      public TaskClass getType () { return (TaskClass) super.getType(); }
+   }
+   
+   public class Postcondition extends Condition {
+      
+      private Postcondition (String script, String where) {
+         super(script, where, TaskClass.this.isStrict());
+      }
+      
+      @Override
+      public TaskClass getType () { return (TaskClass) super.getType(); }
+   }
+   
+   /**
+    * Returns true iff the precondition, postcondition and applicability
+    * conditions for all decompositions for this task class are strict, i.e., 
+    * the condition returns null if any of the slots on which it depends is undefined.
+    * <p>
+    * Controlled by @strict property (default true)
+    */
+   public boolean isStrict () {
+      return getProperty("@strict", true);
+   }
    
    /**
     * @return precondition of this task class (or null if none defined)
-    * (Javascript expression that evaluates to true, false or null)
     */
-   public String getPrecondition () { return precondition; }
+   public Precondition getPrecondition () { return precondition; }
    
    /**
     * @return postcondition of this task class (or null if none defined)
-    * (Javascript expression that evaluates to true, false or null)
     */
-   public String getPostcondition () { return postcondition; }
+   public Postcondition getPostcondition () { return postcondition; }
    
    private final boolean sufficient;
    
@@ -105,7 +134,7 @@ public class TaskClass extends TaskModel.Member {
    
    private final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
    
-   public class Slot {
+   public abstract class Slot {
       
       // TODO: make modified a Slot
       private final String name, type, modified;
@@ -160,6 +189,14 @@ public class TaskClass extends TaskModel.Member {
          } else this.modified = null;        
       }
    }
+   
+   public class Input extends Slot {
+      private Input (String name) { super(name); }
+   }
+
+   public class Output extends Slot {
+      private Output (String name) { super(name); }
+   }
 
    private final Map<String,Slot> slots;
    
@@ -178,12 +215,8 @@ public class TaskClass extends TaskModel.Member {
       catch (ClassNotFoundException e) {}
       simpleName = simple;
       String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
-      precondition = Utils.emptyNull(pre); 
-      postcondition = Utils.emptyNull(post);
-      compiledPrecondition = TaskEngine.isCompilable() ?
-         engine.compile(pre, simple+" precondition") : null;
-      compiledPostcondition = TaskEngine.isCompilable() ?
-         engine.compile(post, simple+" postcondition") : null;
+      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
+      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
       String attribute = xpath("./n:postcondition/@sufficient");
       // default false;
       sufficient = attribute.length() > 0 && Utils.parseBoolean(attribute);
@@ -205,11 +238,11 @@ public class TaskClass extends TaskModel.Member {
       outputNames.add("success"); outputNames.add("when");
       // cache slot types
       slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
-      for (String name : outputNames) slots.put(name, new Slot(name));
+      for (String name : outputNames) slots.put(name, new Output(name));
       boolean hasModifiedInputs = false;
       for (String name : inputNames) {
          Slot slot;
-         slots.put(name, slot = new Slot(name));
+         slots.put(name, slot = new Input(name));
          if ( slot.modified != null ) {
             hasModifiedInputs = true;
             if ( !Utils.equals(slot.type, getSlotType(slot.modified)) ) { // null types possible
