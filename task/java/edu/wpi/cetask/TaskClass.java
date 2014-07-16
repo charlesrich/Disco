@@ -183,35 +183,9 @@ public class TaskClass extends TaskModel.Member {
             this.java = java instanceof Class ? (Class<?>) java : null;               
          }
       }
-   }
-   
-   public class Input extends Slot {
       
-      private final boolean optional;
-      public boolean isOptional () { return optional; }
-
-      private final Output modified;
-      public Output getModified () { return modified; }
-      
-      private Input (String name) { 
-         super(name);
-         String modified = xpath("./n:input[@name=\""+name+"\"]/@modified");
-         if ( modified.length() > 0 ) {
-            if ( !declaredOutputNames.contains(modified) ) { 
-               getErr().println("WARNING: Ignoring unknown modified output slot: "+modified);
-               this.modified = null;
-            } else if ( primitiveTypes.contains(type) || 
-                  (java != null && !Cloneable.class.isAssignableFrom(java)) ){
-               getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
-               this.modified = null;
-            } else this.modified = (Output) slots.get(modified);
-         } else this.modified = null;  
-         // cache optional
-         this.optional = getProperty(name, "@optional", false);
-      }
-
       /**
-       * Return value of this slot in given task.<br>
+       * Return value of this slot in given task.
        *
        * @see Task#getSlotValue(String)
        */
@@ -229,7 +203,7 @@ public class TaskClass extends TaskModel.Member {
       }
 
       /**
-       * Set the value of this slot in given task to given value.<br>
+       * Set the value of this slot in given task to given value.
        * 
        * @see Task#setSlotValue(String,Object)
        */
@@ -238,7 +212,7 @@ public class TaskClass extends TaskModel.Member {
       }  
 
       /**
-       * Set the value of this slot in given task to given value.<br>
+       * Set the value of this slot in given task to given value.
        * 
        * @see Task#setSlotValue(String,Object,boolean)
        */
@@ -265,6 +239,32 @@ public class TaskClass extends TaskModel.Member {
          task.deleteSlotValue(name);
       }
   
+   }
+   
+   public class Input extends Slot {
+      
+      private final boolean optional;
+      public boolean isOptional () { return optional; }
+
+      private final Output modified;
+      public Output getModified () { return modified; }
+      
+      private Input (String name) { 
+         super(name);
+         String modified = xpath("./n:input[@name=\""+name+"\"]/@modified");
+         if ( modified.length() > 0 ) {
+            if ( !declaredOutputNames.contains(modified) ) { 
+               getErr().println("WARNING: Ignoring unknown modified output slot: "+modified);
+               this.modified = null;
+            } else if ( primitiveTypes.contains(type) || 
+                  (java != null && !Cloneable.class.isAssignableFrom(java)) ){
+               getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
+               this.modified = null;
+            } else this.modified = (Output) slots.get(modified);
+         } else this.modified = null;  
+         // cache optional
+         this.optional = getProperty(name, "@optional", false);
+      }
    }
 
    public class Output extends Slot {
