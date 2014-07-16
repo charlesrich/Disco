@@ -469,8 +469,8 @@ public interface Propose {
       }
 
       private void setOptional (Task goal, Input input) {
-         if ( input.isOptional() && !goal.isDefinedSlot(input) ) 
-            goal.setSlotValue(input, null);
+         if ( input.isOptional() && !input.isDefinedSlot(goal) ) 
+            input.setSlotValue(goal, null);
       }
       
       @Override

@@ -209,6 +209,62 @@ public class TaskClass extends TaskModel.Member {
          // cache optional
          this.optional = getProperty(name, "@optional", false);
       }
+
+      /**
+       * Return value of this slot in given task.<br>
+       *
+       * @see Task#getSlotValue(String)
+       */
+      public Object getSlotValue (Task task) { 
+         return task.getSlotValue(name);
+      }
+
+      /**
+       * Test whether this slot has defined value in given task.
+       * 
+       * @see Task#isDefinedSlot(String)
+       */
+      public boolean isDefinedSlot (Task task) {
+         return task.isDefinedSlot(name);
+      }
+
+      /**
+       * Set the value of this slot in given task to given value.<br>
+       * 
+       * @see Task#setSlotValue(String,Object)
+       */
+      public Object setSlotValue (Task task, Object value) {
+         return task.setSlotValue(name, value);
+      }  
+
+      /**
+       * Set the value of this slot in given task to given value.<br>
+       * 
+       * @see Task#setSlotValue(String,Object,boolean)
+       */
+      public void setSlotValue (Task task, Object value, boolean check) {
+         task.setSlotValue(name, value, check);
+      } 
+
+      /**
+       * Set the value of this slot in given task to result of evaluating given JavaScript
+       * expression.
+       * 
+       * @see Task#setSlotValueScript(String,String,String)
+       */
+      public void setSlotValueScript (Task task, String expression, String where) {
+         task.setSlotValueScript(name, expression, where);
+      }
+
+      /**
+       * Make this slot undefined in given task.
+       * 
+       * @see Task#deleteSlotValue(String)
+       */
+      public void deleteSlotValue (Task task) {
+         task.deleteSlotValue(name);
+      }
+  
    }
 
    public class Output extends Slot {

@@ -94,14 +94,7 @@ public class Task extends Instance {
       } else return eval("$this."+name, "getSlotValue"); 
    }
 
-   /**
-    * Return value of the given slot.<br>
-    *
-    * @see #getSlotValue(String)
-    */
-   public Object getSlotValue (Slot slot) { 
-      return getSlotValue(slot.name);
-   }
+ 
 
    private void checkIsSlot (String name) {
       if ( !getType().isSlot(name) ) 
@@ -145,17 +138,7 @@ public class Task extends Instance {
          engine.isDefined(engine.get(bindings.get("$this"), name)) 
          // note using !== (not ===) below b/c null==undefined in JavaScript
          : evalCondition("$this."+name+" !== undefined", "isDefinedSlot");
-   }   
-  
-   /**
-    * Test whether given slot defined. Note if getSlotValue() returns null,
-    * isDefinedSlot() may return true <em>or</em> false.
-    * 
-    * @see #isDefinedSlot(String)
-    */
-   public boolean isDefinedSlot (Slot slot) {
-      return isDefinedSlot(slot.name);
-   }
+   }     
    
    // see Decomposition
    private boolean modified = true;
@@ -183,15 +166,6 @@ public class Task extends Instance {
    }   
    
    /**
-    * Set the value of given slot to given value.<br>
-    * 
-    * @see #setSlotValue(String,Object)
-    */
-   public Object setSlotValue (Slot slot, Object value) {
-      return setSlotValue(slot.name, value);
-   }   
-   
-   /**
     * Set the value of named slot to given value.<br>
     *
     * @see #setSlotValue(String,Object)
@@ -215,15 +189,6 @@ public class Task extends Instance {
       } else failCheck(name, value.toString(), "setSlotValue");
    }  
       
-   /**
-    * Set the value of given slot to given value.<br>
-    * 
-    * @see #setSlotValue(String,Object,boolean)
-    */
-   public void setSlotValue (Slot slot, Object value, boolean check) {
-      setSlotValue(slot.name, value, check);
-   } 
-   
    protected void checkCircular (String name, Object value) {
       if ( value == this ) 
          // will cause infinite loop when printing
@@ -272,16 +237,6 @@ public class Task extends Instance {
       } finally { bindings.remove("$$value"); }
    }
 
-   /**
-    * Set the value of given slot to result of evaluating given JavaScript
-    * expression.
-    * 
-    * @see #setSlotValueScript(String,String,String)
-    */
-   public void setSlotValueScript (Slot slot, String expression, String where) {
-      setSlotValueScript(slot.name, expression, where);
-   }
-   
    void setSlotValueScript (String name, Compiled compiled, String where) {
       if ( !evalCondition(compiled, bindings, where) )
          failCheck(name, "compiled script", where);
@@ -359,16 +314,7 @@ public class Task extends Instance {
       getType().updateBindings(this);
       modified = true;
    }
-   
-    /**
-    * Make given slot undefined.
-    * 
-    * @see #deleteSlotValue(String)
-    */
-   public void deleteSlotValue (Slot slot) {
-      deleteSlotValue(slot.name);
-   }
-   
+  
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
       return condition == null ? null : condition.eval(this);

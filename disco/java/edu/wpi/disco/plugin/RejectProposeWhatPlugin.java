@@ -46,7 +46,7 @@ public class RejectProposeWhatPlugin extends Agenda.Plugin {
       TaskClass type = task.getType();
       boolean undefined = false;
       for (Input input : type.getDeclaredInputs())
-         if ( !task.isDefinedSlot(input) ) {
+         if ( !input.isDefinedSlot(task) ) {
             if ( input.isOptional() ) {
                // applicable only if when asking there are at least two undefined optional
                // inputs or one if not asking

@@ -27,7 +27,7 @@ public class AskWhatNoBindingPlugin extends Agenda.Plugin {
       for (Input input : goal.getType().getDeclaredInputs()) {
          String name = input.getName();
          if ( getGenerateProperty(Ask.What.class, goal, name) &&
-               !goal.isDefinedSlot(input) && 
+               !input.isDefinedSlot(goal) && 
                // if no decomp yet, could be waiting for input to 
                // evaluate applicability condition
                // if this is not desired behavior, inhibit with

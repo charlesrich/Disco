@@ -28,7 +28,7 @@ public class AskWhatPlugin extends SingletonPlugin {
          return false;
       for (Input input : goal.getType().getDeclaredInputs()) 
          if ( getGenerateProperty(Ask.What.class, goal, input.getName()) &&
-              !goal.isDefinedSlot(input) ) {
+              !input.isDefinedSlot(goal) ) {
             this.input = input;
             return true;
          }
