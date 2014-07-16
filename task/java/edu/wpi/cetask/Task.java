@@ -276,7 +276,7 @@ public class Task extends Instance {
     * Set the value of given slot to result of evaluating given JavaScript
     * expression.
     * 
-    * @see #setSlotValue(String,String,String)
+    * @see #setSlotValueScript(String,String,String)
     */
    public void setSlotValueScript (Slot slot, String expression, String where) {
       setSlotValueScript(slot.name, expression, where);
