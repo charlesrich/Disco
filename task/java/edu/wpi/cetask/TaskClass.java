@@ -157,6 +157,8 @@ public class TaskClass extends TaskModel.Member {
       
       private Slot (String name) {
          this.name = name;
+         if ( slots.get(name) != null ) throw new DuplicateSlotNameException(name);
+         slots.put(name,  this);
          // compute type
          if ( name.equals("success") || name.equals("external") )
             this.type = "boolean";
@@ -249,8 +251,9 @@ public class TaskClass extends TaskModel.Member {
       private final Output modified;
       public Output getModified () { return modified; }
       
-      private Input (String name) { 
+      private Input (String name, boolean declared) { 
          super(name);
+         if ( declared ) declaredInputs.add(this);
          String modified = xpath("./n:input[@name=\""+name+"\"]/@modified");
          if ( modified.length() > 0 ) {
             if ( !declaredOutputNames.contains(modified) ) { 
@@ -268,7 +271,11 @@ public class TaskClass extends TaskModel.Member {
    }
 
    public class Output extends Slot {
-      private Output (String name) { super(name); }
+      
+      private Output (String name, boolean declared) { 
+         super(name);
+         if ( declared ) declaredOutputs.add(this);
+      }
    }
 
    final List<Input> inputs, declaredInputs;
@@ -295,40 +302,30 @@ public class TaskClass extends TaskModel.Member {
       sufficient = attribute.length() > 0 && Utils.parseBoolean(attribute);
       declaredOutputNames = xpathValues("./n:output/@name");
       declaredInputNames = xpathValues("./n:input/@name");
-      if ( declaredInputNames.contains("success") || declaredOutputNames.contains("success") )
-         throw new ReservedSlotException("success");
-      if ( declaredInputNames.contains("external") || declaredOutputNames.contains("external") )
-         throw new ReservedSlotException("external");
       outputNames =  new ArrayList<String>(declaredOutputNames);
       inputNames = new ArrayList<String>(declaredInputNames);
       outputNames.add("success"); 
       outputNames.add("when");
       inputNames.add("external");
-      // to cache slot types
       slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
+      // create now for error checking
+      new Output("success", false); 
+      new Output("when", false); 
+      new Input("external", false); 
       // create outputs first for modified
       declaredOutputs = new ArrayList<Output>(declaredOutputNames.size());     
-      for (String name : declaredOutputNames) {
-         if ( declaredOutputNames.indexOf(name) != declaredOutputNames.lastIndexOf(name) )
-            throw new DuplicateSlotNameException(name);
-         declaredOutputs.add(new Output(name));
-      }
+      for (String name : declaredOutputNames) new Output(name, true);
       outputs = new ArrayList<Output>(declaredOutputs);
-      outputs.add(new Output("success")); 
-      outputs.add(new Output("when"));
-      for (Output output : outputs) slots.put(output.name, output);
       declaredInputs = new ArrayList<Input>(declaredInputNames.size());
-      for (String name : declaredInputNames) { 
-         if ( declaredInputNames.indexOf(name) != declaredInputNames.lastIndexOf(name) 
-               || declaredOutputNames.contains(name) )
-            throw new DuplicateSlotNameException(name);
-         declaredInputs.add(new Input(name));
-      }
+      // must be added here to preserve order at end
+      outputs.add((Output) slots.get("success")); 
+      outputs.add((Output) slots.get("when"));
+      for (String name : declaredInputNames) new Input(name, true);
       inputs = new ArrayList<Input>(declaredInputs);
-      inputs.add(new Input("external"));
+      // must be added here to preserve order at end
+      inputs.add((Input) slots.get("external"));
       boolean hasModifiedInputs = false;
       for (Input input : inputs) {
-         slots.put(input.name, input);
          if ( input.modified != null ) {
             hasModifiedInputs = true;
             if ( !Utils.equals(input.type, input.modified.type) ) { // null types possible
@@ -380,12 +377,6 @@ public class TaskClass extends TaskModel.Member {
             // assume this can be top until find decomposition that uses step
             // see contributes
             getEngine().topClasses.add(this);
-      }
-   }
-   
-   private class ReservedSlotException extends RuntimeException {
-      public ReservedSlotException (String name) {
-         super("Attempting to redefine reserved slot "+name+" in "+xpath("./@id"));
       }
    }
    
