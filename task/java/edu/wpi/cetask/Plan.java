@@ -740,7 +740,7 @@ public class Plan {
       }
       // remove all output values (including success and when)
       // do not know what input values to remove because no dependencies
-      for (String name : goal.getType().getOutputNames()) 
+      for (String name : goal.getType().outputNames) 
          goal.deleteSlotValue(name);
       goal.engine.clearLiveAchieved();
    }

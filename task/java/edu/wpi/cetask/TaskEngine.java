@@ -681,9 +681,9 @@ public class TaskEngine {
       if ( thisType == null )
          throw new IllegalArgumentException("Task class not found: "+id);
       Task thisTask = thisType.newInstance();
-      for (String name : type.getInputNames())  
+      for (String name : type.inputNames)  
          copySlotValue(task, thisTask, name);
-      for (String name : type.getOutputNames())
+      for (String name : type.outputNames)
          copySlotValue(task, thisTask, name);
       return thisTask;
    }

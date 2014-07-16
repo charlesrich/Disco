@@ -13,8 +13,6 @@ import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class TaskClass extends TaskModel.Member {
   
-   // TODO check for duplicate slot names
-   
    private final Precondition precondition;
    private final Postcondition postcondition; 
    
@@ -90,7 +88,7 @@ public class TaskClass extends TaskModel.Member {
     */
    public boolean isBuiltin () { return builtin != null; }
       
-   final private List<String> inputNames, outputNames, declaredInputNames, declaredOutputNames;
+   final List<String> inputNames, outputNames, declaredInputNames, declaredOutputNames;
    
    private List<Script> scripts = Collections.emptyList();
    
@@ -150,14 +148,11 @@ public class TaskClass extends TaskModel.Member {
    
    public abstract class Slot {
       
-      // TODO: make modified a Slot
-      private final String name, type, modified;
-      private final boolean optional;
-      private final Class<?> java;
+      protected final String name, type;
+      protected final Class<?> java;
       
       public String getName () { return name; }
       public String getType () { return type; }
-      public boolean isOptional () { return optional; }
       public Class<?> getJava () { return java; }
       
       private Slot (String name) {
@@ -187,9 +182,19 @@ public class TaskClass extends TaskModel.Member {
             catch (RuntimeException e) {}
             this.java = java instanceof Class ? (Class<?>) java : null;               
          }
-         // cache optional
-         this.optional = getProperty(name, "@optional", false);
-         // compute modified (move eventually to Input subclass)
+      }
+   }
+   
+   public class Input extends Slot {
+      
+      private final boolean optional;
+      public boolean isOptional () { return optional; }
+
+      private final Output modified;
+      public Output getModified () { return modified; }
+      
+      private Input (String name) { 
+         super(name);
          String modified = xpath("./n:input[@name=\""+name+"\"]/@modified");
          if ( modified.length() > 0 ) {
             if ( !declaredOutputNames.contains(modified) ) { 
@@ -199,19 +204,20 @@ public class TaskClass extends TaskModel.Member {
                   (java != null && !Cloneable.class.isAssignableFrom(java)) ){
                getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
                this.modified = null;
-            } else this.modified = modified;
-         } else this.modified = null;        
+            } else this.modified = (Output) slots.get(modified);
+         } else this.modified = null;  
+         // cache optional
+         this.optional = getProperty(name, "@optional", false);
       }
-   }
-   
-   public class Input extends Slot {
-      private Input (String name) { super(name); }
    }
 
    public class Output extends Slot {
       private Output (String name) { super(name); }
    }
 
+   final List<Input> inputs, declaredInputs;
+   final List<Output> outputs, declaredOutputs;
+   
    private final Map<String,Slot> slots;
    
    public Slot getSlot (String name) { return slots.get(name); }
@@ -228,40 +234,49 @@ public class TaskClass extends TaskModel.Member {
       try { simple = Utils.getSimpleName(Class.forName(getId()), true); }
       catch (ClassNotFoundException e) {}
       simpleName = simple;
-      String attribute = xpath("./n:postcondition/@sufficient");
-      // default false;
+      String attribute = xpath("./n:postcondition/@sufficient"); 
+      // default sufficient false
       sufficient = attribute.length() > 0 && Utils.parseBoolean(attribute);
-      declaredInputNames = xpathValues("./n:input/@name");
-      for (String name : declaredInputNames) 
-         if ( declaredInputNames.indexOf(name) != declaredInputNames.lastIndexOf(name) )
-            throw new DuplicateSlotNameException(name);
-      inputNames = new ArrayList<String>(declaredInputNames);      
-      inputNames.add("external");
       declaredOutputNames = xpathValues("./n:output/@name");
+      declaredInputNames = xpathValues("./n:input/@name");
       if ( declaredInputNames.contains("success") || declaredOutputNames.contains("success") )
          throw new ReservedSlotException("success");
       if ( declaredInputNames.contains("external") || declaredOutputNames.contains("external") )
          throw new ReservedSlotException("external");
-      for (String name : declaredOutputNames)
+      outputNames =  new ArrayList<String>(declaredOutputNames);
+      inputNames = new ArrayList<String>(declaredInputNames);
+      outputNames.add("success"); 
+      outputNames.add("when");
+      inputNames.add("external");
+      // to cache slot types
+      slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
+      // create outputs first for modified
+      declaredOutputs = new ArrayList<Output>(declaredOutputNames.size());     
+      for (String name : declaredOutputNames) {
          if ( declaredOutputNames.indexOf(name) != declaredOutputNames.lastIndexOf(name) )
             throw new DuplicateSlotNameException(name);
-      outputNames =  new ArrayList<String>(declaredOutputNames);
-      outputNames.add("success"); outputNames.add("when");
-      // after inputs and outputs for error checking
-      String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
-      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
-      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
-      // cache slot types
-      slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
-      for (String name : outputNames) slots.put(name, new Output(name));
+         declaredOutputs.add(new Output(name));
+      }
+      outputs = new ArrayList<Output>(declaredOutputs);
+      outputs.add(new Output("success")); 
+      outputs.add(new Output("when"));
+      for (Output output : outputs) slots.put(output.name, output);
+      declaredInputs = new ArrayList<Input>(declaredInputNames.size());
+      for (String name : declaredInputNames) { 
+         if ( declaredInputNames.indexOf(name) != declaredInputNames.lastIndexOf(name) 
+               || declaredOutputNames.contains(name) )
+            throw new DuplicateSlotNameException(name);
+         declaredInputs.add(new Input(name));
+      }
+      inputs = new ArrayList<Input>(declaredInputs);
+      inputs.add(new Input("external"));
       boolean hasModifiedInputs = false;
-      for (String name : inputNames) {
-         Slot slot;
-         slots.put(name, slot = new Input(name));
-         if ( slot.modified != null ) {
+      for (Input input : inputs) {
+         slots.put(input.name, input);
+         if ( input.modified != null ) {
             hasModifiedInputs = true;
-            if ( !Utils.equals(slot.type, getSlotType(slot.modified)) ) { // null types possible
-               getErr().println("WARNING: Modified output slot of different type: "+slot.name);
+            if ( !Utils.equals(input.type, input.modified.type) ) { // null types possible
+               getErr().println("WARNING: Modified output slot of different type: "+input.name);
             }
          }
       }
@@ -270,6 +285,10 @@ public class TaskClass extends TaskModel.Member {
             !"string".equals(getSlotType("device")) )
          throw new IllegalStateException("Device slot must be of type string in "
                +getId());
+      // conditions after inputs and outputs for error checking
+      String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
+      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
+      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
       // cache bindings
       NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
       for (int i = 0; i < nodes.getLength(); i++) { // preserve order
@@ -380,49 +399,40 @@ public class TaskClass extends TaskModel.Member {
    }
 
    /**
-    * Return list of input slot names, including "external".  Note "device"
+    * Return list of input slots, including "external".  Note "device"
     * has predefined meaning, but is not automatically an input to every task.
     * 
-    * @see #getDeclaredInputNames()
+    * @see #getDeclaredInputs()
     */
-   public List<String> getInputNames () { return inputNames; }
+   public List<Input> getInputs () { return Collections.unmodifiableList(inputs); }
    
    /**
-    * Return list of output slot names, including "success" and "when".
+    * Return list of output slots, including "success" and "when".
     * 
-    * @see #getDeclaredOutputNames()
+    * @see #getDeclaredOutputs()
     */
-   public List<String> getOutputNames () { return outputNames; } 
+   public List<Output> getOutputs () { return Collections.unmodifiableList(outputs); } 
 
    /**
-    * Return list of declared input slot names.
+    * Return list of declared input slots.
     * 
-    * @see #getInputNames()
+    * @see #getInputs()
     */
-   public List<String> getDeclaredInputNames () { return declaredInputNames; }
+   public List<Input> getDeclaredInputs () { return Collections.unmodifiableList(declaredInputs); }
       
    /**
-    * Return list of declared output slot names.
+    * Return list of declared output slots.
     * 
-    * @see #getInputNames()
+    * @see #getInputs()
     */
-   public List<String> getDeclaredOutputNames () { return declaredOutputNames; } 
+   public List<Output> getDeclaredOutputs () { return Collections.unmodifiableList(declaredOutputs); } 
 
    /**
-    * @return name of modified output for given declared input, or null if input not modified.
+    * @return corresponding input for given declared output, or null if output not modified
     */
-   public String getModifiedOutput (String input) {
-      if ( !declaredInputNames.contains(input) ) throw new IllegalArgumentException("Not a declared input: "+input);
-      return slots.get(input).modified;
-   }
-
-   /**
-    * @return name of corresponding input for given declared output, or null if output not modified
-    */
-   public String getModifiedInput (String output) {
-      if ( !declaredOutputNames.contains(output) ) throw new IllegalArgumentException("Not a declared output: "+output);
-      for (String input : declaredInputNames)
-         if ( output.equals(slots.get(input).modified) ) return input;
+   public Input getModifiedInput (Output output) {
+      for (Input input : declaredInputs)
+         if ( output.equals(input.modified) ) return input;
       return null;
    }
    

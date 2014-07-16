@@ -29,7 +29,7 @@ public class Script extends Description {
       
       @Override
       protected boolean check (String slot) {
-         if ( task.getInputNames().contains(slot) ) return true;
+         if ( task.inputNames.contains(slot) ) return true;
          System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
          return false;
       }

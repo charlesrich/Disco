@@ -42,7 +42,7 @@ public class DecompositionClass extends TaskModel.Member {
       
       @Override
       protected boolean check (String slot) {
-         if ( goal.getInputNames().contains(slot) ) return true;
+         if ( goal.inputNames.contains(slot) ) return true;
          System.out.println("WARNING: $this."+slot+" not a valid goal input in "+where);
          return false;
       }
@@ -315,8 +315,8 @@ public class DecompositionClass extends TaskModel.Member {
                expression = null; compiled = null;
                inputInput = value.startsWith("$this.") &&
                      !step.equals("this") &&
-                     getGoal().getInputNames().contains(value.substring(6)) &&
-                     getStepType(step).getInputNames().contains(slot);
+                     getGoal().inputNames.contains(value.substring(6)) &&
+                     getStepType(step).inputNames.contains(slot);
                outputInput = !(step.equals("this") || identityStep.equals("this")); 
                if ( outputInput ) { 
                   // if dataflow (output to input) make sure that compatible

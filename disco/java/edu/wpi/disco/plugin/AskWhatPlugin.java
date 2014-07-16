@@ -6,6 +6,7 @@
 package edu.wpi.disco.plugin;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.*;
 import edu.wpi.disco.lang.*;
 
@@ -17,7 +18,7 @@ public class AskWhatPlugin extends SingletonPlugin {
    
    // assuming single threaded
    
-   private String input;
+   private Input input;
    
    @Override
    protected boolean isApplicable (Plan plan) {
@@ -25,8 +26,8 @@ public class AskWhatPlugin extends SingletonPlugin {
       if ( goal instanceof Utterance || canOther(goal) 
             || goal.isDefinedInputs() )
          return false;
-      for (String input : goal.getType().getDeclaredInputNames()) 
-         if ( getGenerateProperty(Ask.What.class, goal, input) &&
+      for (Input input : goal.getType().getDeclaredInputs()) 
+         if ( getGenerateProperty(Ask.What.class, goal, input.getName()) &&
               !goal.isDefinedSlot(input) ) {
             this.input = input;
             return true;
@@ -36,7 +37,7 @@ public class AskWhatPlugin extends SingletonPlugin {
    
    @Override
    protected Task newTask (Disco disco, Plan plan) {
-      return new Ask.What(disco, self(), plan.getGoal(), input);
+      return new Ask.What(disco, self(), plan.getGoal(), input.getName());
    }
 
    public AskWhatPlugin (Agenda agenda, int priority) { 

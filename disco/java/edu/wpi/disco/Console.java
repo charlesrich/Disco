@@ -6,9 +6,10 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
+import edu.wpi.cetask.TaskClass.Output;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.*;
-
 import java.io.*;
 import java.util.*;
    
@@ -205,10 +206,10 @@ public class Console extends Shell {
       boolean empty = properties.isEmpty();
       if ( member instanceof TaskClass ) {
          TaskClass task = (TaskClass) member;
-         for (String input : task.getDeclaredInputNames())
-            empty &= printSlotProperties(task, input);
-         for (String output : task.getDeclaredOutputNames())
-            empty &= printSlotProperties(task, output);
+         for (Input input : task.getDeclaredInputs())
+            empty &= printSlotProperties(task, input.getName());
+         for (Output output : task.getDeclaredOutputs())
+            empty &= printSlotProperties(task, output.getName());
       }
       if ( !empty ) out.println();
    }

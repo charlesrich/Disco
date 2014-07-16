@@ -6,7 +6,7 @@
 package edu.wpi.cetask.guide;
 
 import edu.wpi.cetask.*;
-
+import edu.wpi.cetask.TaskClass.Input;
 import java.util.*;
 
 public class Guide extends Shell {
@@ -338,10 +338,10 @@ public class Guide extends Shell {
       for (Plan next : live) {
          Task task = next.getGoal();
          TaskClass type = task.getType();
-         for (String name : type.getDeclaredInputNames())
-               if ( !task.isDefinedSlot(name) ) {
+         for (Input input : type.getDeclaredInputs())
+               if ( !task.isDefinedSlot(input.getName()) ) {
                   propose(next);
-                  respondq("what@word", type, name);
+                  respondq("what@word", type, input.getName());
                   return;
                }
       }

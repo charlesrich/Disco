@@ -10,6 +10,7 @@ import java.util.*;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.*;
 import edu.wpi.disco.Agenda.Plugin;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.lang.*;
 
 /**
@@ -26,7 +27,7 @@ public class RejectProposeWhatPlugin extends Agenda.Plugin {
          Plugin.Item item1 = null;
          if ( propose.getGoal() != null && propose.getSlot() != null
                && propose.getValue() == null 
-               && propose.getGoal().getType().getSlot(propose.getSlot()).isOptional() )
+               && ((Input) propose.getGoal().getType().getSlot(propose.getSlot())).isOptional() )
             item1 = new Plugin.Item(new Reject(getDisco(), self(), (Propose.What) goal), plan);
          if ( isApplicable(propose.getGoal(), true) ) {
             Plugin.Item item2 = newItem(propose.getGoal(), plan); 
@@ -44,9 +45,9 @@ public class RejectProposeWhatPlugin extends Agenda.Plugin {
    private boolean isApplicable (Task task, boolean asking) {
       TaskClass type = task.getType();
       boolean undefined = false;
-      for (String input : type.getDeclaredInputNames())
+      for (Input input : type.getDeclaredInputs())
          if ( !task.isDefinedSlot(input) ) {
-            if ( type.getSlot(input).isOptional() ) {
+            if ( input.isOptional() ) {
                // applicable only if when asking there are at least two undefined optional
                // inputs or one if not asking
                if ( undefined || !asking ) return true; 

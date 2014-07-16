@@ -130,7 +130,7 @@ public class Decomposition extends Instance {
    void retract () {
       if ( goal == null )
          throw new IllegalStateException("Decomposition already retracted");
-      for (String name : goal.getType().getOutputNames())
+      for (String name : goal.getType().outputNames)
          goal.deleteSlotValue(name);
       goal = null;
       synchronized (bindings) { 
