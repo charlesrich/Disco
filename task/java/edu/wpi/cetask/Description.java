@@ -159,7 +159,8 @@ public abstract class Description { //TODO: temporarily public for Anahita
       private Script (String script, TaskEngine engine, String where) {
          super(engine, null);
          this.script = script;
-         compiled =  TaskEngine.isCompilable() ? engine.compile(script, where) : null;
+         compiled =  (engine != null && TaskEngine.isCompilable()) ? 
+            engine.compile(script, where) : null;
       }
       
       /**

@@ -8,9 +8,8 @@ package edu.wpi.cetask;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import javax.script.*;
 import javax.xml.namespace.QName;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
 import org.w3c.dom.Node;
 import edu.wpi.cetask.TaskClass.Grounding;
 
@@ -299,17 +298,10 @@ public class TaskModel extends Description {
       }
       
       public Init (String script, TaskEngine engine) {
-         super(script, engine);
+         super(script, null); // don't compile
       }
       
       @Override
-      public TaskModel getEnclosing () { return (TaskModel) super.getEnclosing(); } 
-      
-      void eval () {
-         if ( compiled != null)  
-            try { compiled.eval(new SimpleBindings()); }
-            catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
-         else engine.eval(script, where); 
-      }
+      public TaskModel getEnclosing () { return (TaskModel) super.getEnclosing(); }      
    }
 }

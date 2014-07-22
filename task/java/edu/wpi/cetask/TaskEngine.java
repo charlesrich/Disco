@@ -528,7 +528,7 @@ public class TaskEngine {
          if ( Utils.parseBoolean(Description.xpath(node, model.xpath, "./@init")) ) { 
             Init script = new Init(node, model.xpath, this);
             script.setEnclosing(model);
-            script.eval();
+            eval(script.getScript(), model.getNamespace()+" init");
          } else {
             Grounding script = new Grounding(node, model.xpath, this);
             script.setEnclosing(model); 
