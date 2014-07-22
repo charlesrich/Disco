@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.util.*;
 import javax.script.Bindings;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Grounding;
 import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.cetask.TaskClass.Output;
 import edu.wpi.cetask.TaskClass.Postcondition;
@@ -317,7 +318,7 @@ public class Task extends Instance {
   
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
-      return condition == null ? null : condition.eval(this);
+      return condition == null ? null : condition.evalCondition(this);
    }
    
    private Boolean achieved;
@@ -336,7 +337,7 @@ public class Task extends Instance {
       if ( condition == null ) return null;
       Boolean achieved;
       if ( !getType().hasModifiedInputs() || !occurred() )
-         achieved = condition.eval(this);
+         achieved = condition.evalCondition(this);
       else {
          if ( clonedInputs == null ) // not checking each modified inputs
             throw new IllegalStateException("Modified inputs have not been cloned: "+this);
@@ -344,7 +345,7 @@ public class Task extends Instance {
             Object old = bindings.get("$this");
             try {
                bindings.put("$this", clonedInputs);
-               achieved = condition.eval(this);
+               achieved = condition.evalCondition(this);
             } finally { bindings.put("$this", old); } 
          }
       }
@@ -733,7 +734,7 @@ public class Task extends Instance {
       // clone and cache modified inputs before grounding script executed
       for (Input input : getType().declaredInputs)
          if ( input.getModified() != null ) cloneInput(input.name);
-      Script script = getScript();
+      Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
             try { 
@@ -811,8 +812,8 @@ public class Task extends Instance {
    /**
     * Return appropriate and applicable script to ground this primitive task, or null if none.
     */
-   public Script getScript () {
-      Script script = getType().getScript();
+   public Grounding getGrounding () {
+      Grounding script = getType().getGrounding();
       return script == null ? null : 
          Utils.isFalse(script.isApplicable(this)) ? null : script;
    }

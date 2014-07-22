@@ -8,6 +8,7 @@ package edu.wpi.cetask;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.regex.*;
+import javax.script.ScriptException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -57,30 +58,42 @@ public abstract class Description { //TODO: temporarily public for Anahita
    protected final TaskEngine engine; 
    public TaskEngine getEngine () { return engine; }
    
-   protected Description (Node node, TaskEngine engine, XPath xpath) { 
+   protected Description (Node node, XPath xpath, TaskEngine engine) { 
       if ( node == null ) throw new IllegalArgumentException("Null node");
-      this.node = node; 
-      this.engine = engine;
+      this.node = node;
       this.xpath = xpath;
-      namespace = xpath(about);
+      this.engine = engine;
+      this.namespace = xpath(about);
    }
 
+   // placeholder for creating descriptions without XML
+   protected Description (TaskEngine engine, String namespace) {
+      this.engine = engine;
+      this.namespace = namespace;
+      this.node = null;
+      this.xpath = null;
+   }
+   
    public TaskClass resolveTaskClass (String qname) {
       return engine.resolveTaskClass(parseQName(qname));
    }
    
    // convenient utilities for subclasses
-      
+
    protected Object xpath (String path, QName returnType) {
-      try { return  xpath.evaluate(path, node, returnType); } 
+      try { return xpath.evaluate(path, node, returnType); } 
       catch (XPathExpressionException e) { throw new RuntimeException(e); }
    }
    
-   protected String xpath (String path) {
-      try { return xpath.evaluate(path, node); } 
-      catch (XPathExpressionException e) { throw new RuntimeException(e); }
+   protected String xpath (String expression) {
+      return xpath(node, xpath, expression);
    }
    
+   protected static String xpath (Node node, XPath xpath, String expression) {
+      try { return xpath.evaluate(expression, node); } 
+      catch (XPathExpressionException e) { throw new RuntimeException(e); }
+   }
+
    protected List<String> xpathValues (String path) {
       List<String> values = new ArrayList<String>();
       for (Node node : xpathNodes(path))
@@ -88,12 +101,18 @@ public abstract class Description { //TODO: temporarily public for Anahita
       return values;
    }
    
-   protected List<Node> xpathNodes (String path) { 
-      List<Node> nodes = new ArrayList<Node>();
-      NodeList nodelist = (NodeList) xpath(path, XPathConstants.NODESET);
-      for (int i = 0; i < nodelist.getLength(); i++) // preserve order
-         nodes.add(nodelist.item(i));
-      return nodes;
+   protected List<Node> xpathNodes (String path) {
+      return xpathNodes(node, xpath, path);
+   }
+   
+   protected static List<Node> xpathNodes (Node node, XPath xpath, String path) { 
+      try {
+         List<Node> nodes = new ArrayList<Node>();
+         NodeList nodelist = (NodeList) xpath.evaluate(path, node, XPathConstants.NODESET);
+         for (int i = 0; i < nodelist.getLength(); i++) // preserve order
+            nodes.add(nodelist.item(i));
+         return nodes;
+      } catch (XPathExpressionException e) { throw new RuntimeException(e); }
    }
    
    protected QName parseQName (String qname) {
@@ -110,35 +129,99 @@ public abstract class Description { //TODO: temporarily public for Anahita
          return new QName(getNamespace(), qname);  
    }
    
-   private final static Pattern pattern = // to match $this.slot
-         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+   protected static abstract class Script extends Description {
 
-   protected abstract class Condition {
+      protected final String script;
+      protected final Compiled compiled;
+      protected String where;
+      private Description enclosing;
       
-      protected final String script, where;
+      public String getScript () { return script; }
+
+      public Description getEnclosing () { return enclosing; }
+
+      void setEnclosing (Description enclosing) {
+         if ( this.enclosing != null ) throw new IllegalArgumentException("Already has enclosing: "+this);
+         this.enclosing = enclosing;
+         where = (enclosing instanceof TaskModel.Member ? 
+            Utils.getSimpleName(((TaskModel.Member) enclosing).getId()) : enclosing.getNamespace())
+            +" "+Utils.getSimpleName(getClass(), true);
+      }
+      
+      protected Script (Node node, XPath xpath, String script, TaskEngine engine) {
+         this(script, engine, "compiling "+TaskModel.parseId(node, xpath));
+      }
+      
+      protected Script (String script, TaskEngine engine) {
+         this(script, engine, "compiling");
+      }
+      
+      private Script (String script, TaskEngine engine, String where) {
+         super(engine, null);
+         this.script = script;
+         compiled =  TaskEngine.isCompilable() ? engine.compile(script, where) : null;
+      }
+      
+      /**
+       * Evaluate the grounding script associated with given occurrence.
+       * 
+       * Note: This method is thread-safe, which means that it can be
+       * safely called on other than the Disco thread (as long, of course as the
+       * script does not reference $disco).  Grounding scripts typically
+       * need to be executed on the application (e.g., game) thread.
+       */
+      public void eval (Task occurrence) {
+         if ( compiled != null)  
+            // assuming that $platform and $deviceType already in task.bindings
+            try { compiled.eval(occurrence.bindings); }
+            catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+         else engine.eval(script, occurrence.bindings, where); 
+      }
+      
+      protected static String parseText (Node node, XPath xpath) {
+         return xpath(node, xpath, ".");
+      }
+      
+      @Override
+      public String toString () {
+         return "<#"+Utils.getSimpleName(getClass(), true)+" "+getScript()+">";
+      }
+   }
+   
+   protected static abstract class Condition extends Script {
+      
       private final boolean strict;
-      private final Compiled compiled;
       private final List<String> slots = new ArrayList<String>();
      
-      protected Condition (String script, String where, boolean strict) {
-         this.script = script;
-         this.where = where;
+      protected Condition (String script, boolean strict, TaskEngine engine) {
+         super(script, engine);
          this.strict = strict;
-         compiled =  TaskEngine.isCompilable() ? engine.compile(script, where) : null;
-         Matcher matcher = pattern.matcher(script);
-         while ( matcher.find() ) {
-            String slot = matcher.group().substring(6);
-            if ( check(slot) ) slots.add(slot);
-         }
+      }
+      
+      public boolean isStrict () { return strict; }
+      
+      protected static boolean isStrict (TaskEngine engine, String id) {
+         return engine.getProperty(TaskModel.getPropertyId(id)+"@strict", true);
       }
       
       protected abstract boolean check (String slot);
+
+      private final static Pattern pattern = // to match $this.slot
+         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+
+      @Override
+      void setEnclosing (Description enclosing) {
+         super.setEnclosing(enclosing);
+         if ( enclosing instanceof TaskClass ) {
+            Matcher matcher = pattern.matcher(script);
+            while ( matcher.find() ) {
+               String slot = matcher.group().substring(6);
+               if ( check(slot) ) slots.add(slot);
+            }
+         }
+      }
       
-      public boolean isStrict () { return strict; }
-      public String getScript () { return script; }
-      public Description getType () { return Description.this; }
-      
-      public Boolean eval (Task task) {
+      public Boolean evalCondition (Task task) {
          if ( strict ) {
             for (String slot : slots)
                if ( !task.isDefinedSlot(slot) ) return null;

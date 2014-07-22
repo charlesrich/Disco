@@ -7,6 +7,7 @@ package edu.wpi.cetask;
 
 import java.io.PrintStream;
 import java.util.*;
+import edu.wpi.cetask.TaskClass.Postcondition;
 
 // NB supports subplans not only from decompositions
 
@@ -366,9 +367,8 @@ public class Plan {
    }
    
    private boolean isAchievedSufficient () {
-      return isSucceeded() ||
-          (getType().isSufficient() && isLiveAchieved() && 
-                Utils.isTrue(isAchieved()));
+      return isSucceeded() || 
+         (getType().isSufficient() && isLiveAchieved() && Utils.isTrue(isAchieved()));
    }
 
    /**

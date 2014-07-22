@@ -203,6 +203,12 @@ public abstract class Utils {
       return name;
    }
    
+   public static String getSimpleName (String id) {
+      try { id = Utils.getSimpleName(Class.forName(id), true); }
+      catch (ClassNotFoundException e) {}
+      return id;
+   }
+
    /**
     * Print each item of given list on separate line.
     */

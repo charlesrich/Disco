@@ -6,6 +6,7 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Grounding;
 import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.cetask.TaskClass.Output;
 import edu.wpi.disco.Agenda.Plugin;
@@ -379,7 +380,7 @@ public class Console extends Shell {
          return;
       }
       if ( !(task instanceof Utterance) ) { // see Interaction.done
-         Script script = task.getScript();
+         Grounding script = task.getGrounding();
          task.setExternal(true); // must be set before eval
          if ( script != null ) script.eval(task);
       }

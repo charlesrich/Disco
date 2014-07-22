@@ -34,21 +34,21 @@ public class DecompositionClass extends TaskModel.Member {
    
    private final Applicability applicable;
    
-   public class Applicability extends Condition {
+   public static class Applicability extends Condition {
       
-      private Applicability (String script, String where) {
-         super(script, where, goal.isStrict());
+      private Applicability (String script, boolean strict, TaskEngine engine) {
+         super(script, strict, engine);
       }
       
       @Override
       protected boolean check (String slot) {
-         if ( goal.inputNames.contains(slot) ) return true;
+         if ( getEnclosing().getGoal().inputNames.contains(slot) ) return true;
          System.out.println("WARNING: $this."+slot+" not a valid goal input in "+where);
          return false;
       }
-      
+       
       @Override
-      public DecompositionClass getType () { return (DecompositionClass) super.getType(); }
+      public DecompositionClass getEnclosing () { return (DecompositionClass) super.getEnclosing(); }
    }
    
    /**
@@ -57,7 +57,7 @@ public class DecompositionClass extends TaskModel.Member {
    public Applicability getApplicable () { return applicable; }
    
    public Boolean isApplicable (Task goal) {
-      return applicable == null ? null : applicable.eval(goal);
+      return applicable == null ? null : applicable.evalCondition(goal);
    }
    
    private final boolean ordered;
@@ -131,12 +131,12 @@ public class DecompositionClass extends TaskModel.Member {
       return false;
    }
    
-   DecompositionClass (Node node, TaskModel model, TaskClass goal, XPath xpath) { 
+   DecompositionClass (Node node, XPath xpath, TaskModel model, TaskClass goal) { 
       model.super(node, xpath);
       model.decomps.put(getId(), this);
       this.goal = goal == null ? resolveTaskClass(xpath("./@goal")) : goal;
-      if ( !this.goal.getScripts().isEmpty() )
-         throw new RuntimeException("Task "+this.goal+" cannot have both script and subtasks!");
+      if ( !this.goal.getGroundingAll().isEmpty() )
+         throw new RuntimeException("Task "+this.goal+" cannot have both grounding script and subtasks!");
       if ( this.goal.decompositions.isEmpty() ) 
          this.goal.decompositions = new ArrayList<DecompositionClass>(5);
       this.goal.decompositions.add(this);
@@ -217,7 +217,9 @@ public class DecompositionClass extends TaskModel.Member {
          }
       } catch (Exception e) { Utils.rethrow(e); } 
       String script = xpath("./n:applicable");
-      applicable = script.isEmpty() ? null : new Applicability(script, this+" applicable");
+      applicable = script.isEmpty() ? null : 
+         new Applicability(script, Condition.isStrict(engine,  TaskModel.parseId(node, xpath)), engine);
+      if ( applicable != null ) applicable.setEnclosing(this);
    }
    
    /**

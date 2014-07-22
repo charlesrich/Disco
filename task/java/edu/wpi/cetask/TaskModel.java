@@ -8,14 +8,16 @@ package edu.wpi.cetask;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import javax.script.*;
 import javax.xml.namespace.QName;
-import javax.xml.xpath.XPath;
+import javax.xml.xpath.*;
 import org.w3c.dom.Node;
+import edu.wpi.cetask.TaskClass.Grounding;
 
 public class TaskModel extends Description {
    
-   TaskModel (Node node, TaskEngine engine, XPath xpath) { 
-      super(node, engine, xpath);     
+   TaskModel (Node node, XPath xpath,TaskEngine engine) { 
+      super(node, xpath, engine);     
    }
    
    private URL source; 
@@ -36,9 +38,9 @@ public class TaskModel extends Description {
    
    public DecompositionClass getDecompositionClass (String id) { return decomps.get(id); }
    
-   List<Script> scripts = Collections.emptyList();
+   List<Grounding> scripts = Collections.emptyList();
    
-   public List<Script> getScripts () { return scripts; }
+   public List<Grounding> getGroundingAll () { return scripts; }
    
    @Override
    public String toString () { return getNamespace(); }
@@ -123,6 +125,16 @@ public class TaskModel extends Description {
    
    private final List<String> ids = new ArrayList<String>();
    
+   protected static String getPropertyId (String id) {
+         return (id.startsWith("edu.wpi.disco.lang.") ?
+            // spare users typing this prefix in properties files
+            id.substring(19) : id).replace('$', '.');
+   }
+      
+   protected static String parseId (Node node, XPath xpath) {
+         return xpath(node, xpath, "./@id");
+   }
+   
    /**
     * Base class for members of task model with id's
     */
@@ -138,27 +150,30 @@ public class TaskModel extends Description {
        */
       public String getId () { return id; }
 
-
       /**
        * @return the qualified name of this member
        */
       public QName getQName () { return qname; }
       
       protected Member (Node node, XPath xpath) { 
-         super(node, TaskModel.this.engine, xpath);
-         String id = xpath("./@id");
+         this(node, xpath, parseId(node, xpath));
+      }
+     
+      // placeholder for creating members without XML
+      protected Member (String id) {
+         this(null, null, id);
+      }
+      
+      protected Member (Node node, XPath xpath, String id) {
+         super(node, xpath, TaskModel.this.engine);
          this.id = id.length() > 0 ? id : "**ROOT**";
          qname = new QName(getNamespace(), id);
-         ids.add(id);
+         ids.add(id);  
       }
       
       public TaskModel getModel () { return TaskModel.this; }   
       
-      public String getPropertyId () {
-         return (id.startsWith("edu.wpi.disco.lang.") ?
-            // spare users typing this prefix in properties files
-            id.substring(19) : id).replace('$', '.');
-      }
+      public String getPropertyId () { return TaskModel.getPropertyId(id); }
      
       public String getProperty (String key) {         
         return TaskModel.this.getProperty(getPropertyId()+key);
@@ -275,8 +290,26 @@ public class TaskModel extends Description {
       protected PrintStream getOut () { return engine.getOut(); }
       
       protected PrintStream getErr () { return engine.getErr(); }
-
-
    }
-  
+     
+   public static class Init extends Script {
+
+      Init (Node node, XPath xpath, TaskEngine engine) {
+         this(parseText(node, xpath), engine);
+      }
+      
+      public Init (String script, TaskEngine engine) {
+         super(script, engine);
+      }
+      
+      @Override
+      public TaskModel getEnclosing () { return (TaskModel) super.getEnclosing(); } 
+      
+      void eval () {
+         if ( compiled != null)  
+            try { compiled.eval(new SimpleBindings()); }
+            catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+         else engine.eval(script, where); 
+      }
+   }
 }

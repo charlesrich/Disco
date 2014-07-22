@@ -16,38 +16,47 @@ public class TaskClass extends TaskModel.Member {
    private final Precondition precondition;
    private final Postcondition postcondition; 
    
-   public class Precondition extends Condition {
+   // DESIGN NOTE: Pre/Postcondition, etc., (and Input/Output TODO) below are *not* inner classes,
+   // so that they can be constructed *before* being passed to task class constructor
+   // when creating task classes without XML.
+   
+   public static class Precondition extends Condition {
       
-      private Precondition (String script, String where) {
-         super(script, where, TaskClass.this.isStrict());
+      public Precondition (String script, boolean strict, TaskEngine engine) {
+         super(script, strict, engine);
       }
       
       @Override
       protected boolean check (String slot) {
-         if ( inputNames.contains(slot) ) return true;
+         if ( getEnclosing().inputNames.contains(slot) ) return true;
          System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
          return false;
       }
       
       @Override
-      public TaskClass getType () { return (TaskClass) super.getType(); }
+      public TaskClass getEnclosing () { return (TaskClass) super.getEnclosing(); }
    }
    
-   public class Postcondition extends Condition {
+   public static class Postcondition extends Condition {
       
-      private Postcondition (String script, String where) {
-         super(script, where, TaskClass.this.isStrict());
+      private final boolean sufficient;
+      
+      public Postcondition (String script, boolean strict, boolean sufficient, TaskEngine engine) {
+         super(script, strict, engine);
+         this.sufficient = sufficient;
       }
       
       @Override
       protected boolean check (String slot) {
-         if ( inputNames.contains(slot) || outputNames.contains(slot) ) return true;
+         if ( getEnclosing().inputNames.contains(slot) || getEnclosing().outputNames.contains(slot) ) return true;
          System.out.println("WARNING: $this."+slot+" not a valid input or output in "+where);
          return false;
       }
-       
+      
       @Override
-      public TaskClass getType () { return (TaskClass) super.getType(); }
+      public TaskClass getEnclosing () { return (TaskClass) super.getEnclosing(); }
+      
+      public boolean isSufficient () { return sufficient; }
    }
    
    /**
@@ -71,14 +80,91 @@ public class TaskClass extends TaskModel.Member {
     */
    public Postcondition getPostcondition () { return postcondition; }
    
-   private final boolean sufficient;
-   
    /**
     * Returns true iff postcondition is provided and is sufficient.
     */
-   public boolean isSufficient () { return sufficient; }
+   public boolean isSufficient () { 
+      return postcondition != null && postcondition.isSufficient();
+   }
    
    private Class<? extends Task> builtin;
+   
+   // may be toplevel (default) grounding script
+   
+   public static class Grounding extends Script {
+
+      private final Applicability applicable;
+      private final String platform, deviceType, model;
+      private final TaskClass task;
+
+      public String getPlatform () { return platform; }
+      public String getDeviceType () { return deviceType; }
+      public String getModel () { return model; }
+      
+      public TaskClass getTask () {
+         return getEnclosing() instanceof TaskClass ? (TaskClass) getEnclosing() : task;
+      }
+
+      Grounding (Node node, XPath xpath, TaskEngine engine) {
+         this(parseText(node, xpath), parseApplicable(node, xpath, engine), 
+                Utils.emptyNull(xpath(node, xpath, "./@platform")),
+                Utils.emptyNull(xpath(node, xpath, "./@deviceType")),
+                Utils.emptyNull(xpath(node, xpath, "./@model")),
+                Utils.emptyNull(xpath(node, xpath, "./@task")),
+                engine);        
+      }
+      
+      private static Applicability parseApplicable (Node node, XPath xpath, TaskEngine engine) {
+         String condition = xpath(node, xpath, "./@applicable");
+         return condition.isEmpty() ? null : 
+            new Applicability(condition, Condition.isStrict(engine, TaskModel.parseId(node, xpath)), engine);
+      }
+      
+      public Grounding (String script, TaskEngine engine) {
+         this(script, null, null, null, null, null, engine);
+      }
+      
+      public Grounding (String script, Applicability applicable, 
+            String platform, String deviceType, String model, String task, TaskEngine engine) {
+         super(script, engine);
+         this.applicable = applicable;
+         if ( applicable != null ) applicable.setEnclosing(this);
+         this.platform = platform;
+         this.deviceType = deviceType;
+         this.model = model;
+         this.task = task == null ? null : resolveTaskClass(task);
+      }
+
+      @Override
+      void setEnclosing (Description enclosing) {
+         super.setEnclosing(enclosing);
+         if ( getTask() == null && this.platform == null )
+            throw new RuntimeException("Syntax Error: Toplevel script without task, platform or init=true");
+      }
+      
+      public Boolean isApplicable (Task occurrence) {
+         return applicable == null ? null : applicable.evalCondition(occurrence);
+      }      
+      
+      public static class Applicability extends Condition {
+      
+         private Applicability (String script, boolean strict, TaskEngine engine) {
+            super(script, strict, engine);
+         }
+      
+         @Override
+         protected boolean check (String slot) {
+            Description enclosing = getEnclosing().getEnclosing();
+            if ( !(enclosing instanceof TaskClass) || 
+                  ((TaskClass) enclosing).inputNames.contains(slot) ) return true;
+            System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+            return false;
+         }
+      
+         @Override
+         public Grounding getEnclosing () { return (Grounding) super.getEnclosing(); }
+      }
+   }
    
    /**
     * A task class is builtin if its id is defined as a subclass of {@link Task}.
@@ -90,15 +176,15 @@ public class TaskClass extends TaskModel.Member {
       
    final List<String> inputNames, outputNames, declaredInputNames, declaredOutputNames;
    
-   private List<Script> scripts = Collections.emptyList();
+   private List<Grounding> scripts = Collections.emptyList();
    
    /**
-    * Return all scripts associated with this primitive task class (for all platforms and
+    * Return all grounding scripts associated with this primitive task class (for all platforms and
     * device types). 
     * 
-    * @see #getScript()
+    * @see #getGrounding()
     */
-   public List<Script> getScripts () {
+   public List<Grounding> getGroundingAll () {
       if ( !scripts.isEmpty() && !isPrimitive() ) {
          getErr().println("Ignoring grounding script for non-primitive: "+this);
          return Collections.emptyList();
@@ -110,10 +196,10 @@ public class TaskClass extends TaskModel.Member {
     * Return script to ground instances of this primitive task class appropriate
     * for platform and device type of this task engine, or null if none.
     */
-   public Script getScript () {
-      List<Script> candidates = new ArrayList<Script>(getScripts());
-      for (Iterator<Script> i = candidates.iterator(); i.hasNext();) {
-         Script script = i.next();
+   public Grounding getGrounding () {
+      List<Grounding> candidates = new ArrayList<Grounding>(getGroundingAll());
+      for (Iterator<Grounding> i = candidates.iterator(); i.hasNext();) {
+         Grounding script = i.next();
          String platform = script.getPlatform(),
             deviceType = script.getDeviceType();
          // remove scripts not appropriate to current platform and deviceType
@@ -123,10 +209,9 @@ public class TaskClass extends TaskModel.Member {
       }
       if ( candidates.isEmpty() ) { 
          // look for default script for model and then overall (must be toplevel)
-         Script global = null;
+         Grounding global = null;
          for (TaskModel model : engine.getModels()) {
-            for (Script script : model.getScripts()) {
-               if ( script.isInit() ) continue;
+            for (Grounding script : model.getGroundingAll()) {
                TaskClass task = script.getTask();
                if ( task == null ) {
                   String ns = script.getModel();
@@ -146,6 +231,8 @@ public class TaskClass extends TaskModel.Member {
    
    private final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
    
+   // TODO: Make Input/Ouput static classes (see design note above)
+
    public abstract class Slot {
       
       protected final String name, type;
@@ -289,17 +376,56 @@ public class TaskClass extends TaskModel.Member {
    
    public boolean hasModifiedInputs () { return hasModifiedInputs; }
    
+   TaskClass (Node node, XPath xpath, TaskModel model) { 
+      this(node, xpath, model, TaskModel.parseId(node, xpath),
+            parsePrecondition(node, xpath, model.getEngine()), 
+            parsePostcondition(node, xpath, model.getEngine()),
+            parseGrounding(node, xpath, model.getEngine()));
+   }
+   
+   private static Precondition parsePrecondition (Node node, XPath xpath, TaskEngine engine) {
+      String condition = xpath(node, xpath, "./n:precondition");
+      return condition.isEmpty() ? null : 
+         new Precondition(condition, Condition.isStrict(engine,TaskModel.parseId(node, xpath)), engine);
+   }
+   
+   private static Postcondition parsePostcondition (Node node, XPath xpath, TaskEngine engine) {
+      String condition = xpath(node, xpath, "./n:postcondition");
+      String sufficient = xpath(node, xpath, "./n:postcondition/@sufficient"); 
+      return condition.isEmpty() ? null : 
+         new Postcondition(condition, Condition.isStrict(engine, TaskModel.parseId(node, xpath)),
+               sufficient.length() > 0 && Utils.parseBoolean(sufficient), engine);
+   }  
+   
+   private static List<Grounding> parseGrounding (Node node, XPath xpath, TaskEngine engine) {
+      List<Grounding> scripts = Collections.emptyList();
+      for (Node script : xpathNodes(node, xpath, "./n:script")) {
+         if ( scripts.isEmpty() ) scripts = new ArrayList<Grounding>(2);
+         scripts.add(new Grounding(script, xpath, engine));
+      }  
+      return scripts;
+   }
+   
+   /**
+    * Limited, incomplete constructor for task classes without using XML.
+    * Provided to support LIMSI Discolog project.
+    */
+   public TaskClass (TaskModel model, String id, 
+         Precondition precondition, Postcondition postcondition, Grounding script) {
+       this(null, null, model, id, precondition, postcondition, Collections.singletonList(script));
+   }
+   
    @SuppressWarnings("unchecked")
-   TaskClass (Node node, TaskModel model, XPath xpath) { 
-      model.super(node, xpath);
-      // cache simple name (suppress package for builtin classes) 
-      String simple = getId();
-      try { simple = Utils.getSimpleName(Class.forName(getId()), true); }
-      catch (ClassNotFoundException e) {}
-      simpleName = simple;
-      String attribute = xpath("./n:postcondition/@sufficient"); 
-      // default sufficient false
-      sufficient = attribute.length() > 0 && Utils.parseBoolean(attribute);
+   private TaskClass (Node node, XPath xpath, TaskModel model, String id, 
+         Precondition precondition, Postcondition postcondition,
+         List<Grounding> scripts) { 
+      model.super(node, xpath, id);
+      simpleName = Utils.getSimpleName(id);
+      for (Grounding script : scripts) {
+         if ( this.scripts.isEmpty() ) this.scripts = new ArrayList<Grounding>(2);
+         this.scripts.add(script);
+         script.setEnclosing(this);
+      }
       declaredOutputNames = xpathValues("./n:output/@name");
       declaredInputNames = xpathValues("./n:input/@name");
       outputNames =  new ArrayList<String>(declaredOutputNames);
@@ -338,10 +464,14 @@ public class TaskClass extends TaskModel.Member {
             !"string".equals(getSlotType("device")) )
          throw new IllegalStateException("Device slot must be of type string in "
                +getId());
-      // conditions after inputs and outputs for error checking
-      String pre = xpath("./n:precondition"), post = xpath("./n:postcondition");
-      precondition = pre.isEmpty() ? null : new Precondition(pre, simple+" precondition");
-      postcondition = post.isEmpty() ? null : new Postcondition(post, simple+" postcondition");
+      // process conditions after inputs for error checking
+      this.precondition = precondition;
+      this.postcondition = postcondition;
+      if ( precondition != null ) precondition.setEnclosing(this);
+      if ( postcondition != null ) postcondition.setEnclosing(this);
+      if ( (precondition != null && isStrict() != precondition.isStrict())
+            || (postcondition != null && isStrict() != postcondition.isStrict()) )
+         System.out.println("WARNING: Inconsistent strictness specifications for: "+this);
       // cache bindings
       NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
       for (int i = 0; i < nodes.getLength(); i++) { // preserve order
@@ -361,12 +491,14 @@ public class TaskClass extends TaskModel.Member {
          } catch (XPathException e) { throw new RuntimeException(e); }
       }
       // cache nested scripts
-      for (Node script : xpathNodes("./n:script")) {
-         if ( scripts.isEmpty() ) scripts = new ArrayList<Script>(2);
-         scripts.add(new Script(script, engine, this, xpath));
+      for (Node scriptNode : xpathNodes("./n:script")) {
+         if ( scripts.isEmpty() ) scripts = new ArrayList<Grounding>(2);
+         Grounding script = new Grounding(scriptNode, xpath, engine);
+         script.setEnclosing(this);
+         scripts.add(script);
       }   
       try {  
-         builtin = (Class<? extends Task>) Class.forName(getId());
+         builtin = ((Class<? extends Task>) Class.forName(getId()));
          builtin.getDeclaredField("CLASS").set(null, this);
       } 
       catch (ClassNotFoundException|ClassCastException e) {}
