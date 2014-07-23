@@ -220,6 +220,10 @@ public class DecompositionClass extends TaskModel.Member {
          this.goal.decompositions = new ArrayList<DecompositionClass>(5);
       this.goal.decompositions.add(this);
       this.goal.getDecompositionScript(); // for error check
+      // check for cycles
+      for (String name : stepNames) isRequired(name, null, 0);
+      if ( getEngine().isRecognition() ) 
+         for (String name : stepNames) getStepType(name).contributes(this.goal);
       // analyze and store binding dependencies
       // TODO: Check type compatibility between slots
       NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);

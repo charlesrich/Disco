@@ -56,14 +56,18 @@ public abstract class Description { //TODO: temporarily public for Anahita
    protected final TaskEngine engine; 
    public TaskEngine getEngine () { return engine; }
    
-   protected Description (Node node, XPath xpath, TaskEngine engine) { 
+   protected Description (Node node, XPath xpath, TaskEngine engine) {
+      this(node, xpath, parseAbout(node, xpath), engine);
       if ( node == null ) throw new IllegalArgumentException("Null node");
-      this.node = node;
-      this.xpath = xpath;
-      this.engine = engine;
-      this.namespace = parseAbout(node, xpath);
    }
    
+   protected Description (Node node, XPath xpath, String namespace, TaskEngine engine) {
+      this.node = node;
+      this.xpath = xpath;
+      this.namespace = namespace;
+      this.engine = engine;
+   }
+
    protected static String parseAbout (Node node, XPath xpath) {
       return xpath(node, xpath, "/n:taskModel/@about");
    }

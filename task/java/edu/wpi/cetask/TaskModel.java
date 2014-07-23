@@ -15,8 +15,12 @@ import edu.wpi.cetask.TaskClass.Grounding;
 
 public class TaskModel extends Description {
    
-   TaskModel (Node node, XPath xpath,TaskEngine engine) { 
+   TaskModel (Node node, XPath xpath, TaskEngine engine) { 
       super(node, xpath, engine);     
+   }
+   
+   public TaskModel (String namespace, TaskEngine engine) {
+      super(null, null, namespace, engine);
    }
    
    private URL source; 
@@ -164,9 +168,9 @@ public class TaskModel extends Description {
       }
       
       protected Member (Node node, XPath xpath, String id) {
-         super(node, xpath, TaskModel.this.engine);
+         super(node, xpath, TaskModel.this.getNamespace(), TaskModel.this.engine);
          this.id = id.length() > 0 ? id : "**ROOT**";
-         qname = new QName(getNamespace(), id);
+         qname = new QName(TaskModel.this.getNamespace(), id);
          ids.add(id);  
       }
       
