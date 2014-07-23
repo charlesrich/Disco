@@ -1,0 +1,26 @@
+    # Jul 23, 2014 7:58:33 PM - TaskEngine 1.6 / Disco 1.9
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > next false
+  > task BindingsDelete
+    User says "Let's achieve BindingsDelete."
+  > eval p = $disco.getFocus().getChildren().get(0)
+    # Returned '[BindingsDeletePrim]'
+  > eval p.getGoal().setSlotValue("input", 2)
+    # Returned '2.0'
+  > history
+
+[Achieve BindingsDelete on 2.0] -accepted -live <-focus
+   User says "Let's achieve BindingsDelete."
+   [Execute BindingsDeletePrim on 2.0] -live
+
+  > eval p.getGoal().deleteSlotValue("input")
+    # Returned 'null'
+  > history
+
+[Achieve BindingsDelete] -accepted -live <-focus
+   User says "Let's achieve BindingsDelete."
+   [Execute BindingsDeletePrim] -live
+
+  > quit
+    

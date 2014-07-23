@@ -342,6 +342,18 @@
     <script> println($this.input); test++; </script>
   </task>
 
+  <task id="BindingsDelete">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks">
+       <step name="step" task="BindingsDeletePrim"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+  
+  <task id="BindingsDeletePrim">
+    <input name="input" type="number"/>
+  </task>
+   
   <!-- see decomposeA below -->
   <task id="ProceduralA"/>
     

@@ -421,9 +421,12 @@ public class DecompositionClass extends TaskModel.Member {
                   // special case for retracted slot: propagate undefined to target
                   target.deleteSlotValue(slot);
                if ( inputInput && target.isDefinedSlot(slot) ) 
-                  // special case for inIn identity only: propagate other direction
+                  // special case for inIn identity only: propagate other direction 
                   dependTask.copySlotValue(target, slot, depend.slot, true, false);
                return;
+            } else if ( inputInput && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
+               // special case for inIn identity only: propagate retraction other direction
+               decomp.getGoal().deleteSlotValue(depend.slot);
             } else if ( !TaskEngine.DEBUG // allow looking at values for debugging 
                   && identity && target.isDefinedSlot(slot)  
                   && !Utils.equals(target.getSlotValue(slot), 
