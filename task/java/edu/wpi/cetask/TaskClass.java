@@ -238,7 +238,8 @@ public class TaskClass extends TaskModel.Member {
    private final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
    
    // TODO: Make Input/Ouput static classes (see design note above)
-
+   //       Inherit enclosing from Description?  Also provide copy constructors.
+   
    public abstract class Slot {
       
       protected final String name, type;

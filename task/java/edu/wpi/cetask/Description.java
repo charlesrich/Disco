@@ -155,24 +155,25 @@ public abstract class Description { //TODO: temporarily public for Anahita
       
    protected PrintStream getErr () { return engine.getErr(); }
    
+   private Description enclosing;
+   protected String where;
+
+   public Description getEnclosing () { return enclosing; }
+
+   void setEnclosing (Description enclosing) {
+      if ( this.enclosing != null ) throw new IllegalArgumentException("Already has enclosing: "+this);
+      this.enclosing = enclosing;
+      where = (enclosing instanceof TaskModel.Member ? 
+         Utils.getSimpleName(((TaskModel.Member) enclosing).getId()) : enclosing.getNamespace())
+         +" "+Utils.getSimpleName(getClass(), true);
+   }
+   
    protected static abstract class Script extends Description {
 
       protected final String script;
       protected final Compiled compiled;
-      protected String where;
-      private Description enclosing;
-      
+         
       public String getScript () { return script; }
-
-      public Description getEnclosing () { return enclosing; }
-
-      void setEnclosing (Description enclosing) {
-         if ( this.enclosing != null ) throw new IllegalArgumentException("Already has enclosing: "+this);
-         this.enclosing = enclosing;
-         where = (enclosing instanceof TaskModel.Member ? 
-            Utils.getSimpleName(((TaskModel.Member) enclosing).getId()) : enclosing.getNamespace())
-            +" "+Utils.getSimpleName(getClass(), true);
-      }
       
       protected Script (Node node, XPath xpath, String script, TaskEngine engine) {
          this(script, engine, "compiling "+TaskModel.parseId(node, xpath));

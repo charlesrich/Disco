@@ -64,6 +64,9 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
+   // TODO Provide enclosing class (inherit from Description?)
+   // and copy constructor
+   
    public static class Step {
       private final String name;
       private final TaskClass type;
