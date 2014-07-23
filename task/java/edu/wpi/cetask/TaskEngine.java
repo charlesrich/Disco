@@ -624,6 +624,7 @@ public class TaskEngine {
     * @param id
     * @return task class or null if none
     * @throws AmbiguousIdException
+    * @throws IllegalArgumentException if id is a decomposition class
     */
    public TaskClass getTaskClass (String id) {
       TaskModel.Member member = getMember(id);

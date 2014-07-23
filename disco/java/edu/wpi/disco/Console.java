@@ -174,8 +174,10 @@ public class Console extends Shell {
          if ( name.hasMoreTokens() ) namespace = name.nextToken();
          if ( name.hasMoreTokens() ) 
             warning("Ignoring '"+name.nextToken()+"' (and following)");
-         TaskClass task = namespace == null ? getEngine().getTaskClass(id) :
-            getEngine().getModel(namespace).getTaskClass(id);
+         TaskClass task = null;
+         try { task = namespace == null ? getEngine().getTaskClass(id) :
+                         getEngine().getModel(namespace).getTaskClass(id);
+         } catch (IllegalArgumentException e) {} // is decomposition class
          if ( task != null ) { 
             out.println(); printNamespace(task, namespace);
             out.print("  "); task.print(out); out.println();
