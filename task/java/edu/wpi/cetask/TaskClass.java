@@ -29,7 +29,7 @@ public class TaskClass extends TaskModel.Member {
       @Override
       protected boolean check (String slot) {
          if ( getEnclosing().inputNames.contains(slot) ) return true;
-         System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+         getEnclosing().getErr().println("WARNING: $this."+slot+" not a valid input in "+where);
          return false;
       }
       
@@ -49,7 +49,7 @@ public class TaskClass extends TaskModel.Member {
       @Override
       protected boolean check (String slot) {
          if ( getEnclosing().inputNames.contains(slot) || getEnclosing().outputNames.contains(slot) ) return true;
-         System.out.println("WARNING: $this."+slot+" not a valid input or output in "+where);
+         getEnclosing().getErr().println("WARNING: $this."+slot+" not a valid input or output in "+where);
          return false;
       }
       
@@ -106,12 +106,13 @@ public class TaskClass extends TaskModel.Member {
       }
 
       Grounding (Node node, XPath xpath, TaskEngine engine) {
-         this(parseText(node, xpath), parseApplicable(node, xpath, engine), 
-                Utils.emptyNull(xpath(node, xpath, "./@platform")),
-                Utils.emptyNull(xpath(node, xpath, "./@deviceType")),
-                Utils.emptyNull(xpath(node, xpath, "./@model")),
-                Utils.emptyNull(xpath(node, xpath, "./@task")),
-                engine);        
+         this(parseText(node, xpath), 
+               parseApplicable(node, xpath, engine), 
+               parseTask(node, xpath, engine),
+               Utils.emptyNull(xpath(node, xpath, "./@platform")),
+               Utils.emptyNull(xpath(node, xpath, "./@deviceType")),
+               Utils.emptyNull(xpath(node, xpath, "./@model")),
+               engine);        
       }
       
       private static Applicability parseApplicable (Node node, XPath xpath, TaskEngine engine) {
@@ -120,19 +121,24 @@ public class TaskClass extends TaskModel.Member {
             new Applicability(condition, Condition.isStrict(engine, TaskModel.parseId(node, xpath)), engine);
       }
       
+      private static TaskClass parseTask (Node node, XPath xpath, TaskEngine engine) {
+         String qname = xpath(node, xpath, "./@task");
+         return qname.isEmpty() ? null : resolveTaskClass(node, parseAbout(node, xpath), qname, engine);
+      }
+      
       public Grounding (String script, TaskEngine engine) {
          this(script, null, null, null, null, null, engine);
       }
       
-      public Grounding (String script, Applicability applicable, 
-            String platform, String deviceType, String model, String task, TaskEngine engine) {
+      public Grounding (String script, Applicability applicable, TaskClass task,
+            String platform, String deviceType, String model, TaskEngine engine) {
          super(script, engine);
          this.applicable = applicable;
          if ( applicable != null ) applicable.setEnclosing(this);
+         this.task = task;
          this.platform = platform;
          this.deviceType = deviceType;
          this.model = model;
-         this.task = task == null ? null : resolveTaskClass(task);
       }
 
       @Override
@@ -157,7 +163,7 @@ public class TaskClass extends TaskModel.Member {
             Description enclosing = getEnclosing().getEnclosing();
             if ( !(enclosing instanceof TaskClass) || 
                   ((TaskClass) enclosing).inputNames.contains(slot) ) return true;
-            System.out.println("WARNING: $this."+slot+" not a valid input in "+where);
+            getEnclosing().getErr().println("WARNING: $this."+slot+" not a valid input in "+where);
             return false;
          }
       
@@ -471,7 +477,7 @@ public class TaskClass extends TaskModel.Member {
       if ( postcondition != null ) postcondition.setEnclosing(this);
       if ( (precondition != null && isStrict() != precondition.isStrict())
             || (postcondition != null && isStrict() != postcondition.isStrict()) )
-         System.out.println("WARNING: Inconsistent strictness specifications for: "+this);
+         getErr().println("WARNING: Inconsistent strictness specifications for: "+this);
       // cache bindings
       NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
       for (int i = 0; i < nodes.getLength(); i++) { // preserve order

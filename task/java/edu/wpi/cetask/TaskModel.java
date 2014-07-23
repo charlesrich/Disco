@@ -285,10 +285,6 @@ public class TaskModel extends Description {
       public boolean isInternal () { 
          return getProperty("@internal", getId().charAt(0) == '_');
       }
-      
-      protected PrintStream getOut () { return engine.getOut(); }
-      
-      protected PrintStream getErr () { return engine.getErr(); }
    }
      
    public static class Init extends Script {

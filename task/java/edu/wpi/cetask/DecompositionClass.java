@@ -13,8 +13,6 @@ import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class DecompositionClass extends TaskModel.Member {  
    
-   // TODO check for duplicate step names
-   
    // do not confuse with JavaScript bindings in Instance
    private final Map<String,Binding> bindings = new HashMap<String,Binding>();
    
@@ -67,11 +65,13 @@ public class DecompositionClass extends TaskModel.Member {
    public List<String> getStepNames () { return stepNames; }    
    
    private static class Step {
+      private final String name;
       private final TaskClass type;
       private final int minOccurs, maxOccurs;
       private final List<String> required;
       
-      private Step (TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
+      private Step (String name, TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
+         this.name = name;
          this.type = type;
          this.minOccurs = minOccurs;
          this.maxOccurs = maxOccurs;
@@ -80,7 +80,7 @@ public class DecompositionClass extends TaskModel.Member {
    }
 
    private final Map<String,Step> steps;
-
+   
    /**
     * Return type of given step.
     */
@@ -130,65 +130,99 @@ public class DecompositionClass extends TaskModel.Member {
          if ( isRequired(step, step2, depth+1) ) return true;
       return false;
    }
-   
+
    DecompositionClass (Node node, XPath xpath, TaskModel model, TaskClass goal) { 
-      model.super(node, xpath);
+      this(node, xpath, model, 
+            TaskModel.parseId(node, xpath), 
+            goal == null ? parseGoal(node, xpath, model.getEngine()) : goal,
+            parseSteps(node, xpath, model.getEngine()),
+            parseOrdered(node, xpath));
+   }
+   
+   private static TaskClass parseGoal (Node node, XPath xpath, TaskEngine engine) {
+      String qname = xpath(node, xpath, "./@goal");
+      return qname.isEmpty() ? null : resolveTaskClass(node, parseAbout(node, xpath), qname, engine);
+   }
+   
+   private static List<Step> parseSteps (Node node, XPath xpath, TaskEngine engine) {
+      String id = TaskModel.parseId(node, xpath);
+      List<String> stepNames = xpathValues(node, xpath, "./n:step/@name");
+      int size = stepNames.size();
+      List<Step> steps = new ArrayList<Step>(size);
+      List<String> previousStepNames = null;
+      boolean ordered = parseOrdered(node, xpath);
+      if ( ordered ) previousStepNames = new ArrayList<String>(size);
+      for (String name : stepNames) {
+         if ( stepNames.indexOf(name) != stepNames.lastIndexOf(name) )
+            throw new RuntimeException(
+                  "Attempting to define duplicate step name "+name+" in "+id);
+         List<String> required = null;
+         String requires = xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@requires");
+         if ( ordered ) { 
+            required = new ArrayList<String>(previousStepNames);
+            previousStepNames.add(name);
+            if ( requires.length() > 0 )
+               engine.getErr().println("WARNING: Ignoring explicit requires in ordered decomposition "+id);
+         } else if ( requires.length() > 0) {
+            required = new ArrayList<String>(size-1);
+            StringTokenizer tokenizer = new StringTokenizer(requires);
+            while (tokenizer.hasMoreTokens()) required.add(tokenizer.nextToken());
+         } 
+         String minOccurs = xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@minOccurs");
+         int min = minOccurs.length() == 0 ? 1 : Integer.parseInt(minOccurs);
+         String maxOccurs = xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@maxOccurs");
+         int max = maxOccurs.length() == 0 ? ( min == 0 ? 1 : min ) : 
+                              maxOccurs.equals("unbounded") ? -1 :
+                              Integer.parseInt(maxOccurs);
+         if ( max < min ) {
+            engine.getErr().println("WARNING: Ignoring maxOccurs in "+id+" step "+name);
+            max = min;
+         }
+         TaskClass task = resolveTaskClass(node, 
+               parseAbout(node, xpath),
+               xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@task"), 
+               engine);
+         if ( task == null )
+            throw new RuntimeException("Step "+name+" in "+id+" has unknown task type");
+         steps.add(new Step(name, task, min, max, required));
+      }
+      return steps;
+   }
+   
+   private static boolean parseOrdered (Node node, XPath xpath) {
+      String ordered = xpath(node, xpath, "./@ordered");
+      return ordered.length() == 0 || Utils.parseBoolean(ordered);
+   }
+      
+   /**
+    * Limited, incomplete constructor for decomposition classes without using XML.
+    * Provided to support LIMSI Discolog project.
+    */
+   public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps) { 
+      this(null, null, model, id, goal, steps, false);
+   }
+   
+   private DecompositionClass (Node node, XPath xpath, TaskModel model, 
+         String id, TaskClass goal, List<Step> steps, boolean ordered) { 
+      model.super(node, xpath, id);
+      this.goal = goal;
+      this.steps = new HashMap<String,Step>(steps.size());
+      this.ordered = ordered;
+      stepNames = new ArrayList<String>(steps.size());
+      for (Step step : steps) { 
+         stepNames.add(step.name);
+         this.steps.put(step.name, step);
+      }
       model.decomps.put(getId(), this);
-      this.goal = goal == null ? resolveTaskClass(xpath("./@goal")) : goal;
       if ( !this.goal.getGroundingAll().isEmpty() )
          throw new RuntimeException("Task "+this.goal+" cannot have both grounding script and subtasks!");
       if ( this.goal.decompositions.isEmpty() ) 
          this.goal.decompositions = new ArrayList<DecompositionClass>(5);
       this.goal.decompositions.add(this);
       this.goal.getDecompositionScript(); // for error check
-      // cache ordered (default true)
-      String ordered = xpath("./@ordered");
-      this.ordered =  ordered.length() == 0 || Utils.parseBoolean(ordered);
-      stepNames = xpathValues("./n:step/@name");
-      int size = stepNames.size();
-      steps = new HashMap<String,Step>(size);
-      List<String> previousStepNames = null;
-      if ( isOrdered() ) previousStepNames = new ArrayList<String>(size);
-      for (String name : stepNames) {
-         if ( stepNames.indexOf(name) != stepNames.lastIndexOf(name) )
-            throw new RuntimeException(
-                  "Attempting to define duplicate step name "+name
-                  +" in "+getId());
-         List<String> required = null;
-         String requires = xpath("./n:step[@name=\""+name+"\"]/@requires");
-         if ( isOrdered() ) { 
-            required = new ArrayList<String>(previousStepNames);
-            previousStepNames.add(name);
-            if ( requires.length() > 0 )
-               getErr().println("WARNING: Ignoring explicit requires in ordered decomposition "+getId());
-         } else if ( requires.length() > 0) {
-            required = new ArrayList<String>(size-1);
-            StringTokenizer tokenizer = new StringTokenizer(requires);
-            while (tokenizer.hasMoreTokens()) required.add(tokenizer.nextToken());
-         } 
-         String minOccurs = xpath("./n:step[@name=\""+name+"\"]/@minOccurs");
-         int min = minOccurs.length() == 0 ? 1 : Integer.parseInt(minOccurs);
-         String maxOccurs = xpath("./n:step[@name=\""+name+"\"]/@maxOccurs");
-         int max = maxOccurs.length() == 0 ? ( min == 0 ? 1 : min ) : 
-                              maxOccurs.equals("unbounded") ? -1 :
-                              Integer.parseInt(maxOccurs);
-         if ( max < min ) {
-            getErr().println("WARNING: Ignoring maxOccurs in "+getId()+" step "+name);
-            max = min;
-         }
-         TaskClass task = resolveTaskClass(xpath("./n:step[@name=\""+name+"\"]/@task"));
-         if ( task == null )
-            throw new RuntimeException(
-                  "Step "+name+" in "+getId()+" has unknown task type");
-         steps.put(name, new Step(task, min, max, required));
-      }
-      // check for cycles
-      for (String name : stepNames) isRequired(name, null, 0);
-      if ( getEngine().isRecognition() ) 
-         for (String name : stepNames) getStepType(name).contributes(this.goal);
       // analyze and store binding dependencies
-      NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
       // TODO: Check type compatibility between slots
+      NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
       try { 
          synchronized (bindings) {
             for (int i = 0; i < nodes.getLength(); i++) { // preserve order

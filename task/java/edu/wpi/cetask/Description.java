@@ -25,8 +25,6 @@ public abstract class Description { //TODO: temporarily public for Anahita
    // NB: Some (any) prefix *must* be provided for elements in all
    // XPath expressions, because of way that XPath works with XML namespaces
    
-   static final String about = "/n:taskModel/@about";
-   
    protected final String namespace;
    public String getNamespace () { return namespace; }
 
@@ -63,7 +61,11 @@ public abstract class Description { //TODO: temporarily public for Anahita
       this.node = node;
       this.xpath = xpath;
       this.engine = engine;
-      this.namespace = xpath(about);
+      this.namespace = parseAbout(node, xpath);
+   }
+   
+   protected static String parseAbout (Node node, XPath xpath) {
+      return xpath(node, xpath, "/n:taskModel/@about");
    }
 
    // placeholder for creating descriptions without XML
@@ -74,13 +76,21 @@ public abstract class Description { //TODO: temporarily public for Anahita
       this.xpath = null;
    }
    
-   public TaskClass resolveTaskClass (String qname) {
-      return engine.resolveTaskClass(parseQName(qname));
-   }
-   
    // convenient utilities for subclasses
 
+   public TaskClass resolveTaskClass (String qname) {
+      return resolveTaskClass(node, namespace, qname, engine);
+   }
+   
+   protected static TaskClass resolveTaskClass (Node node, String namespace, String qname, TaskEngine engine) {
+      return engine.resolveTaskClass(parseQName(node, namespace, qname));
+   }
+   
    protected Object xpath (String path, QName returnType) {
+      return xpath(node, xpath, path, returnType);
+   }
+   
+   protected static Object xpath (Node node, XPath xpath, String path, QName returnType) {
       try { return xpath.evaluate(path, node, returnType); } 
       catch (XPathExpressionException e) { throw new RuntimeException(e); }
    }
@@ -95,9 +105,13 @@ public abstract class Description { //TODO: temporarily public for Anahita
    }
 
    protected List<String> xpathValues (String path) {
+      return xpathValues(node, xpath, path);
+   }
+   
+   protected static List<String> xpathValues (Node node, XPath xpath, String path) {
       List<String> values = new ArrayList<String>();
-      for (Node node : xpathNodes(path))
-         values.add(node.getNodeValue());
+      for (Node n : xpathNodes(node, xpath, path))
+         values.add(n.getNodeValue());
       return values;
    }
    
@@ -116,6 +130,10 @@ public abstract class Description { //TODO: temporarily public for Anahita
    }
    
    protected QName parseQName (String qname) {
+      return parseQName(node, namespace, qname);
+   }
+   
+   protected static QName parseQName (Node node, String namespace, String qname) {
       String prefix;
       int i = qname.indexOf(':');
       if ( i >= 0 ) {
@@ -123,11 +141,15 @@ public abstract class Description { //TODO: temporarily public for Anahita
          String ns = node.lookupNamespaceURI(prefix);
          if ( ns == null ) 
             throw new IllegalArgumentException("Unknown namespace prefix "+qname
-                  +" in "+getNamespace()); 
+                  +" in "+namespace); 
          return new QName(ns, qname.substring(i+1), prefix); 
       } else // default namespace is from 'about', not xmlns
-         return new QName(getNamespace(), qname);  
+         return new QName(namespace, qname);  
    }
+     
+   protected PrintStream getOut () { return engine.getOut(); }
+      
+   protected PrintStream getErr () { return engine.getErr(); }
    
    protected static abstract class Script extends Description {
 
