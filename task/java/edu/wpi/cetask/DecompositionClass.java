@@ -34,7 +34,7 @@ public class DecompositionClass extends TaskModel.Member {
    
    public static class Applicability extends Condition {
       
-      private Applicability (String script, boolean strict, TaskEngine engine) {
+      public Applicability (String script, boolean strict, TaskEngine engine) {
          super(script, strict, engine);
       }
       
@@ -64,18 +64,22 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
-   private static class Step {
+   public static class Step {
       private final String name;
       private final TaskClass type;
       private final int minOccurs, maxOccurs;
       private final List<String> required;
       
-      private Step (String name, TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
+      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
          this.name = name;
          this.type = type;
          this.minOccurs = minOccurs;
          this.maxOccurs = maxOccurs;
          this.required = required;
+      }
+      
+      public Step (String name, TaskClass type) {
+         this(name, type, 1, 1, null);
       }
    }
 
@@ -136,6 +140,7 @@ public class DecompositionClass extends TaskModel.Member {
             TaskModel.parseId(node, xpath), 
             goal == null ? parseGoal(node, xpath, model.getEngine()) : goal,
             parseSteps(node, xpath, model.getEngine()),
+            parseApplicable(node, xpath, model.getEngine()),
             parseOrdered(node, xpath));
    }
    
@@ -189,6 +194,12 @@ public class DecompositionClass extends TaskModel.Member {
       return steps;
    }
    
+   private static Applicability parseApplicable (Node node, XPath xpath, TaskEngine engine) {
+      String script = xpath(node, xpath, "./n:applicable");
+      return script.isEmpty() ? null : 
+         new Applicability(script, Condition.isStrict(engine, TaskModel.parseId(node, xpath)), engine);
+   }
+   
    private static boolean parseOrdered (Node node, XPath xpath) {
       String ordered = xpath(node, xpath, "./@ordered");
       return ordered.length() == 0 || Utils.parseBoolean(ordered);
@@ -198,15 +209,17 @@ public class DecompositionClass extends TaskModel.Member {
     * Limited, incomplete constructor for decomposition classes without using XML.
     * Provided to support LIMSI Discolog project.
     */
-   public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps) { 
-      this(null, null, model, id, goal, steps, false);
+   public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps, Applicability applicable) { 
+      this(null, null, model, id, goal, steps, applicable, false);
    }
    
    private DecompositionClass (Node node, XPath xpath, TaskModel model, 
-         String id, TaskClass goal, List<Step> steps, boolean ordered) { 
+         String id, TaskClass goal, List<Step> steps, Applicability applicable, boolean ordered) { 
       model.super(node, xpath, id);
       this.goal = goal;
       this.steps = new HashMap<String,Step>(steps.size());
+      this.applicable = applicable;
+      if ( applicable != null ) applicable.setEnclosing(this);
       this.ordered = ordered;
       stepNames = new ArrayList<String>(steps.size());
       for (Step step : steps) { 
@@ -224,40 +237,38 @@ public class DecompositionClass extends TaskModel.Member {
       for (String name : stepNames) isRequired(name, null, 0);
       if ( getEngine().isRecognition() ) 
          for (String name : stepNames) getStepType(name).contributes(this.goal);
-      // analyze and store binding dependencies
-      // TODO: Check type compatibility between slots
-      NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
-      try { 
-         synchronized (bindings) {
-            for (int i = 0; i < nodes.getLength(); i++) { // preserve order
-               Node bindingNode = nodes.item(i);
-               String variable = xpath.evaluate("./@slot", bindingNode); 
-               if ( bindings.get(variable) != null )
-                  throw new TaskModel.Error(this,
-                        "duplicate bindings for "+variable);
-               bindings.put(variable, new Binding(variable, bindingNode));
-            }
-            for (Binding binding : bindings.values()) {
-               Matcher matcher = pattern.matcher(binding.value);
-               while ( matcher.find() ) {
-                  String dependValue = matcher.group();
-                  Binding depend = bindings.get(dependValue);
-                  if ( depend == null ) {
-                     if ( binding.identity == true )
-                        // special case for identity w/o next level binding
-                        binding.depends.add(new Binding(binding.value, null));
-                     else if ( dependValue.startsWith("$this.") )
-                        // special case for value expression involving $this
-                        binding.depends.add(new Binding(dependValue, null));
-                  } else binding.depends.add(depend);
+      if ( node != null ) { // temporary check
+         // analyze and store binding dependencies
+         // TODO: Check type compatibility between slots
+         NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
+         try { 
+            synchronized (bindings) {
+               for (int i = 0; i < nodes.getLength(); i++) { // preserve order
+                  Node bindingNode = nodes.item(i);
+                  String variable = xpath.evaluate("./@slot", bindingNode); 
+                  if ( bindings.get(variable) != null )
+                     throw new TaskModel.Error(this,
+                           "duplicate bindings for "+variable);
+                  bindings.put(variable, new Binding(variable, bindingNode));
+               }
+               for (Binding binding : bindings.values()) {
+                  Matcher matcher = pattern.matcher(binding.value);
+                  while ( matcher.find() ) {
+                     String dependValue = matcher.group();
+                     Binding depend = bindings.get(dependValue);
+                     if ( depend == null ) {
+                        if ( binding.identity == true )
+                           // special case for identity w/o next level binding
+                           binding.depends.add(new Binding(binding.value, null));
+                        else if ( dependValue.startsWith("$this.") )
+                           // special case for value expression involving $this
+                           binding.depends.add(new Binding(dependValue, null));
+                     } else binding.depends.add(depend);
+                  }
                }
             }
-         }
-      } catch (Exception e) { Utils.rethrow(e); } 
-      String script = xpath("./n:applicable");
-      applicable = script.isEmpty() ? null : 
-         new Applicability(script, Condition.isStrict(engine,  TaskModel.parseId(node, xpath)), engine);
-      if ( applicable != null ) applicable.setEnclosing(this);
+         } catch (Exception e) { Utils.rethrow(e); } 
+      }
    }
    
    /**

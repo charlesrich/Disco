@@ -347,7 +347,8 @@ public class TaskClass extends TaskModel.Member {
       private Input (String name, boolean declared) { 
          super(name);
          if ( declared ) declaredInputs.add(this);
-         String modified = xpath("./n:input[@name=\""+name+"\"]/@modified");
+         // temporary check for node null
+         String modified = node == null ? "" : xpath("./n:input[@name=\""+name+"\"]/@modified");
          if ( modified.length() > 0 ) {
             if ( !declaredOutputNames.contains(modified) ) { 
                getErr().println("WARNING: Ignoring unknown modified output slot: "+modified);
@@ -418,7 +419,8 @@ public class TaskClass extends TaskModel.Member {
     */
    public TaskClass (TaskModel model, String id, 
          Precondition precondition, Postcondition postcondition, Grounding script) {
-       this(null, null, model, id, precondition, postcondition, Collections.singletonList(script));
+       this(null, null, model, id, precondition, postcondition, 
+             script == null ? Collections.<Grounding>emptyList() : Collections.singletonList(script));
    }
    
    @SuppressWarnings("unchecked")
@@ -432,8 +434,13 @@ public class TaskClass extends TaskModel.Member {
          this.scripts.add(script);
          script.setEnclosing(this);
       }
-      declaredOutputNames = xpathValues("./n:output/@name");
-      declaredInputNames = xpathValues("./n:input/@name");
+      if ( node != null ) { // temporary check
+         declaredOutputNames = xpathValues("./n:output/@name");
+         declaredInputNames = xpathValues("./n:input/@name");
+      } else {
+         declaredOutputNames = Collections.emptyList();
+         declaredInputNames = Collections.emptyList();
+      }
       outputNames =  new ArrayList<String>(declaredOutputNames);
       inputNames = new ArrayList<String>(declaredInputNames);
       outputNames.add("success"); 
@@ -478,31 +485,33 @@ public class TaskClass extends TaskModel.Member {
       if ( (precondition != null && isStrict() != precondition.isStrict())
             || (postcondition != null && isStrict() != postcondition.isStrict()) )
          getErr().println("WARNING: Inconsistent strictness specifications for: "+this);
-      // cache bindings
-      NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
-      for (int i = 0; i < nodes.getLength(); i++) { // preserve order
-         Node bindingNode = nodes.item(i);
-         try {
-            String variable = xpath.evaluate("./@slot", bindingNode); 
-            if ( !variable.startsWith("$this.") )
-               throw new TaskModel.Error(this, "Invalid task binding slot "+variable);
-            String slot = variable.substring(6);
-            for (Binding binding : bindings)
-               if ( binding.slot == slot)
-                  throw new TaskModel.Error(this, "duplicate bindings for "+variable);
-            String value =  xpath.evaluate("./@value", bindingNode);
-            // TODO borrow error checking from DecompositionClass,
-            //      e.g, for undefined slots 
-            bindings.add(new Binding(slot, value));
-         } catch (XPathException e) { throw new RuntimeException(e); }
+      if ( node != null ) { // temporary check
+         // cache bindings
+         NodeList nodes = (NodeList) xpath("./n:binding", XPathConstants.NODESET);
+         for (int i = 0; i < nodes.getLength(); i++) { // preserve order
+            Node bindingNode = nodes.item(i);
+            try {
+               String variable = xpath.evaluate("./@slot", bindingNode); 
+               if ( !variable.startsWith("$this.") )
+                  throw new TaskModel.Error(this, "Invalid task binding slot "+variable);
+               String slot = variable.substring(6);
+               for (Binding binding : bindings)
+                  if ( binding.slot == slot)
+                     throw new TaskModel.Error(this, "duplicate bindings for "+variable);
+               String value =  xpath.evaluate("./@value", bindingNode);
+               // TODO borrow error checking from DecompositionClass,
+               //      e.g, for undefined slots 
+               bindings.add(new Binding(slot, value));
+            } catch (XPathException e) { throw new RuntimeException(e); }
+         }
+         // cache nested scripts
+         for (Node scriptNode : xpathNodes("./n:script")) {
+            if ( scripts.isEmpty() ) scripts = new ArrayList<Grounding>(2);
+            Grounding script = new Grounding(scriptNode, xpath, engine);
+            script.setEnclosing(this);
+            scripts.add(script);
+         }  
       }
-      // cache nested scripts
-      for (Node scriptNode : xpathNodes("./n:script")) {
-         if ( scripts.isEmpty() ) scripts = new ArrayList<Grounding>(2);
-         Grounding script = new Grounding(scriptNode, xpath, engine);
-         script.setEnclosing(this);
-         scripts.add(script);
-      }   
       try {  
          builtin = ((Class<? extends Task>) Class.forName(getId()));
          builtin.getDeclaredField("CLASS").set(null, this);
