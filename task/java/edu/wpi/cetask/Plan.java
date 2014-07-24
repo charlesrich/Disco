@@ -7,7 +7,6 @@ package edu.wpi.cetask;
 
 import java.io.PrintStream;
 import java.util.*;
-import edu.wpi.cetask.TaskClass.Postcondition;
 
 // NB supports subplans not only from decompositions
 
