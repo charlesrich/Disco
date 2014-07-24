@@ -362,7 +362,7 @@ public class DecompositionClass extends TaskModel.Member {
          StringTokenizer tokenizer = new StringTokenizer(
                variable.substring(1), ".");
          step = tokenizer.nextToken();
-         boolean inputInput, outputInput, outputOutput;
+         boolean inputInput, outputInput;
          if ( !(step.equals("this") || getStepNames().contains(step)) )
             throw new TaskModel.Error(DecompositionClass.this,
                   "binding slot \""+variable+
