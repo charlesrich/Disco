@@ -23,6 +23,16 @@ public class DecompositionClass extends TaskModel.Member {
       return Collections.unmodifiableMap(bindings);
    }
    
+   /**
+    * @return bindings for slots of given step of this decomposition class.
+    */
+   public List<Binding> getBindings (String step) {
+      List<Binding> result = new ArrayList<Binding>();
+      for (Binding binding : bindings.values())
+         if ( binding.step.equals(step) ) result.add(binding);
+      return result;
+   }
+   
    private final static Pattern pattern = // to match $var.slot
       Pattern.compile("\\$\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
 
@@ -320,17 +330,24 @@ public class DecompositionClass extends TaskModel.Member {
     * Maximum allowed depth of dependency chain in bindings (default 10). Used
     * to protect against cyclic dependencies.
     */
-   public static int MAX_BINDING_DEPTH = 10;  
+   public static int MAX_BINDING_DEPTH = 10; 
    
-   public class Binding {
+   /**
+    * The first three of these are identity bindings.
+    */
+   public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, NON_IDENTITY }
 
+   public class Binding {
+      
       // since these are final, ok to make public
-      public final String variable, value, 
-                          step, slot, identityStep, identitySlot;
       
-      public final TaskClass type; // step type
+      public final String variable, value, step, slot, identityStep, identitySlot;
       
-      public final boolean identity, inputInput, outputInput;
+      public final BindingType type;
+      
+      public final boolean identity; // type is not OTHER
+      
+      public final TaskClass stepType; 
             
       // bindings upon which this binding depends
       private final List<Binding> depends = new ArrayList<Binding>();     
@@ -345,13 +362,14 @@ public class DecompositionClass extends TaskModel.Member {
          StringTokenizer tokenizer = new StringTokenizer(
                variable.substring(1), ".");
          step = tokenizer.nextToken();
+         boolean inputInput, outputInput, outputOutput;
          if ( !(step.equals("this") || getStepNames().contains(step)) )
             throw new TaskModel.Error(DecompositionClass.this,
                   "binding slot \""+variable+
                   "\" does not refer to any step of subtasks");
-         type = getTaskType(step);
+         stepType = getTaskType(step);
          slot = tokenizer.nextToken();
-         if ( !type.isSlot(slot) )
+         if ( !stepType.isSlot(slot) )
             throw new TaskModel.Error(DecompositionClass.this,
                   "binding slot \""+variable+
                   "\" does not refer to any slot of subtasks");
@@ -389,6 +407,10 @@ public class DecompositionClass extends TaskModel.Member {
                } else { this.expression = expression; compiled = null; }
             }
          }
+         type = inputInput ? BindingType.INPUT_INPUT : 
+            outputInput ? BindingType.OUTPUT_INPUT : 
+               identity ? BindingType.OUTPUT_OUTPUT:
+                  BindingType.NON_IDENTITY;
       }
 
       // Note this implements only monotonic propagation, not full
@@ -401,7 +423,7 @@ public class DecompositionClass extends TaskModel.Member {
             throw new IllegalStateException(where + " stopped at depth "+ depth
                   +" (probably circular)");
          depth++;
-         if ( "external".equals(slot) && !type.isPrimitive() )
+         if ( "external".equals(slot) && !stepType.isPrimitive() )
             getErr().println("WARNING: "+getId()+" ignoring external binding of non-primitive task "+variable); 
          for (Binding depend : depends) {
             // allow binding to refer to itself for "default" bindings
@@ -420,12 +442,12 @@ public class DecompositionClass extends TaskModel.Member {
                if ( depend.step.equals(retractedStep) && depend.slot.equals(retractedSlot) )
                   // special case for retracted slot: propagate undefined to target
                   target.deleteSlotValue(slot);
-               if ( inputInput && target.isDefinedSlot(slot) ) 
-                  // special case for inIn identity only: propagate other direction 
+               if ( type == BindingType.INPUT_INPUT && target.isDefinedSlot(slot) ) 
+                  // special case for input-input identity only: propagate other direction 
                   dependTask.copySlotValue(target, slot, depend.slot, true, false);
                return;
-            } else if ( inputInput && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
-               // special case for inIn identity only: propagate retraction other direction
+            } else if ( type == BindingType.INPUT_INPUT && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
+               // special case for input-input identity only: propagate retraction other direction
                decomp.getGoal().deleteSlotValue(depend.slot);
             } else if ( !TaskEngine.DEBUG // allow looking at values for debugging 
                   && identity && target.isDefinedSlot(slot)  
