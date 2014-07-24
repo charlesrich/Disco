@@ -168,7 +168,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
          +" "+Utils.getSimpleName(getClass(), true);
    }
    
-   protected static abstract class Script extends Description {
+   public static abstract class Script extends Description {
 
       protected final String script;
       protected final Compiled compiled;
@@ -216,7 +216,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
       }
    }
    
-   protected static abstract class Condition extends Script {
+   public static abstract class Condition extends Script {
       
       private final boolean strict;
       private final List<String> slots = new ArrayList<String>();
