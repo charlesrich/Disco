@@ -43,7 +43,16 @@ public class ConstructorTest {
       test.interaction.start(false);
    }
    
-   private final Interaction interaction =  new Interaction(new Agent("agent"), new User("user"), null);
+   // NB: use instance of Discolog extension instead of Agent below
+   private final Interaction interaction =  new Interaction(new Agent("agent"), new User("user")) {
+      
+      @Override
+      public void run () {
+         // keep running as long as agent has something to do and then stop
+         while (getSystem().respond(interaction, false, false)) {}
+      }
+   };
+   
    private final Disco disco = interaction.getDisco();
    private final TaskModel model = new TaskModel("urn:edu.wpi.cetask:models:Test", disco); 
    
