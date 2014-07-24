@@ -350,7 +350,14 @@ public class DecompositionClass extends TaskModel.Member {
       public final TaskClass stepType; 
             
       // bindings upon which this binding depends
-      private final List<Binding> depends = new ArrayList<Binding>();     
+      private final List<Binding> depends = new ArrayList<Binding>(); 
+      
+      /**
+       * @return list of bindings upon which the value attribute of this binding depends
+       */
+      public List<Binding> getDepends () { 
+         return Collections.unmodifiableList(depends);
+      }
       
       private final String expression, where;
       private final Compiled compiled;
