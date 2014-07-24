@@ -31,6 +31,7 @@ public class ConstructorTest {
       Plan top = newPlan(a);
       top.add(newPlan(p1));
       top.add(newPlan(b));
+      top.setPlanned(true); // needed only for non-recipe nodes
       test.disco.addTop(top);
       // prevent agent asking about toplevel goal
       test.disco.setProperty("Ask.Should(a)@generate", false);
