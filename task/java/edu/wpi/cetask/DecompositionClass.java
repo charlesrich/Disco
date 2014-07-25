@@ -19,7 +19,9 @@ public class DecompositionClass extends TaskModel.Member {
    /**
     * @return list of declared bindings of this decomposition class.
     */
-   public List<Binding> getDeclaredBindings () { return getBindings(null, true); }
+   public List<Binding> getDeclaredBindings () { 
+      return Collections.unmodifiableList(getBindings(null, true));
+   }
    
    /**
     * @return list of bindings for slots of given step (or "this" for goal) of 
@@ -32,7 +34,7 @@ public class DecompositionClass extends TaskModel.Member {
       for (Binding binding : bindings.values())
          if ( binding.value != null && (declared || binding.step.equals(step)) ) 
             result.add(binding);
-      return Collections.unmodifiableList(result);
+      return result;
    }
    
    private final static Pattern pattern = // to match $var.slot
