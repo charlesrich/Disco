@@ -251,7 +251,7 @@ public class Decomposition extends Instance {
       @Override
       public String getSlotValueToString (String name) {
          updateBindings(false);
-         return engine.toString(getSlotValue(name));
+         return super.getSlotValueToString(name);
       }
       
       @Override
