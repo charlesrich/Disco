@@ -17,20 +17,22 @@ public class DecompositionClass extends TaskModel.Member {
    private final Map<String,Binding> bindings = new HashMap<String,Binding>();
    
    /**
-    * @return the bindings of this decomposition class.
+    * @return list of declared bindings of this decomposition class.
     */
-   public Map<String,Binding> getBindings () {
-      return Collections.unmodifiableMap(bindings);
-   }
+   public List<Binding> getDeclaredBindings () { return getBindings(null, true); }
    
    /**
-    * @return bindings for slots of given step of this decomposition class.
+    * @return list of bindings for slots of given step (or "this" for goal) of 
+    * this decomposition class.
     */
-   public List<Binding> getBindings (String step) {
+   public List<Binding> getBindings (String step) { return getBindings(step, false); }
+   
+   private List<Binding> getBindings (String step, boolean declared) {
       List<Binding> result = new ArrayList<Binding>();
       for (Binding binding : bindings.values())
-         if ( binding.step.equals(step) ) result.add(binding);
-      return result;
+         if ( binding.value != null && (declared || binding.step.equals(step)) ) 
+            result.add(binding);
+      return Collections.unmodifiableList(result);
    }
    
    private final static Pattern pattern = // to match $var.slot
@@ -265,17 +267,20 @@ public class DecompositionClass extends TaskModel.Member {
                   bindings.put(variable, new Binding(variable, bindingNode));
                }
                for (Binding binding : bindings.values()) {
+                  // TODO Should do proper JavaScript tokenizing here instead of just
+                  // looking for occurrences of $step.slot pattern, e.g., to not get fooled by constants
+                  // inside quotations. (Use of this pattern for identity binding detection is ok.)
                   Matcher matcher = pattern.matcher(binding.value);
                   while ( matcher.find() ) {
-                     String dependValue = matcher.group();
-                     Binding depend = bindings.get(dependValue);
+                     String dependVariable = matcher.group();
+                     Binding depend = bindings.get(dependVariable);
                      if ( depend == null ) {
                         if ( binding.identity == true )
-                           // special case for identity w/o next level binding
+                           // special case for self-binding (for default values)
                            binding.depends.add(new Binding(binding.value, null));
-                        else if ( dependValue.startsWith("$this.") )
+                        else if ( dependVariable.startsWith("$this.") )
                            // special case for value expression involving $this
-                           binding.depends.add(new Binding(dependValue, null));
+                           binding.depends.add(new Binding(dependVariable, null));
                      } else binding.depends.add(depend);
                   }
                }
@@ -333,9 +338,10 @@ public class DecompositionClass extends TaskModel.Member {
    public static int MAX_BINDING_DEPTH = 10; 
    
    /**
-    * The first three of these are identity bindings.
+    * The first four of these are identity bindings. Note that INPUT_OUTPUT is an uncommonly
+    * used "through" binding only for goal.
     */
-   public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, NON_IDENTITY }
+   public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, INPUT_OUTPUT, NON_IDENTITY }
 
    public class Binding {
       
@@ -354,6 +360,8 @@ public class DecompositionClass extends TaskModel.Member {
       
       /**
        * @return list of bindings upon which the value attribute of this binding depends
+       * Note this can include undeclared bindings with null value's (for dependencies
+       * on $this and self).
        */
       public List<Binding> getDepends () { 
          return Collections.unmodifiableList(depends);
@@ -361,6 +369,8 @@ public class DecompositionClass extends TaskModel.Member {
       
       private final String expression, where;
       private final Compiled compiled;
+      
+      // TODO Make public Binding constructor(s) that take Step objects
       
       private Binding (String variable, Node node) 
             throws XPathExpressionException {
@@ -416,7 +426,8 @@ public class DecompositionClass extends TaskModel.Member {
          }
          type = inputInput ? BindingType.INPUT_INPUT : 
             outputInput ? BindingType.OUTPUT_INPUT : 
-               identity ? BindingType.OUTPUT_OUTPUT:
+               identity ?
+                  ("this".equals(identityStep) ? BindingType.INPUT_OUTPUT : BindingType.OUTPUT_OUTPUT) :
                   BindingType.NON_IDENTITY;
       }
 
