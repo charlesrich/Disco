@@ -278,7 +278,7 @@ public class DecompositionClass extends TaskModel.Member {
                      Binding depend = bindings.get(dependVariable);
                      if ( depend == null ) {
                         if ( binding.identity == true )
-                           // special case for self-binding (for default values)
+                           // no declared binding for this slot, so create dummy one for propagation
                            binding.depends.add(new Binding(binding.value, null));
                         else if ( dependVariable.startsWith("$this.") )
                            // special case for value expression involving $this
@@ -361,9 +361,8 @@ public class DecompositionClass extends TaskModel.Member {
       private final List<Binding> depends = new ArrayList<Binding>(); 
       
       /**
-       * @return list of bindings upon which the value attribute of this binding depends
-       * Note this can include undeclared bindings with null value's (for dependencies
-       * on $this and self).
+       * @return list of bindings upon which the value attribute of this binding depends.
+       * Note this can include undeclared bindings with null value's.
        */
       public List<Binding> getDepends () { 
          return Collections.unmodifiableList(depends);
