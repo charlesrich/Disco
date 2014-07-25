@@ -158,6 +158,7 @@ public class Task extends Instance {
     * @see #setSlotValue(String,Object,boolean)
     * @see #getSlotValue(String)
     * @see #setSlotValueScript(String,String,String)
+    * @see Plan#setSlotValue(String,Object)
     */
    public Object setSlotValue (String name, Object value) {
       setSlotValue(name, value, true);
@@ -306,6 +307,7 @@ public class Task extends Instance {
     * Make named slot undefined.
     * 
     * @see #isDefinedSlot(String)
+    * @see Plan#deleteSlotValue(String)
     */
    public void deleteSlotValue (String name) {
       checkIsSlot(name);
