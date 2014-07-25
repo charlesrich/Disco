@@ -95,19 +95,17 @@ public class Task extends Instance {
       } else return eval("$this."+name, "getSlotValue"); 
    }
 
- 
-
    private void checkIsSlot (String name) {
       if ( !getType().isSlot(name) ) 
          throw new IllegalArgumentException(name+" is not slot of "+getType());
    }
    
-   private Boolean getSlotValueBoolean (String name) {
+   protected Boolean getSlotValueBoolean (String name) {
       checkIsSlot(name);
       if ( isScriptable(name) ) {
          Object value = engine.get(bindings.get("$this"), name);
          return engine.isDefined(value) ? (Boolean) value : null;
-      } else return evalCondition("$this."+name, "getSlotValue"); 
+      } else return evalCondition("$this."+name, "getSlotValueBoolean"); 
    }
    
    private boolean isScriptable (String name) {

@@ -243,6 +243,18 @@ public class Decomposition extends Instance {
       }
       
       @Override
+      protected Boolean getSlotValueBoolean (String name) {
+         updateBindings(false);
+         return super.getSlotValueBoolean(name);
+      }
+      
+      @Override
+      public String getSlotValueToString (String name) {
+         updateBindings(false);
+         return engine.toString(getSlotValue(name));
+      }
+      
+      @Override
       public boolean isDefinedSlot (String name) {
          updateBindings(false);
          return super.isDefinedSlot(name);
