@@ -8,12 +8,6 @@ package edu.wpi.cetask;
 import java.io.PrintStream;
 import java.util.*;
 
-// NB supports subplans not only from decompositions
-
-/**
- * @author rich
- *
- */
 public class Plan {
    
    private final Task goal;
@@ -907,7 +901,12 @@ public class Plan {
    /**
     * Use this method instead of {@link Task#setSlotValue(String,Object)}
     * when the goal task is not a step in a higher-level decomposition to force
-    * immediate updating of the bindings in the tree.
+    * immediate recursive updating of the bindings in the decomposition
+    * of this plan, if any.
+    * <p>
+    * Note this is usually only required when manipulating plans <em>outside</em>
+    * of the discourse state, since otherwise updating of the bindings will
+    * be triggered by the liveness checking that the agent does on every tick.
     */
    public Object setSlotValue (String name, Object value) {
       goal.setSlotValue(name, value, true);
@@ -916,9 +915,8 @@ public class Plan {
    }   
 
    /**
-    * Use this method instead of {@link Task#deleteSlotValue(String)}
-    * when the goal task is not a step in a higher-level decomposition to force
-    * immediate updating of the bindings in the tree.
+    * Use this method instead of {@link Task#deleteSlotValue(String)} as
+    * discussed in {@link #setSlotValue(String,Object)}
     */
    public void deleteSlotValue (String name) {
       goal.deleteSlotValue(name);
