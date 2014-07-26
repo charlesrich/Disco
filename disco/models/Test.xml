@@ -342,6 +342,22 @@
     <script> println($this.input); test++; </script>
   </task>
 
+  <task id="BindingsDelete2">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks2">
+       <step name="step" task="BindingsDelete1"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+
+  <task id="BindingsDelete1">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks1">
+       <step name="step" task="BindingsDelete"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+
   <task id="BindingsDelete">
     <input name="input" type="number"/>
     <subtasks id="bindingsDeleteSubtasks">

@@ -343,18 +343,16 @@ public class DecompositionClass extends TaskModel.Member {
     * The first four of these are identity bindings. Note that INPUT_OUTPUT is an uncommonly
     * used "through" binding only for goal.
     */
-   public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, INPUT_OUTPUT, NON_IDENTITY }
+   public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, INPUT_OUTPUT, 
+                                    NON_IDENTITY }
 
    public class Binding {
       
       // since these are final, ok to make public
       
       public final String variable, value, step, slot, identityStep, identitySlot;
-      
       public final BindingType type;
-      
-      public final boolean identity; // type is not OTHER
-      
+      public final boolean identity;
       public final TaskClass stepType; 
             
       // bindings upon which this binding depends
@@ -362,7 +360,7 @@ public class DecompositionClass extends TaskModel.Member {
       
       /**
        * @return list of bindings upon which the value attribute of this binding depends.
-       * Note this can include undeclared bindings with null value's.
+       * Note this can include undeclared bindings with null values.
        */
       public List<Binding> getDepends () { 
          return Collections.unmodifiableList(depends);
@@ -409,8 +407,7 @@ public class DecompositionClass extends TaskModel.Member {
                      getStepType(step).inputNames.contains(slot);
                outputInput = !(step.equals("this") || identityStep.equals("this")); 
                if ( outputInput ) { 
-                  // if dataflow (output to input) make sure that compatible
-                  // with ordering constraints
+                  // make sure compatible with ordering constraints
                   if ( !isRequired(step, identityStep, 0) ) 
                      getErr().println("WARNING: "+getId()+" contains binding that needs step "+step+" to require step "+identityStep);
                }
@@ -436,7 +433,7 @@ public class DecompositionClass extends TaskModel.Member {
       // dependency-based constraint propagation
       private void update (Decomposition decomp, int depth, 
                            String retractedStep, String retractedSlot) {
-         Task target = getTask(decomp, step);
+         Task target = getTask(decomp, step); 
          if ( target.occurred() ) return; // never update slot after occurrence
          if ( depth > MAX_BINDING_DEPTH )
             throw new IllegalStateException(where + " stopped at depth "+ depth
@@ -458,16 +455,23 @@ public class DecompositionClass extends TaskModel.Member {
                // don't try to compute binding that depends on undefined
                // variables (except for self-referring), since cannot guarantee that 
                // value expression will be safe (strict)
-               if ( depend.step.equals(retractedStep) && depend.slot.equals(retractedSlot) )
+               if ( depend.step.equals(retractedStep) && depend.slot.equals(retractedSlot) ) {
                   // special case for retracted slot: propagate undefined to target
                   target.deleteSlotValue(slot);
-               if ( type == BindingType.INPUT_INPUT && target.isDefinedSlot(slot) ) 
-                  // special case for input-input identity only: propagate other direction 
+                  updateBindings(decomp, target, step, slot);
+               }
+               if ( type == BindingType.INPUT_INPUT && target.isDefinedSlot(slot)
+                     // don't undo retraction in progress
+                     && !depend.step.equals(retractedStep) && !depend.slot.equals(retractedSlot) ) { 
+                  // special case for input-input identity only: propagate value other direction 
                   dependTask.copySlotValue(target, slot, depend.slot, true, false);
-               return;
+                  updateBindings(decomp, dependTask, null, null);
+               }
+               return; // NB return here
             } else if ( type == BindingType.INPUT_INPUT && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
                // special case for input-input identity only: propagate retraction other direction
                decomp.getGoal().deleteSlotValue(depend.slot);
+               updateBindings(decomp, decomp.getGoal(), depend.step, depend.slot);
             } else if ( !TaskEngine.DEBUG // allow looking at values for debugging 
                   && identity && target.isDefinedSlot(slot)  
                   && !Utils.equals(target.getSlotValue(slot), 
@@ -484,14 +488,22 @@ public class DecompositionClass extends TaskModel.Member {
             else if ( compiled != null )
                target.setSlotValueScript(slot, compiled, where, decomp.bindings);
             else target.setSlotValueScript(slot, expression, where, decomp.bindings);
+            updateBindings(decomp, target, null, null);
          }
       }
       
+      private void updateBindings (Decomposition decomp, Task task, String retractedStep, String retractedSlot) {
+         if ( !(task instanceof Decomposition.Step) ) // if not already done 
+            decomp.updateBindings(true, null, retractedStep, retractedSlot);
+      }
+      
+      // NB: if step is "this" may not return instance of Step
+      // which is reason for updateBindings method above
       private Task getTask (Decomposition decomp, String step) {
          return step.equals("this") ? decomp.getGoal() :
             decomp.getStep(step).getGoal(); 
       }
-          
+     
       private TaskClass getTaskType (String step) {
          return step.equals("this") ? getGoal() : getStepType(step);
       }

@@ -22,5 +22,25 @@
    User says "Let's achieve BindingsDelete."
    [Execute BindingsDeletePrim] -live
 
+  > eval root = new edu.wpi.cetask.Plan($disco.getTaskClass("BindingsDelete2").newInstance())
+    # Returned '[BindingsDelete2]'
+  > eval root.decomposeAll()
+    # Returned 'true'
+  > eval root.getGoal().setSlotValue("input", 5)
+    # Returned '5.0'
+  > eval prim = root.getChildren().get(0).getChildren().get(0).getChildren().get(0)
+    # Returned '[BindingsDeletePrim]'
+  > eval root.setSlotValue("input", 5)
+    # Returned '5.0'
+  > eval prim
+    # Returned '[BindingsDeletePrim(,5.0)]'
+  > eval root.getGoal().deleteSlotValue("input")
+    # Returned 'null'
+  > eval prim
+    # Returned '[BindingsDeletePrim(,5.0)]'
+  > eval root.deleteSlotValue("input")
+    # Returned 'null'
+  > eval prim
+    # Returned '[BindingsDeletePrim]'
   > quit
     

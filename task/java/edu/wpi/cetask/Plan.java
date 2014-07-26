@@ -906,7 +906,7 @@ public class Plan {
    
    /**
     * Use this method instead of {@link Task#setSlotValue(String,Object)}
-    * when the goal task is the root of a decomposition tree to force
+    * when the goal task is not a step in a higher-level decomposition to force
     * immediate updating of the bindings in the tree.
     */
    public Object setSlotValue (String name, Object value) {
@@ -917,14 +917,14 @@ public class Plan {
 
    /**
     * Use this method instead of {@link Task#deleteSlotValue(String)}
-    * when the goal task is the root of a decomposition tree to force
+    * when the goal task is not a step in a higher-level decomposition to force
     * immediate updating of the bindings in the tree.
     */
    public void deleteSlotValue (String name) {
       goal.deleteSlotValue(name);
       if ( decomp != null ) decomp.updateBindings(true, null, "this", name);
    }
-   
+     
    private List<Decomposition> failed = Collections.emptyList();
    
    private boolean planned; // for procedural decomposition
