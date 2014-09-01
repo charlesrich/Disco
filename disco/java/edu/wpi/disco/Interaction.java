@@ -68,7 +68,7 @@ public class Interaction extends Thread {
     */
    public Actor getOther (Actor who) { return who == system ? external : system; }
       
-   private boolean ok = true, guess = true;
+   private boolean ok = true, guess = true, retry = true;
    
    public Actor getActor (Task task) {
       return task.isUser() ? getExternal() : 
@@ -352,7 +352,9 @@ public class Interaction extends Thread {
       responded = false;
       boolean ok = disco.getProperty("interaction@ok", this.ok);
       if ( floor != null ) 
-         floor.respond(this, ok, disco.getProperty("interaction@guess", guess));
+         floor.respond(this, ok, 
+               disco.getProperty("interaction@guess", guess),
+               disco.getProperty("interaction@retry", retry));
       if ( !running ) return false;
       if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
          console.respond(this);

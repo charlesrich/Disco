@@ -27,7 +27,7 @@ public class CallCenterAgent extends Agent {
    }
 
    @Override
-   public Plugin.Item respondIf (Interaction interaction, boolean guess) {
+   public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       // here is where you put logic for generating agent responses that
       // do *not* depend on the plan tree (and therefore not appropriate for
       // implementation as plugins).  Note that unlike DefaultPlugin's,
@@ -39,7 +39,7 @@ public class CallCenterAgent extends Agent {
                         "Please hold for the next operator"), 
                   null);
       }
-      return super.respondIf(interaction, guess);
+      return super.respondIf(interaction, guess, retry);
    }
 
 }

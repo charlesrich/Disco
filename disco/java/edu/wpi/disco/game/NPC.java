@@ -39,13 +39,13 @@ public class NPC extends Agent {
 	}
 	
 	@Override
-	public void done (Interaction interaction, Item item) {
+	public void done (Interaction interaction, Item item, boolean retry) {
 	   if (item.task instanceof Utterance) {
 	      Utterance utterance = (Utterance) item.task;
 	      if ( !(utterance instanceof Say) && utterance.equals(getLastUtterance()) )
 	         return;
 	   }
-		super.done(interaction, item);
+		super.done(interaction, item, retry);
 	}
 	
 	public void setIgnoreObstacles (boolean ignore) {

@@ -51,7 +51,7 @@ public class CoachedInteraction extends NWayInteraction {
          setInteraction(coaching);
          boolean responded = true;
          while (responded) { 
-            try { responded = coach.respond(coaching, false, true); } // guess true
+            try { responded = coach.respond(coaching, false, true, true); } // guess true
             catch (Throwable e) { console.exception(e); }
             if ( responded && 
                  (!console.isRespond() || player.generateBest(coaching) != null) )
@@ -59,7 +59,7 @@ public class CoachedInteraction extends NWayInteraction {
          }
          if ( !running ) break;
          setInteraction(main);
-         try { agent.respond(main, false, true); } // guess true
+         try { agent.respond(main, false, true, true); } // guess true
          catch (Throwable e) { console.exception(e); }
          console.respond(main);
       }

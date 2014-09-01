@@ -8,7 +8,6 @@ package edu.wpi.disco;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.Utterance;
-
 import java.util.List;
 
 /**
@@ -79,17 +78,19 @@ public abstract class Actor {
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)
     * @param guess guess decompositions
+    * @param retry try other decompositions if failure (see {@link Agent#retry(Disco)})
     * @return true if some response was made
     * 
     * @see Interaction
     */
-   public final boolean respond (Interaction interaction, boolean ok, boolean guess) {
+   public final boolean respond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
       synchronized (interaction) { 
-         return synchronizedRespond(interaction, ok, guess); 
+         return synchronizedRespond(interaction, ok, guess, retry); 
       }
    }
    
-   protected abstract boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess);
+   protected abstract boolean synchronizedRespond (Interaction interaction, 
+         boolean ok, boolean guess, boolean retry);
    
    private boolean authorized = true;
    
