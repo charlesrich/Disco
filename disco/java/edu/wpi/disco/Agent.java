@@ -193,7 +193,7 @@ public class Agent extends Actor {
             lastUtterance = (Utterance) item.task;
             say(interaction, (Utterance) item.task);
          }
-         retry(interaction.getDisco());  // see also in respond
+         if ( retry ) retry(interaction.getDisco());  // see also in respond
       }
    }
 
