@@ -24,7 +24,7 @@ This is an implementation of a "task engine," as depicted in
 Figure 4 of the ANSI/CEA-2018 Task Model Description (CE TASK 1.0)
 standard, which may be purchased at http://ce.org/cea-2018.
 
-NB: This software requires JRE 1.6 (Java SE 6.0), which includes
+NB: This software requires JRE 1.7 (Java SE 7.0), which includes
 JavaScript.
 
 Basically, this system implements a simple command line interface,
