@@ -83,6 +83,8 @@ public class Agent extends Actor {
             if ( choice != null ) { 
                plan.apply(choice);
                plan.decomposeAll();
+               // new live plans may have been create above
+               return generateBest(interaction, guess);
             } else if ( guess == null || guess ) {
                Plugin.Item item = generateBest(interaction); // no guessing
                if ( item != null ) return item;
@@ -92,6 +94,7 @@ public class Agent extends Actor {
                         && Utils.equals(decomp.isApplicable(goal), guess) ) {
                      plan.apply(decomp); // one guess
                      plan.decomposeAll();
+                     // new live plans may have been create above
                      item = generateBest(interaction); // no guessing
                      return item != null ? item : 
                         // recursion ends when no more live non-decomposed plans
