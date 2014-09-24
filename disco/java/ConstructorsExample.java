@@ -29,6 +29,9 @@ public class ConstructorsExample {
                       b.getPostcondition().getScript(), null);
       test.newRecipe("r1", b, Collections.singletonList(new Step("s1", p2)), "V");
       test.newRecipe("r2", b, Collections.singletonList(new Step("s1", p3)), "W");
+      // testing
+      System.out.println(test.disco.getTaskClass("p1")); 
+      System.out.println(test.disco.getDecompositionClass("r1")); 
       // build the non-recipe part of the tree
       Plan top = newPlan(a);
       top.add(newPlan(p1));

@@ -233,6 +233,7 @@ public class DecompositionClass extends TaskModel.Member {
    private DecompositionClass (Node node, XPath xpath, TaskModel model, 
          String id, TaskClass goal, List<Step> steps, Applicability applicable, boolean ordered) { 
       model.super(node, xpath, id);
+      model.decomps.put(id, this);
       this.goal = goal;
       this.steps = new HashMap<String,Step>(steps.size());
       this.applicable = applicable;
@@ -243,7 +244,6 @@ public class DecompositionClass extends TaskModel.Member {
          stepNames.add(step.name);
          this.steps.put(step.name, step);
       }
-      model.decomps.put(getId(), this);
       if ( !this.goal.getGroundingAll().isEmpty() )
          throw new RuntimeException("Task "+this.goal+" cannot have both grounding script and subtasks!");
       if ( this.goal.decompositions.isEmpty() ) 

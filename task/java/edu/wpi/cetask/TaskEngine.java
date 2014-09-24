@@ -5,22 +5,21 @@
  */
 package edu.wpi.cetask;
 
+import com.sun.msv.verifier.jarv.TheFactoryImpl;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Grounding;
+import edu.wpi.cetask.TaskModel.Init;
+import org.iso_relax.verifier.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import javax.imageio.metadata.IIOMetadataNode;
 import javax.script.*;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.*;
 import javax.xml.parsers.*;
 import javax.xml.xpath.*;
-import org.iso_relax.verifier.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import com.sun.msv.verifier.jarv.TheFactoryImpl;
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Grounding;
-import edu.wpi.cetask.TaskModel.Init;
 
 /**
  * Implementation of an intepreter for ANSI/CEA-2018 Task Model Description
@@ -286,7 +285,7 @@ public class TaskEngine {
         catch (Exception e) { throw new RuntimeException(e); }
    }
    
-   private final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
+   final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
    
    // default properties for all task models
    final protected Properties properties = new Properties();
@@ -504,21 +503,16 @@ public class TaskEngine {
       }
       TaskModel model = newTaskModel(document, xpath, xmlns);
       model.setSource(source);
-      String namespace = model.getNamespace();
-      if ( models.get(namespace) != null ) 
-         getErr().println("WARNING: redefining task model "+namespace);
-      models.put(namespace, model);  
       // to catch global engine properties in individual model files
       if ( properties != null ) this.properties.putAll(properties);
-      // cache task classes
-      for (Node task : model.xpathNodes("./n:task")) 
-         model.tasks.put(((Element) task).getAttribute("id"), 
-               new TaskClass(task, model.xpath, model));
-      // cache nested decomposition classes (after all task classes cached)
+      // create task classes
+      for (Node task : model.xpathNodes("./n:task"))
+         new TaskClass(task, model.xpath, model); 
+      // create nested decomposition classes (after all task classes created)
       for (TaskClass task : model.getTaskClasses())
          for (Node subtasks : task.xpathNodes("./n:subtasks"))
             new DecompositionClass(subtasks, model.xpath, model, task); 
-      // cache toplevel decomposition classes
+      // create toplevel decomposition classes
       for (Node subtasks : model.xpathNodes("./n:subtasks"))
          new DecompositionClass(subtasks, model.xpath, model, null); 
       clearLiveAchieved();
@@ -742,11 +736,10 @@ public class TaskEngine {
    
    protected Plan getRoot () { return root; }
    
+   private final TaskClass rootClass = new TaskClass(this, "**ROOT*");
+         
    public void clear () {
-      // TODO find better dummy Node type?
-      Node node = new IIOMetadataNode("*ROOT*");
-      root = new Plan(new TaskClass(node, xpath, new TaskModel(node, xpath, this))
-                     .newInstance()); 
+      root = new Plan(rootClass.newInstance()); 
       focus = null;
       if ( cacheLive != null ) clearLiveAchieved(); // called from constructor
    }

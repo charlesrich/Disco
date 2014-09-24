@@ -58,10 +58,10 @@ public abstract class Description { //TODO: temporarily public for Anahita
    
    protected Description (Node node, XPath xpath, TaskEngine engine) {
       this(node, xpath, parseAbout(node, xpath), engine);
-      if ( node == null ) throw new IllegalArgumentException("Null node");
    }
    
    protected Description (Node node, XPath xpath, String namespace, TaskEngine engine) {
+      if ( xpath != null && node == null ) throw new IllegalArgumentException("Null node");
       this.node = node;
       this.xpath = xpath;
       this.namespace = namespace;

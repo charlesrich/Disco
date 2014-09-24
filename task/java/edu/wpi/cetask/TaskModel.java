@@ -16,11 +16,20 @@ import edu.wpi.cetask.TaskClass.Grounding;
 public class TaskModel extends Description {
    
    TaskModel (Node node, XPath xpath, TaskEngine engine) { 
-      super(node, xpath, engine);     
+      this(node, xpath, parseAbout(node, xpath), engine);
    }
    
    public TaskModel (String namespace, TaskEngine engine) {
-      super(null, null, namespace, engine);
+      this(null, null, namespace, engine);
+   }
+   
+   private TaskModel (Node node, XPath xpath, String namespace, TaskEngine engine) {
+      super(node, xpath, namespace, engine);
+      if ( namespace != null ) {
+         if ( engine.models.get(namespace) != null ) 
+            getErr().println("WARNING: redefining task model "+namespace);
+         engine.models.put(namespace, this);
+      }
    }
    
    private URL source; 
@@ -169,7 +178,7 @@ public class TaskModel extends Description {
       
       protected Member (Node node, XPath xpath, String id) {
          super(node, xpath, TaskModel.this.getNamespace(), TaskModel.this.engine);
-         this.id = id.length() > 0 ? id : "**ROOT**";
+         this.id = id;
          qname = new QName(TaskModel.this.getNamespace(), id);
          ids.add(id);  
       }
@@ -272,6 +281,7 @@ public class TaskModel extends Description {
       public boolean equals (Object object) {
          return object instanceof Member
            // works across different engines
+           && namespace != null
            && namespace.equals(((Member) object).getNamespace()) 
            && id.equals(((Member) object).getId());
       }

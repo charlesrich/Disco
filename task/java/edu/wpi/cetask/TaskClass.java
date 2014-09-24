@@ -423,12 +423,13 @@ public class TaskClass extends TaskModel.Member {
        this(null, null, model, id, precondition, postcondition, 
              script == null ? Collections.<Grounding>emptyList() : Collections.singletonList(script));
    }
-   
+      
    @SuppressWarnings("unchecked")
    private TaskClass (Node node, XPath xpath, TaskModel model, String id, 
          Precondition precondition, Postcondition postcondition,
          List<Grounding> scripts) { 
       model.super(node, xpath, id);
+      if ( id.length() != 0 ) model.tasks.put(id, this);
       simpleName = Utils.getSimpleName(id);
       for (Grounding script : scripts) {
          if ( this.scripts.isEmpty() ) this.scripts = new ArrayList<Grounding>(2);
@@ -526,6 +527,23 @@ public class TaskClass extends TaskModel.Member {
             // see contributes
             getEngine().topClasses.add(this);
       }
+   }
+   
+   // for root -- see TaskEngine.clear()
+   TaskClass (TaskEngine engine, String id) {
+      new TaskModel(null, engine).super(null, null, "**ROOT**");
+      precondition = null; postcondition = null;
+      inputNames = outputNames = declaredInputNames = declaredOutputNames = null;
+      scripts = null; 
+      slots = new HashMap<String,Slot>();
+      inputs  =  new ArrayList<Input>();
+      new Input("external", false); 
+      outputs = new ArrayList<Output>();
+      new Output("success", false); 
+      new Output("when", false); 
+      declaredInputs = Collections.emptyList();
+      declaredOutputs = Collections.emptyList(); 
+      simpleName = null; hasModifiedInputs = false;
    }
    
    private class DuplicateSlotNameException extends RuntimeException {
