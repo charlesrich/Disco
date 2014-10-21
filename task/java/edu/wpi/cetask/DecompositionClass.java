@@ -227,7 +227,7 @@ public class DecompositionClass extends TaskModel.Member {
     * Provided to support LIMSI Discolog project.
     */
    public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps, Applicability applicable) { 
-      this(null, null, model, id, goal, steps, applicable, false);
+      this(null, null, model, id, goal, steps, applicable, true);
    }
    
    private DecompositionClass (Node node, XPath xpath, TaskModel model, 
