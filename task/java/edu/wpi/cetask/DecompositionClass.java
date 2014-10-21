@@ -225,9 +225,11 @@ public class DecompositionClass extends TaskModel.Member {
    /**
     * Limited, incomplete constructor for decomposition classes without using XML.
     * Provided to support LIMSI Discolog project.
+    * 
+    * Note if there are ordering constraints ('requires') between steps, they must be specified in Step objects.
     */
    public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps, Applicability applicable) { 
-      this(null, null, model, id, goal, steps, applicable, true);
+      this(null, null, model, id, goal, steps, applicable, false);
    }
    
    private DecompositionClass (Node node, XPath xpath, TaskModel model, 
