@@ -78,25 +78,104 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
-   // TODO Provide enclosing class (inherit from Description?)
-   // and copy constructor
+   // TODO Are going to need some interfaces to make this work!
    
-   public static class Step {
+   private abstract class Slot extends TaskClass.Slot {
+      
+      private final TaskClass.Slot slot;
+      
+      // TO DO use new constructor that does not depend on xml!
+      private Slot (String name) { 
+         super(name,); }
+
+      /**
+       * @return the enclosing step for this slot **FIX/MOVE**
+       */
+      public Step getStep () { return Step.this; }
+      
+      @Override
+      public String getType () { return Step.this.type; }
+      
+      @Override
+      public Class<?> getJava () { return Step.this.java; }
+   }
+ 
+   public static class Input extends Slot {
+      /* TODO
+         
+         List<Step.Input or DecompositionClass.Output> getInputTo();
+       
+       */
+   }
+   
+   public static class Output extends Slot {
+      /* TODO
+       
+        List<Step.Output or Decomposition.Input> getOutputFrom();
+        
+       */
+   }
+   public static class Step extends Description {
       private final String name;
       private final TaskClass type;
       private final int minOccurs, maxOccurs;
       private final List<String> required;
       
-      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
+      // TODO provide copy constructor
+      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
+            List<String> required) {
+         this(name, type, minOccurs, maxOccurs, required, null);
+      }
+      
+      // TODO make required be list of Step's
+      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
+            List<String> required, DecompositionClass enclosing) {
+         super(null, null);
          this.name = name;
          this.type = type;
          this.minOccurs = minOccurs;
          this.maxOccurs = maxOccurs;
          this.required = required;
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public DecompositionClass getEnclosing () { 
+         return (DecompositionClass) super.getEnclosing(); 
       }
       
       public Step (String name, TaskClass type) {
-         this(name, type, 1, 1, null);
+         this(name, type, 1, 1, null, null);
+      }
+      
+      /* TODO
+
+         List<Step.Input> getInputs
+         ...  getOutputs
+       */   
+      
+      public class Input extends TaskClass.Input {
+         public Input (String name) {
+            super(name, Step.this.type.declaredInputs.contains(name), 
+                  Step.this.type);
+         }
+         
+         /* TODO
+            List<Step.Output> getDflowFrom()
+            List<TaskClass.Input> getInputFrom()
+          */
+      }
+      
+      public class Output extends TaskClass.Output {
+         public Output (String name, Step enclosing) { 
+            super(name, Step.this.type.declaredOutputs.contains(name), 
+                  Step.this.type);
+         }
+         
+         /* TODO
+            List<Step.Input> getDflowTo()
+            List<TaskClass.Output> getOutputTo()
+          */
       }
    }
 
@@ -159,6 +238,7 @@ public class DecompositionClass extends TaskModel.Member {
             parseSteps(node, xpath, model.getEngine()),
             parseApplicable(node, xpath, model.getEngine()),
             parseOrdered(node, xpath));
+      for (Step step : steps.values()) step.setEnclosing(this);
    }
    
    private static TaskClass parseGoal (Node node, XPath xpath, TaskEngine engine) {

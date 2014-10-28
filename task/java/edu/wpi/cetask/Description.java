@@ -162,10 +162,12 @@ public abstract class Description { //TODO: temporarily public for Anahita
 
    void setEnclosing (Description enclosing) {
       if ( this.enclosing != null ) throw new IllegalArgumentException("Already has enclosing: "+this);
-      this.enclosing = enclosing;
-      where = (enclosing instanceof TaskModel.Member ? 
-         Utils.getSimpleName(((TaskModel.Member) enclosing).getId()) : enclosing.getNamespace())
-         +" "+Utils.getSimpleName(getClass(), true);
+      if ( enclosing != null ) {
+         this.enclosing = enclosing;
+         where = (enclosing instanceof TaskModel.Member ? 
+            Utils.getSimpleName(((TaskModel.Member) enclosing).getId()) : enclosing.getNamespace())
+            +" "+Utils.getSimpleName(getClass(), true);
+      }
    }
    
    public static abstract class Script extends Description {
