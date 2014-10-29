@@ -181,6 +181,11 @@ public class DecompositionClass extends TaskModel.Member {
    private final Map<String,GoalSlot> slots;
    
    public GoalSlot getSlot (String name) { return slots.get(name); }
+   
+   /**
+    * @return the goal slots for this decomposition class
+    */
+   public Collection<GoalSlot> getSlots () { return slots.values(); }
 
    public static class Step extends Description {
       
