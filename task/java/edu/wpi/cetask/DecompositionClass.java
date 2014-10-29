@@ -185,8 +185,14 @@ public class DecompositionClass extends TaskModel.Member {
    /**
     * @return the goal slots for this decomposition class
     */
-   public Collection<GoalSlot> getSlots () { return slots.values(); }
+   public Collection<GoalSlot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
 
+   private final List<Input> inputs;
+   private final List<Output> outputs;
+   
+   public List<Input> getInputs () { return Collections.unmodifiableList(inputs); }
+   public List<Output> getOutputs ()  { return Collections.unmodifiableList(outputs); }
+   
    public static class Step extends Description {
       
       private final String name;
@@ -201,8 +207,15 @@ public class DecompositionClass extends TaskModel.Member {
       public List<String> getRequired() { return required; }
           
       private final Map<String,Step.Slot> slots;
+      private final List<Input> inputs;
+      private final List<Output> outputs;
+      
+      public List<Input> getInputs () { return Collections.unmodifiableList(inputs); }
+      public List<Output> getOutputs () { return Collections.unmodifiableList(outputs); }
    
       public Step.Slot getSlot (String name) { return slots.get(name); }
+      
+      public Collection<Step.Slot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
       
       // TODO provide copy constructor
       public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
@@ -221,6 +234,10 @@ public class DecompositionClass extends TaskModel.Member {
          this.required = required;
          setEnclosing(enclosing);
          slots = new HashMap<String,Slot>(type.inputNames.size()+type.outputNames.size());
+         inputs = type.inputNames.isEmpty() ? Collections.<Input>emptyList() :
+            new ArrayList<Input>(type.inputNames.size());
+         outputs = type.outputNames.isEmpty() ? Collections.<Output>emptyList() :
+            new ArrayList<Output>(type.outputNames.size());
          for (TaskClass.Slot slot : type.getSlots()) 
             slots.put(slot.getName(), 
                   slot instanceof TaskClass.Input ? new Input(slot.getName(), this) :
@@ -443,6 +460,10 @@ public class DecompositionClass extends TaskModel.Member {
          slots.put(slot.getName(), 
                slot instanceof TaskClass.Input ? new Input(slot.getName(), this) :
                     new Output(slot.getName(), this));
+      inputs = goal.inputNames.isEmpty() ? Collections.<Input>emptyList() :
+            new ArrayList<Input>(goal.inputNames.size());
+      outputs = goal.outputNames.isEmpty() ? Collections.<Output>emptyList() :
+            new ArrayList<Output>(goal.outputNames.size());
       this.steps = new HashMap<String,Step>(steps.size());
       this.applicable = applicable;
       if ( applicable != null ) applicable.setEnclosing(this);

@@ -377,7 +377,7 @@ public class TaskClass extends TaskModel.Member {
    
    public Slot getSlot (String name) { return slots.get(name); }
    
-   public Collection<Slot> getSlots () { return slots.values(); }
+   public Collection<Slot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
    
    private final boolean hasModifiedInputs;
    
