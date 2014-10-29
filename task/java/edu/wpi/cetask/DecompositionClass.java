@@ -77,27 +77,53 @@ public class DecompositionClass extends TaskModel.Member {
    
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
+   
+   private abstract static class SlotWrapper extends TaskClass.SlotBase {
+       
+      protected final TaskClass.Slot slot;
+      
+      protected SlotWrapper (TaskClass task, String name, Description enclosing) {
+         super(name, null);
+         this.slot = task.getSlot(name);         
+         if ( slot == null ) throw new IllegalArgumentException("No slot in "+task+" named "+name);
+         if ( this instanceof Input && !(slot instanceof Input) ) 
+            throw new IllegalArgumentException("No input slot in "+task+" named "+name);
+         else if ( this instanceof Output && !(slot instanceof Output) ) 
+            throw new IllegalArgumentException("No output slot in "+task+" named "+name);
+         setEnclosing(enclosing);
+      }
+      
+      protected SlotWrapper (TaskClass task, TaskClass.Slot slot, Description enclosing) {
+         super(slot.getName(), null);
+         this.slot = slot;
+         if ( task != slot.getEnclosing() ) throw new IllegalArgumentException(slot+" is not a slot of "+task);
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public String getType () { return slot.getType(); }
 
-   private abstract static class Slot extends TaskClass.SlotBase {
+      @Override
+      public Class<?> getJava () { return slot.getJava(); }
+
+      @Override
+      public boolean isDeclared () { return slot.isDeclared(); }
+   }
+
+   private abstract static class Slot extends SlotWrapper {
       
       protected Slot (String name, DecompositionClass enclosing) {
-         super(name, enclosing);
+         super(enclosing.getGoal(), name, enclosing);
       }
 
+      protected Slot (TaskClass.Slot slot, DecompositionClass enclosing) { 
+         super(enclosing.getGoal(), slot, enclosing); 
+      }
+      
       @Override
       public DecompositionClass getEnclosing () {
          return (DecompositionClass) super.getEnclosing();
       }
-
-      @Override
-      public String getType () { return getEnclosing().getGoal().getSlotType(name); }
-
-      @Override
-      public Class<?> getJava () { return getEnclosing().getGoal().getSlot(name).getJava(); }
-
-      @Override
-      public boolean isDeclared () { return getEnclosing().getGoal().getSlot(name).isDeclared(); }
-
    }
  
    public static class Input extends Slot implements Description.Input {
@@ -108,11 +134,13 @@ public class DecompositionClass extends TaskModel.Member {
             throw new IllegalArgumentException(name+" is not an input of "+enclosing.getGoal());
       }
 
-      @Override
-      public boolean isOptional () { return ((Input) getEnclosing().getGoal().getSlot(name)).isOptional(); }
+      public Input (TaskClass.Input input, DecompositionClass enclosing) { super(input, enclosing); }
 
       @Override
-      public Output getModified () { return ((Input) getEnclosing().getGoal().getSlot(name)).getModified(); }
+      public boolean isOptional () { return ((Input) slot).isOptional(); }
+
+      @Override
+      public Output getModified () { return ((Input) slot).getModified(); }
       
       /* TODO
          
@@ -128,6 +156,8 @@ public class DecompositionClass extends TaskModel.Member {
          if ( !enclosing.getGoal().outputNames.contains(name) )
             throw new IllegalArgumentException(name+" is not an output of "+enclosing.getGoal());
       }
+
+      public Output (TaskClass.Output output, DecompositionClass enclosing) { super(output, enclosing); }
 
       /* TODO
        
@@ -182,25 +212,19 @@ public class DecompositionClass extends TaskModel.Member {
          ...  getOutputs
        */   
       
-      private abstract static class Slot extends TaskClass.SlotBase {
+      private abstract static class Slot extends SlotWrapper {
 
          protected Slot (String name, Step enclosing) {
-            super(name, enclosing);
+            this(enclosing.getType().getSlot(name), enclosing);
          }
+
+         protected Slot (TaskClass.Slot slot, Step enclosing) { 
+            super(enclosing.getType(), slot, enclosing); }
 
          @Override
          public Step getEnclosing () {
             return (Step) super.getEnclosing();
          }
-
-         @Override
-         public String getType () { return getEnclosing().getType().getSlotType(name); }
-
-         @Override
-         public Class<?> getJava () { return getEnclosing().getType().getSlot(name).getJava(); }
-
-         @Override
-         public boolean isDeclared () { return getEnclosing().getType().getSlot(name).isDeclared(); }
       }
       
       public class Input extends Slot implements Description.Input {
@@ -211,11 +235,13 @@ public class DecompositionClass extends TaskModel.Member {
             throw new IllegalArgumentException(name+" is not an input of "+enclosing.getType());
          }
 
+         public Input (TaskClass.Input input, Step enclosing) { super(input, enclosing); } 
+         
          @Override
-         public boolean isOptional () { return ((Input) getEnclosing().getType().getSlot(name)).isOptional(); }
+         public boolean isOptional () { return ((Input) slot).isOptional(); }
 
          @Override
-         public Output getModified () { return ((Input) getEnclosing().getType().getSlot(name)).getModified(); }
+         public Output getModified () { return ((Input) slot).getModified(); }
             
          /* TODO
             List<Step.Output> getDflowFrom()
@@ -230,6 +256,8 @@ public class DecompositionClass extends TaskModel.Member {
             if ( !enclosing.getType().outputNames.contains(name) )
                throw new IllegalArgumentException(name+" is not an output of "+enclosing.getType());
          }
+         
+         public Output (TaskClass.Output output, Step enclosing) { super(output, enclosing); }
          
          /* TODO
             List<Step.Input> getDflowTo()
