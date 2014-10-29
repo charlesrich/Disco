@@ -78,29 +78,74 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
-   // TODO Are going to need some interfaces to make this work!
-   
-   private abstract class Slot extends TaskClass.Slot {
+   private abstract static class SlotBase extends Description implements Description.Slot {
       
-      private final TaskClass.Slot slot;
+      protected final String name;
       
-      // TO DO use new constructor that does not depend on xml!
-      private Slot (String name) { 
-         super(name,); }
+      @Override
+      public String getName () { return name; }
+      
+      protected SlotBase (String name, Description enclosing) {
+         super(null, null);
+         this.name = name;
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public Object getSlotValue (Task task) { return task.getSlotValue(name); }
 
-      /**
-       * @return the enclosing step for this slot **FIX/MOVE**
-       */
-      public Step getStep () { return Step.this; }
-      
       @Override
-      public String getType () { return Step.this.type; }
-      
+      public boolean isDefinedSlot (Task task) { return task.isDefinedSlot(name); }
+
       @Override
-      public Class<?> getJava () { return Step.this.java; }
+      public Object setSlotValue (Task task, Object value) { return task.setSlotValue(name, value); }
+
+      @Override
+      public void setSlotValue (Task task, Object value, boolean check) { task.setSlotValue(name, value, check); }
+
+      @Override
+      public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
+
+      @Override
+      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
+   }
+
+   private abstract static class Slot extends SlotBase {
+      
+      protected Slot (String name, DecompositionClass enclosing) {
+         super(name, enclosing);
+      }
+
+      @Override
+      public DecompositionClass getEnclosing () {
+         return (DecompositionClass) super.getEnclosing();
+      }
+
+      @Override
+      public String getType () { return getEnclosing().getGoal().getSlotType(name); }
+
+      @Override
+      public Class<?> getJava () { return getEnclosing().getGoal().getSlot(name).getJava(); }
+
+      @Override
+      public boolean isDeclared () { return getEnclosing().getGoal().getSlot(name).isDeclared(); }
+
    }
  
-   public static class Input extends Slot {
+   public static class Input extends Slot implements Description.Input {
+      
+      public Input (String name, DecompositionClass enclosing) {
+         super(name, enclosing);
+          if ( !enclosing.getGoal().inputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an input of "+enclosing.getGoal());
+      }
+
+      @Override
+      public boolean isOptional () { return ((Input) getEnclosing().getGoal().getSlot(name)).isOptional(); }
+
+      @Override
+      public Output getModified () { return ((Input) getEnclosing().getGoal().getSlot(name)).getModified(); }
+      
       /* TODO
          
          List<Step.Input or DecompositionClass.Output> getInputTo();
@@ -108,18 +153,33 @@ public class DecompositionClass extends TaskModel.Member {
        */
    }
    
-   public static class Output extends Slot {
+   public static class Output extends Slot implements Description.Output {
+      
+      public Output (String name, DecompositionClass enclosing) {
+         super(name, enclosing);
+         if ( !enclosing.getGoal().outputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an output of "+enclosing.getGoal());
+      }
+
       /* TODO
        
         List<Step.Output or Decomposition.Input> getOutputFrom();
         
        */
    }
+   
    public static class Step extends Description {
+      
       private final String name;
       private final TaskClass type;
       private final int minOccurs, maxOccurs;
       private final List<String> required;
+      
+      public String getName () { return name; }
+      public TaskClass getType () { return type; }
+      public int getMinOccurs () { return minOccurs; }
+      public int getMaxOccurs () { return maxOccurs; }
+      public List<String> getRequired() { return required; }
       
       // TODO provide copy constructor
       public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
@@ -154,22 +214,53 @@ public class DecompositionClass extends TaskModel.Member {
          ...  getOutputs
        */   
       
-      public class Input extends TaskClass.Input {
-         public Input (String name) {
-            super(name, Step.this.type.declaredInputs.contains(name), 
-                  Step.this.type);
+      private abstract static class Slot extends SlotBase {
+
+         protected Slot (String name, Step enclosing) {
+            super(name, enclosing);
          }
+
+         @Override
+         public Step getEnclosing () {
+            return (Step) super.getEnclosing();
+         }
+
+         @Override
+         public String getType () { return getEnclosing().getType().getSlotType(name); }
+
+         @Override
+         public Class<?> getJava () { return getEnclosing().getType().getSlot(name).getJava(); }
+
+         @Override
+         public boolean isDeclared () { return getEnclosing().getType().getSlot(name).isDeclared(); }
+      }
+      
+      public class Input extends Slot implements Description.Input {
          
+         public Input (String name, Step enclosing) {
+            super(name, enclosing);
+            if ( !enclosing.getType().inputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an input of "+enclosing.getType());
+         }
+
+         @Override
+         public boolean isOptional () { return ((Input) getEnclosing().getType().getSlot(name)).isOptional(); }
+
+         @Override
+         public Output getModified () { return ((Input) getEnclosing().getType().getSlot(name)).getModified(); }
+            
          /* TODO
             List<Step.Output> getDflowFrom()
             List<TaskClass.Input> getInputFrom()
           */
       }
       
-      public class Output extends TaskClass.Output {
+      public class Output extends Slot implements Description.Output {
+         
          public Output (String name, Step enclosing) { 
-            super(name, Step.this.type.declaredOutputs.contains(name), 
-                  Step.this.type);
+            super(name, enclosing);
+            if ( !enclosing.getType().outputNames.contains(name) )
+               throw new IllegalArgumentException(name+" is not an output of "+enclosing.getType());
          }
          
          /* TODO

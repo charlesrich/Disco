@@ -5,16 +5,16 @@
  */
 package edu.wpi.cetask;
 
+import edu.wpi.cetask.Description.Input;
+import edu.wpi.cetask.Description.Output;
+import edu.wpi.cetask.Description.Slot;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Grounding;
+import edu.wpi.cetask.TaskClass.Postcondition;
+import edu.wpi.cetask.TaskClass.Precondition;
 import java.text.DateFormat;
 import java.util.*;
 import javax.script.Bindings;
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Grounding;
-import edu.wpi.cetask.TaskClass.Input;
-import edu.wpi.cetask.TaskClass.Output;
-import edu.wpi.cetask.TaskClass.Postcondition;
-import edu.wpi.cetask.TaskClass.Precondition;
-import edu.wpi.cetask.TaskClass.Slot;
 
 /**
  * Representation for instances of a task class.
@@ -731,7 +731,7 @@ public class Task extends Instance {
       TaskClass type = getType();
       // clone and cache modified inputs before grounding script executed
       for (Input input : getType().declaredInputs)
-         if ( input.getModified() != null ) cloneInput(input.name);
+         if ( input.getModified() != null ) cloneInput(input.getName());
       Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
@@ -745,7 +745,8 @@ public class Task extends Instance {
          for (Input input : type.declaredInputs) {
             Output modified = input.getModified();
             if ( modified != null ) 
-               engine.put(clonedInputs, modified.name, getSlotValue(modified.name));
+               engine.put(clonedInputs, modified.getName(), 
+                     getSlotValue(modified.getName()));
       }
    }
    
@@ -770,12 +771,12 @@ public class Task extends Instance {
       for (Input input : type.declaredInputs){
          Output modified = input.getModified();
          if ( modified != null ) {
-            Object value = getSlotValue(input.name);
-            Object output = getSlotValue(modified.name);
+            Object value = getSlotValue(input.getName());
+            Object output = getSlotValue(modified.getName());
             // propagate modified input object to output
-            if ( output == null ) setSlotValue(modified.name, value); 
+            if ( output == null ) setSlotValue(modified.getName(), value); 
             else if ( output != value ) 
-               throw new IllegalStateException("Output of modified input not identical "+input.name);
+               throw new IllegalStateException("Output of modified input not identical "+input.getName());
          }
       }
    }
@@ -904,7 +905,7 @@ public class Task extends Instance {
          list.add(getSlotValueIf(name));
       for (Output output : type.declaredOutputs)
          // suppress modified output objects, since must be identical to input
-         list.add(type.getModifiedInput(output) == null ? getSlotValueIf(output.name) : modifiedOutput);
+         list.add(type.getModifiedInput(output) == null ? getSlotValueIf(output.getName()) : modifiedOutput);
        return list;
    }
 

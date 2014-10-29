@@ -170,6 +170,96 @@ public abstract class Description { //TODO: temporarily public for Anahita
       }
    }
    
+   interface Slot {
+      
+      /**
+       * @return the name of this slot.
+       */
+      String getName ();
+      
+      /**
+       * @return the type of this slot
+       * 
+       * @see #getJava()
+       */
+      String getType ();
+      
+      /**
+       * @return the Java class of the type of this slot, if it is a Java type
+       */
+      Class<?> getJava ();
+      
+      /**
+       * @return the enclosing context of this slot, such as the task class, step
+       *         or decomposition class.
+       */
+      Description getEnclosing ();
+      
+      /**
+       * Test whether this slot is declared.
+       */
+      boolean isDeclared ();
+      
+      /**
+       * Return value of this slot in given task.
+       *
+       * @see Task#getSlotValue(String)
+       */
+      Object getSlotValue (Task task); 
+
+      /**
+       * Test whether this slot has defined value in given task.
+       * 
+       * @see Task#isDefinedSlot(String)
+       */
+      boolean isDefinedSlot (Task task);
+
+      /**
+       * Set the value of this slot in given task to given value.
+       * 
+       * @see Task#setSlotValue(String,Object)
+       */
+      Object setSlotValue (Task task, Object value);
+
+      /**
+       * Set the value of this slot in given task to given value.
+       * 
+       * @see Task#setSlotValue(String,Object,boolean)
+       */
+      void setSlotValue (Task task, Object value, boolean check);
+
+      /**
+       * Set the value of this slot in given task to result of evaluating given JavaScript
+       * expression.
+       * 
+       * @see Task#setSlotValueScript(String,String,String)
+       */
+      void setSlotValueScript (Task task, String expression, String where);
+
+      /**
+       * Make this slot undefined in given task.
+       * 
+       * @see Task#deleteSlotValue(String)
+       */
+      void deleteSlotValue (Task task);
+   }
+   
+   interface Input extends Slot {
+      
+      /**
+       * Test whether this input is optional.
+       */
+      boolean isOptional (); 
+
+      /**
+       * @return the corresponding modified output, if any.
+       */
+      Output getModified ();
+      
+   }
+   
+   interface Output extends Slot {}
+   
    public static abstract class Script extends Description {
 
       protected final String script;

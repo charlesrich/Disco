@@ -237,21 +237,22 @@ public class TaskClass extends TaskModel.Member {
    
    private static final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
    
-   public abstract static class Slot extends Description {
+   public abstract static class Slot extends Description implements Description.Slot {
       
       protected final String name, type;
       protected final Class<?> java;
       
+      @Override
       public String getName () { return name; }
+      
+      @Override
       public String getType () { return type; }
+      
+      @Override
       public Class<?> getJava () { return java; }
       
-      /**
-       * @return the enclosing task class for this slot
-       * 
-       * Returns same value as {@link #getEnclosing()}
-       */
-      public TaskClass getTaskClass() { return (TaskClass) super.getEnclosing(); }
+      @Override
+      public TaskClass getEnclosing () { return (TaskClass) super.getEnclosing(); }
       
       // TODO Provide copy constructors.
    
@@ -294,6 +295,7 @@ public class TaskClass extends TaskModel.Member {
        *
        * @see Task#getSlotValue(String)
        */
+      @Override
       public Object getSlotValue (Task task) { 
          return task.getSlotValue(name);
       }
@@ -303,6 +305,7 @@ public class TaskClass extends TaskModel.Member {
        * 
        * @see Task#isDefinedSlot(String)
        */
+      @Override
       public boolean isDefinedSlot (Task task) {
          return task.isDefinedSlot(name);
       }
@@ -312,6 +315,7 @@ public class TaskClass extends TaskModel.Member {
        * 
        * @see Task#setSlotValue(String,Object)
        */
+      @Override
       public Object setSlotValue (Task task, Object value) {
          return task.setSlotValue(name, value);
       }  
@@ -321,6 +325,7 @@ public class TaskClass extends TaskModel.Member {
        * 
        * @see Task#setSlotValue(String,Object,boolean)
        */
+      @Override
       public void setSlotValue (Task task, Object value, boolean check) {
          task.setSlotValue(name, value, check);
       } 
@@ -331,6 +336,7 @@ public class TaskClass extends TaskModel.Member {
        * 
        * @see Task#setSlotValueScript(String,String,String)
        */
+      @Override
       public void setSlotValueScript (Task task, String expression, String where) {
          task.setSlotValueScript(name, expression, where);
       }
@@ -340,19 +346,26 @@ public class TaskClass extends TaskModel.Member {
        * 
        * @see Task#deleteSlotValue(String)
        */
+      @Override
       public void deleteSlotValue (Task task) {
          task.deleteSlotValue(name);
       }
-  
    }
    
-   public static class Input extends Slot {
+   public static class Input extends Slot implements Description.Input {
       
       private final boolean optional;
+      
+      @Override
       public boolean isOptional () { return optional; }
 
       private final Output modified;
+      
+      @Override
       public Output getModified () { return modified; }
+      
+      @Override
+      public boolean isDeclared () { return getEnclosing().declaredInputs.contains(this); }
       
       protected Input (String name, boolean declared, TaskClass enclosing) { 
          super(name, enclosing);
@@ -374,7 +387,10 @@ public class TaskClass extends TaskModel.Member {
       }
    }
 
-   public static class Output extends Slot {
+   public static class Output extends Slot implements Description.Output {
+      
+      @Override
+      public boolean isDeclared () { return getEnclosing().declaredOutputs.contains(this); }
       
       protected Output (String name, boolean declared, TaskClass enclosing) { 
          super(name, enclosing);
@@ -478,7 +494,7 @@ public class TaskClass extends TaskModel.Member {
       for (Input input : inputs) {
          if ( input.modified != null ) {
             hasModifiedInputs = true;
-            if ( !Utils.equals(input.type, input.modified.type) ) { // null types possible
+            if ( !Utils.equals(input.type, input.modified.getType()) ) { // null types possible
                getErr().println("WARNING: Modified output slot of different type: "+input.name);
             }
          }
@@ -652,7 +668,7 @@ public class TaskClass extends TaskModel.Member {
    /**
     * @return corresponding input for given declared output, or null if output not modified
     */
-   public Input getModifiedInput (Output output) {
+   public Input getModifiedInput (Description.Output output) {
       for (Input input : declaredInputs)
          if ( output.equals(input.modified) ) return input;
       return null;
@@ -836,7 +852,8 @@ public class TaskClass extends TaskModel.Member {
          this.slot = slot;
          this.value = value;
          where = TaskClass.this.getId() + " binding for " + slot;
-         String expression = Task.makeExpression("$this", TaskClass.this, slot, value, true);
+         String expression = Task.makeExpression("$this", TaskClass.
+               this, slot, value, true);
          if ( TaskEngine.isCompilable() ) { 
             compiled = engine.compile(expression, where);
             this.expression = null;
