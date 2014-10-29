@@ -16,7 +16,7 @@ public class TaskClass extends TaskModel.Member {
    private final Precondition precondition;
    private final Postcondition postcondition; 
    
-   // DESIGN NOTE: Pre/Postcondition, etc., (and Input/Output TODO) below are *not* inner classes,
+   // DESIGN NOTE: Pre/Postcondition, Input/Output, etc., below are *not* inner classes,
    // so that they can be constructed *before* being passed to task class constructor
    // when creating task classes without XML.
    
@@ -235,35 +235,77 @@ public class TaskClass extends TaskModel.Member {
       return candidates.get(0);
    }
    
-   private final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
-   
-   // TODO: Make Input/Ouput static classes (see design note above)
-   //       Inherit enclosing from Description?  Also provide copy constructors.
-   
-   public abstract class Slot {
+   private static final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
+ 
+   abstract static class SlotBase extends Description implements Description.Slot {
       
-      protected final String name, type;
+      protected final String name;
+      
+      @Override
+      public String getName () { return name; }
+      
+      protected SlotBase (String name, Description enclosing) {
+         super(null, null);
+         this.name = name;
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public Object getSlotValue (Task task) { return task.getSlotValue(name); }
+
+      @Override
+      public boolean isDefinedSlot (Task task) { return task.isDefinedSlot(name); }
+
+      @Override
+      public Object setSlotValue (Task task, Object value) { return task.setSlotValue(name, value); }
+
+      @Override
+      public void setSlotValue (Task task, Object value, boolean check) { task.setSlotValue(name, value, check); }
+
+      @Override
+      public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
+
+      @Override
+      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
+      
+      @Override
+      public String toString () {
+         return getEnclosing() == null ? name : getEnclosing().toString()+'.'+name;
+      }
+   }
+   
+   public abstract static class Slot extends SlotBase {
+      
+      protected final String type;
       protected final Class<?> java;
       
-      public String getName () { return name; }
+      @Override
       public String getType () { return type; }
+      
+      @Override
       public Class<?> getJava () { return java; }
       
-      private Slot (String name) {
-         this.name = name;
-         if ( slots.get(name) != null ) throw new DuplicateSlotNameException(name);
-         slots.put(name,  this);
+      @Override
+      public TaskClass getEnclosing () { return (TaskClass) super.getEnclosing(); }
+      
+      // TODO Provide copy constructors.
+   
+      protected Slot (String name, TaskClass enclosing) {
+         super(name, enclosing);
+         if ( enclosing.slots.get(name) != null ) 
+            throw new DuplicateSlotNameException(name, enclosing.getId());
+         enclosing.slots.put(name, this);
          // compute type
          if ( name.equals("success") || name.equals("external") )
             this.type = "boolean";
          else if ( name.equals("when") ) this.type = "Date";
          else {
             String path = "[@name=\""+name+"\"]/@type";
-            String type = xpath("./n:input"+path+" | "+"./n:output"+path);
+            String type = enclosing.xpath("./n:input"+path+" | "+"./n:output"+path);
             // type attribute is optional (extension by CR)
             if ( type.length() == 0 ) {
-               if ( !declaredInputNames.contains(name)
-                     && !declaredOutputNames.contains(name) )
+               if ( !enclosing.declaredInputNames.contains(name)
+                     && !enclosing.declaredOutputNames.contains(name) )
                   throw new IllegalArgumentException(name+" is not slot of "+this);
                this.type = null;
             } else this.type = type;
@@ -273,103 +315,58 @@ public class TaskClass extends TaskModel.Member {
             this.java = null;
          else {
             Object java = null;
-            try { java = engine.eval(type, "Slot constructor"); }
+            try { java = enclosing.engine.eval(type, "Slot constructor"); }
             // JavaScript constructor may not yet be defined since init script not evaluated yet
             catch (RuntimeException e) {}
             this.java = java instanceof Class ? (Class<?>) java : null;               
          }
       }
-      
-      /**
-       * Return value of this slot in given task.
-       *
-       * @see Task#getSlotValue(String)
-       */
-      public Object getSlotValue (Task task) { 
-         return task.getSlotValue(name);
-      }
-
-      /**
-       * Test whether this slot has defined value in given task.
-       * 
-       * @see Task#isDefinedSlot(String)
-       */
-      public boolean isDefinedSlot (Task task) {
-         return task.isDefinedSlot(name);
-      }
-
-      /**
-       * Set the value of this slot in given task to given value.
-       * 
-       * @see Task#setSlotValue(String,Object)
-       */
-      public Object setSlotValue (Task task, Object value) {
-         return task.setSlotValue(name, value);
-      }  
-
-      /**
-       * Set the value of this slot in given task to given value.
-       * 
-       * @see Task#setSlotValue(String,Object,boolean)
-       */
-      public void setSlotValue (Task task, Object value, boolean check) {
-         task.setSlotValue(name, value, check);
-      } 
-
-      /**
-       * Set the value of this slot in given task to result of evaluating given JavaScript
-       * expression.
-       * 
-       * @see Task#setSlotValueScript(String,String,String)
-       */
-      public void setSlotValueScript (Task task, String expression, String where) {
-         task.setSlotValueScript(name, expression, where);
-      }
-
-      /**
-       * Make this slot undefined in given task.
-       * 
-       * @see Task#deleteSlotValue(String)
-       */
-      public void deleteSlotValue (Task task) {
-         task.deleteSlotValue(name);
-      }
-  
+    
    }
    
-   public class Input extends Slot {
+   public static class Input extends Slot implements Description.Input {
       
       private final boolean optional;
+      
+      @Override
       public boolean isOptional () { return optional; }
 
       private final Output modified;
+      
+      @Override
       public Output getModified () { return modified; }
       
-      private Input (String name, boolean declared) { 
-         super(name);
-         if ( declared ) declaredInputs.add(this);
+      @Override
+      public boolean isDeclared () { return getEnclosing().declaredInputs.contains(this); }
+      
+      protected Input (String name, boolean declared, TaskClass enclosing) { 
+         super(name, enclosing);
+         if ( declared ) enclosing.declaredInputs.add(this);
          // temporary check for node null
-         String modified = node == null ? "" : xpath("./n:input[@name=\""+name+"\"]/@modified");
+         String modified = enclosing.node == null ? "" : enclosing.xpath("./n:input[@name=\""+name+"\"]/@modified");
          if ( modified.length() > 0 ) {
-            if ( !declaredOutputNames.contains(modified) ) { 
+            if ( !enclosing.declaredOutputNames.contains(modified) ) { 
                getErr().println("WARNING: Ignoring unknown modified output slot: "+modified);
                this.modified = null;
             } else if ( primitiveTypes.contains(type) || 
                   (java != null && !Cloneable.class.isAssignableFrom(java)) ){
                getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
                this.modified = null;
-            } else this.modified = (Output) slots.get(modified);
+            } else this.modified = (Output) enclosing.slots.get(modified);
          } else this.modified = null;  
          // cache optional
-         this.optional = getProperty(name, "@optional", false);
+         this.optional = enclosing.getProperty(name, "@optional", false);
       }
    }
 
-   public class Output extends Slot {
+   public static class Output extends Slot implements Description.Output {
       
-      private Output (String name, boolean declared) { 
-         super(name);
-         if ( declared ) declaredOutputs.add(this);
+      @Override
+      public boolean isDeclared () { return getEnclosing().declaredOutputs.contains(this); }
+      
+      protected Output (String name, boolean declared, TaskClass enclosing) { 
+         super(name, enclosing);
+         if ( declared ) enclosing.declaredOutputs.add(this);
       }
    }
 
@@ -379,6 +376,8 @@ public class TaskClass extends TaskModel.Member {
    private final Map<String,Slot> slots;
    
    public Slot getSlot (String name) { return slots.get(name); }
+   
+   public Collection<Slot> getSlots () { return slots.values(); }
    
    private final boolean hasModifiedInputs;
    
@@ -430,7 +429,6 @@ public class TaskClass extends TaskModel.Member {
          List<Grounding> scripts) { 
       model.super(node, xpath, id);
       if ( id.length() != 0 ) model.tasks.put(id, this);
-      simpleName = Utils.getSimpleName(id);
       for (Grounding script : scripts) {
          if ( this.scripts.isEmpty() ) this.scripts = new ArrayList<Grounding>(2);
          this.scripts.add(script);
@@ -450,18 +448,18 @@ public class TaskClass extends TaskModel.Member {
       inputNames.add("external");
       slots = new HashMap<String,Slot>(inputNames.size()+outputNames.size());
       // create now for error checking
-      new Output("success", false); 
-      new Output("when", false); 
-      new Input("external", false); 
+      new Output("success", false, this); 
+      new Output("when", false, this); 
+      new Input("external", false, this); 
       // create outputs first for modified
       declaredOutputs = new ArrayList<Output>(declaredOutputNames.size());     
-      for (String name : declaredOutputNames) new Output(name, true);
+      for (String name : declaredOutputNames) new Output(name, true, this);
       outputs = new ArrayList<Output>(declaredOutputs);
       declaredInputs = new ArrayList<Input>(declaredInputNames.size());
       // must be added here to preserve order at end
       outputs.add((Output) slots.get("success")); 
       outputs.add((Output) slots.get("when"));
-      for (String name : declaredInputNames) new Input(name, true);
+      for (String name : declaredInputNames) new Input(name, true, this);
       inputs = new ArrayList<Input>(declaredInputs);
       // must be added here to preserve order at end
       inputs.add((Input) slots.get("external"));
@@ -469,7 +467,7 @@ public class TaskClass extends TaskModel.Member {
       for (Input input : inputs) {
          if ( input.modified != null ) {
             hasModifiedInputs = true;
-            if ( !Utils.equals(input.type, input.modified.type) ) { // null types possible
+            if ( !Utils.equals(input.type, input.modified.getType()) ) { // null types possible
                getErr().println("WARNING: Modified output slot of different type: "+input.name);
             }
          }
@@ -537,18 +535,18 @@ public class TaskClass extends TaskModel.Member {
       scripts = null; 
       slots = new HashMap<String,Slot>();
       inputs  =  new ArrayList<Input>();
-      new Input("external", false); 
+      new Input("external", false, this); 
       outputs = new ArrayList<Output>();
-      new Output("success", false); 
-      new Output("when", false); 
+      new Output("success", false, this); 
+      new Output("when", false, this); 
       declaredInputs = Collections.emptyList();
       declaredOutputs = Collections.emptyList(); 
-      simpleName = null; hasModifiedInputs = false;
+      hasModifiedInputs = false;
    }
    
-   private class DuplicateSlotNameException extends RuntimeException {
-      public DuplicateSlotNameException (String name) {
-         super("Attempting to define a duplicate slot name "+name+" in "+xpath("./@id"));
+   private static class DuplicateSlotNameException extends RuntimeException {
+      public DuplicateSlotNameException (String name, String id) {
+         super("Attempting to define a duplicate slot name "+name+" in "+id);
       }
    }
 
@@ -643,7 +641,7 @@ public class TaskClass extends TaskModel.Member {
    /**
     * @return corresponding input for given declared output, or null if output not modified
     */
-   public Input getModifiedInput (Output output) {
+   public Input getModifiedInput (Description.Output output) {
       for (Input input : declaredInputs)
          if ( output.equals(input.modified) ) return input;
       return null;
@@ -757,17 +755,6 @@ public class TaskClass extends TaskModel.Member {
     */
    public Decomposition getLastDecomposition () { return lastDecomp; }
    
-   private final String simpleName;
-   
-   @Override
-   public String toString () {
-      // for readability, suppress namespace for unambiguous id's
-      try { 
-         engine.getTaskClass(getId());
-         return simpleName;
-      } catch (TaskEngine.AmbiguousIdException e) { return '{'+getNamespace()+'}'+getId(); } 
-   }
-
    // for extension to plan recognition
    
    private List<TaskClass> contributes = null;
@@ -827,7 +814,8 @@ public class TaskClass extends TaskModel.Member {
          this.slot = slot;
          this.value = value;
          where = TaskClass.this.getId() + " binding for " + slot;
-         String expression = Task.makeExpression("$this", TaskClass.this, slot, value, true);
+         String expression = Task.makeExpression("$this", TaskClass.
+               this, slot, value, true);
          if ( TaskEngine.isCompilable() ) { 
             compiled = engine.compile(expression, where);
             this.expression = null;
