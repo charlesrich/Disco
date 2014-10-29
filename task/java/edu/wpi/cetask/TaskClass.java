@@ -267,7 +267,11 @@ public class TaskClass extends TaskModel.Member {
 
       @Override
       public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
-   
+      
+      @Override
+      public String toString () {
+         return getEnclosing() == null ? name : getEnclosing().toString()+'.'+name;
+      }
    }
    
    public abstract static class Slot extends SlotBase {
@@ -290,7 +294,7 @@ public class TaskClass extends TaskModel.Member {
          super(name, enclosing);
          if ( enclosing.slots.get(name) != null ) 
             throw new DuplicateSlotNameException(name, enclosing.getId());
-         enclosing.slots.put(name,  this);
+         enclosing.slots.put(name, this);
          // compute type
          if ( name.equals("success") || name.equals("external") )
             this.type = "boolean";
@@ -373,6 +377,8 @@ public class TaskClass extends TaskModel.Member {
    
    public Slot getSlot (String name) { return slots.get(name); }
    
+   public Collection<Slot> getSlots () { return slots.values(); }
+   
    private final boolean hasModifiedInputs;
    
    public boolean hasModifiedInputs () { return hasModifiedInputs; }
@@ -423,7 +429,6 @@ public class TaskClass extends TaskModel.Member {
          List<Grounding> scripts) { 
       model.super(node, xpath, id);
       if ( id.length() != 0 ) model.tasks.put(id, this);
-      simpleName = Utils.getSimpleName(id);
       for (Grounding script : scripts) {
          if ( this.scripts.isEmpty() ) this.scripts = new ArrayList<Grounding>(2);
          this.scripts.add(script);
@@ -536,7 +541,7 @@ public class TaskClass extends TaskModel.Member {
       new Output("when", false, this); 
       declaredInputs = Collections.emptyList();
       declaredOutputs = Collections.emptyList(); 
-      simpleName = null; hasModifiedInputs = false;
+      hasModifiedInputs = false;
    }
    
    private static class DuplicateSlotNameException extends RuntimeException {
@@ -750,17 +755,6 @@ public class TaskClass extends TaskModel.Member {
     */
    public Decomposition getLastDecomposition () { return lastDecomp; }
    
-   private final String simpleName;
-   
-   @Override
-   public String toString () {
-      // for readability, suppress namespace for unambiguous id's
-      try { 
-         engine.getTaskClass(getId());
-         return simpleName;
-      } catch (TaskEngine.AmbiguousIdException e) { return '{'+getNamespace()+'}'+getId(); } 
-   }
-
    // for extension to plan recognition
    
    private List<TaskClass> contributes = null;

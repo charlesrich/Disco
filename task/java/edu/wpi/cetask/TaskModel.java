@@ -180,6 +180,7 @@ public class TaskModel extends Description {
          super(node, xpath, TaskModel.this.getNamespace(), TaskModel.this.engine);
          this.id = id;
          qname = new QName(TaskModel.this.getNamespace(), id);
+         simpleName = Utils.getSimpleName(id);
          ids.add(id);  
       }
     
@@ -305,7 +306,18 @@ public class TaskModel extends Description {
       public boolean isInternal () { 
          return getProperty("@internal", getId().charAt(0) == '_');
       }
-   }
+      
+      private final String simpleName;
+
+      @Override
+      public String toString () {
+         // for readability, suppress namespace for unambiguous id's
+         try { 
+            engine.getTaskClass(getId());
+            return simpleName;
+         } catch (TaskEngine.AmbiguousIdException e) { return '{'+getNamespace()+'}'+getId(); } 
+      }
+    }
    
    public static class Init extends Script {
 
