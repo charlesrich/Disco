@@ -77,40 +77,8 @@ public class DecompositionClass extends TaskModel.Member {
    
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
-   
-   private abstract static class SlotBase extends Description implements Description.Slot {
-      
-      protected final String name;
-      
-      @Override
-      public String getName () { return name; }
-      
-      protected SlotBase (String name, Description enclosing) {
-         super(null, null);
-         this.name = name;
-         setEnclosing(enclosing);
-      }
-      
-      @Override
-      public Object getSlotValue (Task task) { return task.getSlotValue(name); }
 
-      @Override
-      public boolean isDefinedSlot (Task task) { return task.isDefinedSlot(name); }
-
-      @Override
-      public Object setSlotValue (Task task, Object value) { return task.setSlotValue(name, value); }
-
-      @Override
-      public void setSlotValue (Task task, Object value, boolean check) { task.setSlotValue(name, value, check); }
-
-      @Override
-      public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
-
-      @Override
-      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
-   }
-
-   private abstract static class Slot extends SlotBase {
+   private abstract static class Slot extends TaskClass.SlotBase {
       
       protected Slot (String name, DecompositionClass enclosing) {
          super(name, enclosing);
@@ -214,7 +182,7 @@ public class DecompositionClass extends TaskModel.Member {
          ...  getOutputs
        */   
       
-      private abstract static class Slot extends SlotBase {
+      private abstract static class Slot extends TaskClass.SlotBase {
 
          protected Slot (String name, Step enclosing) {
             super(name, enclosing);

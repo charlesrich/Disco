@@ -236,14 +236,44 @@ public class TaskClass extends TaskModel.Member {
    }
    
    private static final List<String> primitiveTypes = Arrays.asList(new String[] {"boolean", "string", "number"});
-   
-   public abstract static class Slot extends Description implements Description.Slot {
+ 
+   abstract static class SlotBase extends Description implements Description.Slot {
       
-      protected final String name, type;
-      protected final Class<?> java;
+      protected final String name;
       
       @Override
       public String getName () { return name; }
+      
+      protected SlotBase (String name, Description enclosing) {
+         super(null, null);
+         this.name = name;
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public Object getSlotValue (Task task) { return task.getSlotValue(name); }
+
+      @Override
+      public boolean isDefinedSlot (Task task) { return task.isDefinedSlot(name); }
+
+      @Override
+      public Object setSlotValue (Task task, Object value) { return task.setSlotValue(name, value); }
+
+      @Override
+      public void setSlotValue (Task task, Object value, boolean check) { task.setSlotValue(name, value, check); }
+
+      @Override
+      public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
+
+      @Override
+      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
+   
+   }
+   
+   public abstract static class Slot extends SlotBase {
+      
+      protected final String type;
+      protected final Class<?> java;
       
       @Override
       public String getType () { return type; }
@@ -257,9 +287,7 @@ public class TaskClass extends TaskModel.Member {
       // TODO Provide copy constructors.
    
       protected Slot (String name, TaskClass enclosing) {
-         super(null, null);
-         this.name = name;
-         setEnclosing(enclosing);
+         super(name, enclosing);
          if ( enclosing.slots.get(name) != null ) 
             throw new DuplicateSlotNameException(name, enclosing.getId());
          enclosing.slots.put(name,  this);
@@ -289,67 +317,7 @@ public class TaskClass extends TaskModel.Member {
             this.java = java instanceof Class ? (Class<?>) java : null;               
          }
       }
-      
-      /**
-       * Return value of this slot in given task.
-       *
-       * @see Task#getSlotValue(String)
-       */
-      @Override
-      public Object getSlotValue (Task task) { 
-         return task.getSlotValue(name);
-      }
-
-      /**
-       * Test whether this slot has defined value in given task.
-       * 
-       * @see Task#isDefinedSlot(String)
-       */
-      @Override
-      public boolean isDefinedSlot (Task task) {
-         return task.isDefinedSlot(name);
-      }
-
-      /**
-       * Set the value of this slot in given task to given value.
-       * 
-       * @see Task#setSlotValue(String,Object)
-       */
-      @Override
-      public Object setSlotValue (Task task, Object value) {
-         return task.setSlotValue(name, value);
-      }  
-
-      /**
-       * Set the value of this slot in given task to given value.
-       * 
-       * @see Task#setSlotValue(String,Object,boolean)
-       */
-      @Override
-      public void setSlotValue (Task task, Object value, boolean check) {
-         task.setSlotValue(name, value, check);
-      } 
-
-      /**
-       * Set the value of this slot in given task to result of evaluating given JavaScript
-       * expression.
-       * 
-       * @see Task#setSlotValueScript(String,String,String)
-       */
-      @Override
-      public void setSlotValueScript (Task task, String expression, String where) {
-         task.setSlotValueScript(name, expression, where);
-      }
-
-      /**
-       * Make this slot undefined in given task.
-       * 
-       * @see Task#deleteSlotValue(String)
-       */
-      @Override
-      public void deleteSlotValue (Task task) {
-         task.deleteSlotValue(name);
-      }
+    
    }
    
    public static class Input extends Slot implements Description.Input {
