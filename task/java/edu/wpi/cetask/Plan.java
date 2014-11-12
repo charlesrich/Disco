@@ -347,7 +347,7 @@ public class Plan {
    
    private  boolean isLivePlan () {
       return goal.getSuccess() == null && isLiveAchieved() && 
-            !Utils.isTrue(isAchieved()) &&
+            !(getType().isSufficient() && Utils.isTrue(isAchieved())) &&
             (parent == null || parent.isLivePlan());
    }
 
