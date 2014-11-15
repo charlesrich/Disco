@@ -366,7 +366,8 @@ public class Task extends Instance {
 
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
-      return condition == null ? null : condition.evalCondition(this);
+      return ( condition == null || (condition.isStrict() && !isDefinedInputs()) )  ? null :
+         condition.evalCondition(this);
    }
 
    private Boolean achieved;
@@ -384,7 +385,7 @@ public class Task extends Instance {
       if ( engine.containsAchieved(this) ) // check cached value
          return engine.isAchieved(this);
       Postcondition condition = getType().getPostcondition();
-      if ( condition == null )
+      if ( condition == null || (condition.isStrict() && !(isDefinedInputs() && isDefinedOutputs())) )
          return null;
       Boolean achieved;
       if ( !getType().hasModifiedInputs() || !occurred() )

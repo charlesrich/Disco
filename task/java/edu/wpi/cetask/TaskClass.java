@@ -62,7 +62,8 @@ public class TaskClass extends TaskModel.Member {
    /**
     * Returns true iff the precondition, postcondition and applicability
     * conditions for all decompositions for this task class are strict, i.e., 
-    * the condition returns null if any of the slots on which it depends is undefined.
+    * the condition returns null (unknown) if any of the <em>declared</em> slots 
+    * on which it depends is undefined.
     * <p>
     * Controlled by @strict property (default true)
     */

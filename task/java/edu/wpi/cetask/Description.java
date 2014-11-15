@@ -226,6 +226,10 @@ public abstract class Description { //TODO: temporarily public for Anahita
          this.strict = strict;
       }
       
+      /**
+       * If this property is true, then this condition returns null (unknown) if
+       * any of the relevant <em>declared</em> slots on the associated task class are undefined.
+       */
       public boolean isStrict () { return strict; }
       
       protected static boolean isStrict (TaskEngine engine, String id) {
@@ -250,10 +254,6 @@ public abstract class Description { //TODO: temporarily public for Anahita
       }
       
       public Boolean evalCondition (Task task) {
-         if ( strict ) {
-            for (String slot : slots)
-               if ( !task.isDefinedSlot(slot) ) return null;
-         } 
          return task.evalCondition(script, compiled, where);
       }
    }

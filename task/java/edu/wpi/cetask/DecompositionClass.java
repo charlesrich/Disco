@@ -68,8 +68,9 @@ public class DecompositionClass extends TaskModel.Member {
     */
    public Applicability getApplicable () { return applicable; }
    
-   public Boolean isApplicable (Task goal) {
-      return applicable == null ? null : applicable.evalCondition(goal);
+   public Boolean isApplicable (Task goal) {    
+      return ( applicable == null || (applicable.isStrict() && !goal.isDefinedInputs()) ) ? null
+         : applicable.evalCondition(goal);
    }
    
    private final boolean ordered;
