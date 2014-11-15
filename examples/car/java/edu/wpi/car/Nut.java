@@ -2,9 +2,13 @@ package edu.wpi.car;
 
 public class Nut extends PhysObj {
 
-	public Nut (String name) { super(name, null, null); }
+	public Nut (String name, CarWorld world) { 
+	   super(name, null, world);
+	}
 	
 	// package copy constructor
-	Nut (Nut nut) { super(nut.name, nut.location, null); }
+	Nut (Nut nut, CarWorld world) { 
+	   super(nut.name, nut.location, world); 
+	}
 	
 }

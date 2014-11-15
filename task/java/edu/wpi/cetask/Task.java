@@ -842,12 +842,13 @@ public class Task extends Instance {
     * 
     * @return the hypothetical worlds resulting from this simulation.
     */
+ /*
    public Set<Object> simulate (Set<Object> worlds) { 
       Plan plan = new Plan(this);
       plan.decomposeAll();
       return plan.simulate(worlds);
    }
-
+*/
    protected void evalIf (Plan plan) {
       if ( isSystem() )
          eval(plan);

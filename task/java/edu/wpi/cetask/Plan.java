@@ -299,6 +299,7 @@ public class Plan {
    
    public boolean occurred () { return goal.occurred(); }
    
+/*   
    // TODO provide thread-safe version on Interaction
    // Provide documentation block on TaskEngine class doc 
    Set<Object> simulate (Set<Object> worlds) {
@@ -336,6 +337,8 @@ public class Plan {
       }
       return resulting;
    }
+
+*/
    /**
     * Tests whether plans which require this plan should become live.
     * Note that this plan may have "trailing" optional steps that have
