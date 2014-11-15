@@ -22,10 +22,10 @@ public class CarWorld {
    public final List<Nut> LOOSE_NUTS = new ArrayList<Nut>();
    
    public CarWorld () {
-      LFtire = new Tire("LF tire", this);
-      RFtire = new Tire("RF tire", this);
-      RRtire = new Tire("RR tire", this);
-      LRtire = new Tire("LR tire", this);
+      LFtire = new Tire("tire 1", this);
+      RFtire = new Tire("tire 2", this);
+      LRtire = new Tire("tire 3", this); // note order 
+      RRtire = new Tire("tire 4", this);
       // must create tires before calling Car constructor
       MyCar = new Car(this);
    }
@@ -48,7 +48,7 @@ public class CarWorld {
    
    public void print (PrintStream stream) {
 		if (!LOOSE_NUTS.isEmpty()){
-			stream.append("\nLOOSE_NUTS:");		
+			stream.append("\nLOOSE_NUTS: ");
 			for (Nut nut : LOOSE_NUTS) {
 				stream.append(nut.name + ", ");
 			}
