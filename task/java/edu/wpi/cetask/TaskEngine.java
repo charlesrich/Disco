@@ -200,13 +200,32 @@ public class TaskEngine {
    
    public Task getLastOccurrence () { return last; }
    
-   /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
+   /** DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
     * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
+    * See {@link AbstractScriptEngine#eval(String,Bindings)}
     */
    
    public Object eval (String script, String where) {
       return eval(script, scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE), 
                  where);
+   }
+
+   /**
+    * Evaluate given script with $world temporarily bound (hypothetical) 
+    * to given object.
+    * 
+    * This method is thread-safe, which means that it will not interfere
+    * with other evaluations in current world.
+    */
+   public Object eval (String script, Bindings bindings, Object world, String where) {
+      Bindings global = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
+      synchronized (global) {
+         Object old = bindings.get("$world");
+         try {
+            bindings.put("$world", world);
+            return eval(script, bindings, where);
+         } finally { bindings.put("$world", old); }
+      }
    }
 
    public Object eval (String script, Bindings bindings, String where) {
@@ -218,6 +237,24 @@ public class TaskEngine {
 
    static RuntimeException newRuntimeException (Exception e, String where) {
       return new RuntimeException("Evaluating "+where+"\n"+e, e);
+   }
+   
+   /**
+    * @return current world object (value of $world)
+    * 
+    * @see #setWorld(Object)
+    */
+   public Object getWorld () {
+      return getGlobal("$world");
+   }
+   
+   /**
+    * Set the current world object (value of $world)
+    * 
+    * @see #getWorld()
+    */
+   public void setWorld (Object world) {
+      setGlobal("$world", world);
    }
    
    public Object eval (InputStream input, String where) {
@@ -247,23 +284,23 @@ public class TaskEngine {
    }
    
    public void setGlobal (String variable, Object value) {
-      Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
-      synchronized (bindings) { bindings.put(variable, value); }
+      Bindings global = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
+      synchronized (global) { global.put(variable, value); }
    }
    
    public Object getGlobal (String variable) {
-      Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
-      synchronized (bindings) { return bindings.get(variable); }
+      Bindings global = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
+      synchronized (global) { return global.get(variable); }
    }
    
    public boolean isDefinedGlobal (String variable) {
-      Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
-      synchronized (bindings) { return bindings.containsKey(variable); }
+      Bindings global = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
+      synchronized (global) { return global.containsKey(variable); }
    }
    
    public void deleteGlobal (String variable) {
-      Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
-      synchronized (bindings) { bindings.remove(variable); }
+      Bindings global = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
+      synchronized (global) { global.remove(variable); }
    }
    
    public Compiled compile (String script, String where) {

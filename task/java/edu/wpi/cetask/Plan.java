@@ -299,6 +299,43 @@ public class Plan {
    
    public boolean occurred () { return goal.occurred(); }
    
+   // TODO provide thread-safe version on Interaction
+   // Provide documentation block on TaskEngine class doc 
+   Set<Object> simulate (Set<Object> worlds) {
+      decomposeAll();
+      Set<Object> resulting = new HashSet<Object>(worlds.size());
+      for (Object world : worlds) {
+         if ( !Utils.isFalse(isApplicable(world)) ) {
+            if ( !getType().getPostcondition().isSufficient() ) {
+               if ( isPrimitive() ) goal.execute(this, world); // modify world
+               else {    // TODO logic not quite right below!?
+                  if ( getDecomposition() == null ) {
+                     Iterator<DecompositionClass> decomps = getDecompositions().iterator();
+                     Object nextWorld;
+                     while (decomps.hasNext()) {
+                        if ( decomps.hasNext() ) nextWorld = Utils.copy(world);
+                        DecompositionClass next = decomps.next();
+                        apply(next);
+                        decomposeAll();
+                        while ( hasLive() )
+                           resulting.addAll(getLive().get(0).simulate(Collections.singleton(world)));
+                        if ( decomps.hasNext() ) {
+                           retryCopy();
+                           world = nextWorld;
+                        }
+                     }
+                  } else {
+                     while ( hasLive() )
+                        resulting.addAll(getLive().get(0).simulate(Collections.singleton(world)));
+                  }
+               }
+               // TODO only add states if non-terminal is done (not failed or stuck)
+               if ( !Utils.isFalse(isAchieved(world)) ) resulting.add(world);
+            }
+         }
+      }
+      return resulting;
+   }
    /**
     * Tests whether plans which require this plan should become live.
     * Note that this plan may have "trailing" optional steps that have

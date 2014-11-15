@@ -1,0 +1,330 @@
+<taskModel about="urn:disco.wpi.edu:htnlfd:prim" xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+	<!-- For seeing the graphical model please refer to heres-how/docs/TireRotation.pdf -->
+	
+	<!-- Basic tasks -->
+	<!--  <task id="Unscrew">
+		<input name="stud" type="Stud"/>
+		<output name="nut" type="Nut"/>
+		<precondition> 
+			$this.stud == undefined ? undefined : (($this.stud.getNut() != null &amp;&amp; $world.robot.getHolding() == null) || ($this.stud.getNut() == null))
+		</precondition>
+		<postcondition sufficient="true"> 
+			$this.stud == undefined ? undefined : ($this.stud.getNut() == null)
+		</postcondition>
+		<subtasks id="unscrew">
+			<step name="unscrewRobot" task="UnscrewRobot"/>
+			
+			<binding slot="$unscrewRobot.stud" value="$this.stud"/>
+			<binding slot="$this.nut" value="$unscrewRobot.nut"/>
+		</subtasks>
+	</task>
+	
+	<task id="Unhang">
+		<input name="hub" type="Hub"/>
+		<output name="tire" type="Tire"/>
+		<precondition> 
+			$this.hub == undefined ? undefined : (($this.hub.getTire() != null &amp;&amp; $world.robot.getHolding() == null) || $this.hub.getTire() == null)
+		</precondition>
+		<postcondition sufficient="true"> 
+			$this.hub == undefined ? undefined : ($this.hub.getTire() == null)
+		</postcondition>
+		<subtasks id="unhang">
+			<step name="unhangRobot" task="UnhangRobot"/>
+			
+			<binding slot="$unhangRobot.hub" value="$this.hub"/>
+			<binding slot="$this.tire" value="$unhangRobot.tire"/>
+		</subtasks>
+	</task>  -->
+
+	<!-- Primitive tasks -->
+	<task id="Unscrew">
+		<input name="stud" type="Stud"/>
+		<output name="nut" type="Nut"/>
+		<binding slot="$this.external" value="false"/>
+		<precondition> 
+			$this.stud == undefined ? undefined : ($this.stud.getNut() != null &amp;&amp; $world.robot.getHolding() == null)
+		</precondition>
+		<postcondition sufficient="true"> 
+			$this.stud == undefined ? undefined : ($this.stud.getNut() == null &amp;&amp; $world.robot.getHolding() == $this.nut)
+		</postcondition>
+		<script>
+			if( isROS() ) {
+				var objects = new Array();
+				objects[0] = $this.stud.name;
+				$ros.planRequest("Unscrew",objects);
+				//$this.success = $ros.executeRequest(1,0);
+				if(!failure){
+					if(!$ros.executeRequest(1,0))
+						$this.success = false;
+				}
+				else{
+					if(failureCounter == whichNutDrop){
+						if(!$ros.executeRequest(1,-2))
+							$this.success = false;
+						failureCounter += 1;
+					}
+					else{
+						if(!$ros.executeRequest(1,0))
+							$this.success = false;
+						failureCounter += 1;
+					}
+				}
+				$this.nut = $this.stud.getNut(); 
+				$disco.onTick.run();
+			}
+			else {
+				$this.nut = $this.stud.getNut(); 
+				$this.stud.setNut(null);
+				
+				if(!failure){
+					$world.robot.setHolding($this.nut);
+				}
+				else{
+					if(failureCounter == whichNutDrop){
+						failureCounter += 1;
+					}
+					else{
+						$world.robot.setHolding($this.nut);
+						failureCounter += 1;
+					}
+				}
+				
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();
+			}
+		</script>
+	</task>
+
+	<task id="Screw">
+		<input name="nut" type="Nut" modified="newNut"/>
+		<input name="stud" type="Stud"/>
+		<output name="newNut" type="Nut"/>
+		<binding slot="$this.external" value="false"/>
+		<precondition> 
+			($this.stud == undefined || $this.nut == undefined) ? undefined : ($this.stud.getNut() == null &amp;&amp; $world.robot.getHolding() == $this.nut)
+		</precondition>
+		<postcondition sufficient="true"> 
+			($this.stud == undefined || $this.nut == undefined) ? undefined : ($this.stud.getNut() === $this.newNut &amp;&amp; $world.robot.getHolding() == null)
+		</postcondition>
+		<script>  
+			if( isROS() ) {
+				var objects = new Array();
+				objects[0] = $this.nut.name;
+				objects[1] = $this.stud.name;
+				$ros.planRequest("Screw",objects);
+				if(!$ros.executeRequest(1,0))
+						$this.success = false;
+				$disco.onTick.run();
+			}
+			else {
+				$this.newNut.setLocation($this.stud.getLocation());
+				$this.stud.setNut($this.newNut);
+				$world.robot.setHolding(null);	
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();		
+			}
+		</script>
+	</task>
+
+	<task id="Unhang"> 
+		<input name="hub" type="Hub"/>
+		<output name="tire" type="Tire"/>
+		<precondition> 
+			$this.hub == undefined ? undefined : ($this.hub.getTire() != null &amp;&amp; $world.robot.getHolding() == null 
+			&amp;&amp; $this.hub.studA.getNut() == null &amp;&amp; $this.hub.studB.getNut() == null &amp;&amp; $this.hub.studC.getNut() == null)
+		</precondition>
+		<postcondition sufficient="true"> 
+			$this.hub == undefined ? undefined : ($this.hub.getTire() == null &amp;&amp; $world.robot.getHolding() == $this.tire)
+		</postcondition>
+		<script>
+		    
+			if( isROS() ) {
+			
+				var objects = new Array();
+				objects[0] = $this.hub.name;
+				$ros.planRequest("Unhang",objects);
+				if(!$ros.executeRequest(1,0))
+						$this.success = false;			    
+				$this.tire = $this.hub.getTire();
+				$disco.onTick.run();
+				
+			}
+			else {
+				$this.tire = $this.hub.getTire();
+				$this.hub.setTire(null);
+				$world.robot.setHolding($this.tire);
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();
+			}
+		</script>
+	</task>
+
+	<task id="Hang">
+		<input name="tire" type="Tire" modified="newTire"/>
+		<input name="hub" type="Hub"/>
+		<output name="newTire" type="Tire"/>
+		<binding slot="$this.external" value="false"/>
+		<!-- note we really should check that tire is "loose", but we are not keeping track of loose tires for now -->
+		<precondition> 
+			($this.tire == undefined || $this.hub == undefined ) ? undefined :  ($this.hub.getTire() == null &amp;&amp; $world.robot.getHolding() == $this.tire
+			&amp;&amp; $this.hub.studA.getNut() == null &amp;&amp; $this.hub.studB.getNut() == null &amp;&amp; $this.hub.studC.getNut() == null)
+		</precondition>
+		<postcondition sufficient="true"> 
+			($this.hub == undefined || $this.tire == undefined) ? undefined : ($this.hub.getTire() === $this.newTire &amp;&amp; $world.robot.getHolding() == null)
+		</postcondition>
+		<script>
+			if( isROS() ) {
+				var objects = new Array();
+				objects[0] = $this.tire.name;
+				objects[1] = $this.hub.name;
+				$ros.planRequest("Hang",objects);
+				if(!$ros.executeRequest(1,0))
+						$this.success = false;	
+				$disco.onTick.run();
+				$this.newTire = $this.hub.getTire();
+			}
+			else {
+				$this.newTire.setLocation($this.hub.getLocation());
+				$this.hub.setTire($this.newTire);
+				$world.robot.setHolding(null);
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();
+			}
+		</script>
+	</task>
+	
+	<!-- Note there are no preconditions specified below for PickUp and PutDown. This means that the preconditions default to 'unknown'.   
+	The actual preconditions are too complex to specify at here -->
+	<task id="PickUp">
+		<input name="object" type="PhysObj" modified="newObject"/>
+		<output name="newObject" type="PhysObj"/>
+		<binding slot="$this.external" value="false"/>
+		<precondition> 
+			$this.object == undefined ? undefined :  ($world.robot.getHolding() == null || $world.robot.getHolding() ==
+$this.object)
+		</precondition>
+		<postcondition sufficient="true">
+			($this.object == undefined || $this.newObject == undefined) ? undefined : $world.robot.getHolding() == $this.newObject
+		</postcondition>
+		<script>
+			if( isROS() ) {
+				var objects = new Array();
+				objects[0] = $this.object.name;
+
+				if ( $this.object instanceof Tire ) {
+					$ros.planRequest("Pickup",objects);
+					if(!$ros.executeRequest(0,0))
+						$this.success = false;	
+					
+					$disco.onTick.run();
+				}
+				else if ( $this.object instanceof Nut ) {
+					// if ( $world.LOOSE_NUTS.contains($this.object) ) {
+						$ros.planRequest("Pickup",objects);
+						if(!$ros.executeRequest(0,0))
+							$this.success = false;							
+						$disco.onTick.run();
+						$world.LOOSE_NUTS.remove($this.newObject);
+					// }
+					// else {
+					//	$this.success = false;
+					// }
+				}
+			}
+			else {					    					 
+				if ( $this.object instanceof Tire ) {
+					$this.newObject.setLocation($this.object.getLocation().x,
+					$this.object.getLocation().y,
+					$this.object.getLocation().z+1);
+					$world.robot.setHolding($this.newObject);
+				}
+				else if ( $this.object instanceof Nut ) {
+					//if ( $world.LOOSE_NUTS.contains($this.object) ) {
+						$this.newObject.setLocation($this.object.getLocation().x,
+						$this.object.getLocation().y,
+						$this.object.getLocation().z+2);
+						$world.LOOSE_NUTS.remove($this.newObject);
+						if(!failure){
+							$world.robot.setHolding($this.newObject);
+						}
+						else{
+							if(failureCounter == whichNutDrop){
+								failureCounter += 1;
+							}
+							else{
+								$world.robot.setHolding($this.newObject);
+								failureCounter += 1;
+							}
+						}
+						
+					//}
+					//else {
+						//$this.success = false;
+					//}
+				}
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();
+			}
+		</script>
+	</task>
+
+	<task id="PutDown">
+		<input name="object" type="PhysObj" modified="newObject"/>
+		<output name="newObject" type="PhysObj"/>
+		<binding slot="$this.external" value="false"/>
+		<precondition> 
+			$this.object == undefined ? undefined :  ($world.robot.getHolding() == $this.object || $world.robot.getHolding() == null)
+		</precondition>
+		<postcondition sufficient="true">
+			($this.object == undefined || $this.newObject == undefined) ? undefined : $world.robot.getHolding() == null
+		</postcondition>
+		<script>
+			if( isROS() ) {
+			    var objects = new Array();
+				objects[0] = $this.object.name;
+				$ros.planRequest("Putdown",objects);
+				if(!$ros.executeRequest(0,0))
+						$this.success = false;	
+									
+				if ( $this.object instanceof Tire ) {
+					$disco.onTick.run();
+				}
+				else if ( $this.object instanceof Nut ) {
+					$disco.onTick.run();
+					$world.LOOSE_NUTS.add($this.newObject); 
+				}
+			}
+			else {
+				if ( $this.object instanceof Tire ) {
+					$this.newObject.setLocation(new Location(0,0,0));
+				}
+				else if ( $this.object instanceof Nut ) {
+					$this.newObject.setLocation(new Location(20,20,20));
+					$world.LOOSE_NUTS.add($this.newObject); 
+				}
+				$world.robot.setHolding(null);
+				if(LearnAgent.callback != null)
+					LearnAgent.callback.updateWorld();
+			}
+		</script>
+	</task>
+	
+	<script init="true">
+		var rotationPattern; // = "frontToRear";
+		var failure = false;
+		var whichNutDrop = 3;
+		var failureCounter = 1;
+		var isRosConn = $ros.isRosConnected();
+		if(isRosConn){
+			$ros.subscribeUpdates("/abstract_world_model/world", "heres_how_symbolic_model/AbstractWorld");
+		}
+		function isROS(){
+			if(isRosConn != $ros.isRosConnected()){
+				Packages.java.lang.System.out.println("Inconsistent Connection");
+				Packages.java.lang.System.exit();
+			}
+			return isRosConn;
+		}
+	</script>
+
+</taskModel>

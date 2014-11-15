@@ -15,6 +15,16 @@ import java.util.*;
 public abstract class Utils {
 
    private Utils () {}  // non-instantiatable class for static methods only
+   
+   /**
+    * Invoke copy constructor on given object.
+    */
+   public static Object copy (Object object) {
+      try { return object.getClass().getConstructor(object.getClass()).newInstance(object); } 
+      catch (Exception e) {
+         throw new RuntimeException("No public copy constructor for: "+object.getClass());
+      }
+   }
 
    // three-valued logic (null represents unknown)
    

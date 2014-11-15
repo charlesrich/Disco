@@ -1,0 +1,178 @@
+<taskModel about="urn:disco.wpi.edu:htnlfd:TireRotation" xmlns:prim="urn:disco.wpi.edu:htnlfd:prim" xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+	<!-- For seeing the graphical model please refer to heres-how/docs/TireRotation.pdf -->
+	<task id="RotateTires">
+		<subtasks id="rotateTires">
+			<step name="removeTires" task="RemoveTires"/>	
+			<step name="rotate" task="Rotate"/>
+			<step name="screwHubs" task="ScrewHubs"/>		
+
+            <binding slot="$rotate.tire1" value="$removeTires.tire1"/>
+			<binding slot="$rotate.tire2" value="$removeTires.tire2"/>
+			<binding slot="$rotate.tire3" value="$removeTires.tire3"/>
+			<binding slot="$rotate.tire4" value="$removeTires.tire4"/>
+
+		</subtasks>
+	</task>
+	
+	<task id="RemoveTires">				
+        <output name="tire1" type="Tire"/>
+        <output name="tire2" type="Tire"/>
+        <output name="tire3" type="Tire"/>
+        <output name="tire4" type="Tire"/>
+
+		<subtasks id="removeTires" ordered="false">
+			<step name="removeTire1" task="RemoveTire"/>	
+			<step name="removeTire2" task="RemoveTire"/>	
+			<step name="removeTire3" task="RemoveTire"/>	
+			<step name="removeTire4" task="RemoveTire"/>	
+
+			<binding slot="$removeTire1.hub" value="$world.MyCar.LFhub"/>
+			<binding slot="$removeTire2.hub" value="$world.MyCar.RFhub"/>
+			<binding slot="$removeTire3.hub" value="$world.MyCar.LRhub"/>
+			<binding slot="$removeTire4.hub" value="$world.MyCar.RRhub"/>
+
+            <binding slot="$this.tire1" value="$removeTire1.tire"/>
+			<binding slot="$this.tire2" value="$removeTire2.tire"/>
+			<binding slot="$this.tire3" value="$removeTire3.tire"/>
+			<binding slot="$this.tire4" value="$removeTire4.tire"/>
+		</subtasks>		
+	</task>
+	
+	<task id="RemoveTire">
+		<input name="hub" type="Hub"/>
+        <output name="tire" type="Tire"/>
+		
+		<subtasks id="removeTire">
+			<step name="unscrewHub" task="UnscrewHub"/>	
+			<step name="unhangHub" task="UnhangHub"/>	
+
+			<binding slot="$unscrewHub.hub" value="$this.hub"/>
+			<binding slot="$unhangHub.hub" value="$this.hub"/>	
+            <binding slot="$this.tire" value="$unhangHub.tire"/>
+		</subtasks>		
+	</task>
+	
+	<task id="Rotate">
+        <input name="tire1" type="Tire"/>
+        <input name="tire2" type="Tire"/>
+        <input name="tire3" type="Tire"/>
+        <input name="tire4" type="Tire"/>
+		<subtasks id="frontToRear" ordered="false">
+			<step name="hangTire1" task="HangTire"/>	
+			<step name="hangTire2" task="HangTire"/>	
+			<step name="hangTire3" task="HangTire"/>	
+			<step name="hangTire4" task="HangTire"/>
+			<!--  <applicable> rotationPattern == null ? undefined : rotationPattern == "frontToRear" </applicable>  -->
+			
+			<binding slot="$hangTire1.tire" value="$this.tire1"/>
+			<binding slot="$hangTire1.hub" value="$world.MyCar.LRhub"/>
+			
+			<binding slot="$hangTire2.tire" value="$this.tire2"/>
+			<binding slot="$hangTire2.hub" value="$world.MyCar.RRhub"/>
+			
+			<binding slot="$hangTire3.tire" value="$this.tire3"/>
+			<binding slot="$hangTire3.hub" value="$world.MyCar.LFhub"/>
+			
+			<binding slot="$hangTire4.tire" value="$this.tire4"/>
+			<binding slot="$hangTire4.hub" value="$world.MyCar.RFhub"/>	
+		</subtasks>	
+	</task>
+
+	<task id="ScrewHubs">
+		<subtasks id="screwHubs" ordered="false">
+			<step name="screwHub1" task="ScrewHub"/>	
+			<step name="screwHub2" task="ScrewHub"/>	
+			<step name="screwHub3" task="ScrewHub"/>	
+			<step name="screwHub4" task="ScrewHub"/>
+
+			<binding slot="$screwHub1.hub" value="$world.MyCar.LFhub"/>
+			<binding slot="$screwHub2.hub" value="$world.MyCar.LRhub"/>
+			<binding slot="$screwHub3.hub" value="$world.MyCar.RFhub"/>
+			<binding slot="$screwHub4.hub" value="$world.MyCar.RRhub"/>
+		</subtasks>		
+	</task>
+
+	<task id="ScrewHub">
+		<input name="hub" type="Hub"/>
+		
+		<subtasks id="screwHub" ordered="false">
+			<step name="screwStud1" task="ScrewStud"/>	
+			<step name="screwStud2" task="ScrewStud"/>	
+			<step name="screwStud3" task="ScrewStud"/>
+
+			<binding slot="$screwStud1.stud" value="$this.hub.studA"/>
+			<binding slot="$screwStud2.stud" value="$this.hub.studB"/>
+			<binding slot="$screwStud3.stud" value="$this.hub.studC"/>			
+		</subtasks>		
+	</task>
+
+	<task id="ScrewStud">
+		<input name="stud" type="Stud"/>
+		
+		<subtasks id="screwStud">
+			<step name="pickup" task="prim:PickUp"/>	
+			<step name="screw" task="prim:Screw"/>	
+	
+			<binding slot="$screw.stud" value="$this.stud"/>	
+			<binding slot="$pickup.object" value="$world.LOOSE_NUTS.isEmpty() ? undefined : $world.LOOSE_NUTS.get(0)"/>
+			<binding slot="$screw.nut" value="$pickup.newObject"/>			
+		</subtasks>		
+	</task>
+
+	<task id="HangTire">
+		<input name="tire" type="Tire" modified="newTire"/>
+		<input name="hub" type="Hub"/>
+		<output name="newTire" type="Tire"/>
+		
+		<subtasks id="hangTire">
+			<step name="pickup" task="prim:PickUp"/>
+			<step name="hang" task="prim:Hang"/>
+			
+			<binding slot="$pickup.object" value="$this.tire"/>
+			<binding slot="$hang.hub" value="$this.hub"/>		
+			<binding slot="$hang.tire" value="$pickup.newObject"/>				
+			<binding slot="$this.newTire" value="$hang.newTire"/>
+		</subtasks>
+	</task>	
+
+	<task id="UnhangHub">
+		<input name="hub" type="Hub"/>
+        <output name="tire" type="Tire"/>
+
+		<subtasks id="unhangHub">
+			<step name="unhang" task="prim:Unhang"/>
+			<step name="putdown" task="prim:PutDown"/>
+
+			<binding slot="$unhang.hub" value="$this.hub"/>	
+			<binding slot="$putdown.object" value="$unhang.tire"/>
+            <binding slot="$this.tire" value="$putdown.newObject"/>
+		</subtasks>
+	</task>	
+	
+	<task id="UnscrewHub">
+		<input name="hub" type="Hub"/>
+		
+		<subtasks id="unscrewHub" ordered="false">
+			<step name="unscrewStud1" task="UnscrewStud"/>
+			<step name="unscrewStud2" task="UnscrewStud"/>
+			<step name="unscrewStud3" task="UnscrewStud"/>
+		
+			<binding slot="$unscrewStud1.stud" value="$this.hub.studA"/>		
+			<binding slot="$unscrewStud2.stud" value="$this.hub.studB"/>
+			<binding slot="$unscrewStud3.stud" value="$this.hub.studC"/>	
+		</subtasks>
+	</task>	
+
+	<task id="UnscrewStud">
+		<input name="stud" type="Stud"/>
+		
+		<subtasks id="unscrewStud">				
+			<step name="unscrew" task="prim:Unscrew"/>
+			<step name="putdown" task="prim:PutDown"/>	
+		
+			<binding slot="$unscrew.stud" value="$this.stud"/>
+			<binding slot="$putdown.object" value="$unscrew.nut"/>
+		</subtasks>		
+	</task>
+
+</taskModel>
