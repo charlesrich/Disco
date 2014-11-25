@@ -331,10 +331,10 @@ public class TaskClass extends TaskModel.Member {
       @Override
       public boolean isOptional () { return optional; }
 
-      private final Output modified;
+      private final TaskClass.Output modified;
       
       @Override
-      public Output getModified () { return modified; }
+      public TaskClass.Output getModified () { return modified; }
       
       @Override
       public boolean isDeclared () { return getEnclosing().declaredInputs.contains(this); }
@@ -352,7 +352,7 @@ public class TaskClass extends TaskModel.Member {
                   (java != null && !Cloneable.class.isAssignableFrom(java)) ){
                getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
                this.modified = null;
-            } else this.modified = (Output) enclosing.slots.get(modified);
+            } else this.modified = (TaskClass.Output) enclosing.slots.get(modified);
          } else this.modified = null;  
          // cache optional
          this.optional = enclosing.getProperty(name, "@optional", false);
