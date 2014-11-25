@@ -119,6 +119,15 @@ public class TaskEngine {
    public void put (Object object, String field, Object value) {
       scriptEngine.put(object, field, value);
    }
+
+   /**
+    * Delete the field of given Javascript object.
+    */
+   public void delete (Object object, String field) {
+      scriptEngine.delete(object, field);
+   }
+   
+   boolean isScriptable () { return scriptEngine.isScriptable(); }
    
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
 

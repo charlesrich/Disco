@@ -107,6 +107,28 @@ class RhinoScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
+   void delete (Object object, String field) {
+      switch (thisPackage) {
+         case Package1:
+            sun.org.mozilla.javascript.internal.Scriptable scriptable1 = 
+               (sun.org.mozilla.javascript.internal.Scriptable) object;
+            scriptable1.delete(field);
+            break;
+         case Package2:
+            org.mozilla.javascript.Scriptable scriptable2 = 
+               (org.mozilla.javascript.Scriptable) object;
+            scriptable2.delete(field);
+            break;
+         case Package3:
+            sun.org.mozilla.javascript.Scriptable scriptable3 = 
+               (sun.org.mozilla.javascript.Scriptable) object;
+            scriptable3.delete(field);
+            break;
+         default: throw new IllegalArgumentException("Cannot perform delete on "+object);
+      }
+   }
+   
+   @Override
    public Object invokeFunction (String name, Object... args)
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)

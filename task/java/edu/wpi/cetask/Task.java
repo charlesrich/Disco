@@ -309,7 +309,11 @@ public class Task extends Instance {
     */
    public void deleteSlotValue (String name) {
       checkIsSlot(name);
-      eval("delete $this."+name, "deleteSlotValue");
+      if ( engine.isScriptable() )
+         engine.delete(bindings.get("$this"), name);
+      else 
+         // call super.eval to avoid only removing from clonedInputs instead
+         super.eval("delete $this."+name, "deleteSlotValue");
       getType().updateBindings(this);
       modified = true;
    }
