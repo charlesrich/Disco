@@ -903,7 +903,7 @@ public class Task extends Instance {
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
    }
    
-   static private final Object trim = new Object();
+   static private final Object omit = new Object();
    
    public List<Object> getDeclaredSlotValues () {
       List<Object> list = new ArrayList<Object>();
@@ -915,8 +915,8 @@ public class Task extends Instance {
          Input input = type.getModifiedInput(output);
          if ( input != null ) {
             Object old = getSlotValueIf(input.getName());
-            list.add( old == trim ? value :
-               (value == trim || toString(value).equals(toString(old))) ? trim : value);
+            list.add( old == omit ? value :
+               (value == omit || toString(value).equals(toString(old))) ? omit : value);
          } else list.add(value);
       }
       return list;
@@ -928,14 +928,14 @@ public class Task extends Instance {
             ( clonedInputs != null ? engine.get(clonedInputs, name) :
                getSlotValue(name) )
             : eval("$this."+name, "getSlotValueIf") )
-         : trim;
+         : omit;
    }
    
    protected StringBuilder argListBuilder (List<Object> args) {
       for (int i = args.size(); i-- > 0;) { 
          Object arg = args.get(i);
          // trim undefined slots and duplicate printing modified outputs from end
-         if ( arg == trim ) args.remove(i);
+         if ( arg == omit ) args.remove(i);
          else break;
       }
       StringBuilder buffer = new StringBuilder();
@@ -943,7 +943,7 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != trim ) buffer.append(toString(arg));
+         if ( arg != omit ) buffer.append(toString(arg));
       }
       return buffer;
    }
