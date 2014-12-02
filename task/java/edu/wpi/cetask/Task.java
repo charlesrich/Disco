@@ -903,16 +903,23 @@ public class Task extends Instance {
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
    }
    
-   static private final Object undefined = new Object();
+   static private final Object trim = new Object();
    
    public List<Object> getDeclaredSlotValues () {
       List<Object> list = new ArrayList<Object>();
       TaskClass type = getType();
       for (String name : type.declaredInputNames)
          list.add(getSlotValueIf(name));
-      for (String name : type.declaredOutputNames)
-         list.add(getSlotValueIf(name));
-       return list;
+      for (Output output : type.declaredOutputs) {
+         Object value = getSlotValueIf(output.getName());
+         Input input = type.getModifiedInput(output);
+         if ( input != null ) {
+            Object old = getSlotValueIf(input.getName());
+            list.add( old == trim ? value :
+               (value == trim || toString(value).equals(toString(old))) ? trim : value);
+         } else list.add(value);
+      }
+      return list;
    }
 
    private Object getSlotValueIf (String name) {
@@ -921,14 +928,14 @@ public class Task extends Instance {
             ( clonedInputs != null ? engine.get(clonedInputs, name) :
                getSlotValue(name) )
             : eval("$this."+name, "getSlotValueIf") )
-         : undefined;
+         : trim;
    }
    
    protected StringBuilder argListBuilder (List<Object> args) {
       for (int i = args.size(); i-- > 0;) { 
          Object arg = args.get(i);
-         // trim undefined output args from end
-         if ( arg == undefined ) args.remove(i);
+         // trim undefined slots and duplicate printing modified outputs from end
+         if ( arg == trim ) args.remove(i);
          else break;
       }
       StringBuilder buffer = new StringBuilder();
@@ -936,7 +943,7 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined ) buffer.append(toString(arg));
+         if ( arg != trim ) buffer.append(toString(arg));
       }
       return buffer;
    }
