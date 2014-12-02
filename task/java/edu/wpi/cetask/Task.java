@@ -92,7 +92,8 @@ public class Task extends Instance {
       if ( isScriptable(name) ) {
          Object value = engine.get(bindings.get("$this"), name);
          return engine.isDefined(value) ? value : null;
-      } else return eval("$this."+name, "getSlotValue"); 
+         // super.eval below to avoid returning cached value in clonedInputs
+      } else return super.eval("$this."+name, "getSlotValue"); 
    }
 
    private void checkIsSlot (String name) {
@@ -105,7 +106,8 @@ public class Task extends Instance {
       if ( isScriptable(name) ) {
          Object value = engine.get(bindings.get("$this"), name);
          return engine.isDefined(value) ? (Boolean) value : null;
-      } else return evalCondition("$this."+name, "getSlotValueBoolean"); 
+         // super.evalCondition below to avoid returning cached value in clonedInputs
+      } else return super.evalCondition("$this."+name, "getSlotValueBoolean"); 
    }
    
    private boolean isScriptable (String name) {
@@ -177,6 +179,7 @@ public class Task extends Instance {
          if ( engine.isScriptable(value) ) {
             modified = true;
             engine.put(bindings.get("$this"), name, value);
+            if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
          } else 
             synchronized (bindings) {
                try {
@@ -900,30 +903,32 @@ public class Task extends Instance {
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
    }
    
-   static private final Object modifiedOutput = new Object(),
-         // both undefined and null in JavaScript get returned as null in Java
-         undefined = new Object();
+   static private final Object undefined = new Object();
    
    public List<Object> getDeclaredSlotValues () {
       List<Object> list = new ArrayList<Object>();
       TaskClass type = getType();
       for (String name : type.declaredInputNames)
          list.add(getSlotValueIf(name));
-      for (Output output : type.declaredOutputs)
-         // suppress modified output objects, since must be identical to input
-         list.add(type.getModifiedInput(output) == null ? getSlotValueIf(output.getName()) : modifiedOutput);
+      for (String name : type.declaredOutputNames)
+         list.add(getSlotValueIf(name));
        return list;
    }
 
    private Object getSlotValueIf (String name) {
-      return isDefinedSlot(name) ? getSlotValue(name) : undefined;
+      return isDefinedSlot(name) ? 
+         ( isScriptable(name) ? 
+            ( clonedInputs != null ? engine.get(clonedInputs, name) :
+               getSlotValue(name) )
+            : eval("$this."+name, "getSlotValueIf") )
+         : undefined;
    }
    
    protected StringBuilder argListBuilder (List<Object> args) {
       for (int i = args.size(); i-- > 0;) { 
          Object arg = args.get(i);
-         // trim undefined or modified output args from end
-         if ( arg == undefined || arg == modifiedOutput ) args.remove(i);
+         // trim undefined output args from end
+         if ( arg == undefined ) args.remove(i);
          else break;
       }
       StringBuilder buffer = new StringBuilder();
@@ -931,7 +936,7 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined || arg == modifiedOutput ) buffer.append(toString(arg));
+         if ( arg != undefined ) buffer.append(toString(arg));
       }
       return buffer;
    }

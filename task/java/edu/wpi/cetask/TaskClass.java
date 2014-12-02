@@ -245,7 +245,7 @@ public class TaskClass extends TaskModel.Member {
       public String getName () { return name; }
       
       protected SlotBase (String name, Description enclosing) {
-         super(null, null);
+         super(enclosing == null ? null : enclosing.engine, null);
          this.name = name;
          setEnclosing(enclosing);
       }
