@@ -28,7 +28,7 @@ public abstract class Utils {
          }
       try { return type.getConstructor(type).newInstance(object); } 
       catch (Exception e) {
-         throw new RuntimeException("No public copy constructor for: "+type);
+         throw new RuntimeException("Error calling copy constructor for: "+type);
       }
    }
 
