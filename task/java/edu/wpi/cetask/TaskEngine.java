@@ -113,12 +113,21 @@ public class TaskEngine {
    }
    
    /**
-    * See the field of given Javascript object. See LiveConnect documentation
+    * Set the field of given Javascript object. See LiveConnect documentation
     * for conversion of value from Java to Javascript.
     */
    public void put (Object object, String field, Object value) {
       scriptEngine.put(object, field, value);
    }
+
+   /**
+    * Delete the field of given Javascript object.
+    */
+   public void delete (Object object, String field) {
+      scriptEngine.delete(object, field);
+   }
+   
+   boolean isScriptable () { return scriptEngine.isScriptable(); }
    
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
 

@@ -9,15 +9,12 @@ import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.Recognition.Explanation;
 import edu.wpi.disco.lang.*;
-
 import org.iso_relax.verifier.Schema;
 import org.w3c.dom.Document;
 import org.xml.sax.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 

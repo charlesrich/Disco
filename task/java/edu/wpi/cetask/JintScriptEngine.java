@@ -83,6 +83,11 @@ class JintScriptEngine extends ScriptEngineWrapper
                ((java.lang.Number) value).doubleValue());
       ((JsObject) object).DefineOwnProperty(field, (JsInstance) value);
    }
+   
+   @Override
+   void delete (Object object, String field) {
+      ((JsObject) object).Delete(field);
+   }
 
    @Override
    public Bindings getBindings (int scope) { 
