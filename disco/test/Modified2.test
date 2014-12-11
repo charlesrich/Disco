@@ -28,6 +28,8 @@ ModifiedA(agent,,6.0)
     # Returned '[9]'
   > eval a.getSlotValue("input1")
     # Returned '[9]'
+  > eval a.setSlotValue("output", new Mutable(9))
+    # Returned '[9]'
   > eval println(a)
 ModifiedA(agent,[9],6.0)
     # Returned 'null'
