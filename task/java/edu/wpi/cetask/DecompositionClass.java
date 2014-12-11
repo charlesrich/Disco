@@ -12,7 +12,7 @@ import org.w3c.dom.*;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class DecompositionClass extends TaskModel.Member {  
-   
+
    // do not confuse with JavaScript bindings in Instance
    private final Map<String,Binding> bindings = new HashMap<String,Binding>();
    
@@ -68,9 +68,8 @@ public class DecompositionClass extends TaskModel.Member {
     */
    public Applicability getApplicable () { return applicable; }
    
-   public Boolean isApplicable (Task goal) {    
-      return ( applicable == null || (applicable.isStrict() && !goal.isDefinedInputs()) ) ? null
-         : applicable.evalCondition(goal);
+   public Boolean isApplicable (Task goal) {
+      return applicable == null ? null : applicable.evalCondition(goal);
    }
    
    private final boolean ordered;
@@ -79,29 +78,246 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
-   // TODO Provide enclosing class (inherit from Description?)
-   // and copy constructor
+   private abstract static class Slot extends TaskClass.SlotBase {
+       
+      protected final TaskClass.Slot slot;
+      
+      protected Slot (TaskClass task, String name, Description enclosing) {
+         super(name, null);
+         this.slot = task.getSlot(name);         
+         if ( slot == null ) throw new IllegalArgumentException("No slot in "+task+" named "+name);
+         if ( this instanceof Input && !(slot instanceof Input) ) 
+            throw new IllegalArgumentException("No input slot in "+task+" named "+name);
+         else if ( this instanceof Output && !(slot instanceof Output) ) 
+            throw new IllegalArgumentException("No output slot in "+task+" named "+name);
+         setEnclosing(enclosing);
+      }
+      
+      protected Slot (TaskClass task, TaskClass.Slot slot, Description enclosing) {
+         super(slot.getName(), null);
+         if ( task != slot.getEnclosing() ) throw new IllegalArgumentException(slot+" is not a slot of "+task);
+         this.slot = slot;
+         setEnclosing(enclosing);
+      }
+      
+      @Override
+      public String getType () { return slot.getType(); }
+
+      @Override
+      public Class<?> getJava () { return slot.getJava(); }
+
+      @Override
+      public boolean isDeclared () { return slot.isDeclared(); }
+      
+      protected List<DecompositionClass.Slot> fromSlots = Collections.emptyList(),
+            toSlots = Collections.emptyList();
+   }
+    
+   /* TODO  addBinding(Decomposition.Slot slot, String value) */
+
+   private void addBinding (DecompositionClass.Slot from, DecompositionClass.Slot to) {
+      if ( from.toSlots.isEmpty() ) from.toSlots = new ArrayList<Slot>(3);
+      if ( to.fromSlots.isEmpty() ) to.fromSlots = new ArrayList<Slot>(3);
+      from.toSlots.add(to);
+      to.fromSlots.add(from);
+   }
+ 
+   private abstract static class GoalSlot extends DecompositionClass.Slot {
+      
+      protected GoalSlot (String name, DecompositionClass enclosing) {
+         super(enclosing.getGoal(), name, enclosing);
+      }
+
+      protected GoalSlot (TaskClass.Slot slot, DecompositionClass enclosing) { 
+         super(enclosing.getGoal(), slot, enclosing); 
+      }
+      
+      @Override
+      public DecompositionClass getEnclosing () {
+         return (DecompositionClass) super.getEnclosing();
+      }
+   }
+  
+   public static class Input extends GoalSlot implements Description.Input {
+      
+      public Input (String name, DecompositionClass enclosing) {
+         super(name, enclosing);
+          if ( !enclosing.getGoal().inputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an input of "+enclosing.getGoal());
+      }
+
+      public Input (TaskClass.Input input, DecompositionClass enclosing) { super(input, enclosing); }
+
+      @Override
+      public boolean isOptional () { return ((Input) slot).isOptional(); }
+
+      @Override
+      public Output getModified () { return ((Input) slot).getModified(); }
+      
+      /**
+       * @return slots in the definition of this decomposition class that this goal input
+       *         has dataflow to (usually inputs of steps, but may also be an output of goal)
+       */
+      public List<DecompositionClass.Slot> to () { return toSlots; }
+   }
    
-   public static class Step {
+   public static class Output extends GoalSlot implements Description.Output {
+      
+      public Output (String name, DecompositionClass enclosing) {
+         super(name, enclosing);
+         if ( !enclosing.getGoal().outputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an output of "+enclosing.getGoal());
+      }
+
+      public Output (TaskClass.Output output, DecompositionClass enclosing) { super(output, enclosing); }
+      
+      /**
+       * @return slots in the definition of this decomposition class that this goal output
+       *         has dataflow from (usually outputs of steps, but may also be an input of goal)
+       */
+      public List<DecompositionClass.Slot> from () { return toSlots; }
+   }
+    
+   private final Map<String,GoalSlot> slots;
+   
+   public GoalSlot getSlot (String name) { return slots.get(name); }
+   
+   /**
+    * @return the goal slots for this decomposition class
+    */
+   public Collection<GoalSlot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
+
+   private final List<Input> inputs;
+   private final List<Output> outputs;
+   
+   public List<Input> getInputs () { return Collections.unmodifiableList(inputs); }
+   public List<Output> getOutputs ()  { return Collections.unmodifiableList(outputs); }
+   
+   public static class Step extends Description {
+      
       private final String name;
       private final TaskClass type;
       private final int minOccurs, maxOccurs;
       private final List<String> required;
       
-      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, List<String> required) {
+      public String getName () { return name; }
+      public TaskClass getType () { return type; }
+      public int getMinOccurs () { return minOccurs; }
+      public int getMaxOccurs () { return maxOccurs; }
+      public List<String> getRequired() { return required; }
+          
+      private final Map<String,Step.Slot> slots;
+      private final List<Input> inputs;
+      private final List<Output> outputs;
+      
+      public List<Input> getInputs () { return Collections.unmodifiableList(inputs); }
+      public List<Output> getOutputs () { return Collections.unmodifiableList(outputs); }
+   
+      public Step.Slot getSlot (String name) { return slots.get(name); }
+      
+      public Collection<Step.Slot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
+      
+      // TODO provide copy constructor
+      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
+            List<String> required) {
+         this(name, type, minOccurs, maxOccurs, required, null);
+      }
+      
+      // TODO make required be list of Step's
+      public Step (String name, TaskClass type, int minOccurs, int maxOccurs, 
+            List<String> required, DecompositionClass enclosing) {
+         super(null, null);
          this.name = name;
          this.type = type;
          this.minOccurs = minOccurs;
          this.maxOccurs = maxOccurs;
          this.required = required;
+         setEnclosing(enclosing);
+         slots = new HashMap<String,Slot>(type.inputNames.size()+type.outputNames.size());
+         inputs = type.inputNames.isEmpty() ? Collections.<Input>emptyList() :
+            new ArrayList<Input>(type.inputNames.size());
+         outputs = type.outputNames.isEmpty() ? Collections.<Output>emptyList() :
+            new ArrayList<Output>(type.outputNames.size());
+         for (TaskClass.Slot slot : type.getSlots()) 
+            slots.put(slot.getName(), 
+                  slot instanceof TaskClass.Input ? new Input(slot.getName(), this) :
+                       new Output(slot.getName(), this));
+      }
+      
+      @Override
+      public DecompositionClass getEnclosing () { 
+         return (DecompositionClass) super.getEnclosing(); 
       }
       
       public Step (String name, TaskClass type) {
-         this(name, type, 1, 1, null);
+         this(name, type, 1, 1, null, null);
+      }
+      
+      @Override
+      public String toString () { 
+         return getEnclosing() == null ? name : getEnclosing().toString()+'.'+name; 
+      }
+      
+      private abstract static class Slot extends DecompositionClass.Slot {
+
+         protected Slot (String name, Step enclosing) {
+            this(enclosing.getType().getSlot(name), enclosing);
+         }
+
+         protected Slot (TaskClass.Slot slot, Step enclosing) { 
+            super(enclosing.getType(), slot, enclosing); }
+
+         @Override
+         public Step getEnclosing () {
+            return (Step) super.getEnclosing();
+         }
+      }
+      
+      public class Input extends Slot implements Description.Input {
+         
+         public Input (String name, Step enclosing) {
+            super(name, enclosing);
+            if ( !enclosing.getType().inputNames.contains(name) )
+            throw new IllegalArgumentException(name+" is not an input of "+enclosing.getType());
+         }
+
+         public Input (TaskClass.Input input, Step enclosing) { super(input, enclosing); } 
+         
+         @Override
+         public boolean isOptional () { return ((Input) slot).isOptional(); }
+
+         @Override
+         public Output getModified () { return ((Input) slot).getModified(); }
+         
+         /**
+          * @return slots in the definition of this decomposition class that this step input
+          *         has dataflow from (usually outputs of steps, but may also be an input of goal)
+          */
+         public List<DecompositionClass.Slot> from () { return fromSlots; }
+      }
+      
+      public class Output extends Slot implements Description.Output {
+         
+         public Output (String name, Step enclosing) { 
+            super(name, enclosing);
+            if ( !enclosing.getType().outputNames.contains(name) )
+               throw new IllegalArgumentException(name+" is not an output of "+enclosing.getType());
+         }
+         
+         public Output (TaskClass.Output output, Step enclosing) { super(output, enclosing); }
+
+           
+         /**
+          * @return slots in the definition of this decomposition class that this step output
+          *         has dataflow to (usually inputs of steps, but may also be an output of goal)
+          */
+         public List<DecompositionClass.Slot> to () { return toSlots; }
       }
    }
 
    private final Map<String,Step> steps;
+   
+   public Step getStep (String name) { return steps.get(name); }
    
    /**
     * Return type of given step.
@@ -160,6 +376,7 @@ public class DecompositionClass extends TaskModel.Member {
             parseSteps(node, xpath, model.getEngine()),
             parseApplicable(node, xpath, model.getEngine()),
             parseOrdered(node, xpath));
+      for (Step step : steps.values()) step.setEnclosing(this);
    }
    
    private static TaskClass parseGoal (Node node, XPath xpath, TaskEngine engine) {
@@ -226,6 +443,8 @@ public class DecompositionClass extends TaskModel.Member {
    /**
     * Limited, incomplete constructor for decomposition classes without using XML.
     * Provided to support LIMSI Discolog project.
+    * 
+    * Note if there are ordering constraints ('requires') between steps, they must be specified in Step objects.
     */
    public DecompositionClass (TaskModel model, String id, TaskClass goal, List<Step> steps, Applicability applicable) { 
       this(null, null, model, id, goal, steps, applicable, false);
@@ -236,6 +455,15 @@ public class DecompositionClass extends TaskModel.Member {
       model.super(node, xpath, id);
       model.decomps.put(id, this);
       this.goal = goal;
+      slots = new HashMap<String,GoalSlot>(goal.inputNames.size()+goal.outputNames.size());
+      for (TaskClass.Slot slot : goal.getSlots()) 
+         slots.put(slot.getName(), 
+               slot instanceof TaskClass.Input ? new Input(slot.getName(), this) :
+                    new Output(slot.getName(), this));
+      inputs = goal.inputNames.isEmpty() ? Collections.<Input>emptyList() :
+            new ArrayList<Input>(goal.inputNames.size());
+      outputs = goal.outputNames.isEmpty() ? Collections.<Output>emptyList() :
+            new ArrayList<Output>(goal.outputNames.size());
       this.steps = new HashMap<String,Step>(steps.size());
       this.applicable = applicable;
       if ( applicable != null ) applicable.setEnclosing(this);
@@ -355,6 +583,7 @@ public class DecompositionClass extends TaskModel.Member {
       public final BindingType type;
       public final boolean identity;
       public final TaskClass stepType; 
+      public final Slot from, to;
             
       // bindings upon which this binding depends
       private final List<Binding> depends = new ArrayList<Binding>(); 
@@ -369,8 +598,6 @@ public class DecompositionClass extends TaskModel.Member {
       
       private final String expression, where;
       private final Compiled compiled;
-      
-      // TODO Make public Binding constructor(s) that take Step objects
       
       private Binding (String variable, Node node) 
             throws XPathExpressionException {
@@ -428,6 +655,28 @@ public class DecompositionClass extends TaskModel.Member {
                identity ?
                   ("this".equals(identityStep) ? BindingType.INPUT_OUTPUT : BindingType.OUTPUT_OUTPUT) :
                   BindingType.NON_IDENTITY;
+         switch (type) {
+            case INPUT_INPUT:
+               from = getSlot(identitySlot); 
+               to = getStep(step).getSlot(slot);
+               break;
+            case OUTPUT_INPUT:
+               from = getStep(identityStep).getSlot(identitySlot);
+               to = getStep(step).getSlot(slot);
+               break;
+            case INPUT_OUTPUT:
+               from = getSlot(identitySlot);
+               to = getSlot(slot);
+               break;
+            case OUTPUT_OUTPUT:
+               from = getStep(identityStep).getSlot(identitySlot);
+               to = getSlot(slot);
+               break;
+            default: // NON_IDENTITY
+               from = null;
+               to = step.equals("this") ? getSlot(slot) : getStep(step).getSlot(slot);
+         }
+         if ( type != BindingType.NON_IDENTITY ) addBinding(from, to);
       }
 
       // Note this implements only monotonic propagation, not full
@@ -541,7 +790,7 @@ public class DecompositionClass extends TaskModel.Member {
 
       @Override
       public String toString () { return variable; }
-
+      
       private DecompositionClass getOuterType () {
          return DecompositionClass.this;
       }      

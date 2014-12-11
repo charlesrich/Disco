@@ -47,13 +47,11 @@ public class CarWorld {
    }
    
    public void print (PrintStream stream) {
-		if (!LOOSE_NUTS.isEmpty()){
-			stream.append("\nLOOSE_NUTS: ");
-			for (Nut nut : LOOSE_NUTS) {
-				stream.append(nut.name + ", ");
-			}
-			stream.append("\n");
-		}
+      if ( !LOOSE_NUTS.isEmpty() ) {
+         stream.append("\nLOOSE_NUTS: ");
+         stream.append(LOOSE_NUTS.toString());
+         stream.append("\n");
+      }
 		MyCar.print(stream, "");
 	}
 

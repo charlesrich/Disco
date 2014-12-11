@@ -17,9 +17,14 @@ public abstract class Utils {
    private Utils () {}  // non-instantiatable class for static methods only
    
    /**
-    * Invoke copy constructor on given object.
+    * Invoke clone method or copy constructor on given object.
     */
    public static Object copy (Object object) {
+      if ( object instanceof Cloneable ) 
+         try { return object.getClass().getMethod("clone").invoke(object); }
+         catch (Exception e) {
+            throw new RuntimeException("Error calling clone method for: "+object.getClass());
+         }
       try { return object.getClass().getConstructor(object.getClass()).newInstance(object); } 
       catch (Exception e) {
          throw new RuntimeException("No public copy constructor for: "+object.getClass());
