@@ -168,6 +168,32 @@ class RhinoScriptEngine extends ScriptEngineWrapper
       }
    }
    
+ /* TODO Use below to avoid calling 'eval' for slots with Java objects
+    See Task.isScriptable(String)
+ 
+   private static Object jsToJava (Object value, Class target) {
+      switch (thisPackage) {
+         case Package1:
+             try {
+               sun.org.mozilla.javascript.internal.Context.enter();
+               return sun.org.mozilla.javascript.internal.Context.jsToJava(value, target); 
+             } finally { sun.org.mozilla.javascript.internal.Context.exit(); }   
+         case Package2:
+            try {
+               org.mozilla.javascript.Context.enter();
+               return org.mozilla.javascript.Context.jsToJava(value, target); 
+            } finally { org.mozilla.javascript.Context.exit(); }   
+         case Package3:
+            try {
+               sun.org.mozilla.javascript.Context.enter();
+               return sun.org.mozilla.javascript.Context.jsToJava(value, target); 
+            } finally { sun.org.mozilla.javascript.Context.exit(); }   
+         default: throw new IllegalArgumentException("Cannot perform jsToJava on "+value);
+      }
+   }
+   
+*/
+   
    @Override
    public Bindings getBindings (int scope) { return rhino.getBindings(scope); }
    
