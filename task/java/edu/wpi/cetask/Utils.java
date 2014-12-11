@@ -20,14 +20,15 @@ public abstract class Utils {
     * Invoke clone method or copy constructor on given object.
     */
    public static Object copy (Object object) {
+      Class<?> type = object.getClass();
       if ( object instanceof Cloneable ) 
-         try { return object.getClass().getMethod("clone").invoke(object); }
+         try { return type.getMethod("clone").invoke(object); }
          catch (Exception e) {
-            throw new RuntimeException("Error calling clone method for: "+object.getClass());
+            throw new RuntimeException("Error calling clone method for: "+type);
          }
-      try { return object.getClass().getConstructor(object.getClass()).newInstance(object); } 
+      try { return type.getConstructor(type).newInstance(object); } 
       catch (Exception e) {
-         throw new RuntimeException("No public copy constructor for: "+object.getClass());
+         throw new RuntimeException("No public copy constructor for: "+type);
       }
    }
 

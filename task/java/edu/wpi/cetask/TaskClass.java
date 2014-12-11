@@ -348,9 +348,8 @@ public class TaskClass extends TaskModel.Member {
             if ( !enclosing.declaredOutputNames.contains(modified) ) { 
                getErr().println("WARNING: Ignoring unknown modified output slot: "+modified);
                this.modified = null;
-            } else if ( primitiveTypes.contains(type) || 
-                  (java != null && !Cloneable.class.isAssignableFrom(java)) ){
-               getErr().println("WARNING: Ignoring modified attribute of non-cloneable input slot: "+name);
+            } else if ( primitiveTypes.contains(type) ) {
+               getErr().println("WARNING: Ignoring modified attribute of primitive input slot: "+name);
                this.modified = null;
             } else this.modified = (TaskClass.Output) enclosing.slots.get(modified);
          } else this.modified = null;  

@@ -306,12 +306,18 @@
     </subtasks>
   </task>
   
-  <task id="ModifiedJava">
+  <task id="ModifiedVector">
     <input name="input" type="java.util.Vector" modified="output"/>
     <output name="output" type="java.util.Vector"/>
     <script> $this.output = $this.input.add(1); </script>
   </task>	
   
+  <task id="ModifiedList">
+    <input name="input" type="java.util.List" modified="output"/>
+    <output name="output" type="java.util.List"/>
+    <script> $this.output = $this.input.add(1); </script>
+  </task>	
+
   <task id="BindingsValueTest">
     <subtasks id="bindingsValueTest">
        <step name="set" task="disco:Say.Eval"/>
