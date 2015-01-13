@@ -13,7 +13,7 @@
     Agent says "Please execute C."
   > done
     User execute C.
-    Agent says "Agent1."
+    Agent says "Agent1 alt1."
   > say
 [1] Agent1_User1.
 [2] Agent1_User2.
@@ -32,7 +32,7 @@
          Agent says "Please execute C."
          User execute C.
       [ ] -done
-         Agent says "Agent1."
+         Agent says "Agent1 alt1."
          [ ] -done
             User says "Agent1_User2."
       [Achieve IntB] -live
@@ -59,7 +59,7 @@
          Agent says "Please execute C."
          User execute C.
       [ ] -done
-         Agent says "Agent1."
+         Agent says "Agent1 alt1."
          [ ] -done
             User says "Agent1_User2."
       [Achieve IntB with great care and precision] -live

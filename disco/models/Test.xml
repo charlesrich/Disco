@@ -88,7 +88,7 @@
     <subtasks id="a1"> 
       <step name="a1" task="disco:Say.Agent"/>
       <step name="a1_u" task="_A1_U"/>
-      <binding slot="$a1.text" value="'Agent1'"/>
+      <binding slot="$a1.text" value="'Agent1 alt1|Agent1 alt2'"/>
     </subtasks>
   </task>
   

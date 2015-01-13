@@ -889,6 +889,13 @@ public class Disco extends TaskEngine {
       quotedOr = Pattern.compile("\\\\\\|");         
  
    /**
+    * If true, then {@link #getAlternative(String,String,boolean)} uses randomness instead of counting.
+    */
+   public static boolean RANDOM_ALTERNATIVES = false;
+   
+   private static Random random;
+   
+   /**
     * Utility function for sequencing through alternatives using | separators (which
     * may be quoted with backslash).  Used for task formatting strings,
     * translation tables and {@link edu.wpi.disco.lang.Say}.
@@ -897,6 +904,8 @@ public class Disco extends TaskEngine {
     * @param value string with alternatives (may have only one)
     * @param advance whether to advance count afterward
     * @return chosen alternative
+    * 
+    * @see #RANDOM_ALTERNATIVES
     */
    public String getAlternative (String key, String value, boolean advance) {
       if ( value == null || value.indexOf('|') < 0 ) return value; // early exit
@@ -912,14 +921,19 @@ public class Disco extends TaskEngine {
          if ( ++end < value.length() )
             // add trailing alternative, if any
             alts.add(value.substring(end, value.length()));
-         key += "@getAlternative";
-         int alt = (Integer) getUserModel(key, 0);
-         value = alts.get(alt);
-         // advance to next alternative
-         if ( advance ) {
-            alt = (alt+1) % alts.size();
-            putUserModel(key, alt);
-         } 
+         if ( RANDOM_ALTERNATIVES ) {
+            if ( random == null ) random = new Random();
+            value = alts.get(random.nextInt(alts.size()));
+         } else {
+            key += "@getAlternative";
+            int alt = (Integer) getUserModel(key, 0);
+            value = alts.get(alt);
+            // advance to next alternative
+            if ( advance ) {
+               alt = (alt+1) % alts.size();
+               putUserModel(key, alt);
+            } 
+         }
       }
       // fix quoted or's, if any
       quotedOr.matcher(value).replaceAll("\\|");

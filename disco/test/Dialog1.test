@@ -3,7 +3,7 @@
   > load models/Test.xml
   > task _A1
     User says "Let's achieve _A1."
-    Agent says "Agent1."
+    Agent says "Agent1 alt1."
   > say
 [1] Agent1_User1.
 [2] Agent1_User2.
@@ -14,10 +14,13 @@
 
 [ ] -accepted -done
    User says "Let's achieve _A1."
-   Agent says "Agent1."
+   Agent says "Agent1 alt1."
    [ ] -done <-focus
       User says "Agent1_User2."
       Agent says "Ok."
 
+  > task _A1
+    User says "Let's achieve _A1."
+    Agent says "Agent1 alt2."
   > quit
     
