@@ -585,6 +585,18 @@ public class TaskClass extends TaskModel.Member {
       return property != null ? property :
          getDecompositions().isEmpty() && getDecompositionScript() == null;
    }
+
+   /**
+    * Force this task class to be treated as primitive or not, regardless
+    * of whether decompositions are known.  Usually used to make a task
+    * class non-primitive even though decompositions not (yet) known.
+    * Cannot set to primitive if decompositions are known.
+    */
+   public void setPrimitive (boolean primitive) {
+      if ( primitive && !getDecompositions().isEmpty() ) 
+         throw new UnsupportedOperationException("Cannot make primitive with known decompositions: "+this);
+      setProperty("@primitive", primitive);
+   }
    
    /**
     * Test whether this class can serve as root of plan recognition. Typically 
@@ -603,18 +615,6 @@ public class TaskClass extends TaskModel.Member {
     */
    public void setTop (boolean top) {
       setProperty("@top", top); // see TaskModel.setProperty(String,boolean)
-   }
-
-   /**
-    * Force this task class to be treated as primitive or not, regardless
-    * of whether decompositions are known.  Usually used to make a task
-    * class non-primitive even though decompositions not (yet) known.
-    * Cannot set to primitive if decompositions are known.
-    */
-   public void setPrimitive (boolean primitive) {
-      if ( primitive && !getDecompositions().isEmpty() ) 
-         throw new UnsupportedOperationException("Cannot make primitive with known decompositions: "+this);
-      setProperty("@primitive", primitive);
    }
 
    /**
