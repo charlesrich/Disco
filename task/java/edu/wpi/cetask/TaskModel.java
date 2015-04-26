@@ -86,9 +86,11 @@ public class TaskModel extends Description {
       return value == null ? defaultValue : (Double) Double.parseDouble(value);
    }
    
+
    public Boolean getProperty (String key, Boolean defaultValue) {
+      // note this method should *not* call TaskClass.isTop()!
       String value = getProperty(key);
-      return value == null ? defaultValue : (Boolean) Utils.parseBoolean(value);
+      return value == null ? defaultValue : (Boolean) Utils.parseBoolean(value);   
    }
    
    public String removeProperty (String key) {
@@ -116,7 +118,15 @@ public class TaskModel extends Description {
    }
    
    public void setProperty (String key, boolean value) {
-      setProperty(key, Boolean.toString(value));
+      if ( key.endsWith("@top") ) {
+         TaskClass task = getTaskClass(key.substring(0, key.length()-4));
+         if ( task != null ) {
+            // make sure list stays consistent with property
+            boolean contains = engine.topClasses.contains(task); 
+            if ( value && !contains) engine.topClasses.add(task);
+            else if ( !value && contains ) engine.topClasses.remove(task);
+         } else setProperty(key, Boolean.toString(value)); // not loaded yet
+      } else setProperty(key, Boolean.toString(value));
    }
    
    public void storeProperties () {
