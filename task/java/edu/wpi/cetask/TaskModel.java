@@ -123,7 +123,7 @@ public class TaskModel extends Description {
          if ( task != null ) {
             // make sure list stays consistent with property
             boolean contains = engine.topClasses.contains(task); 
-            if ( value && !contains) engine.topClasses.add(task);
+            if ( value && !contains ) engine.topClasses.add(task);
             else if ( !value && contains ) engine.topClasses.remove(task);
          } else setProperty(key, Boolean.toString(value)); // not loaded yet
       } else setProperty(key, Boolean.toString(value));
