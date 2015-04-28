@@ -1,0 +1,22 @@
+load models/Test.xml
+debug
+# Root1, Root2 and Root3 are @top=false in Test.properties
+# unexplained
+execute Prim5
+history
+clear
+eval $disco.getTaskClass("Root1").setTop(true)
+eval $disco.getTaskClass("Root2").setTop(true)
+eval $disco.getTaskClass("Root3").setTop(true)
+execute Prim5
+# recognize Root1
+history 
+clear
+# Ambiguous:  Root1, Root3
+execute Prim1
+quit
+clear
+eval $disco.getTaskClass("Abs2").setTop(true)
+execute Prim1
+# recognize Abs2
+history

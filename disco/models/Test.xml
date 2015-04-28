@@ -379,6 +379,55 @@
   <!-- see decomposeA below -->
   <task id="ProceduralA"/>
     
+  <!-- for test/RecogTop1 -->
+
+  <task id="Root1">
+    <subtasks id="root1">
+      <step name="step1" task="Abs1"/>
+      <step name="step2" task="Prim4"/>
+    </subtasks>
+  </task>
+
+  <task id="Abs1">
+    <subtasks id="abs1a" ordered="false">
+      <step name="step1" task="Abs2"/>
+      <step name="step2" task="Prim3"/>
+    </subtasks>
+    <subtasks id="abs1b">
+      <step name="step1" task="Prim5"/>
+      <step name="step2" task="Prim2"/>
+    </subtasks>
+
+  </task>
+
+  <task id="Abs2">
+    <subtasks id="abs2" ordered="false">
+      <step name="step1" task="Prim1"/>
+      <step name="step2" task="Prim2"/>
+    </subtasks>
+  </task>
+
+  <task id="Prim1"/>
+  <task id="Prim2"/>
+  <task id="Prim3"/>
+  <task id="Prim4"/>
+  <task id="Prim5"/>
+
+  <task id="Root2">
+    <subtasks id="root2">
+      <step name="step1" task="Prim2"/>
+      <step name="step2" task="Prim3"/>
+    </subtasks>
+  </task>
+
+  <task id="Root3">
+    <subtasks id="root3">
+      <step name="step1" task="Abs2"/>
+      <step name="step2" task="Prim4"/>
+    </subtasks>
+  </task>
+
+
   <script init="true">
   
     // for BindingsValueTest

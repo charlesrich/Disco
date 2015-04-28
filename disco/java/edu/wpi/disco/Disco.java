@@ -479,7 +479,7 @@ public class Disco extends TaskEngine {
          while (tops.hasNext()) {
             top = tops.next();
             if ( !tried.contains(top) )
-               explanations.addAll(recognition.recognize(top, null));
+               explanations.addAll(new Recognition(occurrence).recognize(top, null));
          }
          if ( !explanations.isEmpty() ) return explanations;
          // as last resort, consider all toplevel task types in engine
@@ -487,7 +487,7 @@ public class Disco extends TaskEngine {
          for (TaskClass task : getTopClasses()) 
             if ( type.isPathFrom(task) ) 
                explanations.addAll(
-                     recognition.recognize(new Plan(task.newInstance()), null));
+                     new Recognition(occurrence).recognize(new Plan(task.newInstance()), null));
       }
       return explanations;
    }
