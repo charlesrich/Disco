@@ -106,7 +106,7 @@ public class Agent extends Actor {
       if ( Disco.TRACE ) {
          List<Plugin.Item> items = generate(interaction);
          if ( items.isEmpty() ) return null;
-         Utils.print(items, interaction.getDisco().getOut());
+         if ( items.size() > 1) Utils.print(items, interaction.getDisco().getOut());
          return items.get(0);
       } //else 
       return super.generateBest(interaction);
