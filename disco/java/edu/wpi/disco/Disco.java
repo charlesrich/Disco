@@ -478,16 +478,15 @@ public class Disco extends TaskEngine {
          Iterator<Plan> tops = getTops().iterator();
          while (tops.hasNext()) {
             top = tops.next();
-            if ( !tried.contains(top) )
-               explanations.addAll(new Recognition(occurrence).recognize(top, null));
+            if ( !tried.contains(top) ) 
+               explanations = recognition.recognize(top, null);
          }
          if ( !explanations.isEmpty() ) return explanations;
          // as last resort, consider all toplevel task types in engine
          TaskClass type = occurrence.getType();
          for (TaskClass task : getTopClasses()) 
             if ( type.isPathFrom(task) ) 
-               explanations.addAll(
-                     new Recognition(occurrence).recognize(new Plan(task.newInstance()), null));
+               explanations = recognition.recognize(new Plan(task.newInstance()), null);
       }
       return explanations;
    }

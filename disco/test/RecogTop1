@@ -16,6 +16,7 @@ clear
 
 # Ambiguous: Root1, Root3
 execute Prim1
+history
 clear
 
 quit
@@ -28,6 +29,7 @@ clear
 
 # Ambiguous: Root1, Abs2, Root2
 execute Prim2
+history
 clear
 
 eval $disco.getTaskClass("Abs1").setTop(true)
@@ -38,6 +40,7 @@ clear
 
 # Ambiguous: Abs2, Abs1, Root1, Root2, Root3
 execute Prim2
+history
 clear
 
 execute Prim5
