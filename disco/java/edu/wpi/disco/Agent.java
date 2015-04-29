@@ -103,6 +103,14 @@ public class Agent extends Actor {
             }
          }
       }
+      return chooseBest(interaction);
+   }
+   
+   /**
+    * Override this method to choose best on basis other than priorities.
+    * Call {@link #generate(Interaction)} to generate candidates.
+    */
+   protected Plugin.Item chooseBest (Interaction interaction) {
       if ( Disco.TRACE ) {
          List<Plugin.Item> items = generate(interaction);
          if ( items.isEmpty() ) return null;
@@ -111,7 +119,7 @@ public class Agent extends Actor {
       } //else 
       return super.generateBest(interaction);
    }
-
+   
    /**
     * An utterance always ends a turn.  If the <tt>ok</tt> flag is true, then 
     * a turn always ends in an utterance (using 'Ok' if needed).  The
