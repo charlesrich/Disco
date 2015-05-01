@@ -488,6 +488,40 @@ public class Disco extends TaskEngine {
             if ( type.isPathFrom(task) ) 
                explanations = recognition.recognize(new Plan(task.newInstance()), null);
       }
+      // TODO See test/RecogTop1 for last test case, which requires "putting back" the
+      //      ambiguous case removed here
+      if ( explanations.size() > 1 ) {
+         // remove ambiguity due to nested toplevel tasks
+         List<Explanation> candidates = Collections.emptyList();
+         // find explanations that contribute* to all other explanations
+         // that do not contribute* to it
+         outer: for (Explanation e : explanations) {
+            for (Explanation other : explanations) {
+               if ( other.focus != e.focus && 
+                     ( other.start == null || e.start == null
+                       || (!other.start.getType().isPathFrom(e.start.getType()) &&  
+                           !e.start.getType().isPathFrom(other.start.getType()) ) ) ) 
+                  continue outer;
+            }
+            if ( candidates.isEmpty() ) candidates = new ArrayList<Explanation>(explanations.size());
+            candidates.add(e);
+         }
+         if ( !candidates.isEmpty() ) {
+            if ( candidates.size() > 1 ) {
+               // remove candidates that contribute* to another candidate
+               // i.e., prefer highest level candidate(s)
+               List<Explanation> highest = new ArrayList<Explanation>(candidates);
+               for (Explanation c : candidates) {
+                  for (Explanation other : candidates)
+                     if ( other.focus != c.focus && other.start != null && c.start != null
+                           && other.start.getType().isPathFrom(c.start.getType()) )
+                        highest.remove(other);
+               }
+               candidates = highest;
+            }
+            explanations = candidates;
+         }
+      }
       return explanations;
    }
   

@@ -42,17 +42,29 @@ history
 clear
 
 execute Prim5
-# Recognize Abs1
+# Recognize Root1
+history
+clear
+
+eval $disco.getTaskClass("Root3").setTop(false)
+execute Prim1
+execute Prim2
+execute Prim3
+execute Prim4
+# Recognize Root1
 history
 
 quit
 
-# does not work yet because too late to "insert" new Root1 as top after
+# last test does not work yet because too late to "insert" new Root1 as top after
 # it has been eliminated and Abs2 has been started
-# unless maybe call recog *again* after Abs2 completed?
-# only after a toplevel completed, not just any non-primitive (just
+# unless maybe call recog *again* after Abs2 completed (actually after next occurrrence)?
+# And start a *new* toplevel plan (e.g., Root1) as appropriate? (Do some surgery to prevent
+# duplication in history)---> essentially are splicing Root1 in!
+# But only do this after a toplevel completed, not just any non-primitive (just
 # to catch this case)?
 clear
+eval $disco.getTaskClass("Root3").setTop(false)
 execute Prim1
 execute Prim2
 execute Prim3
