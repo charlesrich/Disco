@@ -19,15 +19,13 @@ execute Prim1
 history
 clear
 
-quit
-
 eval $disco.getTaskClass("Abs2").setTop(true)
 execute Prim1
 # Recognize Abs2
 history
 clear
 
-# Ambiguous: Root1, Abs2, Root2
+# Ambiguous: Root1, Root2, Root3, Abs2
 execute Prim2
 history
 clear
@@ -38,16 +36,23 @@ execute Prim1
 history
 clear
 
-# Ambiguous: Abs2, Abs1, Root1, Root2, Root3
+# Ambiguous: Root1, Root2, Root3, Abs2, Abs1
 execute Prim2
 history
 clear
 
 execute Prim5
-# Recognize Abs2
+# Recognize Abs1
 history
-clear
 
+quit
+
+# does not work yet because too late to "insert" new Root1 as top after
+# it has been eliminated and Abs2 has been started
+# unless maybe call recog *again* after Abs2 completed?
+# only after a toplevel completed, not just any non-primitive (just
+# to catch this case)?
+clear
 execute Prim1
 execute Prim2
 execute Prim3
@@ -55,5 +60,5 @@ execute Prim4
 # Recognize Root1
 history
 
-quit
+
 

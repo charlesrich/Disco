@@ -407,12 +407,6 @@
     </subtasks>
   </task>
 
-  <task id="Prim1"/>
-  <task id="Prim2"/>
-  <task id="Prim3"/>
-  <task id="Prim4"/>
-  <task id="Prim5"/>
-
   <task id="Root2">
     <subtasks id="root2">
       <step name="step1" task="Prim2"/>
@@ -427,6 +421,21 @@
     </subtasks>
   </task>
 
+  <task id="Prim1">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim2">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim3">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim4">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim5">
+    <binding slot="$this.external" value="true"/>
+  </task>
 
   <script init="true">
   

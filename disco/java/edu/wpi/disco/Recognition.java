@@ -12,7 +12,7 @@ import java.util.*;
 
 class Recognition { 
    
-   private final List<Explanation> explanations = new ArrayList<Explanation>(4); 
+   private List<Explanation> explanations = new ArrayList<Explanation>(4); 
    private final Task occurrence;
    
    List<Explanation> getExplanations () { return explanations; }
@@ -26,6 +26,33 @@ class Recognition {
    
    List<Explanation> recognize (Plan plan, Plan exclude) {
       recognizeWalk(plan, exclude);
+      if ( explanations.size() > 1 ) {
+         // remove ambiguity due to nested toplevel tasks
+         List<Explanation> candidates = Collections.emptyList();
+         // find explanations that contribute* to all other explanations
+         outer: for (Explanation e : explanations) {
+            for (Explanation other : explanations) {
+               if ( other.focus != e.focus && 
+                     ( other.start == null || e.start == null
+                       || !e.start.getType().isPathFrom(other.start.getType()) ) ) 
+                  continue outer;
+            }
+            if ( candidates.isEmpty() ) candidates = new ArrayList<Explanation>(explanations.size());
+            candidates.add(e);
+         }
+         if ( !candidates.isEmpty() ) {
+            if ( candidates.size() > 1 ) {
+               // remove candidates that contribute* to another explanation
+               for (Explanation c : candidates) {
+                  for (Explanation other : candidates)
+                     if ( other.focus != c.focus && other.start != null && c.start != null
+                           && other.start.getType().isPathFrom(c.start.getType()) )
+                        candidates.remove(other);
+               }
+            }
+            explanations = candidates;
+         }
+      }
       if ( Disco.TRACE && !explanations.isEmpty()) {
          PrintStream out = ((Disco) plan.getGoal().engine).getOut();
          out.println("Plan recognition for "+occurrence+" in "
