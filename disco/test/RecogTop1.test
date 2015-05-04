@@ -1,0 +1,195 @@
+    # May 4, 2015 6:55:44 PM - TaskEngine 1.6 / Disco 1.9
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > debug
+  > # Root1, Root2 and Root3 are @top=false in Test.properties
+  > # unexplained
+  > execute Prim5
+Unexplained occurrence: execute Prim5
+    Prim5(user)
+    Ok(agent)
+  > history
+
+Prim5(user)
+Ok(agent)
+
+  > clear
+  > 
+  > eval $disco.getTaskClass("Root1").setTop(true)
+    # Returned 'null'
+  > eval $disco.getTaskClass("Root2").setTop(true)
+    # Returned 'null'
+  > eval $disco.getTaskClass("Root3").setTop(true)
+    # Returned 'null'
+  > execute Prim5
+    Prim5(user)
+    Propose.Should(agent,Prim2(user))
+  > # Recognize Root1
+  > history 
+
+[Root1] -live
+   [Abs1] -live
+      Prim5(user)
+      [Prim2(user)] -live <-focus
+         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
+            Propose.Should(agent,Prim2(user))
+   [Prim4(user)]
+
+  > clear
+  > 
+  > # Ambiguous: Root1, Root3
+  > execute Prim1
+Ignoring ambiguity of 2
+Explanation[start=[Root1],path=[<root1,step1>, <abs1a,step1>, <abs2,step1>],focus=[Prim1(user)]]
+Explanation[start=[Root3],path=[<root3,step1>, <abs2,step1>],focus=[Prim1(user)]]
+    Prim1(user)
+    Propose.Should(agent,Prim2(user))
+  > clear
+  > 
+  > eval $disco.getTaskClass("Abs2").setTop(true)
+    # Returned 'null'
+  > execute Prim1
+    Prim1(user)
+    Propose.Should(agent,Prim2(user))
+  > # Recognize Abs2
+  > history
+
+[Abs2] -live
+   Prim1(user)
+   [Prim2(user)] -live <-focus
+      [Accept(user,Propose.Should(agent,Prim2(user)))] -live
+         Propose.Should(agent,Prim2(user))
+
+  > clear
+  > 
+  > # Ambiguous: Root1, Root2, Root3, Abs2
+  > execute Prim2
+Ignoring ambiguity of 4
+Explanation[start=[Root1],path=[<root1,step1>, <abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
+Explanation[start=[Root2],path=[<root2,step1>],focus=[Prim2(user)]]
+Explanation[start=[Root3],path=[<root3,step1>, <abs2,step2>],focus=[Prim2(user)]]
+Explanation[start=[Abs2],path=[<abs2,step2>],focus=[Prim2(user)]]
+    Prim2(user)
+    Propose.Should(agent,Prim1(user))
+  > clear
+  > 
+  > eval $disco.getTaskClass("Abs1").setTop(true)
+    # Returned 'null'
+  > execute Prim1
+    Prim1(user)
+    Propose.Should(agent,Prim2(user))
+  > # Recognize Abs2
+  > history
+
+[Abs2] -live
+   Prim1(user)
+   [Prim2(user)] -live <-focus
+      [Accept(user,Propose.Should(agent,Prim2(user)))] -live
+         Propose.Should(agent,Prim2(user))
+
+  > clear
+  > 
+  > # Ambiguous: Root1, Root2, Root3, Abs2, Abs1
+  > execute Prim2
+Ignoring ambiguity of 5
+Explanation[start=[Root1],path=[<root1,step1>, <abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
+Explanation[start=[Root2],path=[<root2,step1>],focus=[Prim2(user)]]
+Explanation[start=[Root3],path=[<root3,step1>, <abs2,step2>],focus=[Prim2(user)]]
+Explanation[start=[Abs2],path=[<abs2,step2>],focus=[Prim2(user)]]
+Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
+    Prim2(user)
+    Propose.Should(agent,Prim1(user))
+  > clear
+  > 
+  > execute Prim5
+    Prim5(user)
+    Propose.Should(agent,Prim2(user))
+  > # Recognize Root1
+  > history
+
+[Root1] -live
+   [Abs1] -live
+      Prim5(user)
+      [Prim2(user)] -live <-focus
+         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
+            Propose.Should(agent,Prim2(user))
+   [Prim4(user)]
+
+  > clear
+  > 
+  > eval $disco.getTaskClass("Root3").setTop(false)
+    # Returned 'null'
+  > execute Prim1
+    Prim1(user)
+    Propose.Should(agent,Prim2(user))
+  > execute Prim2
+    Prim2(user)
+    Propose.Should(agent,Prim3(user))
+  > execute Prim3
+    Prim3(user)
+    Propose.Should(agent,Prim4(user))
+  > execute Prim4
+    Prim4(user)
+    Ok(agent)
+  > # Recognize Root1
+  > history
+
+[Root1] -done
+   [Abs1] -done
+      [Abs2] -done
+         Prim1(user)
+         [Prim2(user)] -done
+            Propose.Should(agent,Prim2(user))
+            Prim2(user)
+      [Prim3(user)] -done
+         Propose.Should(agent,Prim3(user))
+         Prim3(user)
+   [Prim4(user)] -done <-focus
+      Propose.Should(agent,Prim4(user))
+      Prim4(user)
+      Ok(agent)
+
+  > clear
+  > 
+  > # the test below does not work properly yet because too late to "insert" Root1 
+  > # as top after it has been eliminated as ambiguous and Abs2 has been started
+  > # what will happen instead is that Prim3 will be viewed as starting a *new* Root1
+  > # see TODO in Disco.recognize() for discussion of solution
+  > eval $disco.getTaskClass("Root3").setTop(true)
+    # Returned 'null'
+  > execute Prim1
+    Prim1(user)
+    Propose.Should(agent,Prim2(user))
+  > execute Prim2
+    Prim2(user)
+    Ok(agent)
+  > execute Prim3
+    Prim3(user)
+    Propose.Should(agent,Prim1(user))
+  > execute Prim4
+Unexplained occurrence: execute Prim4
+    Prim4(user)
+    Propose.Should(agent,Prim1(user))
+  > # Recognize Root1 -- incorrect
+  > history
+
+[Abs2] -done
+   Prim1(user)
+   [Prim2(user)] -done
+      Propose.Should(agent,Prim2(user))
+      Prim2(user)
+      Ok(agent)
+[Root1] -live
+   [Abs1] -live
+      Prim3(user)
+      [Abs2] -live
+         [Prim1(user)] -live <-focus
+            Propose.Should(agent,Prim1(user))
+            Prim4(user)
+            [Accept(user,Propose.Should(agent,Prim1(user)))] -live
+               Propose.Should(agent,Prim1(user))
+         [Prim2(user)] -live
+   [Prim4(user)]
+
+  > quit
+    

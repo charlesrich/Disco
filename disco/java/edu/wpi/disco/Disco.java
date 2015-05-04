@@ -488,8 +488,10 @@ public class Disco extends TaskEngine {
             if ( type.isPathFrom(task) ) 
                explanations = recognition.recognize(new Plan(task.newInstance()), null);
       }
-      // TODO See test/RecogTop1 for last test case, which requires "putting back" the
-      //      ambiguous case removed here
+      // TODO See last test in test/RecogTop1 which does not yet work because it requires
+      // "putting back" the ambiguous case removed here.  Solution is to check, whenever
+      // a new toplevel plan is started, whether it can be recognized as starting a parent
+      // top of immediately preceding top and, if so, build the right structure
       if ( explanations.size() > 1 ) {
          // remove ambiguity due to nested toplevel tasks
          List<Explanation> candidates = Collections.emptyList();
