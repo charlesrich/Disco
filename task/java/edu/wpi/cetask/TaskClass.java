@@ -520,7 +520,7 @@ public class TaskClass extends TaskModel.Member {
       catch (NoSuchFieldException e) { throw new IllegalStateException(e); }
       catch (IllegalAccessException e) { throw new IllegalStateException(e); }
       if ( !getId().equals("**ROOT**") && getEngine().isRecognition() ) {
-         if ( getProperty("@top", true) )
+         if ( getProperty("@top", true) ) // sic not isTop()
             // assume this can be top until find decomposition that uses step
             // see contributes
             getEngine().topClasses.add(this);
@@ -585,18 +585,7 @@ public class TaskClass extends TaskModel.Member {
       return property != null ? property :
          getDecompositions().isEmpty() && getDecompositionScript() == null;
    }
-   
-   /**
-    * Test whether this class can serve as root of plan recognition. Typically 
-    * this is because they do not contribute to any other
-    * task classes. However, this can be overridden by @top property in library.
-    * 
-    * @see TaskEngine#getTopClasses()
-    */
-   public boolean isTop () {
-      return engine.topClasses.contains(this);
-   }
-   
+
    /**
     * Force this task class to be treated as primitive or not, regardless
     * of whether decompositions are known.  Usually used to make a task
@@ -607,6 +596,25 @@ public class TaskClass extends TaskModel.Member {
       if ( primitive && !getDecompositions().isEmpty() ) 
          throw new UnsupportedOperationException("Cannot make primitive with known decompositions: "+this);
       setProperty("@primitive", primitive);
+   }
+   
+   /**
+    * Test whether this class can serve as root of plan recognition. Typically 
+    * this is because it does not contribute to any other task classes.  However,
+    * this can be overridden by the @top property.
+    * 
+    * @see TaskEngine#getTopClasses()
+    * @see #setTop(boolean)
+    */
+   public boolean isTop () {
+      return engine.topClasses.contains(this);
+   }
+   
+   /**
+    * @see #isTop()
+    */
+   public void setTop (boolean top) {
+      setProperty("@top", top); // see TaskModel.setProperty(String,boolean)
    }
 
    /**
@@ -777,7 +785,7 @@ public class TaskClass extends TaskModel.Member {
             task.explains = new HashSet<TaskClass>();
          task.explains.add(this);
          task.addExplains(this, explains, new ArrayList<TaskClass>());
-         if ( !this.getProperty("@top", false) )
+         if ( !getProperty("@top", false) ) // sic not isTop()
             getEngine().topClasses.remove(this);
       }
    }

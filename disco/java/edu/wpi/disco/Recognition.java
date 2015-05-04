@@ -6,7 +6,6 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
-
 import java.io.PrintStream;
 import java.util.*;
 
@@ -47,9 +46,10 @@ class Recognition {
             if ( child.getGoal() != goal ) recognizeWalk(child, exclude);
          }
          // there could also be an interpolated explanation here
-         recognizeDecomp(plan, plan.getType(), 
-                         // preserve order and speed up cycle check 
-                         new LinkedHashSet<DecompStep>());
+         recognizeDecomp(plan, plan.getType(),
+               // speed up check for circularity, but preserve
+               // order for debugging (only)
+               new LinkedHashSet<DecompStep>());
       }
    }
    
@@ -63,8 +63,7 @@ class Recognition {
    }
 
    // interpolating based on decompositions
-   private void recognizeDecomp (Plan start, TaskClass current, 
-                                 Set<DecompStep> path) {
+   private void recognizeDecomp (Plan start, TaskClass current, Set<DecompStep> path) {
       if ( !start.isDecomposed() && occurrence.isPathFrom(current) ) {
          for (DecompositionClass decomp : current.getDecompositions()) {
             for (String step : decomp.getLiveStepNames()) {
@@ -119,8 +118,8 @@ class Recognition {
    
    static class Explanation {
 
-      final private Plan focus; // to attach occurrence 
-      final private Plan start; // to attach decomp (may be null)
+      final Plan focus; // to attach occurrence 
+      final Plan start; // to attach decomp (may be null)
       final private Decomposition decomp; // may be null
       final private List<DecompStep> path; // for debugging
 
@@ -128,7 +127,7 @@ class Recognition {
          this.start = start;
          this.focus = focus;
          this.decomp = start == null ? null : start.getDecomposition();
-         this.path = path == null || !TaskEngine.DEBUG ? null :
+         this.path = (path == null || !TaskEngine.DEBUG) ? null :
             new ArrayList<DecompStep>(path);
       }
 

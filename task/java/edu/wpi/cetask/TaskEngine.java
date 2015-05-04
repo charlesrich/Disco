@@ -1089,6 +1089,7 @@ public class TaskEngine {
     * task classes. However, this can be overridden by @top property in library.
     * 
     * @see TaskClass#isTop()
+    * @see TaskClass#setTop(boolean)
     */
    public List<TaskClass> getTopClasses () { 
       return Collections.unmodifiableList(topClasses); 
