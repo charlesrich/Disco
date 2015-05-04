@@ -479,6 +479,7 @@ public class Disco extends TaskEngine {
          while (tops.hasNext()) {
             top = tops.next();
             if ( !tried.contains(top) ) 
+               // accumulate in single Recognition instance
                explanations = recognition.recognize(top, null);
          }
          if ( !explanations.isEmpty() ) return explanations;
@@ -486,6 +487,7 @@ public class Disco extends TaskEngine {
          TaskClass type = occurrence.getType();
          for (TaskClass task : getTopClasses()) 
             if ( type.isPathFrom(task) ) 
+               // accumulate in single Recognition instance
                explanations = recognition.recognize(new Plan(task.newInstance()), null);
       }
       // TODO See last test in test/RecogTop1 which does not yet work because it requires
