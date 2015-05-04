@@ -689,6 +689,10 @@ public class Task extends Instance {
          overwrite = copySlotValue(from, name, name, true, false) || overwrite;
       for (String name : getType().outputNames)
          overwrite = copySlotValue(from, name, name, true, false) || overwrite;
+      if ( from.clonedInputs != null ) {
+         if ( clonedInputs != null ) overwrite = true;
+         clonedInputs = from.clonedInputs;
+      }
       return overwrite;
    }
    
@@ -736,7 +740,8 @@ public class Task extends Instance {
    
    protected  void evalIf (Plan plan) { if ( isSystem() ) eval(plan); }
    
-   protected void eval (Plan plan) {
+   // public for Console.execute()
+   public void eval (Plan plan) {
       TaskClass type = getType();
       // clone and cache modified inputs before grounding script executed
       for (Input input : getType().declaredInputs)
