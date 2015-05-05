@@ -16,6 +16,20 @@ class Recognition {
    
    List<Explanation> getExplanations () { return explanations; }
    
+   private void add (Explanation explanation) {
+      if ( explanation.start != null ) {
+         TaskClass task = explanation.start.getType();
+         for (Explanation e : explanations)
+            // ignore ambiguity between different explanations for
+            // the same task type --- this is a pretty strong
+            // oversimplification, since it ignores inputs/outputs
+            // and the fact that there could validly be different
+            // implementations, but it works well in practice
+            if ( task == e.start.getType() ) return;
+      }
+      explanations.add(explanation);
+   }
+   
    Recognition (Task occurrence) { this.occurrence = occurrence; } 
 
    // Note immediate children of root node are always searched,
@@ -40,7 +54,7 @@ class Recognition {
       if ( plan != exclude && (plan.isLive() || onStackHasLive(plan)) ) {
          Task goal = plan.getGoal();
          if ( occurrence.contributes(plan) ) 
-            explanations.add(new Explanation(plan, null, null));
+            add(new Explanation(plan, null, null));
          for (Plan child : plan.getChildren()) {
             // prefer parent to prevent spurious ambiguity 
             if ( child.getGoal() != goal ) recognizeWalk(child, exclude);
@@ -79,7 +93,7 @@ class Recognition {
                         Plan focus = instantiate(start, path);
                         // make sure instantiation didn't fail
                         if ( focus != null && occurrence.contributes(focus) )
-                           explanations.add(new Explanation(focus, start, path));
+                           add(new Explanation(focus, start, path));
                      } finally { start.setDecomposition(null); }
                   } 
                   // there could be another interpolated explanation here
