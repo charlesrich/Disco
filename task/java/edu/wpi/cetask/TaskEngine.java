@@ -1076,6 +1076,8 @@ public class TaskEngine {
    // for extension to plan recognition with interpolation of decompositions
 
    // package permission for TaskClass
+   // note this list includes primitives, because there is no way to know
+   // if they won't be decomposed by later loaded library--see getTopClasses()
    final List<TaskClass> topClasses = new ArrayList<TaskClass>(); 
    
    /**
@@ -1084,14 +1086,21 @@ public class TaskEngine {
    public boolean isRecognition () { return false; }
 
    /**
-    * Returns unmodifiable list of task classes which can serve as root of plan
-    * recognition. Typically this is because they do not contribute to any other
-    * task classes. However, this can be overridden by @top property in library.
+    * Returns unmodifiable list of non-primitive task classes which can serve as root of plan
+    * recognition. By default, these are classes that do not contribute to any other task classes.
+    * However, this can be overridden by @top property in library.
     * 
     * @see TaskClass#isTop()
     * @see TaskClass#setTop(boolean)
     */
    public List<TaskClass> getTopClasses () { 
+      for (TaskClass task : topClasses)
+         if ( task.isPrimitive() ) {
+            List<TaskClass> tops = new ArrayList<TaskClass>(topClasses.size());
+            for (TaskClass top : topClasses)
+               if ( !top.isPrimitive() ) tops.add(top);
+            return tops;
+         }
       return Collections.unmodifiableList(topClasses); 
    }
 }
