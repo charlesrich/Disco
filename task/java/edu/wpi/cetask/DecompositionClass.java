@@ -494,7 +494,7 @@ public class DecompositionClass extends TaskModel.Member {
                   String variable = xpath.evaluate("./@slot", bindingNode); 
                   if ( bindings.get(variable) != null )
                      throw new TaskModel.Error(this,
-                           "duplicate bindings or circularity for "+variable);
+                           "duplicate bindings for "+variable);
                   bindings.put(variable, new Binding(variable, bindingNode));
                }
                for (Binding binding : bindings.values()) {
