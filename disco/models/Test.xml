@@ -437,6 +437,17 @@
     <binding slot="$this.external" value="true"/>
   </task>
 
+  <!-- test test/RecogTop2 -->
+
+  <task id="Top2">
+    <subtasks id="top2" ordered="false">
+      <step name="step1" task="Prim6"/>
+      <step name="step2" task="Prim6"/>
+    </subtasks>
+  </task>
+
+  <task id="Prim6"/>
+  
   <script init="true">
   
     // for BindingsValueTest

@@ -1,0 +1,18 @@
+    # May 6, 2015 9:15:43 PM - TaskEngine 1.6 / Disco 1.9
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > eval $disco.getTaskClass("Top2").setTop(true)
+    # Returned 'null'
+  > execute Prim6
+    User execute Prim6.
+    Agent execute Prim6.
+    Agent says "Ok."
+  > history
+
+[Achieve Top2] -done <-focus
+   User execute Prim6.
+   Agent execute Prim6.
+   Agent says "Ok."
+
+  > quit
+    
