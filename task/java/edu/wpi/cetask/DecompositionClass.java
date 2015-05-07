@@ -508,16 +508,23 @@ public class DecompositionClass extends TaskModel.Member {
                      if ( depend == null ) {
                         if ( binding.identity == true )
                            // no declared binding for this slot, so create dummy one for propagation
-                           binding.depends.add(new Binding(binding.value, null));
+                           addDepend(binding, new Binding(binding.value, null));
                         else if ( dependVariable.startsWith("$this.") )
                            // special case for value expression involving $this
-                           binding.depends.add(new Binding(dependVariable, null));
-                     } else binding.depends.add(depend);
+                           addDepend(binding, new Binding(dependVariable, null));
+                     } else addDepend(binding, depend);
                   }
                }
             }
          } catch (Exception e) { Utils.rethrow(e); } 
       }
+   }
+   
+   private static void addDepend (Binding binding, Binding depend) {
+      String variable = binding.variable;
+      for (Binding current : binding.depends) 
+         if ( current.variable.equals(variable) ) return; // eliminate duplicates
+      binding.depends.add(depend);
    }
    
    /**
@@ -679,7 +686,7 @@ public class DecompositionClass extends TaskModel.Member {
          if ( type != BindingType.NON_IDENTITY ) addBinding(from, to);
       }
 
-      /* DESIGN NOTE: Default values and inverse bindings
+      /* DESIGN NOTE: Self-referring bindings for default values and inverse bindings
       
          As a special case, a binding that refers to its slot attribute in its
          value attribute is allowed without a circularity warning in order to 
@@ -715,7 +722,7 @@ public class DecompositionClass extends TaskModel.Member {
          for (Binding depend : depends) 
             if ( equals(depend) ) { self = true; break; }
          // if binding refers to itself, we have a default value or inverse binding
-         // which should not have any dependencies (to avoid circularity)
+         // so we ignore dependencies to avoid circularity
          if ( !self ) 
             for (Binding depend : depends) 
                depend.update(decomp, depth, retractedStep, retractedSlot); // recursive
