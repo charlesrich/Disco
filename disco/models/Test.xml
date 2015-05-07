@@ -448,10 +448,26 @@
 
   <task id="Prim6"/>
   
+  <task id="InverseBinding">
+    <input name="input" type="number"/>
+    <subtasks id="inverseBinding">
+      <step name="step1" task="InversePrim"/>
+      <binding slot="$step1.input" value="f($this.input)"/>
+      <binding slot="$this.input" value="$this.input == undefined ? $step1.input : undefined"/>
+    </subtasks>
+  </task>
+
+  <task id="InversePrim">
+    <input name="input" type="number"/>
+  </task>
+  
   <script init="true">
   
     // for BindingsValueTest
     var test;
+    
+    // for InverseBinding
+    function f (n) { return n; }
     
     // number of times A needs to be done to succeed (-1 means never)
     var A = -1;

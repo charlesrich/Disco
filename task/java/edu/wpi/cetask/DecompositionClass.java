@@ -679,6 +679,26 @@ public class DecompositionClass extends TaskModel.Member {
          if ( type != BindingType.NON_IDENTITY ) addBinding(from, to);
       }
 
+      /* DESIGN NOTE: Default values and inverse bindings
+      
+         As a special case, a binding that refers to its slot attribute in its
+         value attribute is allowed without a circularity warning in order to 
+         support two useful features:
+         
+         (1) Default values, e.g.,
+         
+             <binding slot="$this.slot1" value="$this.slot1 == undefined ? 5 : undefined"/>
+             
+         (2) Inverse bindings, e.g.,
+         
+             <binding slot="$step1.slot1" value="f($this.input)"/>
+             <binding slot="$this.input" value="g($step1.slot1)"/>
+             
+         The second binding above uses the inverse function g to propagate
+         a value "up" from plan recognition.  This is taking one step closer 
+         to full constraint propagation.
+      */
+      
       // Note this implements only monotonic propagation, not full
       // dependency-based constraint propagation
       private void update (Decomposition decomp, int depth, 
@@ -691,11 +711,14 @@ public class DecompositionClass extends TaskModel.Member {
          depth++;
          if ( "external".equals(slot) && !stepType.isPrimitive() )
             getErr().println("WARNING: "+getId()+" ignoring external binding of non-primitive task "+variable); 
-         for (Binding depend : depends) {
-            // allow binding to refer to itself for "default" bindings
-            if ( !equals(depend) )
+         boolean self = false;
+         for (Binding depend : depends) 
+            if ( equals(depend) ) { self = true; break; }
+         // if binding refers to itself, we have a default value or inverse binding
+         // which should not have any dependencies (to avoid circularity)
+         if ( !self ) 
+            for (Binding depend : depends) 
                depend.update(decomp, depth, retractedStep, retractedSlot); // recursive
-         }
          for (Binding depend : depends) {
             Task dependTask = getTask(decomp, depend.step); 
             if ( dependTask == null )

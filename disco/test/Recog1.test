@@ -13,7 +13,6 @@
          Agent says "How shall we achieve IntA?"
 
   > done IntE
-Ignoring ambiguity of 4
     User execute IntE.
     Agent says "Please execute IntF."
   > status
@@ -33,7 +32,6 @@ Ignoring ambiguity of 4
     User says "Let's achieve IntA."
     Agent says "How shall we achieve IntA?"
   > done IntG
-Ignoring ambiguity of 2
     User execute IntG.
     Agent says "Please execute IntE."
   > status
