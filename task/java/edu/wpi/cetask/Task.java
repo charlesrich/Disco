@@ -286,7 +286,7 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(expression, extra, where) )
+         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), extra, where) )
             failCheck(name, expression, where);
          else modified = true;
       } finally { extra.remove("$$value"); extra.remove("$$this"); }
