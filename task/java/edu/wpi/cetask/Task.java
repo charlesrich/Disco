@@ -248,7 +248,7 @@ public class Task extends Instance {
    static String makeExpression (String self, TaskClass type, String name, 
                                  String value, boolean onlyDefined) {
       StringBuilder buffer = new StringBuilder();
-      buffer.append("$$value = ").append(value).append(';');
+      buffer.append("$$value = (").append(value).append(");");
       if ( onlyDefined ) 
          buffer.append("if ( $$value == undefined ) $$value = true; else ");
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
