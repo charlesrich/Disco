@@ -288,9 +288,8 @@ public class Task extends Instance {
          extra.put("$$this", bindings.get("$this"));
          if ( !evalCondition(expression, extra, where) )
             failCheck(name, expression, where);
-         else  modified = true;
-      } 
-      finally { extra.remove("$$value"); extra.remove("$$this"); }
+         else modified = true;
+      } finally { extra.remove("$$value"); extra.remove("$$this"); }
    }
    
    void setSlotValueScript (String name, Compiled compiled, String where,
@@ -299,10 +298,8 @@ public class Task extends Instance {
          extra.put("$$this", bindings.get("$this"));
          if ( !evalCondition(compiled, extra, where) )
             failCheck(name, "compiled script", where);
-         else  modified = true;
-
-      } 
-      finally { extra.remove("$$value"); extra.remove("$$this"); }
+         else modified = true;
+      } finally { extra.remove("$$value"); extra.remove("$$this"); }
    }
    
    /**
