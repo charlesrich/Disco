@@ -361,7 +361,7 @@ public class DecompositionClass extends TaskModel.Member {
    private boolean isRequired (String step1, String step2, int depth) {
       if (depth > MAX_REQUIRES_DEPTH) 
          throw new RuntimeException(getId()+" requires stopped at depth "+ depth
-                  +" (probably circular)");
+                  +" (probably circular requires)");
       List<String> required = getRequiredStepNames(step1);
       if ( required.contains(step2) ) return true;
       for (String step : required)
@@ -714,7 +714,7 @@ public class DecompositionClass extends TaskModel.Member {
          if ( target.occurred() ) return; // never update slot after occurrence
          if ( depth > MAX_BINDING_DEPTH )
             throw new IllegalStateException(where + " stopped at depth "+ depth
-                  +" (probably circular)");
+                  +" (probably circular bindings)");
          depth++;
          if ( "external".equals(slot) && !stepType.isPrimitive() )
             getErr().println("WARNING: "+getId()+" ignoring external binding of non-primitive task "+variable); 
