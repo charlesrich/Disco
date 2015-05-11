@@ -740,9 +740,7 @@ public class Task extends Instance {
    // public for Console.execute()
    public void eval (Plan plan) {
       TaskClass type = getType();
-      // clone and cache modified inputs before grounding script executed
-      for (Input input : getType().declaredInputs)
-         if ( input.getModified() != null ) cloneInput(input.getName());
+      cloneInputs(); //  cache modified inputs before grounding script executed
       Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
@@ -796,9 +794,21 @@ public class Task extends Instance {
    private Object clonedInputs;  
    
    /**
-    * Clone and cache copy of named input <em>before</em> modification (for
-    * use evaluating postconditions).  Note that for reported actions by
+    * Clone and cache copy of all modified inputs <em>before</em> modification (for
+    * use in evaluating postconditions).  Note that for reported actions by
     * user, this method should be called before done method.
+    * 
+    * @see #cloneInput(String)
+    */
+   public void cloneInputs () {
+      for (Input input : getType().declaredInputs)
+         if ( input.getModified() != null ) cloneInput(input.getName());
+   }
+   
+   /**
+    * Clone and cache copy of named input. 
+    * 
+    * @see #cloneInputs()
     */
    public void cloneInput (String name) {
       Slot slot = getType().getSlot(name);
