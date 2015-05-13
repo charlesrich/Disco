@@ -484,9 +484,8 @@ public class Disco extends TaskEngine {
          }
          if ( !explanations.isEmpty() ) return explanations;
          // as last resort, consider all toplevel task types in engine
-         TaskClass type = occurrence.getType();
          for (TaskClass task : getTopClasses()) 
-            if ( type.isPathFrom(task) ) 
+            if ( occurrence.isPathFrom(task) ) 
                // accumulate in single Recognition instance
                explanations = recognition.recognize(new Plan(task.newInstance()), null);
       }
@@ -503,8 +502,8 @@ public class Disco extends TaskEngine {
             for (Explanation other : explanations) {
                if ( other.focus != e.focus && 
                      ( other.start == null || e.start == null
-                       || (!other.start.getType().isPathFrom(e.start.getType()) &&  
-                           !e.start.getType().isPathFrom(other.start.getType()) ) ) ) 
+                       || (!other.start.getGoal().isPathFrom(e.start.getType()) &&  
+                           !e.start.getGoal().isPathFrom(other.start.getType()) ) ) ) 
                   continue outer;
             }
             if ( candidates.isEmpty() ) candidates = new ArrayList<Explanation>(explanations.size());
@@ -518,7 +517,7 @@ public class Disco extends TaskEngine {
                for (Explanation c : candidates) {
                   for (Explanation other : candidates)
                      if ( other.focus != c.focus && other.start != null && c.start != null
-                           && other.start.getType().isPathFrom(c.start.getType()) )
+                           && other.start.getGoal().isPathFrom(c.start.getType()) )
                         highest.remove(other);
                }
                candidates = highest;

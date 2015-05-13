@@ -1,4 +1,4 @@
-    # May 4, 2015 6:55:44 PM - TaskEngine 1.6 / Disco 1.9
+    # May 13, 2015 7:19:56 PM - TaskEngine 1.6 / Disco 1.10
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
   > debug
@@ -36,7 +36,21 @@ Ok(agent)
    [Prim4(user)]
 
   > clear
-  > 
+  > execute edu.wpi.disco.lang.Propose$Succeeded / $disco.getTaskClass("Prim5").newInstance()
+    Propose.Succeeded(user,Prim5(user))
+    Propose.Should(agent,Prim2(user))
+  > history
+
+[Root1] -live
+   [Abs1] -live
+      [Prim5(user)] -succeeded
+         Propose.Succeeded(user,Prim5(user))
+      [Prim2(user)] -live <-focus
+         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
+            Propose.Should(agent,Prim2(user))
+   [Prim4(user)]
+
+  > clear
   > # Ambiguous: Root1, Root3
   > execute Prim1
 Ignoring ambiguity of 2
