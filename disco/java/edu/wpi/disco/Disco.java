@@ -510,7 +510,12 @@ public class Disco extends TaskEngine {
             candidates.add(e);
          }
          if ( !candidates.isEmpty() ) {
-            if ( candidates.size() > 1 ) {
+            if ( TRACE ) {
+               getOut().println("Reducing ambiguity of "+explanations.size()+
+                     " to highest toplevel(s)");
+               for (Explanation e : explanations) getOut().println(e);
+            }
+            if ( candidates.size() > 1 ) {              
                // remove candidates that contribute* to another candidate
                // i.e., prefer highest level candidate(s)
                List<Explanation> highest = new ArrayList<Explanation>(candidates);
