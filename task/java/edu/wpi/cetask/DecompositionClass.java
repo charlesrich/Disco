@@ -649,12 +649,12 @@ public class DecompositionClass extends TaskModel.Member {
             } else { 
                inputInput = outputInput = false;
                identityStep = identitySlot = null;
-               String expression = Task.makeExpression("$$this",
-                     getTaskType(step), slot, value, true);
                if ( TaskEngine.isCompilable() ) { 
-                  compiled = engine.compile(expression, where);
+                  compiled = engine.compile(
+                        Task.makeExpression("$$this", getTaskType(step), slot, value, true),
+                        where);
                   this.expression = null; 
-               } else { this.expression = expression; compiled = null; }
+               } else { this.expression = value; compiled = null; }
             }
          }
          type = inputInput ? BindingType.INPUT_INPUT : 

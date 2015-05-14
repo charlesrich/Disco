@@ -268,8 +268,8 @@ public class Task extends Instance {
    private static String checkExpression (TaskClass task, String name) {
       String type = task.getSlotType(name);
       return type == null ? "true" :
-          // allow any slot to be set to null (for "optional" inputs)
-          ("$$value === null || "+ 
+          // ignore undefined and allow any slot to be set to null (for "optional" inputs)
+          ("$$value == undefined || $$value === null || "+ 
              ("boolean".equals(type) ? "typeof $$value == \"boolean\"" :
                "string".equals(type) ? "typeof $$value == \"string\"" :
                   "number".equals(type) ? "typeof $$value == \"number\"" :
