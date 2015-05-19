@@ -2,16 +2,15 @@
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
   > debug
+  > next false
   > # Root1, Root2 and Root3 are @top=false in Test.properties
   > # unexplained
-  > execute Prim5
-Unexplained occurrence: execute Prim5
-    Prim5(user)
-    Ok(agent)
+  > execute Prim5 / 7
+Unexplained occurrence: execute Prim5 on 7.0
+    Prim5(user,7.0)
   > history
 
-Prim5(user)
-Ok(agent)
+Prim5(user,7.0)
 
   > clear
   > 
@@ -21,33 +20,29 @@ Ok(agent)
     # Returned 'null'
   > eval $disco.getTaskClass("Root3").setTop(true)
     # Returned 'null'
-  > execute Prim5
-    Prim5(user)
-    Propose.Should(agent,Prim2(user))
+  > execute Prim5 / 7
+    Prim5(user,7.0)
   > # Recognize Root1
   > history 
 
 [Root1] -live
-   [Abs1] -live
-      Prim5(user)
-      [Prim2(user)] -live <-focus
-         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
-            Propose.Should(agent,Prim2(user))
+   [Abs1(7.0)] -live <-focus
+      Prim5(user,7.0)
+      [Prim2(user)] -live
    [Prim4(user)]
 
   > clear
-  > execute edu.wpi.disco.lang.Propose$Succeeded / $disco.getTaskClass("Prim5").newInstance()
-    Propose.Succeeded(user,Prim5(user))
-    Propose.Should(agent,Prim2(user))
+  > eval p = $disco.getTaskClass("Prim5").newInstance(); p.setSlotValue("input1", 7)
+    # Returned '7.0'
+  > execute edu.wpi.disco.lang.Propose$Succeeded / p
+    Propose.Succeeded(user,Prim5(user,7.0))
   > history
 
 [Root1] -live
-   [Abs1] -live
-      [Prim5(user)] -succeeded
-         Propose.Succeeded(user,Prim5(user))
-      [Prim2(user)] -live <-focus
-         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
-            Propose.Should(agent,Prim2(user))
+   [Abs1(7.0)] -live
+      [Prim5(user,7.0)] -succeeded <-focus
+         Propose.Succeeded(user,Prim5(user,7.0))
+      [Prim2(user)] -live
    [Prim4(user)]
 
   > clear
@@ -57,22 +52,18 @@ Ignoring ambiguity of 2
 Explanation[start=[Root1],path=[<root1,step1>, <abs1a,step1>, <abs2,step1>],focus=[Prim1(user)]]
 Explanation[start=[Root3],path=[<root3,step1>, <abs2,step1>],focus=[Prim1(user)]]
     Prim1(user)
-    Propose.Should(agent,Prim2(user))
   > clear
   > 
   > eval $disco.getTaskClass("Abs2").setTop(true)
     # Returned 'null'
   > execute Prim1
     Prim1(user)
-    Propose.Should(agent,Prim2(user))
   > # Recognize Abs2
   > history
 
-[Abs2] -live
+[Abs2] -live <-focus
    Prim1(user)
-   [Prim2(user)] -live <-focus
-      [Accept(user,Propose.Should(agent,Prim2(user)))] -live
-         Propose.Should(agent,Prim2(user))
+   [Prim2(user)] -live
 
   > clear
   > 
@@ -84,22 +75,18 @@ Explanation[start=[Root2],path=[<root2,step1>],focus=[Prim2(user)]]
 Explanation[start=[Root3],path=[<root3,step1>, <abs2,step2>],focus=[Prim2(user)]]
 Explanation[start=[Abs2],path=[<abs2,step2>],focus=[Prim2(user)]]
     Prim2(user)
-    Propose.Should(agent,Prim1(user))
   > clear
   > 
   > eval $disco.getTaskClass("Abs1").setTop(true)
     # Returned 'null'
   > execute Prim1
     Prim1(user)
-    Propose.Should(agent,Prim2(user))
   > # Recognize Abs2
   > history
 
-[Abs2] -live
+[Abs2] -live <-focus
    Prim1(user)
-   [Prim2(user)] -live <-focus
-      [Accept(user,Propose.Should(agent,Prim2(user)))] -live
-         Propose.Should(agent,Prim2(user))
+   [Prim2(user)] -live
 
   > clear
   > 
@@ -112,21 +99,17 @@ Explanation[start=[Root3],path=[<root3,step1>, <abs2,step2>],focus=[Prim2(user)]
 Explanation[start=[Abs2],path=[<abs2,step2>],focus=[Prim2(user)]]
 Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
     Prim2(user)
-    Propose.Should(agent,Prim1(user))
   > clear
   > 
-  > execute Prim5
-    Prim5(user)
-    Propose.Should(agent,Prim2(user))
+  > execute Prim5 / 7
+    Prim5(user,7.0)
   > # Recognize Root1
   > history
 
 [Root1] -live
-   [Abs1] -live
-      Prim5(user)
-      [Prim2(user)] -live <-focus
-         [Accept(user,Propose.Should(agent,Prim2(user)))] -live
-            Propose.Should(agent,Prim2(user))
+   [Abs1(7.0)] -live <-focus
+      Prim5(user,7.0)
+      [Prim2(user)] -live
    [Prim4(user)]
 
   > clear
@@ -135,33 +118,22 @@ Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
     # Returned 'null'
   > execute Prim1
     Prim1(user)
-    Propose.Should(agent,Prim2(user))
   > execute Prim2
     Prim2(user)
-    Propose.Should(agent,Prim3(user))
   > execute Prim3
     Prim3(user)
-    Propose.Should(agent,Prim4(user))
   > execute Prim4
     Prim4(user)
-    Ok(agent)
   > # Recognize Root1
   > history
 
-[Root1] -done
+[Root1] -done <-focus
    [Abs1] -done
       [Abs2] -done
          Prim1(user)
-         [Prim2(user)] -done
-            Propose.Should(agent,Prim2(user))
-            Prim2(user)
-      [Prim3(user)] -done
-         Propose.Should(agent,Prim3(user))
-         Prim3(user)
-   [Prim4(user)] -done <-focus
-      Propose.Should(agent,Prim4(user))
-      Prim4(user)
-      Ok(agent)
+         Prim2(user)
+      Prim3(user)
+   Prim4(user)
 
   > clear
   > 
@@ -173,35 +145,25 @@ Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
     # Returned 'null'
   > execute Prim1
     Prim1(user)
-    Propose.Should(agent,Prim2(user))
   > execute Prim2
     Prim2(user)
-    Ok(agent)
   > execute Prim3
     Prim3(user)
-    Propose.Should(agent,Prim1(user))
   > execute Prim4
 Unexplained occurrence: execute Prim4
     Prim4(user)
-    Propose.Should(agent,Prim1(user))
   > # Recognize Root1 -- incorrect
   > history
 
 [Abs2] -done
    Prim1(user)
-   [Prim2(user)] -done
-      Propose.Should(agent,Prim2(user))
-      Prim2(user)
-      Ok(agent)
+   Prim2(user)
 [Root1] -live
-   [Abs1] -live
+   [Abs1] -live <-focus
       Prim3(user)
+      Prim4(user)
       [Abs2] -live
-         [Prim1(user)] -live <-focus
-            Propose.Should(agent,Prim1(user))
-            Prim4(user)
-            [Accept(user,Propose.Should(agent,Prim1(user)))] -live
-               Propose.Should(agent,Prim1(user))
+         [Prim1(user)] -live
          [Prim2(user)] -live
    [Prim4(user)]
 

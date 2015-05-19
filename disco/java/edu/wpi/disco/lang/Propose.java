@@ -641,6 +641,10 @@ public interface Propose {
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
          respondSuccess(contributes, implicit, success);
+         if ( contributes != null && contributes.getType() != getType() ) {
+            Task should = getNested();
+            if ( should != null ) contributes.match(should); // copy slot values
+         }
       }
       
       @Override

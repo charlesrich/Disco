@@ -389,6 +389,7 @@
   </task>
 
   <task id="Abs1">
+    <input name="input1" type="number"/>
     <subtasks id="abs1a" ordered="false">
       <step name="step1" task="Abs2"/>
       <step name="step2" task="Prim3"/>
@@ -396,6 +397,7 @@
     <subtasks id="abs1b">
       <step name="step1" task="Prim5"/>
       <step name="step2" task="Prim2"/>
+      <binding slot="$step1.input1" value="$this.input1"/>
     </subtasks>
 
   </task>
@@ -434,6 +436,7 @@
     <binding slot="$this.external" value="true"/>
   </task>
   <task id="Prim5">
+    <input name="input1" type="number"/>
     <binding slot="$this.external" value="true"/>
   </task>
 
