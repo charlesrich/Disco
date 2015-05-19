@@ -155,7 +155,7 @@ public class Decomposition extends Instance {
    
    public Plan getStep (String name) { return steps.get(name); }
    
-   public Collection<Plan> getSteps () { return steps.values(); }
+   public Collection<Plan> getSteps () { return Collections.unmodifiableCollection(steps.values()); }
    
    /**
     * Return name of step for given plan or null if not a step.

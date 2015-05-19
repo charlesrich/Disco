@@ -40,13 +40,13 @@ public class TaskModel extends Description {
    
    final Map<String,TaskClass> tasks = new HashMap<String,TaskClass>();
    
-   public Collection<TaskClass> getTaskClasses () { return tasks.values(); }
+   public Collection<TaskClass> getTaskClasses () { return Collections.unmodifiableCollection(tasks.values()); }
    
    public TaskClass getTaskClass (String id) { return tasks.get(id); }
 
    final Map<String,DecompositionClass> decomps = new HashMap<String,DecompositionClass>();
 
-   public Collection<DecompositionClass> getDecompositionClasses () { return decomps.values(); }
+   public Collection<DecompositionClass> getDecompositionClasses () { return Collections.unmodifiableCollection(decomps.values()); }
    
    public DecompositionClass getDecompositionClass (String id) { return decomps.get(id); }
    

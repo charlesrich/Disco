@@ -611,7 +611,7 @@ public class TaskEngine {
    /**
     * Return collection of task models loaded into this engine.
     */
-   public Collection<TaskModel> getModels () { return models.values(); }
+   public Collection<TaskModel> getModels () { return Collections.unmodifiableCollection(models.values()); }
 
    /**
     * Return unique task class, if any, identified by given qualified name
