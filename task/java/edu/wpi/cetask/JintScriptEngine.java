@@ -156,9 +156,16 @@ class JintScriptEngine extends ScriptEngineWrapper
    public Double evalDouble (String script, Bindings bindings) 
                   throws ScriptException {
       cli.System.Object value = (cli.System.Object) eval(script, bindings);
-      return value == null ? Double.NaN : new Double(value.ToString());
+      return value == null ? null : new Double(value.ToString());
    }
 
+   @Override
+   public Long evalLong (String script, Bindings bindings) 
+                  throws ScriptException {
+      cli.System.Object value = (cli.System.Object) eval(script, bindings);
+      return value == null ? null : new Long(value.ToString());
+   }
+   
    @Override
    public Compiled compile (String script) throws ScriptException {
       try {
