@@ -102,6 +102,7 @@ public class TaskEngine {
          Task.compiledCloneThis = compile(Task.cloneThis, "compiledCloneThis");
          Task.compiledCloneSlot = compile(Task.cloneSlot, "compiledCloneSlot");
       }
+      rootClass = new TaskClass(this, "**ROOT*"); // after scriptEngine initialized	
       try { 
          // load functions used in equals and hashCode into global scope
          //eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
@@ -753,7 +754,7 @@ public class TaskEngine {
    
    protected Plan getRoot () { return root; }
    
-   private final TaskClass rootClass = new TaskClass(this, "**ROOT*");
+   private final TaskClass rootClass;
          
    public void clear () {
       root = new Plan(rootClass.newInstance()); 
