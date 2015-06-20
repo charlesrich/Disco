@@ -7,16 +7,16 @@ package edu.wpi.cetask;
 
 import javax.script.*;
 
-// simple wrapper for Rhino script engine included in JDK 1.7
+// simple wrapper for Nashorn script engine included in JDK 1.8
 
-class RhinoScriptEngine extends ScriptEngineWrapper 
+class NashornScriptEngine extends ScriptEngineWrapper 
                         implements Invocable, Compilable {
    
-   private final ScriptEngine rhino;
+   private final ScriptEngine nashorn;
    private final Object scope; // for invokeFunction 
    
-   public RhinoScriptEngine (ScriptEngine rhino) {
-      this.rhino = rhino;
+   public NashornScriptEngine (ScriptEngine nashorn) {
+      this.nashorn = nashorn;
       try { scope = eval("new Object()"); }
       catch (ScriptException e) { throw new RuntimeException(e); }
    }
@@ -133,7 +133,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)
          args[i] = javaToJS(args[i], scope);
-      return ((Invocable) rhino).invokeFunction(name, args);
+      return ((Invocable) nashorn).invokeFunction(name, args);
    }
    
    @Override
@@ -141,7 +141,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)
          args[i] = javaToJS(args[i], thiz);
-      return ((Invocable) rhino).invokeMethod(thiz, name, args);
+      return ((Invocable) nashorn).invokeMethod(thiz, name, args);
    }
    
    private static Object javaToJS (Object value, Object scriptable) {
@@ -195,22 +195,22 @@ class RhinoScriptEngine extends ScriptEngineWrapper
 */
    
    @Override
-   public Bindings getBindings (int scope) { return rhino.getBindings(scope); }
+   public Bindings getBindings (int scope) { return nashorn.getBindings(scope); }
    
    @Override
-   public ScriptContext getContext () { return rhino.getContext(); }
+   public ScriptContext getContext () { return nashorn.getContext(); }
 
    @Override
-   public void setContext (ScriptContext context) { rhino.setContext(context); }
+   public void setContext (ScriptContext context) { nashorn.setContext(context); }
 
    @Override
    public Object eval (String script, Bindings bindings) throws ScriptException {
-      return rhino.eval(script, bindings);
+      return nashorn.eval(script, bindings);
    }
 
    @Override
    public Object eval (String script) throws ScriptException {
-      return rhino.eval(script);
+      return nashorn.eval(script);
    }
    
    @Override
@@ -235,7 +235,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper
       private final CompiledScript compiled;
 
       public RhinoCompiled (String script) throws ScriptException {
-         compiled = ((Compilable) rhino).compile(script);
+         compiled = ((Compilable) nashorn).compile(script);
       }
 
       @Override

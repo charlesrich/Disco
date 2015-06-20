@@ -76,8 +76,11 @@ public class TaskEngine {
    public TaskEngine () {
       ENGINE = this;
       ScriptEngineManager mgr = new ScriptEngineManager();
-      ScriptEngine rhino = mgr.getEngineByName("ECMAScript");
-      if ( rhino != null ) scriptEngine = new RhinoScriptEngine(rhino);
+      ScriptEngine ECMAScript = mgr.getEngineByName("ECMAScript");
+      if ( ECMAScript != null ) 
+         scriptEngine = ECMAScript instanceof jdk.nashorn.api.scripting.NashornScriptEngine ?
+            new NashornScriptEngine(ECMAScript) :
+            new RhinoScriptEngine(ECMAScript);
       else if ( JintScriptEngine.EXISTS ) { 
          // for Mono need to instantiate Jint engine manually
          scriptEngine = new JintScriptEngine();
@@ -87,6 +90,9 @@ public class TaskEngine {
       COMPILABLE = scriptEngine instanceof Compilable;
       INVOCABLE = scriptEngine instanceof Invocable;
       SCRIPTABLE = scriptEngine.isScriptable();
+      if ( !(COMPILABLE && INVOCABLE && SCRIPTABLE) )
+         getErr().println("WARNING! JavaScript engine "+scriptEngine.getClass()+
+               " is not compilable or invocable or scriptable---Disco will run much slower than usual.");
       try { loadDefaultProperties(); }
       catch (IOException e) { throw new RuntimeException(e); }
       defaultProperties();
@@ -98,7 +104,9 @@ public class TaskEngine {
       }
       try { 
          // load functions used in equals and hashCode into global scope
-         eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
+         //eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
+         scriptEngine.eval(
+               Utils.toString(TaskEngine.class.getResourceAsStream("default.js")));
          // note JSON is included in Rhino for JDK 1.7
       } catch (Exception e) { getErr().println(e); }
       clear();  // after default.js loaded

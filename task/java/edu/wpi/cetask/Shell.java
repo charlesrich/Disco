@@ -195,12 +195,6 @@ public class Shell {
       printVersion(); out.println();
       engine.setStart(now);
       println(engine.getProperty("shell@welcome"));
-      if ( !TaskEngine.isCompilable() )
-         println("WARNING: "+engine.getScriptEngine()+
-         " conditions are not compiled (will run slower).");
-      if ( !TaskEngine.SCRIPTABLE)
-         println("WARNING: "+engine.getScriptEngine()+
-         " does not use (sun.)org.mozilla.javascript.(internal.)Scriptable and will run slower.");
    }         
    
    private void setErrOut (PrintStream stream) {
