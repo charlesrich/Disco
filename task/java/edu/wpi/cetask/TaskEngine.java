@@ -30,7 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.6";
+   public static String VERSION = "1.7";
    
    // DESIGN NOTE: There may be multiple instances of TaskEngine, but they
    //              must all have the same type of ScriptEngine

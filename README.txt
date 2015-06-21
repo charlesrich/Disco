@@ -47,13 +47,16 @@ edu.wpi.disco.Disco.  You can also run the jar file directly as:
 
      java -jar release/lib/disco.jar
 
-NB: This is pure Java software and requires JRE 1.7 (Java SE 7.0),
-which includes JavaScript.  It has been tested in JRE 1.7 on Windows,
-Mac and Unix (Ubuntu).  NB: Due to accessing an unsupported API for
-the JavaScript interpreter (for efficiency reasons), Disco requires the
-Oracle release of Java, and will not, for example, work with OpenJDK.
+NB: This is pure Java software and assumes Java 8 (JRE 1.8) which
+includes Nashorn JavaScript (ECMAScript) engine.  It has been tested
+with Java SE 8u45 in the Windows x64, Mac OS X x64 and Linux x64
+releases from Oracle (java.oracle.com). OpenJDK Java 8 releases are
+not available at time of this writing.
 
-Note this jar file includes all the binary class files in both the
+The release-java7 folder contains an archived copy of the last release
+of Disco built in Java 7 (using the builtin Rhino JavaScript engine).
+
+Note that disco.jar includes all the binary class files in both the
 disco and task projects (but not the libraries for disco/d4g or the
 speech libraries in task/lib).
 
