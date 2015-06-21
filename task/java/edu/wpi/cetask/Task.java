@@ -179,15 +179,16 @@ public class Task extends Instance {
          if ( engine.isScriptable(value) ) {
             modified = true;
             engine.put(bindings.get("$this"), name, value);
-            if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
-         } else 
+         } else { 
             synchronized (bindings) {
                try {
                   bindings.put("$$value", value); // convert to JavaScript value
                   modified = true;
-                  eval("$this."+name+" = $$value;", "setSlotValue"); 
+                  super.eval("$this."+name+" = $$value;", "setSlotValue"); // sic super
                } finally { bindings.remove("$$value"); }
             }
+         }
+         if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
       } else failCheck(name, value.toString(), "setSlotValue");
    }  
       
@@ -281,7 +282,7 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), extra, where) )
+         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, false), extra, where) )
             failCheck(name, expression, where);
          else modified = true;
       } finally { extra.remove("$$value"); extra.remove("$$this"); }

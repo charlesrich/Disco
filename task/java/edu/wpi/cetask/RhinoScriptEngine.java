@@ -226,6 +226,12 @@ class RhinoScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
+   public Long evalLong (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Long) eval(script, bindings);
+   }
+   
+   @Override
    public Compiled compile (String script) throws ScriptException {
       return new RhinoCompiled(script);
    }
