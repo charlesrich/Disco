@@ -298,7 +298,7 @@ public class TaskClass extends TaskModel.Member {
          // compute type
          if ( name.equals("success") || name.equals("external") )
             this.type = "boolean";
-         else if ( name.equals("when") ) this.type = "Date";
+         else if ( name.equals("when") ) this.type = "number";
          else {
             String path = "[@name=\""+name+"\"]/@type";
             String type = enclosing.xpath("./n:input"+path+" | "+"./n:output"+path);

@@ -260,6 +260,12 @@ public class TaskEngine {
       catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
+   Long evalLong (String script, Bindings bindings, String where) {
+      try { return scriptEngine.evalLong(script, bindings); } 
+      catch (ScriptException e) { throw newRuntimeException(e, where); } 
+      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
+   }
+   
    public void importPackage (String pkg) {
       eval("importPackage("+pkg+")", "importPackage");
    }

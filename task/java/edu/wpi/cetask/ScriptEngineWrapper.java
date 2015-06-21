@@ -13,11 +13,14 @@ import javax.script.*;
 
 abstract class ScriptEngineWrapper extends AbstractScriptEngine {
 
-   // these two methods added to handle type coercion from Jint
+   // these three methods added to handle type coercion from Jint
    public abstract Boolean evalBoolean (String script, Bindings bindings) 
                    throws ScriptException;
    
    public abstract Double evalDouble (String script, Bindings bindings) 
+                   throws ScriptException;
+   
+   public abstract Long evalLong (String script, Bindings bindings) 
                    throws ScriptException;
    
    boolean isScriptable () { return false; }

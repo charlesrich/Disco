@@ -179,15 +179,16 @@ public class Task extends Instance {
          if ( engine.isScriptable(value) ) {
             modified = true;
             engine.put(bindings.get("$this"), name, value);
-            if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
-         } else 
+         } else { 
             synchronized (bindings) {
                try {
                   bindings.put("$$value", value); // convert to JavaScript value
                   modified = true;
-                  eval("$this."+name+" = $$value;", "setSlotValue"); 
+                  super.eval("$this."+name+" = $$value;", "setSlotValue"); // sic super
                } finally { bindings.remove("$$value"); }
             }
+         }
+         if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
       } else failCheck(name, value.toString(), "setSlotValue");
    }  
       
@@ -215,10 +216,7 @@ public class Task extends Instance {
          try {
             bindings.put("$$value", value); // convert to JavaScript object
             return Utils.booleanValue(
-                  eval( // workaround bug: "$$value instanceof Date" returns false
-                        type.equals("Date") ? "$$value.getUTCDate !== undefined" :
-                           ("$$value instanceof "+type),
-                        "checkSlotValue"));
+                  eval("$$value instanceof "+type, "checkSlotValue"));
          } finally { bindings.remove("$$value"); }
       }
    }
@@ -273,8 +271,6 @@ public class Task extends Instance {
              ("boolean".equals(type) ? "typeof $$value == \"boolean\"" :
                "string".equals(type) ? "typeof $$value == \"string\"" :
                   "number".equals(type) ? "typeof $$value == \"number\"" :
-                     // work around bug: "$$value instanceof Date" returns false
-                     "Date".equals(type) ? "$$value.getUTCDate !== undefined" :
                         "$$value instanceof "+type));
    }
    
@@ -286,7 +282,7 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), extra, where) )
+         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, false), extra, where) )
             failCheck(name, expression, where);
          else modified = true;
       } finally { extra.remove("$$value"); extra.remove("$$this"); }
@@ -430,22 +426,17 @@ public class Task extends Instance {
     * @see #setWhen(long)
     */
    public long getWhen () {
-      try { 
-         return // for some reason, millis get converted to double first 
-               engine.evalDouble("$this.when.getTime()", bindings, "getWhen").longValue(); 
-      } catch (RuntimeException e) { throw e; }
-        catch (Exception e) { throw new RuntimeException(e); }
+      Object value = getSlotValue("when"); 
+      return value == null ? 0 : (Long) value;
    }
 
    /**
-    * Set the time when this task occurred. Javascript instance of Date object
-    * is created with given milliseconds.
+    * Set the time when this task occurred. 
     * 
     * @see #getWhen()
     */
    public void setWhen (long milliseconds) {
-      setSlotValueScript("when", "new Date("+Long.toString(milliseconds)+")", 
-            "setWhen");
+      setSlotValue("when", milliseconds);
    }
    
    /**
