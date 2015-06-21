@@ -34,13 +34,13 @@
 
   <task id="SetDestination">
     <input name="who" type="Character"/>
-    <input name="destination" type="Unity3d.Vector3"/>
+    <input name="destination" type="UnityEngine.Vector3"/>
     <script> setDestination($this.who, $this.destination) </script>
   </task>
     
   <task id="_Arrived">
     <input name="who" type="Character"/>
-    <input name="destination" type="Unity3d.Vector3"/>
+    <input name="destination" type="UnityEngine.Vector3"/>
   </task>
 
  <!-- GoToCover is similar to GoTo except the specific destination is chosen
