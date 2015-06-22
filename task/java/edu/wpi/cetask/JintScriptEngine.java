@@ -8,9 +8,7 @@ package edu.wpi.cetask;
 import cli.Jint.*;
 import cli.Jint.Expressions.Program;
 import cli.Jint.Native.*;
-
 import java.util.Map.Entry;
-
 import javax.script.*;
 
 // wrapper for Jint to support running CETask/Disco under Mono (for Unity)
@@ -104,6 +102,17 @@ class JintScriptEngine extends ScriptEngineWrapper
       } finally { unbindGlobal(bindings); }
    }
    
+   @Override
+   public Object eval (String script, ScriptContext context) throws ScriptException {
+      // because eval(String,Bindings) overridden above
+      throw new IllegalStateException();
+   }
+
+   @Override
+   public Bindings createBindings () {
+      return new SimpleBindings();
+   }
+   
    // TODO There probably is a more efficient way to do this binding and
    //      unbinding using the scoping structures of Jint
    
@@ -170,15 +179,15 @@ class JintScriptEngine extends ScriptEngineWrapper
    public Compiled compile (String script) throws ScriptException {
       try {
          if (null != null) throw new JintException(); // to fool compiler
-         return new JintCompiled(script);
+         return new CompiledJint(script);
       } catch (JintException e) { throw new ScriptException(e.toString()); }
    }
 
-   private class JintCompiled extends Compiled {
+   private class CompiledJint extends Compiled {
 
       private final Program program;
 
-      public JintCompiled (String script) {
+      public CompiledJint (String script) {
          program = JintEngine.Compile(script, true); //debug info   
       }
 
@@ -192,6 +201,12 @@ class JintScriptEngine extends ScriptEngineWrapper
          finally { unbindGlobal(bindings); }
       }
       
+      @Override
+      public Object eval (ScriptContext context) throws ScriptException {
+         // because eval(Bindings) overridden above
+         throw new IllegalStateException();
+      }
+         
       @Override
       public Boolean evalBoolean (Bindings bindings) throws ScriptException {
          cli.System.Object value = (cli.System.Object) eval(bindings);

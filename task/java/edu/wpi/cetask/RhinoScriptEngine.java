@@ -9,14 +9,13 @@ import javax.script.*;
 
 // simple wrapper for Rhino script engine included in JDK 1.7
 
-class RhinoScriptEngine extends ScriptEngineWrapper 
+class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
                         implements Invocable, Compilable {
    
-   private final ScriptEngine rhino;
    private final Object scope; // for invokeFunction 
    
    public RhinoScriptEngine (ScriptEngine rhino) {
-      this.rhino = rhino;
+      super(rhino);
       try { scope = eval("new Object()"); }
       catch (ScriptException e) { throw new RuntimeException(e); }
    }
@@ -133,7 +132,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)
          args[i] = javaToJS(args[i], scope);
-      return ((Invocable) rhino).invokeFunction(name, args);
+      return ((Invocable) jsr).invokeFunction(name, args);
    }
    
    @Override
@@ -141,7 +140,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)
          args[i] = javaToJS(args[i], thiz);
-      return ((Invocable) rhino).invokeMethod(thiz, name, args);
+      return ((Invocable) jsr).invokeMethod(thiz, name, args);
    }
    
    private static Object javaToJS (Object value, Object scriptable) {
@@ -193,66 +192,5 @@ class RhinoScriptEngine extends ScriptEngineWrapper
    }
    
 */
-   
-   @Override
-   public Bindings getBindings (int scope) { return rhino.getBindings(scope); }
-   
-   @Override
-   public ScriptContext getContext () { return rhino.getContext(); }
-
-   @Override
-   public void setContext (ScriptContext context) { rhino.setContext(context); }
-
-   @Override
-   public Object eval (String script, Bindings bindings) throws ScriptException {
-      return rhino.eval(script, bindings);
-   }
-
-   @Override
-   public Object eval (String script) throws ScriptException {
-      return rhino.eval(script);
-   }
-   
-   @Override
-   public Boolean evalBoolean (String script, Bindings bindings) 
-                  throws ScriptException {
-      return (Boolean) eval(script, bindings);
-   }
-
-   @Override
-   public Double evalDouble (String script, Bindings bindings) 
-                  throws ScriptException {
-      return (Double) eval(script, bindings);
-   }
-   
-   @Override
-   public Long evalLong (String script, Bindings bindings) 
-                  throws ScriptException {
-      return (Long) eval(script, bindings);
-   }
-   
-   @Override
-   public Compiled compile (String script) throws ScriptException {
-      return new RhinoCompiled(script);
-   }
-
-   private class RhinoCompiled extends Compiled {
-
-      private final CompiledScript compiled;
-
-      public RhinoCompiled (String script) throws ScriptException {
-         compiled = ((Compilable) rhino).compile(script);
-      }
-
-      @Override
-      public Object eval (Bindings bindings) throws ScriptException {
-         synchronized (bindings) { return compiled.eval(bindings); }
-      }
-      
-      @Override
-      public Boolean evalBoolean (Bindings bindings) throws ScriptException {
-         return (Boolean) eval(bindings);
-      }
-   }
 
 }

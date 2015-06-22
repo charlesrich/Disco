@@ -182,7 +182,7 @@ public class Task extends Instance {
          } else { 
             synchronized (bindings) {
                try {
-                  bindings.put("$$value", value); // convert to JavaScript value
+                  bindings.put("$$value", value); 
                   modified = true;
                   super.eval("$this."+name+" = $$value;", "setSlotValue"); // sic super
                } finally { bindings.remove("$$value"); }
@@ -238,9 +238,11 @@ public class Task extends Instance {
    }
 
    void setSlotValueScript (String name, Compiled compiled, String where) {
-      if ( !evalCondition(compiled, bindings, where) )
-         failCheck(name, "compiled script", where);
-      else modified = true;
+      try {
+         if ( !evalCondition(compiled, bindings, where) )
+            failCheck(name, "compiled script", where);
+         else modified = true;
+      } finally { bindings.remove("$$value"); }
    }
    
    static String makeExpression (String self, TaskClass type, String name, 

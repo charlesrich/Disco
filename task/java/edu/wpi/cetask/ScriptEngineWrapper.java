@@ -6,22 +6,52 @@
 package edu.wpi.cetask;
 
 import java.io.Reader;
+import java.util.List;
 import javax.script.*;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 // wrapper for script engine used in TaskEngine 
 // a complete implementation of ScriptEngine is not required
 
 abstract class ScriptEngineWrapper extends AbstractScriptEngine {
-
+   
+   public static ScriptEngineWrapper getScriptEngine () {
+      ScriptEngineManager mgr = new ScriptEngineManager();
+      List<ScriptEngineFactory> factories = mgr.getEngineFactories();
+      if ( factories == null || factories.isEmpty() ) {
+         if ( JintScriptEngine.EXISTS ) {
+            // for Mono need to instantiate Jint engine manually
+            JintScriptEngine jint = new JintScriptEngine();
+            jint.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+            return jint;
+         } else throw new IllegalStateException("No JavaScript engine found!");
+      }
+      ScriptEngineFactory factory = factories.get(0);
+      ScriptEngineWrapper.JSR_223 wrapper = factory instanceof NashornScriptEngineFactory ?
+         new NashornScriptEngine(
+               ((NashornScriptEngineFactory) factory).getScriptEngine(
+                     new String[] { })) :  // "--global-per-engine"
+         new RhinoScriptEngine(factory.getScriptEngine());
+       wrapper.jsr.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+       return wrapper;
+   }
+   
    // these three methods added to handle type coercion from Jint
-   public abstract Boolean evalBoolean (String script, Bindings bindings) 
-                   throws ScriptException;
    
-   public abstract Double evalDouble (String script, Bindings bindings) 
-                   throws ScriptException;
-   
-   public abstract Long evalLong (String script, Bindings bindings) 
-                   throws ScriptException;
+   public Boolean evalBoolean (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Boolean) eval(script, bindings);
+   }
+
+   public Double evalDouble (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Double) eval(script, bindings);
+   }
+
+   public Long evalLong (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Long) eval(script, bindings);
+   }
    
    boolean isScriptable () { return false; }
    boolean isScriptable (Object value) { return false; }
@@ -69,14 +99,65 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
 
       @Override
       public ScriptEngine getEngine () { return ScriptEngineWrapper.this; }
-
-      @Override
-      @Deprecated
-      public Object eval (ScriptContext context) {
-         throw new RuntimeException("Unimplemented");
-      }
    }
   
+   protected static class JSR_223 extends ScriptEngineWrapper {
+      
+      protected final ScriptEngine jsr;
+      
+      protected JSR_223 (ScriptEngine jsr) {
+         this.jsr = jsr;
+      }
+
+      @Override
+      public Bindings createBindings () {
+        return jsr.createBindings();
+      }
+      
+      @Override
+      public Bindings getBindings (int scope) { return jsr.getBindings(scope); }
+
+      @Override
+      public ScriptContext getContext () { return jsr.getContext(); }
+
+      @Override
+      public void setContext (ScriptContext context) { jsr.setContext(context); }
+
+      @Override
+      public Object eval (String script, ScriptContext context) throws ScriptException {
+         return jsr.eval(script, context);
+      }
+
+      @Override
+      public Object eval (String script) throws ScriptException {
+         return jsr.eval(script);
+      }
+      
+      @Override
+      public Compiled compile (String script) throws ScriptException {
+         return new CompiledJRS_223(script);
+      }
+
+      protected class CompiledJRS_223 extends Compiled {
+
+         private final CompiledScript compiled;
+
+         public CompiledJRS_223 (String script) throws ScriptException {
+            compiled = ((Compilable) jsr).compile(script);
+         }
+
+         @Override
+         public Object eval (ScriptContext context) throws ScriptException {
+            return compiled.eval(context);
+         }
+
+         @Override
+         public Boolean evalBoolean (Bindings bindings) throws ScriptException {
+            return (Boolean) eval(bindings);
+         }
+      }
+   }
+   
    // unused methods
 
    @Override
@@ -84,22 +165,10 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    public ScriptEngineFactory getFactory () {
       throw new RuntimeException("Unimplemented");
    }
-  
-   @Override
-   @Deprecated
-   public Object eval (String script, ScriptContext context) {
-      throw new RuntimeException("Unimplemented");
-   }
 
    @Override
    @Deprecated
    public Object eval (Reader reader, ScriptContext context) {
-      throw new RuntimeException("Unimplemented");
-   }
-
-   @Override
-   @Deprecated
-   public Bindings createBindings () {
       throw new RuntimeException("Unimplemented");
    }
 

@@ -75,17 +75,7 @@ public class TaskEngine {
    
    public TaskEngine () {
       ENGINE = this;
-      ScriptEngineManager mgr = new ScriptEngineManager();
-      ScriptEngine ECMAScript = mgr.getEngineByName("ECMAScript");
-      if ( ECMAScript != null ) 
-         scriptEngine = ECMAScript instanceof jdk.nashorn.api.scripting.NashornScriptEngine ?
-            new NashornScriptEngine(ECMAScript) :
-            new RhinoScriptEngine(ECMAScript);
-      else if ( JintScriptEngine.EXISTS ) { 
-         // for Mono need to instantiate Jint engine manually
-         scriptEngine = new JintScriptEngine();
-         scriptEngine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-      } else throw new IllegalStateException("No ECMAScript engine found!");
+      scriptEngine = ScriptEngineWrapper.getScriptEngine();
       // check implementation-dependent properties of script engine
       COMPILABLE = scriptEngine instanceof Compilable;
       INVOCABLE = scriptEngine instanceof Invocable;
