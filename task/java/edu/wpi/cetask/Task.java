@@ -230,19 +230,15 @@ public class Task extends Instance {
     */
    public void setSlotValueScript (String name, String expression, String where) {
       // only evaluate expression once (in case of side effects)
-      try {
-         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), where) )
-            failCheck(name, expression, where);
-         else modified = true;
-      } finally { bindings.remove("$$value"); }
+      if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), where) )
+         failCheck(name, expression, where);
+      else modified = true;
    }
 
    void setSlotValueScript (String name, Compiled compiled, String where) {
-      try {
-         if ( !evalCondition(compiled, bindings, where) )
-            failCheck(name, "compiled script", where);
-         else modified = true;
-      } finally { bindings.remove("$$value"); }
+      if ( !evalCondition(compiled, bindings, where) )
+         failCheck(name, "compiled script", where);
+      else modified = true;
    }
    
    static String makeExpression (String self, TaskClass type, String name, 
@@ -254,7 +250,8 @@ public class Task extends Instance {
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
          // note using [ ] to protect keywords
          .append(self).append("['").append(name).append("']")
-         .append(" = $$value; $$value = true; } else $$value = false; $$value");
+         .append(" = $$value; $$value = true; } else $$value = false;"
+            + "(function (value) {delete $$value; return value;})($$value)");
       return buffer.toString();
    }
    

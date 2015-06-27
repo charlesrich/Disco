@@ -208,13 +208,14 @@ public class TaskEngine {
    
    public Task getLastOccurrence () { return last; }
    
-   /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
-    * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
+   /**
+    * Evaluate in using default (global) context (not in any task instance)
     */
-   
    public Object eval (String script, String where) {
-      return eval(script, scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE), 
-                 where);
+      try { return scriptEngine.eval(script); }
+      catch (ScriptException e) {
+         if ( DEBUG ) getErr().println(script);
+         throw newRuntimeException(e, where); } 
    }
 
    public Object eval (String script, Bindings bindings, String where) {
@@ -233,8 +234,10 @@ public class TaskEngine {
    }
 
    Boolean evalBoolean (String script, String where) {
-      return evalBoolean(script, scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE), 
-                         where);
+      if ( script == null || script.length() == 0 ) return null;
+      try { return (Boolean) scriptEngine.eval(script); }
+      catch (ScriptException e) { throw newRuntimeException(e, where); } 
+      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
    Boolean evalBoolean (String script, Bindings bindings, String where) {

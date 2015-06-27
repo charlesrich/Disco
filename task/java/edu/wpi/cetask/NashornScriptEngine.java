@@ -13,12 +13,12 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
                           implements Invocable, Compilable {
    
    /**
-    *  NB: Do <em>not</em> use "--global-per-engine" option.  It will
-    *  break the system.  Default behavior correctly provides
-    *  separation of TaskEngine#setGlobal(String,Object) for separate
-    *  engine instances.
+    *  --global-per-engine option required below since each task instance 
+    *  uses its own ENGINE_SCOPE, but they need to share a single GLOBAL_SCOPE
+    *  (e.g., for loading task library initializations).  Note that separate
+    *  instances of TaskEngine still have independent global name spaces.
     */
-   public static String[] OPTIONS = new String[] {};
+   public static String[] OPTIONS = new String[] {"--global-per-engine"};
    
    private final Object scope; // for invokeFunction ?????????????
    
@@ -56,7 +56,7 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    void delete (Object object, String field) {
       throw new UnsupportedOperationException("delete("+object+","+field+")");
    }
-   
+ 
    @Override
    public Object invokeFunction (String name, Object... args)
          throws ScriptException, NoSuchMethodException {
