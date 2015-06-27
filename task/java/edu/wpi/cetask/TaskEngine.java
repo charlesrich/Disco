@@ -256,10 +256,6 @@ public class TaskEngine {
       catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
-   public void importPackage (String pkg) {
-      eval("importPackage("+pkg+")", "importPackage");
-   }
-   
    public void setGlobal (String variable, Object value) {
       Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
       synchronized (bindings) { bindings.put(variable, value); }
