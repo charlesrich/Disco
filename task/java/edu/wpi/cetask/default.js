@@ -78,3 +78,13 @@ edu.wpi.cetask_helper = {
 // for compatibility with Jint for Unity
 
 Debug = { Log : function (obj) { println(obj); }}
+
+// for Nashorn compatibility with Rhino
+
+if ( (typeof println) === 'undefined' ) 
+   println = function (x) { java.lang.System.out.println(x); }
+
+
+
+
+
