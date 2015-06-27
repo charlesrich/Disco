@@ -43,7 +43,8 @@ edu.wpi.cetask_helper = {
              }
              return hash;
            default:
-             if ( x instanceof java.lang.Object ) return x.hashCode();
+             try { if ( x instanceof java.lang.Object ) return x.hashCode(); }
+             catch (e) {} // for Nashorn
              for (var p in x) {
                 factor *= 31;
                 var value = x[p];
@@ -61,14 +62,14 @@ edu.wpi.cetask_helper = {
      // respect custom clone method if defined (to go deeper)
      if ( typeof x.clone == "function" ) return x.clone();
      if ( x instanceof java.lang.Object ) {
-	 if ( x instanceof java.lang.Cloneable ) return x.clone();
-	 throw new Error("Modified Java input object does not implement Cloneable: "+x);
+         if ( x instanceof java.lang.Cloneable ) return x.clone();
+         throw new Error("Modified Java input object does not implement Cloneable: "+x);
      }
      // avoid calling constructor directly (may require arguments)
      var copy = Object.create(x.constructor.prototype);
      for (var p in x) {// works for arrays also
-	 // don't include inherited properties
-	 if (x.hasOwnProperty(p)) copy[p] = x[p];
+         // don't include inherited properties
+         if (x.hasOwnProperty(p)) copy[p] = x[p];
      }
      return copy;           
    }

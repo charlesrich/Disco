@@ -56,10 +56,10 @@ public class Task extends Instance {
    }
    
    // see Javascript function definitions in default.js
-   final static String hashCode = "Packages.edu.wpi.cetask_helper.hashCode($this)",
-                       cloneThis = "Packages.edu.wpi.cetask_helper.clone($this);",
-                       cloneSlot = "$this[$$value] = Packages.edu.wpi.cetask_helper.clone($this[$$value]);",
-                       equals = "Packages.edu.wpi.cetask_helper.equals($this,$$value)";
+   final static String hashCode = "edu.wpi.cetask_helper.hashCode($this)",
+                       cloneThis = "edu.wpi.cetask_helper.clone($this);",
+                       cloneSlot = "$this[$$value] = edu.wpi.cetask_helper.clone($this[$$value]);",
+                       equals = "edu.wpi.cetask_helper.equals($this,$$value)";
 
    static Compiled compiledEquals, compiledHashCode, compiledCloneThis, compiledCloneSlot;
    
