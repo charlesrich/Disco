@@ -29,8 +29,7 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       ScriptEngineFactory factory = factories.get(0);
       ScriptEngineWrapper.JSR_223 wrapper = factory instanceof NashornScriptEngineFactory ?
          new NashornScriptEngine(
-               ((NashornScriptEngineFactory) factory).getScriptEngine(
-                     new String[] { })) :  // "--global-per-engine"
+               ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS)) :
          new RhinoScriptEngine(factory.getScriptEngine());
        wrapper.jsr.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
        return wrapper;

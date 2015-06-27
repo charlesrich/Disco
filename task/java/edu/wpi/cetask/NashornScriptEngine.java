@@ -12,6 +12,14 @@ import javax.script.*;
 class NashornScriptEngine extends ScriptEngineWrapper.JSR_223 
                           implements Invocable, Compilable {
    
+   /**
+    *  NB: Do <em>not</em> use "--global-per-engine" option.  It will
+    *  break the system.  Default behavior correctly provides
+    *  separation of TaskEngine#setGlobal(String,Object) for separate
+    *  engine instances.
+    */
+   public static String[] OPTIONS = new String[] {};
+   
    private final Object scope; // for invokeFunction ?????????????
    
    public NashornScriptEngine (ScriptEngine nashorn) {
