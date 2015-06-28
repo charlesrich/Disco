@@ -35,33 +35,48 @@ public class Task extends Instance {
    @Override
    public TaskClass getType () { return (TaskClass) super.getType(); }
 
+   // for hashing/comparing of Tasks in Agenda.generate()
+   
    @Override
-   public boolean equals (Object object) {
-      if ( this == object ) return true;
+   public boolean equals (Object object) {     
       if ( !(object instanceof Task) ) return false;
       Task task = (Task) object;
-      if ( !task.getType().equals(type) ) return false;
-      synchronized (bindings) {
-         try {
-            bindings.put("$$value", task.bindings.get("$this")); 
-            return (Boolean) super.evalCondition(equals, compiledEquals, "equals");
-         } finally { bindings.remove("$$value"); }
-      }
+      if ( type != task.type ) return false;
+      for (Slot slot : getType().getInputs())
+         if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
+            return false;
+      for (Slot slot : getType().getOutputs())
+         if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
+            return false;
+      return true;
    }
 
    @Override 
    public int hashCode () {
-      return type.hashCode() ^
-         eval(hashCode, compiledHashCode, "hashCode").hashCode();
+      int factor = 31;
+      int hash = type.hashCode()*factor;
+      for (Slot slot : getType().getInputs()) {
+         Object value = slot.getSlotValue(this);
+         if ( value != null ) {
+            factor *= 31;
+            hash += value.hashCode()*factor;
+         }
+      }
+      for (Slot slot : getType().getOutputs()) {
+         Object value = slot.getSlotValue(this);
+         if ( value != null ) {
+            factor *= 31;
+            hash += value.hashCode()*factor;
+         }
+      }
+      return hash;
    }
-   
+  
    // see Javascript function definitions in default.js
-   final static String hashCode = "edu.wpi.cetask_helper.hashCode($this)",
-                       cloneThis = "edu.wpi.cetask_helper.clone($this);",
-                       cloneSlot = "$this[$$value] = edu.wpi.cetask_helper.clone($this[$$value]);",
-                       equals = "edu.wpi.cetask_helper.equals($this,$$value)";
-
-   static Compiled compiledEquals, compiledHashCode, compiledCloneThis, compiledCloneSlot;
+   final static String cloneThis = "edu_wpi_cetask_clone($this);",
+                       cloneSlot = "$this[$$value] = edu_wpi_cetask_clone($this[$$value]);";
+                       
+   static Compiled compiledCloneThis, compiledCloneSlot;
    
    /**
     * Return value of the named slot.<br>

@@ -77,18 +77,18 @@ public class TaskEngine {
       ENGINE = this;
       scriptEngine = ScriptEngineWrapper.getScriptEngine();
       // check implementation-dependent properties of script engine
-      COMPILABLE = scriptEngine instanceof Compilable;
+      COMPILABLE = false; /////////////scriptEngine instanceof Compilable;
       INVOCABLE = scriptEngine instanceof Invocable;
       SCRIPTABLE = scriptEngine.isScriptable();
+      /*
       if ( !(COMPILABLE && INVOCABLE && SCRIPTABLE) )
          getErr().println("WARNING! JavaScript engine "+scriptEngine.getClass()+
                " is not compilable or invocable or scriptable---Disco will run much slower than usual.");
+               */
       try { loadDefaultProperties(); }
       catch (IOException e) { throw new RuntimeException(e); }
       defaultProperties();
-      if ( COMPILABLE && Task.compiledEquals != null ) {
-         Task.compiledEquals = compile(Task.equals, "compiledEquals");
-         Task.compiledHashCode = compile(Task.hashCode, "compiledHashCode");
+      if ( COMPILABLE && Task.compiledCloneThis != null ) {
          Task.compiledCloneThis = compile(Task.cloneThis, "compiledCloneThis");
          Task.compiledCloneSlot = compile(Task.cloneSlot, "compiledCloneSlot");
       }

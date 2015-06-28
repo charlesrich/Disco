@@ -157,7 +157,7 @@ public class Agenda {
           */
          @Override
          public boolean equals (Object object) {
-            return  object instanceof Item && ((Item) object).task.equals(task);
+            return object instanceof Item && ((Item) object).task.equals(task);
          }
 
          @Override
