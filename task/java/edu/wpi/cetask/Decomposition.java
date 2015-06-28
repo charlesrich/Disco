@@ -135,8 +135,8 @@ public class Decomposition extends Instance {
          goal.deleteSlotValue(name);
       goal = null;
       synchronized (bindings) { 
-         bindings.put("$this", null); 
-         bindings.put("$plan", null); 
+         bindings.remove("$this", null); 
+         bindings.remove("$plan", null); 
       }
    }
    

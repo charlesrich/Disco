@@ -12,14 +12,14 @@
     # Returned '[ModifiedA(,[8],6.0)]'
   > eval p.execute()
     # Returned 'null'
-  > eval println(a)
+  > eval java.lang.System.out.println(a)
 ModifiedA(agent,[8],6.0,[14])
     # Returned 'null'
   > eval a.deleteSlotValue("input1")
     # Returned 'null'
   > eval a.deleteSlotValue("output")
     # Returned 'null'
-  > eval println(a)
+  > eval java.lang.System.out.println(a)
 ModifiedA(agent,,6.0)
     # Returned 'null'
   > eval a.getSlotValue("output")
@@ -30,7 +30,7 @@ ModifiedA(agent,,6.0)
     # Returned '[9]'
   > eval a.setSlotValue("output", new Mutable(9))
     # Returned '[9]'
-  > eval println(a)
+  > eval java.lang.System.out.println(a)
 ModifiedA(agent,[9],6.0)
     # Returned 'null'
   > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
@@ -41,24 +41,24 @@ ModifiedA(agent,[9],6.0)
     # Returned '[ModifiedJava(,[])]'
   > eval p.execute()
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(agent,[],[1.0])
     # Returned 'null'
   > eval j.deleteSlotValue("input")
     # Returned 'null'
   > eval j.deleteSlotValue("output")
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(agent)
     # Returned 'null'
   > eval j.getSlotValue("output")
     # Returned 'null'
   > eval j.setSlotValue("input", new java.util.Vector())
     # Returned '[]'
-  > eval println(j.getSlotValue("input"))
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
 []
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(agent,[])
     # Returned 'null'
   > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
@@ -69,33 +69,33 @@ ModifiedJava(agent,[])
     # Returned 'true'
   > eval j.setSlotValue("input", v1)
     # Returned '[1.0]'
-  > eval println(j.getSlotValue("input"))
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
 [1.0]
     # Returned 'null'
   > eval j.setSlotValue("output", v2)
     # Returned '[2.0]'
-  > eval println(j.getSlotValue("output"))
+  > eval java.lang.System.out.println(j.getSlotValue("output"))
 [2.0]
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0],[2.0])
     # Returned 'null'
   > eval j.deleteSlotValue("output")
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0])
     # Returned 'null'
   > eval j.setSlotValue("output", v1)
     # Returned '[1.0]'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0])
     # Returned 'null'
   > eval j.getSlotValue("output").add(3)
     # Returned 'true'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0, 3.0])
     # Returned 'null'
-  > eval println(j.getSlotValue("input"))
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
 [1.0, 3.0]
     # Returned 'null'
   > quit

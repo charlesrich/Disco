@@ -1,8 +1,6 @@
 var edu = {};
 edu.wpi = {};
 
-var $plan;
-
 // for convenience in console debugging with eval
 edu.wpi.cetask = Packages.edu.wpi.cetask;
 
@@ -82,7 +80,7 @@ Debug = { Log : function (obj) { println(obj); }}
 // for Nashorn compatibility with Rhino
 
 if ( (typeof println) === 'undefined' ) 
-   println = function (x) { java.lang.System.out.println(x); }
+    println = function (obj) { print(obj+"\n"); }
 
 
 

@@ -4,7 +4,7 @@
   <task id="E"/>
 
   <task id="F">
-    <script>println("[Executing script for F]");</script>
+    <script> java.lang.System.out.println("[Executing script for F]");</script>
   </task>
 
   <subtasks id="EF" goal="D" ordered="false">
