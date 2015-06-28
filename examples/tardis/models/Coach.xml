@@ -239,14 +239,14 @@
       println("WARNING: Task model must be run in CoachedInteraction!");
     
     // remove plugin that adds cancel items to menu
-    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin);
+    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin.class);
     // remove plugin that will re-propose toplevel goals
-    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.TopsPlugin);
+    $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.TopsPlugin.class);
     // remove plugin that asks about toplevel goals
-    $disco.removeAgentPlugin(Packages.edu.wpi.disco.plugin.AskShouldTopPlugin);
+    $disco.removeAgentPlugin(Packages.edu.wpi.disco.plugin.AskShouldTopPlugin.class);
 
     // get pointer to disco instance for interview
-    var $interview = $disco.getInteraction().getNWay().getActiveInteractions().get(0).getDisco();
+    $interview = $disco.getInteraction().getNWay().getActiveInteractions().get(0).getDisco();
     if ( $interview == $disco || $interview == undefined )
       println("WARNING: $interview not correctly defined. Check that Coach model loaded into proper configuration!");
 

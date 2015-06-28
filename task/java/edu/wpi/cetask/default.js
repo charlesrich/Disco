@@ -20,9 +20,10 @@ edu.wpi.cetask_helper = {
     function (x1, x2) {
        for (var name in x1) { 
           var value = x1[name]; 
-          if ( !(value instanceof java.lang.Object ? 
-                 value.equals(x2[name]) : value == x2[name]) ) 
-             return false;
+	       if ( value instanceof java.lang.Object )
+             try { return value.equals(x2[name]); }
+             catch (e) { return false; } // for Nashorn
+          else return value == x2[name];
        }       
        return true;
   },
@@ -42,7 +43,7 @@ edu.wpi.cetask_helper = {
              return hash;
            default:
              try { if ( x instanceof java.lang.Object ) return x.hashCode(); }
-             catch (e) {} // for Nashorn
+             catch (e) { return 0; } // for Nashorn
              for (var p in x) {
                 factor *= 31;
                 var value = x[p];

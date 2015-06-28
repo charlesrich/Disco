@@ -47,7 +47,7 @@
      var companyBusiness="computer technology"; 
 
      // remove plugin that adds cancel items to menu 
-     $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin);
+     $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin.class);
 
      function toStream (file) {
         file = java.lang.System.getProperty("user.dir")
