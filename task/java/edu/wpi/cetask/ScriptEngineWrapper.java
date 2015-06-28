@@ -6,7 +6,6 @@
 package edu.wpi.cetask;
 
 import java.io.Reader;
-import java.util.List;
 import javax.script.*;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
@@ -17,22 +16,21 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    public static ScriptEngineWrapper getScriptEngine () {
       ScriptEngineManager mgr = new ScriptEngineManager();
-      List<ScriptEngineFactory> factories = mgr.getEngineFactories();
-      if ( factories == null || factories.isEmpty() ) {
-         if ( JintScriptEngine.EXISTS ) {
-            // for Mono need to instantiate Jint engine manually
-            JintScriptEngine jint = new JintScriptEngine();
-            jint.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-            return jint;
-         } else throw new IllegalStateException("No JavaScript engine found!");
-      }
-      ScriptEngineFactory factory = factories.get(0);
-      ScriptEngineWrapper.JSR_223 wrapper = factory instanceof NashornScriptEngineFactory ?
-         new NashornScriptEngine(
-               ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS)) :
-         new RhinoScriptEngine(factory.getScriptEngine());
-       wrapper.jsr.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-       return wrapper;
+      for (ScriptEngineFactory factory : mgr.getEngineFactories()) 
+         if ( factory.getNames().contains("ECMAScript") ) {
+            ScriptEngineWrapper.JSR_223 wrapper = factory instanceof NashornScriptEngineFactory ?
+               new NashornScriptEngine(
+                     ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS)) :
+               new RhinoScriptEngine(factory.getScriptEngine());
+            wrapper.jsr.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+            return wrapper;
+         }
+      if ( JintScriptEngine.EXISTS ) {
+         // for Mono need to instantiate Jint engine manually
+         JintScriptEngine jint = new JintScriptEngine();
+         jint.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+         return jint;
+      } else throw new IllegalStateException("No JavaScript engine found!");
    }
    
    // these three methods added to handle type coercion from Jint
