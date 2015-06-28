@@ -45,6 +45,7 @@ public class Shell {
     */
    public void setOut (PrintStream stream) {
       out = stream;
+      System.setOut(stream);
       getEngine().getScriptEngine().getContext().setWriter(new PrintWriter(stream, true));
    }
    
@@ -54,7 +55,7 @@ public class Shell {
     */
    public void setErr (PrintStream stream) {
       err = stream;
-      getEngine().getScriptEngine().getContext().setErrorWriter(new PrintWriter(stream, true));
+      // note not redirecting system error stream 
    }
    
    final public File log;
