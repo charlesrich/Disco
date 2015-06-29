@@ -6,11 +6,11 @@
   > # Root1, Root2 and Root3 are @top=false in Test.properties
   > # unexplained
   > execute Prim5 / 7
-Unexplained occurrence: execute Prim5 on 7.0
-    Prim5(user,7.0)
+Unexplained occurrence: execute Prim5 on 7
+    Prim5(user,7)
   > history
 
-Prim5(user,7.0)
+Prim5(user,7)
 
   > clear
   > 
@@ -21,27 +21,27 @@ Prim5(user,7.0)
   > eval $disco.getTaskClass("Root3").setTop(true)
     # Returned 'null'
   > execute Prim5 / 7
-    Prim5(user,7.0)
+    Prim5(user,7)
   > # Recognize Root1
   > history 
 
 [Root1] -live
-   [Abs1(7.0)] -live <-focus
-      Prim5(user,7.0)
+   [Abs1(7)] -live <-focus
+      Prim5(user,7)
       [Prim2(user)] -live
    [Prim4(user)]
 
   > clear
   > eval p = $disco.getTaskClass("Prim5").newInstance(); p.setSlotValue("input1", 7)
-    # Returned '7.0'
+    # Returned '7'
   > execute edu.wpi.disco.lang.Propose$Succeeded / p
-    Propose.Succeeded(user,Prim5(user,7.0))
+    Propose.Succeeded(user,Prim5(user,7))
   > history
 
 [Root1] -live
-   [Abs1(7.0)] -live
-      [Prim5(user,7.0)] -succeeded <-focus
-         Propose.Succeeded(user,Prim5(user,7.0))
+   [Abs1(7)] -live
+      [Prim5(user,7)] -succeeded <-focus
+         Propose.Succeeded(user,Prim5(user,7))
       [Prim2(user)] -live
    [Prim4(user)]
 
@@ -102,13 +102,13 @@ Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
   > clear
   > 
   > execute Prim5 / 7
-    Prim5(user,7.0)
+    Prim5(user,7)
   > # Recognize Root1
   > history
 
 [Root1] -live
-   [Abs1(7.0)] -live <-focus
-      Prim5(user,7.0)
+   [Abs1(7)] -live <-focus
+      Prim5(user,7)
       [Prim2(user)] -live
    [Prim4(user)]
 

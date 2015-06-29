@@ -7,12 +7,12 @@
   > eval p = $disco.getFocus().getChildren().get(0)
     # Returned '[BindingsDeletePrim]'
   > eval p.getGoal().setSlotValue("input", 2)
-    # Returned '2.0'
+    # Returned '2'
   > history
 
-[Achieve BindingsDelete on 2.0] -accepted -live <-focus
+[Achieve BindingsDelete on 2] -accepted -live <-focus
    User says "Let's achieve BindingsDelete."
-   [Execute BindingsDeletePrim on 2.0] -live
+   [Execute BindingsDeletePrim on 2] -live
 
   > eval p.getGoal().deleteSlotValue("input")
     # Returned 'null'
@@ -27,17 +27,17 @@
   > eval root.decomposeAll()
     # Returned 'true'
   > eval root.getGoal().setSlotValue("input", 5)
-    # Returned '5.0'
+    # Returned '5'
   > eval prim = root.getChildren().get(0).getChildren().get(0).getChildren().get(0)
     # Returned '[BindingsDeletePrim]'
   > eval root.setSlotValue("input", 5)
-    # Returned '5.0'
+    # Returned '5'
   > eval prim
-    # Returned '[BindingsDeletePrim(,5.0)]'
+    # Returned '[BindingsDeletePrim(,5)]'
   > eval root.getGoal().deleteSlotValue("input")
     # Returned 'null'
   > eval prim
-    # Returned '[BindingsDeletePrim(,5.0)]'
+    # Returned '[BindingsDeletePrim(,5)]'
   > eval root.deleteSlotValue("input")
     # Returned 'null'
   > eval prim

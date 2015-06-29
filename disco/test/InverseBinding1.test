@@ -5,11 +5,11 @@
   > eval $disco.getTaskClass("InverseBinding").setTop(true)
     # Returned 'null'
   > execute InversePrim / 6
-    User execute InversePrim on 6.0.
+    User execute InversePrim on 6.
   > history
 
-[Achieve InverseBinding on 6.0] -done <-focus
-   User execute InversePrim on 6.0.
+[Achieve InverseBinding] -done <-focus
+   User execute InversePrim on 6.
 
   > clear
   > task InverseBinding / 8

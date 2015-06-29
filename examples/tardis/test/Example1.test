@@ -63,6 +63,7 @@ interviewee&interviewer  > say
     Interviewee says "Hello, I'm Daniel Blanc."
     Interviewer says "Good to meet you."
 interviewee&interviewer  > next
+[Agent and User Shake Hands now]
     Interviewer execute ShakeHands.
     Interviewer says "May I have your resume?"
 interviewee&interviewer  > say
