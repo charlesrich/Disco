@@ -12,7 +12,7 @@ import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 // wrapper for script engine used in TaskEngine 
 // a complete implementation of ScriptEngine is not required
 
-abstract class ScriptEngineWrapper extends AbstractScriptEngine {
+public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    public static ScriptEngineWrapper getScriptEngine () {
       ScriptEngineManager mgr = new ScriptEngineManager();
@@ -50,6 +50,31 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       return (Long) eval(script, bindings);
    }
    
+   
+   // prevent recursive calls to eval, which engines do not usually support
+   private boolean eval;
+   
+   @Override
+   public final Object eval (String script, ScriptContext context) throws ScriptException {
+      if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+      try { 
+         eval = true; 
+         return protectedEval(script, context);
+      } finally { eval = false; }
+   }
+   
+   @Override
+   public final Object eval (String script) throws ScriptException {
+      if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+      try { 
+         eval = true; 
+         return protectedEval(script);
+      } finally { eval = false; }
+   }
+   
+   abstract protected Object protectedEval (String script, ScriptContext context) throws ScriptException;
+   abstract protected Object protectedEval (String script) throws ScriptException;
+     
    boolean isScriptable () { return false; }
    boolean isScriptable (Object value) { return false; }
    
@@ -58,7 +83,7 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    boolean isDefined (Object value) { 
       throw new RuntimeException("Unimplemented"); 
    }
-   
+
    Object undefined () { throw new RuntimeException("Unimplemented");  }
    
    Object get (Object object, String field) {
@@ -121,37 +146,41 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       public void setContext (ScriptContext context) { jsr.setContext(context); }
 
       @Override
-      public Object eval (String script, ScriptContext context) throws ScriptException {
+      protected Object protectedEval (String script, ScriptContext context) throws ScriptException {
          return jsr.eval(script, context);
       }
 
       @Override
-      public Object eval (String script) throws ScriptException {
+      protected Object protectedEval (String script) throws ScriptException {
          return jsr.eval(script);
       }
       
       @Override
       public Compiled compile (String script) throws ScriptException {
-         return new CompiledJRS_223(script);
+         return new CompiledJRS_223((Compilable) jsr, script);
+      }
+   }
+   
+   protected class CompiledJRS_223 extends Compiled {
+
+      private final CompiledScript compiled;
+
+      public CompiledJRS_223 (Compilable jsr, String script) throws ScriptException {
+         compiled = jsr.compile(script);
       }
 
-      protected class CompiledJRS_223 extends Compiled {
-
-         private final CompiledScript compiled;
-
-         public CompiledJRS_223 (String script) throws ScriptException {
-            compiled = ((Compilable) jsr).compile(script);
-         }
-
-         @Override
-         public Object eval (ScriptContext context) throws ScriptException {
+      @Override
+      public Object eval (ScriptContext context) throws ScriptException {
+         if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+         try { 
+            eval = true; 
             return compiled.eval(context);
-         }
+         } finally { eval = false; }
+      }
 
-         @Override
-         public Boolean evalBoolean (Bindings bindings) throws ScriptException {
-            return (Boolean) eval(bindings);
-         }
+      @Override
+      public Boolean evalBoolean (Bindings bindings) throws ScriptException {
+         return (Boolean) eval(bindings);
       }
    }
    

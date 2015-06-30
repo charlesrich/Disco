@@ -552,6 +552,8 @@ public class TaskClass extends TaskModel.Member {
 
    /**
     * Thread-safe method to create new instance of this task class.
+    * NB: This method must be used in JavaScript instead of directly calling
+    *     builtin constructors!
     */
    public Task newInstance () { 
       try { return isBuiltin() ? newStep(null, null, false) : new Task(this, engine); }
@@ -822,8 +824,7 @@ public class TaskClass extends TaskModel.Member {
          this.slot = slot;
          this.value = value;
          where = TaskClass.this.getId() + " binding for " + slot;
-         String expression = Task.makeExpression("$this", TaskClass.
-               this, slot, value, true);
+         String expression = Task.makeExpression("$this", TaskClass.this, slot, value, true);
          if ( TaskEngine.isCompilable() ) { 
             compiled = engine.compile(expression, where);
             this.expression = null;
@@ -838,11 +839,9 @@ public class TaskClass extends TaskModel.Member {
                task.failCheck(slot, "compiled script", where);
             else task.setModified(true);
          } else {
-            try {
-               if ( !task.evalConditionFinal(expression, where) )
-                  task.failCheck(slot, value, where);
-               else task.setModified(true);
-            } finally { task.bindings.remove("$$value"); }
+            if ( !task.evalConditionFinal(expression, where) )
+               task.failCheck(slot, value, where);
+            else task.setModified(true);
          }
       }
       

@@ -6,6 +6,7 @@
 package edu.wpi.cetask;
 
 import javax.script.*;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 // simple wrapper for Nashorn script engine included in JDK 1.8
 
@@ -29,7 +30,7 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    }
 
    @Override
-   boolean isScriptable () { return false; }  //////  TRUE!!!
+   boolean isScriptable () { return false; }  //////// TRUE!!! 
     
    @Override
    boolean isScriptable (Object value) { return isScriptable(); }
@@ -44,17 +45,17 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    
    @Override
    Object get (Object object, String field) {
-      throw new UnsupportedOperationException("get("+object+","+field+")");
+      return ((ScriptObjectMirror) object).get(field);
    }
       
    @Override
    void put (Object object, String field, Object value) {
-      throw new UnsupportedOperationException("put("+object+","+field+","+value+")");
+      ((ScriptObjectMirror) object).put(field, value);
    }
    
    @Override
    void delete (Object object, String field) {
-      throw new UnsupportedOperationException("delete("+object+","+field+")");
+      ((ScriptObjectMirror) object).remove(field);
    }
  
    @Override

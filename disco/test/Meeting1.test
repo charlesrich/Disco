@@ -96,7 +96,8 @@
 # This Propose.What is the semantics of an utterance such as "The end
 #  time is ...".
 
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("End").newInstance() / "time" / 1300
+  > instance End
+  > done edu.wpi.disco.lang.Propose$What / $instance / "time" / 1300
     User says "The End time is 1300.0."
 
 # Plan recognition automatically chooses the "end" recipe.
@@ -115,7 +116,8 @@
     Agent says "What is the Meeting start?"
   > done / / / 1200
     User says "The Meeting start is 1200.0."
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Duration").newInstance() / "duration" / 100
+  > instance Duration
+  > done edu.wpi.disco.lang.Propose$What / $instance / "duration" / 100
     User says "The Duration duration is 100.0."
   > next
     Agent execute Duration on 1200.0 and 100.0 producing 1300.0.
@@ -127,9 +129,11 @@
 
   > task _Meeting
     User says "Let's achieve _Meeting."
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Meeting").newInstance() / "start" / 1200
+  > instance Meeting
+  > done edu.wpi.disco.lang.Propose$What / $instance / "start" / 1200
     User says "The Meeting start is 1200.0."
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("End").newInstance() / "time" / 1200
+  > instance End
+  > done edu.wpi.disco.lang.Propose$What / $instance / "time" / 1200
     User says "The End time is 1200.0."
   > next
     Agent execute End on 1200.0.
@@ -140,9 +144,11 @@
 
   > task _Meeting
     User says "Let's achieve _Meeting."
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Meeting").newInstance() / "start" / 1200
+  > instance Meeting
+  > done edu.wpi.disco.lang.Propose$What / $instance / "start" / 1200
     User says "The Meeting start is 1200.0."
-  > done edu.wpi.disco.lang.Propose$What / $disco.getTaskClass("Duration").newInstance() / "duration" / 100
+  > instance Duration
+  > done edu.wpi.disco.lang.Propose$What / $instance / "duration" / 100
     User says "The Duration duration is 100.0."
   > next
     Agent execute Duration on 1200.0 and 100.0 producing 1300.0.

@@ -103,9 +103,17 @@ class JintScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
-   public Object eval (String script, ScriptContext context) throws ScriptException {
+   protected Object protectedEval (String script, ScriptContext context) throws ScriptException {
       // because eval(String,Bindings) overridden above
       throw new IllegalStateException();
+   }
+   
+   @Override
+   protected Object protectedEval (String script) throws ScriptException {
+      try { 
+         if (null != null) throw new JintException(); // to fool compiler
+         return jint.Run(script);
+      } catch (JintException e) { throw new ScriptException(e.toString()); }
    }
 
    @Override
@@ -145,14 +153,6 @@ class JintScriptEngine extends ScriptEngineWrapper
              .get_GlobalScope();
    }
 
-   @Override
-   public Object eval (String script) throws ScriptException {
-      try { 
-         if (null != null) throw new JintException(); // to fool compiler
-         return jint.Run(script);
-      } catch (JintException e) { throw new ScriptException(e.toString()); }
-   }
-   
    @Override
    public Boolean evalBoolean (String script, Bindings bindings) 
                   throws ScriptException {

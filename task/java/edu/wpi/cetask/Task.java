@@ -36,7 +36,7 @@ public class Task extends Instance {
    public TaskClass getType () { return (TaskClass) super.getType(); }
 
    // for hashing/comparing of Tasks in Agenda.generate()
-   
+
    @Override
    public boolean equals (Object object) {     
       if ( !(object instanceof Task) ) return false;
@@ -204,7 +204,7 @@ public class Task extends Instance {
             }
          }
          if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
-      } else failCheck(name, value.toString(), "setSlotValue");
+      } else failCheck(name, value == null ? "null" : value.toString(), "setSlotValue");
    }  
       
    protected void checkCircular (String name, Object value) {
@@ -221,7 +221,12 @@ public class Task extends Instance {
             ( type.equals("number") && value instanceof Number ) )
          return true;
       Slot slot = getType().getSlot(name);
-      if ( slot instanceof Input && ((Input) slot).isOptional() && value == null ) return true;
+      // ignore undefined and allow any slot to be set to null (for "optional" inputs)
+      if ( value == null ) {
+         if ( slot instanceof Input && !((Input) slot).isOptional() )
+            getErr().println("WARNING: Setting null value for non-optional input slot "+name+" of "+this);
+         return true;
+      }
       if ( slot.getJava() != null ) return slot.getJava().isInstance(value);
       if ( engine.getScriptEngine() instanceof JintScriptEngine // for Unity only
             && Utils.startsWith(type, "Packages.") )
@@ -229,9 +234,12 @@ public class Task extends Instance {
          catch (ClassNotFoundException e) { return false; }
       synchronized (bindings) {
          try {
-            bindings.put("$$value", value); // convert to JavaScript object
+            bindings.put("$$value", value); 
             return Utils.booleanValue(
-                  eval("$$value instanceof "+type, "checkSlotValue"));
+                  eval( (type.equals("boolean") || type.equals("string") || type.equals("number")) ?
+                         ("typeof $$value === '"+type+"'") :
+                         ("$$value instanceof "+type), 
+                        "checkSlotValue"));
          } finally { bindings.remove("$$value"); }
       }
    }
@@ -296,12 +304,12 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, false), extra, where) )
+         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, true), extra, where) )
             failCheck(name, expression, where);
          else modified = true;
-      } finally { extra.remove("$$value"); extra.remove("$$this"); }
+      } finally { extra.remove("$$this"); }
    }
-   
+  
    void setSlotValueScript (String name, Compiled compiled, String where,
                             Bindings extra) {
       try {
@@ -309,7 +317,7 @@ public class Task extends Instance {
          if ( !evalCondition(compiled, extra, where) )
             failCheck(name, "compiled script", where);
          else modified = true;
-      } finally { extra.remove("$$value"); extra.remove("$$this"); }
+      } finally { extra.remove("$$this"); }
    }
    
    /**
