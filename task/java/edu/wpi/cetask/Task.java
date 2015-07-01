@@ -98,15 +98,15 @@ public class Task extends Instance {
     * a pre- or postcondition specifies otherwise.
     * 
     * @see #isDefinedSlot(String)
-    * @see #deleteSlotValue(String)
+    * @see #removeSlotValue(String)
     * @see #isDefinedInputs()
     * @see #isDefinedOutputs()
     */
    public Object getSlotValue (String name) { 
       checkIsSlot(name);
       if ( isScriptable(name) ) {
-         Object value = engine.get(bindings.get("$this"), name);
-         return engine.isDefined(value) ? value : null;
+         Object object = bindings.get("$this");
+         return engine.isDefined(object, name) ? engine.get(object, name) : null;
          // super.eval below to avoid returning cached value in clonedInputs
       } else return super.eval("$this."+name, "getSlotValue"); 
    }
@@ -119,8 +119,8 @@ public class Task extends Instance {
    protected Boolean getSlotValueBoolean (String name) {
       checkIsSlot(name);
       if ( isScriptable(name) ) {
-         Object value = engine.get(bindings.get("$this"), name);
-         return engine.isDefined(value) ? (Boolean) value : null;
+         Object object = bindings.get("$this");
+         return engine.isDefined(object, name) ? (Boolean) engine.get(object, name) : null;
          // super.evalCondition below to avoid returning cached value in clonedInputs
       } else return super.evalCondition("$this."+name, "getSlotValueBoolean"); 
    }
@@ -146,12 +146,12 @@ public class Task extends Instance {
     * isDefinedSlot() may return true <em>or</em> false.
     * 
     * @see #getSlotValue(String)
-    * @see #deleteSlotValue(String)
+    * @see #removeSlotValue(String)
     */
    public boolean isDefinedSlot (String name) {
       checkIsSlot(name);
       return TaskEngine.SCRIPTABLE ?
-         engine.isDefined(engine.get(bindings.get("$this"), name)) 
+         engine.isDefined(bindings.get("$this"), name) 
          // note using !== (not ===) below b/c null==undefined in JavaScript
          : evalCondition("$this."+name+" !== undefined", "isDefinedSlot");
    }     
@@ -325,11 +325,11 @@ public class Task extends Instance {
     * 
     * @see #isDefinedSlot(String)
     */
-   public void deleteSlotValue (String name) {
+   public void removeSlotValue (String name) {
       checkIsSlot(name);
       if ( engine.isScriptable() ) {
-         engine.delete(bindings.get("$this"), name);
-         if ( clonedInputs != null ) engine.delete(clonedInputs, name); 
+         engine.remove(bindings.get("$this"), name);
+         if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
       } else { 
          super.eval("delete $this."+name, "deleteSlotValue"); // not clonedInputs
          if ( clonedInputs != null ) eval("delete $this."+name, "deleteSlotValue");
@@ -719,13 +719,13 @@ public class Task extends Instance {
    boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
                           boolean onlyDefined, boolean check) {
       if ( TaskEngine.SCRIPTABLE ) {
-         Object value = engine.get(from.bindings.get("$this"), fromSlot);
+         Object fromObject = from.bindings.get("$this");
+         if ( onlyDefined && !engine.isDefined(fromObject, fromSlot) ) return false;
+         Object value = engine.get(fromObject, fromSlot);
          checkCircular(thisSlot, value);
-         if ( onlyDefined && !engine.isDefined(value) ) return false;
          if ( check ) checkSlotValue(thisSlot, getType().getSlotType(thisSlot), value);
          Object task = bindings.get("$this");
-         Object thisValue = engine.get(task, thisSlot);
-         boolean overwrite = engine.isDefined(thisValue);
+         boolean overwrite = engine.isDefined(task, thisSlot);
          engine.put(task, thisSlot, value);
          modified = true;
          return overwrite;

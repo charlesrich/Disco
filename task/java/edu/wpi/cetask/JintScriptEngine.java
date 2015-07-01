@@ -48,13 +48,11 @@ class JintScriptEngine extends ScriptEngineWrapper
    boolean isScriptable (Object value) { return value instanceof JsObject; }
    
    @Override
-   boolean isDefined (Object value) { 
+   boolean isDefined (Object object, String field) {
+      Object value = get(object, field);
       // note null below means "not initialized", not JsNull.Instance
       return !( value == null || value == JsUndefined.Instance );
    }
-   
-   @Override
-   Object undefined () { return JsUndefined.Instance; }
    
    // the type checks below are doing what LiveConnect does for Rhino
    
@@ -83,7 +81,7 @@ class JintScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
-   void delete (Object object, String field) {
+   void remove (Object object, String field) {
       ((JsObject) object).Delete(field);
    }
 

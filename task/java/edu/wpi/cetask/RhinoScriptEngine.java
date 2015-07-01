@@ -57,13 +57,11 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
    boolean isScriptable (Object value) { return isScriptable(); }
    
    @Override
-   boolean isDefined (Object value) {
+   boolean isDefined (Object object, String field) {
+      Object value = get(object, field);
       return !( value == notFound || value == undefined );
    }
-   
-   @Override
-   Object undefined () { return undefined; }
-   
+  
    @Override
    Object get (Object object, String field) {
       switch (thisPackage) {
@@ -106,7 +104,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
    }
    
    @Override
-   void delete (Object object, String field) {
+   void remove (Object object, String field) {
       switch (thisPackage) {
          case Package1:
             sun.org.mozilla.javascript.internal.Scriptable scriptable1 = 

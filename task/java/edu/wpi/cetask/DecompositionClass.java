@@ -737,7 +737,7 @@ public class DecompositionClass extends TaskModel.Member {
                // value expression will be safe (strict)
                if ( depend.step.equals(retractedStep) && depend.slot.equals(retractedSlot) ) {
                   // special case for retracted slot: propagate undefined to target
-                  target.deleteSlotValue(slot);
+                  target.removeSlotValue(slot);
                   updateBindings(decomp, target, step, slot);
                }
                if ( type == BindingType.INPUT_INPUT && target.isDefinedSlot(slot)
@@ -750,7 +750,7 @@ public class DecompositionClass extends TaskModel.Member {
                return; // NB return here
             } else if ( type == BindingType.INPUT_INPUT && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
                // special case for input-input identity only: propagate retraction other direction
-               decomp.getGoal().deleteSlotValue(depend.slot);
+               decomp.getGoal().removeSlotValue(depend.slot);
                updateBindings(decomp, decomp.getGoal(), depend.step, depend.slot);
             } else if ( !TaskEngine.DEBUG // allow looking at values for debugging 
                   && identity && target.isDefinedSlot(slot)  

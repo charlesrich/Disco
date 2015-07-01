@@ -1,7 +1,7 @@
 import javax.script.*;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.*;
-
+import jdk.nashorn.api.scripting.*;
 
 public class Test {
 
@@ -11,6 +11,20 @@ public class Test {
             new User("user"),
             null);
       Disco engine = i.getDisco();
+      ScriptEngineWrapper script = engine.getScriptEngine();
+      try {
+         System.out.println(script.invokeFunction("Object"));
+      } catch (Exception e) { System.out.println(e); }
+      Object obj = engine.newObject();
+      System.out.println(((ScriptObjectMirror) obj).newObject());
+      engine.put(obj, "foo", 7);
+      //Bindings bindings = new SimpleBindings();
+      //bindings.put("x", obj);
+      //engine.put(obj, "foo", new Object()); /// try remove also!
+      //engine.eval("x.foo = undefined", bindings, "test");
+      System.out.println(ScriptObjectMirror.isUndefined(
+            ((ScriptObjectMirror) obj).getMember("foo")));
+      /*
       Interaction i2 = new Interaction(
             new Agent("agent"), 
             new User("user"),
@@ -21,7 +35,6 @@ public class Test {
       engine.setGlobal("foo", 7);
       System.out.println(engine.getGlobal("foo"));
       System.out.println(engine2.getGlobal("foo"));
-      /*
       Bindings bindings = new SimpleBindings();
       bindings.put("$this", engine.newObject());
       bindings.put("$$value", 1434917591894L);
@@ -30,7 +43,6 @@ public class Test {
            "print($$value);$this.x = $$value; print($this.x);print($this.x.class)",
            bindings,
            "test"));
-           */
       engine.load("../task/models/ABC.xml");
       TaskClass cls = engine.getTaskClass("B");
       Task t1 = cls.newInstance();

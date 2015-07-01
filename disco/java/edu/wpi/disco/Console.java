@@ -237,7 +237,10 @@ public class Console extends Shell {
       Disco.TRACE = state.length() == 0 || Utils.parseBoolean(state);
    }
    
-   { status.add("history"); status.add("trace"); status.add("reset"); status.add("print"); }
+   { 
+      status.add("history"); status.add("trace"); status.add("reset"); 
+      status.add("print"); status.add("instance"); 
+   }
 
    /* *
     * Equivalent to executing Propose.Should of specified task.

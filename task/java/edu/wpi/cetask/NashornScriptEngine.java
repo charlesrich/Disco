@@ -21,28 +21,22 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
     */
    public static String[] OPTIONS = new String[] {"--global-per-engine"};
    
-   private final Object scope; // for invokeFunction ?????????????
-   
    public NashornScriptEngine (ScriptEngine nashorn) {
       super(nashorn);
-      try { scope = eval("new Object()"); }
-      catch (ScriptException e) { throw new RuntimeException(e); }
    }
-
+   
    @Override
-   boolean isScriptable () { return false; }  //////// TRUE!!! 
+   boolean isScriptable () { return true; }
     
    @Override
    boolean isScriptable (Object value) { return isScriptable(); }
    
    @Override
-   boolean isDefined (Object value) {
-      return value != jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
+   boolean isDefined (Object object, String field) {
+      return !ScriptObjectMirror.isUndefined(
+            ((ScriptObjectMirror) object).getMember(field));
    }
-   
-   @Override
-   Object undefined () { return jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED; }
-   
+
    @Override
    Object get (Object object, String field) {
       return ((ScriptObjectMirror) object).get(field);
@@ -54,27 +48,19 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    }
    
    @Override
-   void delete (Object object, String field) {
+   void remove (Object object, String field) {
       ((ScriptObjectMirror) object).remove(field);
    }
  
    @Override
    public Object invokeFunction (String name, Object... args)
          throws ScriptException, NoSuchMethodException {
-      for (int i = args.length; i-- > 0;)
-         args[i] = javaToJS(args[i], scope);
       return ((Invocable) jsr).invokeFunction(name, args);
    }
    
    @Override
    public Object invokeMethod (Object thiz, String name, Object... args)
          throws ScriptException, NoSuchMethodException {
-      for (int i = args.length; i-- > 0;)
-         args[i] = javaToJS(args[i], thiz);
       return ((Invocable) jsr).invokeMethod(thiz, name, args);
-   }
-   
-   private static Object javaToJS (Object value, Object scriptable) {
-      throw new UnsupportedOperationException("javaToJS("+value+","+scriptable+")");
    }
 }

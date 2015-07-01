@@ -56,7 +56,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    @Override
    public final Object eval (String script, ScriptContext context) throws ScriptException {
-      if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+      if ( eval ) throw new IllegalStateException("Recursive JavaScript eval not allowed!");
       try { 
          eval = true; 
          return protectedEval(script, context);
@@ -65,7 +65,8 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    @Override
    public final Object eval (String script) throws ScriptException {
-      if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+      if ( eval ) 
+         throw new IllegalStateException("Recursive JavaScript eval not allowed!");
       try { 
          eval = true; 
          return protectedEval(script);
@@ -80,12 +81,10 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    // following four methods only used for scriptable engines
    
-   boolean isDefined (Object value) { 
+   boolean isDefined (Object object, String field) { 
       throw new RuntimeException("Unimplemented"); 
    }
 
-   Object undefined () { throw new RuntimeException("Unimplemented");  }
-   
    Object get (Object object, String field) {
       throw new RuntimeException("Unimplemented"); 
    }
@@ -94,7 +93,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       throw new RuntimeException("Unimplemented"); 
    }
     
-   void delete (Object object, String field) { 
+   void remove (Object object, String field) { 
       throw new RuntimeException("Unimplemented"); 
    }
    
@@ -123,7 +122,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       public ScriptEngine getEngine () { return ScriptEngineWrapper.this; }
    }
   
-   protected static class JSR_223 extends ScriptEngineWrapper {
+   protected abstract static class JSR_223 extends ScriptEngineWrapper {
       
       protected final ScriptEngine jsr;
       
@@ -171,7 +170,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
 
       @Override
       public Object eval (ScriptContext context) throws ScriptException {
-         if ( eval ) throw new RuntimeException("Recursive JavaScript eval not allowed!");
+         if ( eval ) throw new IllegalStateException("Recursive JavaScript eval not allowed!");
          try { 
             eval = true; 
             return compiled.eval(context);

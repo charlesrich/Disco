@@ -266,7 +266,7 @@ public class TaskClass extends TaskModel.Member {
       public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
 
       @Override
-      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
+      public void deleteSlotValue (Task task) { task.removeSlotValue(name); }
       
       @Override
       public String toString () {
