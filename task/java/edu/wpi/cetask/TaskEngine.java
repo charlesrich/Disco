@@ -80,7 +80,7 @@ public class TaskEngine {
       COMPILABLE = false; /////////////scriptEngine instanceof Compilable;
       INVOCABLE = scriptEngine instanceof Invocable;
       SCRIPTABLE = scriptEngine.isScriptable();
-      /*
+      /*////////
       if ( !(COMPILABLE && INVOCABLE && SCRIPTABLE) )
          getErr().println("WARNING! JavaScript engine "+scriptEngine.getClass()+
                " is not compilable or invocable or scriptable---Disco will run much slower than usual.");
@@ -119,21 +119,21 @@ public class TaskEngine {
       scriptEngine.put(object, field, value);
    }
 
+   public boolean isDefined (Object object, String field) { 
+      return scriptEngine.isDefined(object, field); 
+   }
+   
    /**
-    * Delete the field of given Javascript object.
+    * Remove the field of given Javascript object.
     */
-   public void delete (Object object, String field) {
-      scriptEngine.delete(object, field);
+   public void remove (Object object, String field) {
+      scriptEngine.remove(object, field);
    }
    
    boolean isScriptable () { return scriptEngine.isScriptable(); }
    
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
-
-   boolean isDefined (Object value) { return scriptEngine.isDefined(value); }
-   
-   Object undefined () { return scriptEngine.undefined(); }
-   
+ 
    // for extensions
 
    protected void loadDefaultProperties () throws IOException {
@@ -289,13 +289,10 @@ public class TaskEngine {
       }
    }
   
-   public Object newObject () {
-      try {
-         return TaskEngine.INVOCABLE ? 
-            scriptEngine.invokeFunction("edu_wpi_cetask_newObject") : 
-               eval("new Object()", "newObject");
-      } catch (RuntimeException e) { throw e; }
-        catch (Exception e) { throw new RuntimeException(e); }
+   public Object newObject () { 
+      try { return scriptEngine.invokeFunction("Object"); }
+      // should never have exception
+      catch (Exception e) { throw new IllegalStateException(e); }
    }
    
    final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
@@ -702,12 +699,13 @@ public class TaskEngine {
    
    private void copySlotValue (Task from, Task to, String name) {
       if ( SCRIPTABLE ) {
-         Object value = scriptEngine.get(from.bindings.get("$this"), name);
-         if ( isDefined(value) ) {
+         Object object = from.bindings.get("$this");
+         if ( isDefined(object, name) ) {
             Object javaValue = from.getSlotValue(name);
             if ( javaValue instanceof Task ) {
                to.setSlotValue(name, copy((Task) javaValue));
-            } else scriptEngine.put(to.bindings.get("$this"), name, value);
+            } else 
+               scriptEngine.put(to.bindings.get("$this"), name, scriptEngine.get(object, name));
          }
       } else {
          if ( from.isDefinedSlot(name) ) {

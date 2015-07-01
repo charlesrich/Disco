@@ -16,7 +16,6 @@ public class Test {
          System.out.println(script.invokeFunction("Object"));
       } catch (Exception e) { System.out.println(e); }
       Object obj = engine.newObject();
-      System.out.println(((ScriptObjectMirror) obj).newObject());
       engine.put(obj, "foo", 7);
       //Bindings bindings = new SimpleBindings();
       //bindings.put("x", obj);

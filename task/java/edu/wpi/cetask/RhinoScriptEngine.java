@@ -50,6 +50,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
          }
       }
    }
+   
    @Override
    boolean isScriptable () { return thisPackage != null; }
     

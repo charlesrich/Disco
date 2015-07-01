@@ -14,7 +14,7 @@
    User says "Let's achieve BindingsDelete."
    [Execute BindingsDeletePrim on 2] -live
 
-  > eval p.getGoal().deleteSlotValue("input")
+  > eval p.getGoal().removeSlotValue("input")
     # Returned 'null'
   > history
 
@@ -34,11 +34,11 @@
     # Returned '5'
   > eval prim
     # Returned '[BindingsDeletePrim(,5)]'
-  > eval root.getGoal().deleteSlotValue("input")
+  > eval root.getGoal().removeSlotValue("input")
     # Returned 'null'
   > eval prim
     # Returned '[BindingsDeletePrim(,5)]'
-  > eval root.deleteSlotValue("input")
+  > eval root.removeSlotValue("input")
     # Returned 'null'
   > eval prim
     # Returned '[BindingsDeletePrim]'

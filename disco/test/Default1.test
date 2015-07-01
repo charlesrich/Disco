@@ -23,7 +23,7 @@
     User says "One of us should execute Default on 5."
   > eval $disco.getFocus().getGoal().setSlotValue("input1", 7)
     # Returned '7'
-  > eval $disco.getFocus().getGoal().deleteSlotValue("input1")
+  > eval $disco.getFocus().getGoal().removeSlotValue("input1")
     # Returned 'null'
   > history
 

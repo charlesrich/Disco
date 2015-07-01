@@ -15,9 +15,9 @@
   > eval java.lang.System.out.println(a)
 ModifiedA(agent,[8],6.0,[14])
     # Returned 'null'
-  > eval a.deleteSlotValue("input1")
+  > eval a.removeSlotValue("input1")
     # Returned 'null'
-  > eval a.deleteSlotValue("output")
+  > eval a.removeSlotValue("output")
     # Returned 'null'
   > eval java.lang.System.out.println(a)
 ModifiedA(agent,,6.0)
@@ -44,9 +44,9 @@ ModifiedA(agent,[9],6.0)
   > eval java.lang.System.out.println(j)
 ModifiedJava(agent,[],[1.0])
     # Returned 'null'
-  > eval j.deleteSlotValue("input")
+  > eval j.removeSlotValue("input")
     # Returned 'null'
-  > eval j.deleteSlotValue("output")
+  > eval j.removeSlotValue("output")
     # Returned 'null'
   > eval java.lang.System.out.println(j)
 ModifiedJava(agent)
@@ -80,7 +80,7 @@ ModifiedJava(agent,[])
   > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0],[2.0])
     # Returned 'null'
-  > eval j.deleteSlotValue("output")
+  > eval j.removeSlotValue("output")
     # Returned 'null'
   > eval java.lang.System.out.println(j)
 ModifiedJava(,[1.0])
