@@ -265,16 +265,15 @@ public class Task extends Instance {
    }
    
    static String makeExpression (String self, TaskClass type, String name, 
-                                 String value, boolean onlyDefined) {
+         String value, boolean onlyDefined) {
       StringBuilder buffer = new StringBuilder();
-      buffer.append("$$value = (").append(value).append(");");
-      if ( onlyDefined ) 
-         buffer.append("if ( $$value == undefined ) $$value = true; else ");
+      buffer.append("(function(value){");
+      if ( onlyDefined ) buffer.append("if (value == undefined) return true; ");
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
-         // note using [ ] to protect keywords
-         .append(self).append("['").append(name).append("']")
-         .append(" = $$value; $$value = true; } else $$value = false;"
-            + "(function (value) {delete $$value; return value;})($$value)");
+      // note using [ ] to protect keywords
+      .append(self).append("['").append(name).append("']")
+      .append(" = value; return true;} return false;})(")
+      .append(value).append(")");
       return buffer.toString();
    }
    
@@ -289,11 +288,11 @@ public class Task extends Instance {
       String type = task.getSlotType(name);
       return type == null ? "true" :
           // ignore undefined and allow any slot to be set to null (for "optional" inputs)
-          ("$$value == undefined || $$value === null || "+ 
-             ("boolean".equals(type) ? "typeof $$value == \"boolean\"" :
-               "string".equals(type) ? "typeof $$value == \"string\"" :
-                  "number".equals(type) ? "typeof $$value == \"number\"" :
-                        "$$value instanceof "+type));
+          ("value == undefined || value === null || "+ 
+             ("boolean".equals(type) ? "typeof value == \"boolean\"" :
+               "string".equals(type) ? "typeof value == \"string\"" :
+                  "number".equals(type) ? "typeof value == \"number\"" :
+                        "value instanceof "+type));
    }
    
    /**
@@ -331,8 +330,8 @@ public class Task extends Instance {
          engine.remove(bindings.get("$this"), name);
          if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
       } else { 
-         super.eval("delete $this."+name, "deleteSlotValue"); // not clonedInputs
-         if ( clonedInputs != null ) eval("delete $this."+name, "deleteSlotValue");
+         super.eval("delete $this."+name, "removeSlotValue"); // not clonedInputs
+         if ( clonedInputs != null ) eval("delete $this."+name, "removeSlotValue");
       }
       getType().updateBindings(this);
       modified = true;

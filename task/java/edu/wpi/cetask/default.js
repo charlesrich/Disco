@@ -5,8 +5,6 @@ edu.wpi.cetask = Packages.edu.wpi.cetask;
 
 function edu_wpi_cetask_toString (obj) { return obj.toString(); }
 
-function edu_wpi_cetask_newObject () { return new Object(); }
-
 // default shallow cloning (as in Java)
 function edu_wpi_cetask_clone (x) {
      if ( x == null || typeof x != "object" ) return x;

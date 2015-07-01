@@ -20,7 +20,7 @@
    [Execute Optional3 on goodbye] -live
    [Execute Optional3]
 
-  > eval $disco.getFocus().getDecomposition().getStep("step1").getGoal().deleteSlotValue("input1")
+  > eval $disco.getFocus().getDecomposition().getStep("step1").getGoal().removeSlotValue("input1")
     # Returned 'null'
   > eval $disco.getFocus().getDecomposition().getStep("step2").getGoal().setSlotValue("input1", "next")
     # Returned 'next'

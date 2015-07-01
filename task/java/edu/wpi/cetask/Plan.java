@@ -918,7 +918,7 @@ public class Plan {
     * Use this method instead of {@link Task#removeSlotValue(String)} as
     * discussed in {@link #setSlotValue(String,Object)}
     */
-   public void deleteSlotValue (String name) {
+   public void removeSlotValue (String name) {
       goal.removeSlotValue(name);
       if ( decomp != null ) decomp.updateBindings(true, null, "this", name);
    }
