@@ -47,11 +47,21 @@ edu.wpi.disco.Disco.  You can also run the jar file directly as:
 
      java -jar release/lib/disco.jar
 
-NB: This is pure Java software and assumes Java 8 (JRE 1.8) which
-includes Nashorn JavaScript (ECMAScript) engine.  It has been tested
-with Java SE 8u45 in the Windows x64, Mac OS X x64 and Linux x64
-releases from Oracle (java.oracle.com). OpenJDK Java 8 releases are
-not available at time of this writing.
+NB: This is pure Java software and is supported only in Java 8 (JRE
+1.8) which includes Nashorn JavaScript (ECMAScript) engine.  It has
+been tested with Java SE 8u60 in the Windows x64, Mac OS X x64 and
+Linux x64 releases from Oracle (java.oracle.com). OpenJDK Java 8
+releases are not available at time of this writing.
+
+**NB** Due to a bug in Nashorn that was only recently corrected, Disco
+requires Java Version 8u60 Build b21, or higher.  At the time of this
+writing, this version of Java 8 is only available from the Java Early
+Access Releases site at https://jdk8.java.net/download.html.
+
+To see what version you are running, type "java -version" to a command
+shell and look for "build 1.8.0_60-ea-b21" (or similar with number
+higher than 60).
+******
 
 The release-java7 folder contains an archived copy of the last release
 of Disco built in Java 7 (using the builtin Rhino JavaScript engine).
