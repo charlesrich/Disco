@@ -28,7 +28,6 @@ implementation.
       team
    release
      
-
 The two main toplevel folders, task and disco, are Eclipse Java
 projects containing all of the source code for Disco.  The task
 project is the reference implementation for CETask; the disco project
@@ -53,7 +52,8 @@ been tested with Java SE 8u60 in the Windows x64, Mac OS X x64 and
 Linux x64 releases from Oracle (java.oracle.com). OpenJDK Java 8
 releases are not available at time of this writing.
 
-**NB** Due to a bug in Nashorn that was only recently corrected, Disco
+******************
+Due to a bug in Nashorn that was only recently corrected, Disco
 requires Java Version 8u60 Build b21, or higher.  At the time of this
 writing, this version of Java 8 is only available from the Java Early
 Access Releases site at https://jdk8.java.net/download.html.
@@ -61,7 +61,7 @@ Access Releases site at https://jdk8.java.net/download.html.
 To see what version you are running, type "java -version" to a command
 shell and look for "build 1.8.0_60-ea-b21" (or similar with number
 higher than 60).
-******
+******************
 
 The release-java7 folder contains an archived copy of the last release
 of Disco built in Java 7 (using the builtin Rhino JavaScript engine).
