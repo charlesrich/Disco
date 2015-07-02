@@ -101,13 +101,12 @@ class JintScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
-   protected Object protectedEval (String script, ScriptContext context) throws ScriptException {
-      // because eval(String,Bindings) overridden above
-      throw new IllegalStateException();
+   public Object eval (String script, ScriptContext context) throws ScriptException {
+      throw new UnsupportedOperationException();
    }
    
    @Override
-   protected Object protectedEval (String script) throws ScriptException {
+   public Object eval (String script) throws ScriptException {
       try { 
          if (null != null) throw new JintException(); // to fool compiler
          return jint.Run(script);

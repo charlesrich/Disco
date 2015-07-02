@@ -50,32 +50,6 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       return (Long) eval(script, bindings);
    }
    
-   
-   // prevent recursive calls to eval, which engines do not usually support
-   private boolean eval;
-   
-   @Override
-   public final Object eval (String script, ScriptContext context) throws ScriptException {
-      if ( eval ) throw new IllegalStateException("Recursive JavaScript eval not allowed!");
-      try { 
-         eval = true; 
-         return protectedEval(script, context);
-      } finally { eval = false; }
-   }
-   
-   @Override
-   public final Object eval (String script) throws ScriptException {
-      if ( eval ) 
-         throw new IllegalStateException("Recursive JavaScript eval not allowed!");
-      try { 
-         eval = true; 
-         return protectedEval(script);
-      } finally { eval = false; }
-   }
-   
-   abstract protected Object protectedEval (String script, ScriptContext context) throws ScriptException;
-   abstract protected Object protectedEval (String script) throws ScriptException;
-     
    boolean isScriptable () { return false; }
    boolean isScriptable (Object value) { return false; }
    
@@ -145,12 +119,12 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       public void setContext (ScriptContext context) { jsr.setContext(context); }
 
       @Override
-      protected Object protectedEval (String script, ScriptContext context) throws ScriptException {
+      public Object eval (String script, ScriptContext context) throws ScriptException {
          return jsr.eval(script, context);
       }
 
       @Override
-      protected Object protectedEval (String script) throws ScriptException {
+      public Object eval (String script) throws ScriptException {
          return jsr.eval(script);
       }
       
@@ -170,11 +144,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
 
       @Override
       public Object eval (ScriptContext context) throws ScriptException {
-         if ( eval ) throw new IllegalStateException("Recursive JavaScript eval not allowed!");
-         try { 
-            eval = true; 
-            return compiled.eval(context);
-         } finally { eval = false; }
+         return compiled.eval(context);
       }
 
       @Override
