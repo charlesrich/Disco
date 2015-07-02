@@ -170,6 +170,9 @@
        addTop(task);
     }
 
+	 // note this needs to be defined in $interview engine
+    $interview.setGlobal("userEmotion", "sad");
+
     function getUserEmotion () { return $interview.getGlobal("userEmotion"); }
 
     // returns true iff user has responded to given in-focus agent id

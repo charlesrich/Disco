@@ -41,10 +41,9 @@
   </task>
 
   <script init="true"> 
-     var userEmotion = "sad";
 
-     var interviewer="Marceau"; 
-     var companyBusiness="computer technology"; 
+     interviewer="Marceau"; 
+     companyBusiness="computer technology"; 
 
      // remove plugin that adds cancel items to menu 
      $disco.removeUserPlugin(Packages.edu.wpi.disco.plugin.ProposeShouldNotPlugin.class);
