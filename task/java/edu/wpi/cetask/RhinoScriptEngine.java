@@ -26,9 +26,9 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
     * appears to be obsolete.
     */
    private enum Package { Package1, Package2, Package3 }
-   private static Package thisPackage;
    private static Object notFound, undefined;
-   
+   static Package thisPackage;
+
    static {
       // note lib/js.jar contains classes for compilation on all platforms
       // but not execution classes
@@ -50,13 +50,7 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
          }
       }
    }
-   
-   @Override
-   boolean isScriptable () { return thisPackage != null; }
-    
-   @Override
-   boolean isScriptable (Object value) { return isScriptable(); }
-   
+ 
    @Override
    boolean isDefined (Object object, String field) {
       Object value = get(object, field);
@@ -165,31 +159,5 @@ class RhinoScriptEngine extends ScriptEngineWrapper.JSR_223
          default: throw new IllegalArgumentException("Cannot perform javaToJS on "+value);
       }
    }
-   
- /* TODO Use below to avoid calling 'eval' for slots with Java objects
-    See Task.isScriptable(String)
  
-   private static Object jsToJava (Object value, Class target) {
-      switch (thisPackage) {
-         case Package1:
-             try {
-               sun.org.mozilla.javascript.internal.Context.enter();
-               return sun.org.mozilla.javascript.internal.Context.jsToJava(value, target); 
-             } finally { sun.org.mozilla.javascript.internal.Context.exit(); }   
-         case Package2:
-            try {
-               org.mozilla.javascript.Context.enter();
-               return org.mozilla.javascript.Context.jsToJava(value, target); 
-            } finally { org.mozilla.javascript.Context.exit(); }   
-         case Package3:
-            try {
-               sun.org.mozilla.javascript.Context.enter();
-               return sun.org.mozilla.javascript.Context.jsToJava(value, target); 
-            } finally { sun.org.mozilla.javascript.Context.exit(); }   
-         default: throw new IllegalArgumentException("Cannot perform jsToJava on "+value);
-      }
-   }
-   
-*/
-
 }

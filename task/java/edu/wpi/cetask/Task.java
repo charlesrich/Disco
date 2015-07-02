@@ -128,7 +128,7 @@ public class Task extends Instance {
    private boolean isScriptable (String name) {
       // for Java objects (or if could be Java object), must use LiveConnect
       Slot slot = getType().getSlot(name);
-      return TaskEngine.SCRIPTABLE && slot.getType() != null && slot.getJava() == null;
+      return slot.getType() != null && slot.getJava() == null;
    }
 
    /**
@@ -150,10 +150,7 @@ public class Task extends Instance {
     */
    public boolean isDefinedSlot (String name) {
       checkIsSlot(name);
-      return TaskEngine.SCRIPTABLE ?
-         engine.isDefined(bindings.get("$this"), name) 
-         // note using !== (not ===) below b/c null==undefined in JavaScript
-         : evalCondition("$this."+name+" !== undefined", "isDefinedSlot");
+      return engine.isDefined(bindings.get("$this"), name); 
    }     
    
    // see Decomposition
@@ -326,13 +323,8 @@ public class Task extends Instance {
     */
    public void removeSlotValue (String name) {
       checkIsSlot(name);
-      if ( engine.isScriptable() ) {
-         engine.remove(bindings.get("$this"), name);
-         if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
-      } else { 
-         super.eval("delete $this."+name, "removeSlotValue"); // not clonedInputs
-         if ( clonedInputs != null ) eval("delete $this."+name, "removeSlotValue");
-      }
+      engine.remove(bindings.get("$this"), name);
+      if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
       getType().updateBindings(this);
       modified = true;
    }
@@ -716,25 +708,17 @@ public class Task extends Instance {
    }
    
    boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
-                          boolean onlyDefined, boolean check) {
-      if ( TaskEngine.SCRIPTABLE ) {
-         Object fromObject = from.bindings.get("$this");
-         if ( onlyDefined && !engine.isDefined(fromObject, fromSlot) ) return false;
-         Object value = engine.get(fromObject, fromSlot);
-         checkCircular(thisSlot, value);
-         if ( check ) checkSlotValue(thisSlot, getType().getSlotType(thisSlot), value);
-         Object task = bindings.get("$this");
-         boolean overwrite = engine.isDefined(task, thisSlot);
-         engine.put(task, thisSlot, value);
-         modified = true;
-         return overwrite;
-      } else {
-         if ( onlyDefined && !from.isDefinedSlot(fromSlot) ) return false;
-         boolean overwrite = isDefinedSlot(thisSlot);
-         setSlotValueScript(thisSlot, "$this."+fromSlot, "copySlotValue", 
-               from.bindings);
-         return overwrite;
-      }
+         boolean onlyDefined, boolean check) {
+      Object fromObject = from.bindings.get("$this");
+      if ( onlyDefined && !engine.isDefined(fromObject, fromSlot) ) return false;
+      Object value = engine.get(fromObject, fromSlot);
+      checkCircular(thisSlot, value);
+      if ( check ) checkSlotValue(thisSlot, getType().getSlotType(thisSlot), value);
+      Object task = bindings.get("$this");
+      boolean overwrite = engine.isDefined(task, thisSlot);
+      engine.put(task, thisSlot, value);
+      modified = true;
+      return overwrite;
    }
 
    /**

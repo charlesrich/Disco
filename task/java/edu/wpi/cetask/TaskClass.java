@@ -825,7 +825,7 @@ public class TaskClass extends TaskModel.Member {
          this.value = value;
          where = TaskClass.this.getId() + " binding for " + slot;
          String expression = Task.makeExpression("$this", TaskClass.this, slot, value, true);
-         if ( TaskEngine.isCompilable() ) { 
+         if ( !TaskEngine.DEBUG ) { 
             compiled = engine.compile(expression, where);
             this.expression = null;
          } else { this.expression = expression; compiled = null; }

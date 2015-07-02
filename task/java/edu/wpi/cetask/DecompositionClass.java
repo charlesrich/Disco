@@ -649,7 +649,7 @@ public class DecompositionClass extends TaskModel.Member {
             } else { 
                inputInput = outputInput = false;
                identityStep = identitySlot = null;
-               if ( TaskEngine.isCompilable() ) { 
+               if ( !TaskEngine.DEBUG ) { 
                   compiled = engine.compile(
                         Task.makeExpression("$$this", getTaskType(step), slot, value, true),
                         where);

@@ -24,13 +24,7 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    public NashornScriptEngine (ScriptEngine nashorn) {
       super(nashorn);
    }
-   
-   @Override
-   boolean isScriptable () { return true; }
-    
-   @Override
-   boolean isScriptable (Object value) { return isScriptable(); }
-   
+  
    @Override
    boolean isDefined (Object object, String field) {
       return !ScriptObjectMirror.isUndefined(

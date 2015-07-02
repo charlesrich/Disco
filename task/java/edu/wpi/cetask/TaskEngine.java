@@ -32,20 +32,12 @@ public class TaskEngine {
    
    public static String VERSION = "1.7";
    
-   // DESIGN NOTE: There may be multiple instances of TaskEngine, but they
-   //              must all have the same type of ScriptEngine
-   
-   static boolean SCRIPTABLE, INVOCABLE, COMPILABLE;
-   
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
    // TODO  Allow single task model to be shared among instances of TaskEngine
    
    // for synchronization in Task.done(); overridden by Disco
    protected Object synchronizer = new Object(); 
-
-   // better to detect Javascript typos when interpreted than failed compilation
-   public static boolean isCompilable () { return COMPILABLE && !DEBUG; }
    
    private String platform, deviceType;
    
@@ -76,29 +68,18 @@ public class TaskEngine {
    public TaskEngine () {
       ENGINE = this;
       scriptEngine = ScriptEngineWrapper.getScriptEngine();
-      // check implementation-dependent properties of script engine
-      COMPILABLE = false; /////////////scriptEngine instanceof Compilable;
-      INVOCABLE = scriptEngine instanceof Invocable;
-      SCRIPTABLE = scriptEngine.isScriptable();
-      /*////////
-      if ( !(COMPILABLE && INVOCABLE && SCRIPTABLE) )
-         getErr().println("WARNING! JavaScript engine "+scriptEngine.getClass()+
-               " is not compilable or invocable or scriptable---Disco will run much slower than usual.");
-               */
       try { loadDefaultProperties(); }
       catch (IOException e) { throw new RuntimeException(e); }
       defaultProperties();
-      if ( COMPILABLE && Task.compiledCloneThis != null ) {
+      if ( Task.compiledCloneThis != null ) {
          Task.compiledCloneThis = compile(Task.cloneThis, "compiledCloneThis");
          Task.compiledCloneSlot = compile(Task.cloneSlot, "compiledCloneSlot");
       }
       rootClass = new TaskClass(this, "**ROOT*"); // after scriptEngine initialized	
       try { 
          // load functions used in equals and hashCode into global scope
-         //eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
          scriptEngine.eval(
                Utils.toString(TaskEngine.class.getResourceAsStream("default.js")));
-         // note JSON is included in Rhino for JDK 1.7
       } catch (Exception e) { getErr().println(e); }
       clear();  // after default.js loaded
    }
@@ -130,8 +111,6 @@ public class TaskEngine {
       scriptEngine.remove(object, field);
    }
    
-   boolean isScriptable () { return scriptEngine.isScriptable(); }
-   
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
  
    // for extensions
@@ -161,17 +140,12 @@ public class TaskEngine {
       }
       if ( value == null || value instanceof Number || value instanceof String ) 
          return value+"";
-      if ( INVOCABLE && SCRIPTABLE ) 
-         try {
-            return scriptEngine.isScriptable(value) ?
-               (String) scriptEngine.invokeFunction("edu_wpi_cetask_toString", value) :
+      try {
+         return scriptEngine.isScriptable(value) ?
+            (String) scriptEngine.invokeFunction("edu_wpi_cetask_toString", value) :
                value+"";
-         } catch (ScriptException e) { throw new RuntimeException(e); }         
-           catch (NoSuchMethodException e) { throw new RuntimeException(e); }
-      // do it the slow way
-      Bindings bindings = new SimpleBindings();
-      bindings.put("$$value", value);
-      return (String) eval("$$value+''", bindings, "toString");
+      } catch (ScriptException e) { throw new RuntimeException(e); }         
+        catch (NoSuchMethodException e) { throw new RuntimeException(e); }
    }
 
    private long tick = 0;
@@ -280,7 +254,7 @@ public class TaskEngine {
    }
    
    public Compiled compile (String script, String where) {
-      if ( !COMPILABLE || script.length() == 0 ) return null;
+      if ( script.length() == 0 ) return null;
       try { return scriptEngine.compile(script); } 
       catch (ScriptException e) { 
          getErr().println("WARNING: Javascript syntax error in "+where               +"\n"+e);
@@ -698,27 +672,16 @@ public class TaskEngine {
    }
    
    private void copySlotValue (Task from, Task to, String name) {
-      if ( SCRIPTABLE ) {
-         Object object = from.bindings.get("$this");
-         if ( isDefined(object, name) ) {
-            Object javaValue = from.getSlotValue(name);
-            if ( javaValue instanceof Task ) {
-               to.setSlotValue(name, copy((Task) javaValue));
-            } else 
-               scriptEngine.put(to.bindings.get("$this"), name, scriptEngine.get(object, name));
-         }
-      } else {
-         if ( from.isDefinedSlot(name) ) {
-            Object value = from.getSlotValue(name);
-            if ( value instanceof Task ) 
-               to.setSlotValue(name, copy((Task) value));
-            else
-               to.setSlotValueScript(name, "$this."+name, "copySlotValue", 
-                     from.bindings);
-         } 
+      Object object = from.bindings.get("$this");
+      if ( isDefined(object, name) ) {
+         Object javaValue = from.getSlotValue(name);
+         if ( javaValue instanceof Task ) {
+            to.setSlotValue(name, copy((Task) javaValue));
+         } else 
+            scriptEngine.put(to.bindings.get("$this"), name, scriptEngine.get(object, name));
       }
    }
-   
+
    // for extension
    public String getExternalName () { return "user"; }
    public String getSystemName () { return "system"; } 

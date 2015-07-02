@@ -16,21 +16,26 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    public static ScriptEngineWrapper getScriptEngine () {
       ScriptEngineManager mgr = new ScriptEngineManager();
+      ScriptEngineWrapper wrapper = null;
+      ScriptEngine engine = null;
       for (ScriptEngineFactory factory : mgr.getEngineFactories()) 
          if ( factory.getNames().contains("ECMAScript") ) {
-            ScriptEngineWrapper.JSR_223 wrapper = factory instanceof NashornScriptEngineFactory ?
-               new NashornScriptEngine(
-                     ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS)) :
-               new RhinoScriptEngine(factory.getScriptEngine());
-            wrapper.jsr.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-            return wrapper;
+            if ( factory instanceof NashornScriptEngineFactory ) {
+               wrapper = new NashornScriptEngine(engine =
+                     ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS));
+               break;
+            } else if ( RhinoScriptEngine.thisPackage != null ) {
+               wrapper = new RhinoScriptEngine(engine = factory.getScriptEngine());
+               break;
+            }
          }
-      if ( JintScriptEngine.EXISTS ) {
-         // for Mono need to instantiate Jint engine manually
-         JintScriptEngine jint = new JintScriptEngine();
-         jint.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-         return jint;
-      } else throw new IllegalStateException("No JavaScript engine found!");
+      if ( engine != null ) engine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+      else if ( JintScriptEngine.EXISTS ) { 
+         wrapper = new JintScriptEngine();
+         wrapper.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+      }
+      if ( wrapper == null ) throw new IllegalStateException("No recognized JavaScript engine found!"); 
+      return wrapper;
    }
    
    // these three methods added to handle type coercion from Jint
@@ -49,44 +54,16 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
                   throws ScriptException {
       return (Long) eval(script, bindings);
    }
+ 
+   abstract boolean isScriptable (Object value);
+   abstract boolean isDefined (Object object, String field); 
+   abstract Object get (Object object, String field); 
+   abstract void put (Object object, String field, Object value); 
+   abstract void remove (Object object, String field); 
+   abstract public Object invokeFunction (String name, Object... args) 
+         throws ScriptException, NoSuchMethodException;
+   abstract public Compiled compile (String script) throws ScriptException;
    
-   boolean isScriptable () { return false; }
-   boolean isScriptable (Object value) { return false; }
-   
-   // following four methods only used for scriptable engines
-   
-   boolean isDefined (Object object, String field) { 
-      throw new RuntimeException("Unimplemented"); 
-   }
-
-   Object get (Object object, String field) {
-      throw new RuntimeException("Unimplemented"); 
-   }
-   
-   void put (Object object, String field, Object value) { 
-      throw new RuntimeException("Unimplemented"); 
-   }
-    
-   void remove (Object object, String field) { 
-      throw new RuntimeException("Unimplemented"); 
-   }
-   
-   @SuppressWarnings("unused")
-   public Object invokeMethod (Object thiz, String name, Object... args) 
-         throws ScriptException, NoSuchMethodException {
-      throw new RuntimeException("Unimplemented");
-   }
-
-   @SuppressWarnings("unused")
-   public Object invokeFunction (String name, Object... args) 
-         throws ScriptException, NoSuchMethodException {
-      throw new RuntimeException("Unimplemented");
-   }
-   
-   public Compiled compile (String script) throws ScriptException {
-      throw new ScriptException("Unimplemented"); 
-   }
-
    protected abstract class Compiled extends CompiledScript {
 
       // this method added to handle type coercion from Jint
@@ -109,6 +86,9 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
         return jsr.createBindings();
       }
       
+      @Override
+      boolean isScriptable (Object value) { return true; }
+   
       @Override
       public Bindings getBindings (int scope) { return jsr.getBindings(scope); }
 
@@ -158,28 +138,28 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    @Override
    @Deprecated
    public ScriptEngineFactory getFactory () {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Override
    @Deprecated
    public Object eval (Reader reader, ScriptContext context) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Deprecated
    public CompiledScript compile (Reader script) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
    
    @Deprecated
    public <T> T getInterface (Class<T> clasz) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Deprecated
    public <T> T getInterface (Object thiz, Class<T> clasz) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
 }

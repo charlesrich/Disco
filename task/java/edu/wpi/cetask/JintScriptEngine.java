@@ -40,9 +40,6 @@ class JintScriptEngine extends ScriptEngineWrapper
       True = bool.get_True();
       False = bool.get_False();
    }
-
-   @Override
-   boolean isScriptable () { return true; }
    
    @Override
    boolean isScriptable (Object value) { return value instanceof JsObject; }
@@ -201,7 +198,7 @@ class JintScriptEngine extends ScriptEngineWrapper
       @Override
       public Object eval (ScriptContext context) throws ScriptException {
          // because eval(Bindings) overridden above
-         throw new IllegalStateException();
+         throw new UnsupportedOperationException("Not implemented");
       }
          
       @Override
@@ -221,6 +218,12 @@ class JintScriptEngine extends ScriptEngineWrapper
       return jint.CallFunction((JsFunction) f.Get(scope), args);
    }
  
+   @Override
+   public Object invokeMethod (Object thiz, String name, Object... args)
+         throws ScriptException, NoSuchMethodException {
+      throw new UnsupportedOperationException("Not implemented");
+   }
+   
    // for testing
    
    public static void main (String[] args) {
