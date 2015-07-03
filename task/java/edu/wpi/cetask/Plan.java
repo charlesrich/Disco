@@ -81,7 +81,7 @@ public class Plan {
    private int repeatStep;
    
    /**
-    * Makes this plan the nth repeated step (maxOccurs > 1).
+    * Makes this plan the nth repeated step (maxOccurs &gt; 1).
     * Useful for procedural decompositions.  
     */
    public void setRepeatStep (int repeatStep) {

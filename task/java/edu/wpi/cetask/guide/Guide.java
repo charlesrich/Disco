@@ -208,7 +208,7 @@ public class Guide extends Shell {
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
     * variable and use variable in 'done'.
     * 
-    * @param args &lt;id&gt [&lt;namespace&gt] [ / &lt;value&gt ]*
+    * @param args &lt;id&gt; [&lt;namespace&gt;] [ / &lt;value&gt; ]*
     */
    public void task (String args) {
       Task task = processTask(args, getProposed(), false);
@@ -239,7 +239,7 @@ public class Guide extends Shell {
    /**
     * Select decomposition class for current focus task.
     * 
-    * @param args &lt;id&gt
+    * @param args &lt;id&gt;
     */
    public void by (String args) {
       Plan focus = getEngine().getFocus();
@@ -263,7 +263,7 @@ public class Guide extends Shell {
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
     * variable and use variable in 'done'.
     * 
-    * @param args [&lt;id&gt [&lt;namespace&gt]] [ / &lt;value&gt ]*
+    * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public void done (String args) {
       Task occurrence = processTaskIf(args, getProposed(), true);

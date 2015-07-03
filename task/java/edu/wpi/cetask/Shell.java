@@ -508,7 +508,7 @@ public class Shell {
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
     * variable and use variable in 'done'.
     * 
-    * @param args [&lt;id&gt [&lt;namespace&gt]] [ / &lt;value&gt ]*
+    * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public Task processTask (String args, Plan focus, boolean optional) {
       TaskClass type = focus == null ? null : focus.getType(); 

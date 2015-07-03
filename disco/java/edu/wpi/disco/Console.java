@@ -17,7 +17,7 @@ import java.util.*;
  * Interactive console for developing and debugging task models.
  * <p>
  * Do <em>not</em> use this class for integrating Disco as a component into a
- * larger system (see {@link ComponentExample}).
+ * larger system (see ComponentExample in default package).
  * <p>
  * Note: Disco is single threaded. However, to allow for running a debug console
  * alongside a real-time Disco thread, processing of a console commands
@@ -257,7 +257,7 @@ public class Console extends Shell {
    /**
     * Set this true to cause TTSay actions to be created in history. E.g.,
     * 
-    * <tt> > eval Packages.edu.wpi.disco.Console.TTSay = true </tt> 
+    * <tt> eval Packages.edu.wpi.disco.Console.TTSay = true </tt> 
     */
    public static boolean TTSay;
    

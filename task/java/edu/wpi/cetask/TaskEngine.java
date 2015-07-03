@@ -375,7 +375,7 @@ public class TaskEngine {
    
    /**
     * Load, parse, validate and return task model from specified XML document.  Loads the
-    * first toplevel <taskModel> element. Validation errors written to error output.
+    * first toplevel &lt;taskModel&gt; element. Validation errors written to error output.
     * Also loads associated properties file(s), if they exist.
     * 
     * <em>NB:</em> This implementation does not support forward or circular 
@@ -599,9 +599,8 @@ public class TaskEngine {
     * Return the unique task class, if any, in currently loaded task models
     * which is identified by given id.
     *  
-    * @param id
     * @return task class or null if none
-    * @throws AmbiguousIdException
+    * @throws AmbiguousIdException if id in more than one model
     * @throws IllegalArgumentException if id is a decomposition class
     */
    public TaskClass getTaskClass (String id) {
@@ -614,9 +613,8 @@ public class TaskEngine {
     * Return the unique decomposition class, if any, in currently loaded task models
     * which is identified by given id.
     *  
-    * @param id
     * @return decomposition class or null if none
-    * @throws AmbiguousIdException
+    * @throws AmbiguousIdException if id in more than one model
     */
    public DecompositionClass getDecompositionClass (String id) {
       TaskModel.Member member = getMember(id);
@@ -953,7 +951,7 @@ public class TaskEngine {
     * Shift focus to the given plan or null.
     * 
     * @return true iff this is an "unexpected focus shift" in the sense of Lesh,
-    *         Rich & Sidner's UM'01 paper, i.e., we are leaving the current
+    *         Rich and Sidner's UM'01 paper, i.e., we are leaving the current
     *         focus when it is started but not done.
     *         
     * @see #getFocus()        
