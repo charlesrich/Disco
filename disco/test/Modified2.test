@@ -1,0 +1,102 @@
+    # Dec 1, 2014 6:56:23 PM - TaskEngine 1.6 / Disco 1.9
+    Welcome to Disco! (Type 'help' for command list)
+  > 
+  > load models/Test.xml
+  > eval a = $disco.getTaskClass("ModifiedA").newInstance()
+    # Returned 'ModifiedA'
+  > eval a.setSlotValue("input1", new Mutable(8))
+    # Returned '[8]'
+  > eval a.setSlotValue("input2", 6)
+    # Returned '6.0'
+  > eval p = new edu.wpi.cetask.Plan(a)
+    # Returned '[ModifiedA(,[8],6.0)]'
+  > eval p.execute()
+    # Returned 'null'
+  > eval println(a)
+ModifiedA(agent,[8],6.0,[14])
+    # Returned 'null'
+  > eval a.deleteSlotValue("input1")
+    # Returned 'null'
+  > eval a.deleteSlotValue("output")
+    # Returned 'null'
+  > eval println(a)
+ModifiedA(agent,,6.0)
+    # Returned 'null'
+  > eval a.getSlotValue("output")
+    # Returned 'null'
+  > eval a.setSlotValue("input1", new Mutable(9))
+    # Returned '[9]'
+  > eval a.getSlotValue("input1")
+    # Returned '[9]'
+  > eval a.setSlotValue("output", new Mutable(9))
+    # Returned '[9]'
+  > eval println(a)
+ModifiedA(agent,[9],6.0)
+    # Returned 'null'
+  > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
+    # Returned 'ModifiedJava'
+  > eval j.setSlotValue("input", new java.util.Vector())
+    # Returned '[]'
+  > eval p = new edu.wpi.cetask.Plan(j)
+    # Returned '[ModifiedJava(,[])]'
+  > eval p.execute()
+    # Returned 'null'
+  > eval println(j)
+ModifiedJava(agent,[],[1.0])
+    # Returned 'null'
+  > eval j.deleteSlotValue("input")
+    # Returned 'null'
+  > eval j.deleteSlotValue("output")
+    # Returned 'null'
+  > eval println(j)
+ModifiedJava(agent)
+    # Returned 'null'
+  > eval j.getSlotValue("output")
+    # Returned 'null'
+  > eval j.setSlotValue("input", new java.util.Vector())
+    # Returned '[]'
+  > eval println(j.getSlotValue("input"))
+[]
+    # Returned 'null'
+  > eval println(j)
+ModifiedJava(agent,[])
+    # Returned 'null'
+  > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
+    # Returned 'ModifiedJava'
+  > eval v1 = new java.util.Vector(); v1.add(1)
+    # Returned 'true'
+  > eval v2 = new java.util.Vector(); v2.add(2)
+    # Returned 'true'
+  > eval j.setSlotValue("input", v1)
+    # Returned '[1.0]'
+  > eval println(j.getSlotValue("input"))
+[1.0]
+    # Returned 'null'
+  > eval j.setSlotValue("output", v2)
+    # Returned '[2.0]'
+  > eval println(j.getSlotValue("output"))
+[2.0]
+    # Returned 'null'
+  > eval println(j)
+ModifiedJava(,[1.0],[2.0])
+    # Returned 'null'
+  > eval j.deleteSlotValue("output")
+    # Returned 'null'
+  > eval println(j)
+ModifiedJava(,[1.0])
+    # Returned 'null'
+  > eval j.setSlotValue("output", v1)
+    # Returned '[1.0]'
+  > eval println(j)
+ModifiedJava(,[1.0])
+    # Returned 'null'
+  > eval j.getSlotValue("output").add(3)
+    # Returned 'true'
+  > eval println(j)
+ModifiedJava(,[1.0, 3.0])
+    # Returned 'null'
+  > eval println(j.getSlotValue("input"))
+[1.0, 3.0]
+    # Returned 'null'
+  > quit
+    

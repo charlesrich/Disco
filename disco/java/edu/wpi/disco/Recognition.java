@@ -6,7 +6,6 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
-
 import java.io.PrintStream;
 import java.util.*;
 
@@ -16,6 +15,20 @@ class Recognition {
    private final Task occurrence;
    
    List<Explanation> getExplanations () { return explanations; }
+   
+   private void add (Explanation explanation) {
+      if ( explanation.start != null ) {
+         TaskClass task = explanation.start.getType();
+         for (Explanation e : explanations)
+            // ignore ambiguity between different explanations for
+            // the same task type --- this is a pretty strong
+            // oversimplification, since it ignores inputs/outputs
+            // and the fact that there could validly be different
+            // implementations, but it works well in practice
+            if ( task == e.start.getType() ) return;
+      }
+      explanations.add(explanation);
+   }
    
    Recognition (Task occurrence) { this.occurrence = occurrence; } 
 
@@ -41,15 +54,16 @@ class Recognition {
       if ( plan != exclude && (plan.isLive() || onStackHasLive(plan)) ) {
          Task goal = plan.getGoal();
          if ( occurrence.contributes(plan) ) 
-            explanations.add(new Explanation(plan, null, null));
+            add(new Explanation(plan, null, null));
          for (Plan child : plan.getChildren()) {
             // prefer parent to prevent spurious ambiguity 
             if ( child.getGoal() != goal ) recognizeWalk(child, exclude);
          }
          // there could also be an interpolated explanation here
-         recognizeDecomp(plan, plan.getType(), 
-                         // preserve order and speed up cycle check 
-                         new LinkedHashSet<DecompStep>());
+         recognizeDecomp(plan, plan.getType(),
+               // speed up check for circularity, but preserve
+               // order for debugging (only)
+               new LinkedHashSet<DecompStep>());
       }
    }
    
@@ -63,8 +77,7 @@ class Recognition {
    }
 
    // interpolating based on decompositions
-   private void recognizeDecomp (Plan start, TaskClass current, 
-                                 Set<DecompStep> path) {
+   private void recognizeDecomp (Plan start, TaskClass current, Set<DecompStep> path) {
       if ( !start.isDecomposed() && occurrence.isPathFrom(current) ) {
          for (DecompositionClass decomp : current.getDecompositions()) {
             for (String step : decomp.getLiveStepNames()) {
@@ -80,7 +93,7 @@ class Recognition {
                         Plan focus = instantiate(start, path);
                         // make sure instantiation didn't fail
                         if ( focus != null && occurrence.contributes(focus) )
-                           explanations.add(new Explanation(focus, start, path));
+                           add(new Explanation(focus, start, path));
                      } finally { start.setDecomposition(null); }
                   } 
                   // there could be another interpolated explanation here
@@ -119,8 +132,8 @@ class Recognition {
    
    static class Explanation {
 
-      final private Plan focus; // to attach occurrence 
-      final private Plan start; // to attach decomp (may be null)
+      final Plan focus; // to attach occurrence 
+      final Plan start; // to attach decomp (may be null)
       final private Decomposition decomp; // may be null
       final private List<DecompStep> path; // for debugging
 
@@ -128,7 +141,7 @@ class Recognition {
          this.start = start;
          this.focus = focus;
          this.decomp = start == null ? null : start.getDecomposition();
-         this.path = path == null || !TaskEngine.DEBUG ? null :
+         this.path = (path == null || !TaskEngine.DEBUG) ? null :
             new ArrayList<DecompStep>(path);
       }
 

@@ -6,6 +6,7 @@
 package edu.wpi.disco.lang;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Disco;
 
 /**
@@ -457,18 +458,19 @@ public interface Propose {
                if ( isDefinedSlot("value") ) {
                   if ( nested.isDefinedSlot(slot) && nested.getSlotValue(slot).equals(getValue()) )
                      nested.deleteSlotValue(slot);
-               } else setOptional(nested, slot); // set given undefined optional slot to null
+               } else // set given undefined optional slot to null
+                  setOptional(nested, (Input) nested.getType().getSlot(slot)); 
             } else if ( !isDefinedSlot("value") ) {
                // set all undefined optional slots to null 
-               for (String input : nested.getType().getDeclaredInputNames()) 
+               for (Input input : nested.getType().getDeclaredInputs()) 
                   setOptional(nested, input);
             }
          }
       }
 
-      private void setOptional (Task goal, String slot) {
-         if ( goal.getType().getSlot(slot).isOptional() && !goal.isDefinedSlot(slot) ) 
-            goal.setSlotValue(slot, null);
+      private void setOptional (Task goal, Input input) {
+         if ( input.isOptional() && !input.isDefinedSlot(goal) ) 
+            input.setSlotValue(goal, null);
       }
       
       @Override
@@ -639,6 +641,10 @@ public interface Propose {
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
          respondSuccess(contributes, implicit, success);
+         if ( contributes != null && contributes.getType() != getType() ) {
+            Task should = getNested();
+            if ( should != null ) contributes.match(should); // copy slot values
+         }
       }
       
       @Override

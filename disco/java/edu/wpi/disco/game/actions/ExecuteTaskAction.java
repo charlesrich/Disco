@@ -6,9 +6,9 @@
 package edu.wpi.disco.game.actions;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Grounding;
 import edu.wpi.disco.Actor;
 import edu.wpi.disco.game.SingleInteraction;
-
 import java.util.*;
 
 /**
@@ -48,7 +48,7 @@ public class ExecuteTaskAction extends Action {
 		}
 		task.done(true);
 		// execute script, if any 
-		Script script = task.getScript();
+		Grounding script = task.getGrounding();
 		if ( script != null ) script.eval(task);
 		
 		// broadcast to all interactions (but script not re-executed since

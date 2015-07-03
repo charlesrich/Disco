@@ -83,6 +83,8 @@ public class Agent extends Actor {
             if ( choice != null ) { 
                plan.apply(choice);
                plan.decomposeAll();
+               // new live plans may have been create above
+               return generateBest(interaction, guess);
             } else if ( guess == null || guess ) {
                Plugin.Item item = generateBest(interaction); // no guessing
                if ( item != null ) return item;
@@ -92,6 +94,7 @@ public class Agent extends Actor {
                         && Utils.equals(decomp.isApplicable(goal), guess) ) {
                      plan.apply(decomp); // one guess
                      plan.decomposeAll();
+                     // new live plans may have been create above
                      item = generateBest(interaction); // no guessing
                      return item != null ? item : 
                         // recursion ends when no more live non-decomposed plans
@@ -100,15 +103,23 @@ public class Agent extends Actor {
             }
          }
       }
+      return chooseBest(interaction);
+   }
+   
+   /**
+    * Override this method to choose best on basis other than priorities.
+    * Call {@link #generate(Interaction)} to generate candidates.
+    */
+   protected Plugin.Item chooseBest (Interaction interaction) {
       if ( Disco.TRACE ) {
          List<Plugin.Item> items = generate(interaction);
          if ( items.isEmpty() ) return null;
-         Utils.print(items, interaction.getDisco().getOut());
+         if ( items.size() > 1) Utils.print(items, interaction.getDisco().getOut());
          return items.get(0);
       } //else 
       return super.generateBest(interaction);
    }
-
+   
    /**
     * An utterance always ends a turn.  If the <tt>ok</tt> flag is true, then 
     * a turn always ends in an utterance (using 'Ok' if needed).  The
@@ -121,29 +132,30 @@ public class Agent extends Actor {
     * 
     * @param ok force turn to end with 'Ok' if necessary
     * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
+    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
     */
    @Override
-   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
+   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
-      retry(disco); // see also in done
+      if ( retry ) retry(disco); // see also in done
       for (int i = max; i-- > 0;) {
-         Plugin.Item item = respondIf(interaction, guess);
+         Plugin.Item item = respondIf(interaction, guess, retry);
          if ( item == null ) {
             // say "Ok" when nothing else to say and end of turn is required
             if ( ok ) item = newOk(disco);
             else return false;
          }
-         done(interaction, item);
+         done(interaction, item, retry);
          if ( item.task instanceof Utterance) return true; // end of turn
       }
       // maximum number of non-utterances
-      if ( ok ) done(interaction, newOk(disco));
+      if ( ok ) done(interaction, newOk(disco), retry);
       return true;
    }
    
-   public Plugin.Item respondIf (Interaction interaction, boolean guess) {
+   public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
-      retry(disco); // see also in done
+      if ( retry) retry(disco); // see also in done
       disco.decomposeAll();
       Plugin.Item item = generateBest(interaction);
       if ( guess ) {
@@ -181,8 +193,10 @@ public class Agent extends Actor {
    /**
     * Thread-safe method for notifying interaction that given plugin item
     * has occurred.
+    * 
+    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
     */
-   public void done (Interaction interaction, Plugin.Item item) { 
+   public void done (Interaction interaction, Plugin.Item item, boolean retry) { 
       synchronized (interaction) { // typically used in dialogue loop
          interaction.done(this == interaction.getExternal(), 
                item.task, item.contributes);
@@ -190,13 +204,12 @@ public class Agent extends Actor {
             lastUtterance = (Utterance) item.task;
             say(interaction, (Utterance) item.task);
          }
-         retry(interaction.getDisco());  // see also in respond
+         if ( retry ) retry(interaction.getDisco());  // see also in respond
       }
    }
 
    protected void retry (Disco disco) {
       synchronized (disco.getInteraction()) { // called in DiscoUnity agent
-         // TODO provide more general control over retrying?
          Stack<Segment> stack = disco.getStack();
          for (int i = stack.size(); i-- > 1;) {
             Plan plan = stack.get(i).getPlan();

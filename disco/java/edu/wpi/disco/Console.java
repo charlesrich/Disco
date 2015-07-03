@@ -6,9 +6,10 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
+import edu.wpi.cetask.TaskClass.Output;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.*;
-
 import java.io.*;
 import java.util.*;
    
@@ -172,8 +173,10 @@ public class Console extends Shell {
          if ( name.hasMoreTokens() ) namespace = name.nextToken();
          if ( name.hasMoreTokens() ) 
             warning("Ignoring '"+name.nextToken()+"' (and following)");
-         TaskClass task = namespace == null ? getEngine().getTaskClass(id) :
-            getEngine().getModel(namespace).getTaskClass(id);
+         TaskClass task = null;
+         try { task = namespace == null ? getEngine().getTaskClass(id) :
+                         getEngine().getModel(namespace).getTaskClass(id);
+         } catch (IllegalArgumentException e) {} // is decomposition class
          if ( task != null ) { 
             out.println(); printNamespace(task, namespace);
             out.print("  "); task.print(out); out.println();
@@ -205,10 +208,10 @@ public class Console extends Shell {
       boolean empty = properties.isEmpty();
       if ( member instanceof TaskClass ) {
          TaskClass task = (TaskClass) member;
-         for (String input : task.getDeclaredInputNames())
-            empty &= printSlotProperties(task, input);
-         for (String output : task.getDeclaredOutputNames())
-            empty &= printSlotProperties(task, output);
+         for (Input input : task.getDeclaredInputs())
+            empty &= printSlotProperties(task, input.getName());
+         for (Output output : task.getDeclaredOutputs())
+            empty &= printSlotProperties(task, output.getName());
       }
       if ( !empty ) out.println();
    }
@@ -378,9 +381,8 @@ public class Console extends Shell {
          return;
       }
       if ( !(task instanceof Utterance) ) { // see Interaction.done
-         Script script = task.getScript();
          task.setExternal(true); // must be set before eval
-         if ( script != null ) script.eval(task);
+         task.eval(new Plan(task));
       }
       done(task, focus); 
    }

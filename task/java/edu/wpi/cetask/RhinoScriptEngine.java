@@ -107,6 +107,28 @@ class RhinoScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
+   void delete (Object object, String field) {
+      switch (thisPackage) {
+         case Package1:
+            sun.org.mozilla.javascript.internal.Scriptable scriptable1 = 
+               (sun.org.mozilla.javascript.internal.Scriptable) object;
+            scriptable1.delete(field);
+            break;
+         case Package2:
+            org.mozilla.javascript.Scriptable scriptable2 = 
+               (org.mozilla.javascript.Scriptable) object;
+            scriptable2.delete(field);
+            break;
+         case Package3:
+            sun.org.mozilla.javascript.Scriptable scriptable3 = 
+               (sun.org.mozilla.javascript.Scriptable) object;
+            scriptable3.delete(field);
+            break;
+         default: throw new IllegalArgumentException("Cannot perform delete on "+object);
+      }
+   }
+   
+   @Override
    public Object invokeFunction (String name, Object... args)
          throws ScriptException, NoSuchMethodException {
       for (int i = args.length; i-- > 0;)
@@ -145,6 +167,32 @@ class RhinoScriptEngine extends ScriptEngineWrapper
          default: throw new IllegalArgumentException("Cannot perform javaToJS on "+value);
       }
    }
+   
+ /* TODO Use below to avoid calling 'eval' for slots with Java objects
+    See Task.isScriptable(String)
+ 
+   private static Object jsToJava (Object value, Class target) {
+      switch (thisPackage) {
+         case Package1:
+             try {
+               sun.org.mozilla.javascript.internal.Context.enter();
+               return sun.org.mozilla.javascript.internal.Context.jsToJava(value, target); 
+             } finally { sun.org.mozilla.javascript.internal.Context.exit(); }   
+         case Package2:
+            try {
+               org.mozilla.javascript.Context.enter();
+               return org.mozilla.javascript.Context.jsToJava(value, target); 
+            } finally { org.mozilla.javascript.Context.exit(); }   
+         case Package3:
+            try {
+               sun.org.mozilla.javascript.Context.enter();
+               return sun.org.mozilla.javascript.Context.jsToJava(value, target); 
+            } finally { sun.org.mozilla.javascript.Context.exit(); }   
+         default: throw new IllegalArgumentException("Cannot perform jsToJava on "+value);
+      }
+   }
+   
+*/
    
    @Override
    public Bindings getBindings (int scope) { return rhino.getBindings(scope); }

@@ -535,9 +535,9 @@ public class Shell {
       if ( type == null ) return null;
       Task task = type.newInstance();
       // process input, output and success slot values, if any
-      for (String name : type.getDeclaredInputNames()) 
+      for (String name : type.declaredInputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
-      for (String name : type.getDeclaredOutputNames()) 
+      for (String name : type.declaredOutputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       if ( optional ) {
          if ( nextArg(tokenizer, task, "success") ) 

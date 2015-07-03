@@ -88,7 +88,7 @@
     <subtasks id="a1"> 
       <step name="a1" task="disco:Say.Agent"/>
       <step name="a1_u" task="_A1_U"/>
-      <binding slot="$a1.text" value="'Agent1'"/>
+      <binding slot="$a1.text" value="'Agent1 alt1|Agent1 alt2'"/>
     </subtasks>
   </task>
   
@@ -306,6 +306,12 @@
     </subtasks>
   </task>
   
+  <task id="ModifiedJava">
+    <input name="input" type="java.util.Vector" modified="output"/>
+    <output name="output" type="java.util.Vector"/>
+    <script> $this.output = $this.input.add(1); </script>
+  </task>	
+  
   <task id="BindingsValueTest">
     <subtasks id="bindingsValueTest">
        <step name="set" task="disco:Say.Eval"/>
@@ -342,13 +348,129 @@
     <script> println($this.input); test++; </script>
   </task>
 
+  <task id="BindingsDelete2">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks2">
+       <step name="step" task="BindingsDelete1"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+
+  <task id="BindingsDelete1">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks1">
+       <step name="step" task="BindingsDelete"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+
+  <task id="BindingsDelete">
+    <input name="input" type="number"/>
+    <subtasks id="bindingsDeleteSubtasks">
+       <step name="step" task="BindingsDeletePrim"/>
+       <binding slot="$step.input" value="$this.input"/>
+    </subtasks>
+  </task>
+  
+  <task id="BindingsDeletePrim">
+    <input name="input" type="number"/>
+  </task>
+   
   <!-- see decomposeA below -->
   <task id="ProceduralA"/>
     
+  <!-- for test/RecogTop1 -->
+
+  <task id="Root1">
+    <subtasks id="root1">
+      <step name="step1" task="Abs1"/>
+      <step name="step2" task="Prim4"/>
+    </subtasks>
+  </task>
+
+  <task id="Abs1">
+    <input name="input1" type="number"/>
+    <subtasks id="abs1a" ordered="false">
+      <step name="step1" task="Abs2"/>
+      <step name="step2" task="Prim3"/>
+    </subtasks>
+    <subtasks id="abs1b">
+      <step name="step1" task="Prim5"/>
+      <step name="step2" task="Prim2"/>
+      <binding slot="$step1.input1" value="$this.input1"/>
+    </subtasks>
+
+  </task>
+
+  <task id="Abs2">
+    <subtasks id="abs2" ordered="false">
+      <step name="step1" task="Prim1"/>
+      <step name="step2" task="Prim2"/>
+    </subtasks>
+  </task>
+
+  <task id="Root2">
+    <subtasks id="root2">
+      <step name="step1" task="Prim2"/>
+      <step name="step2" task="Prim3"/>
+    </subtasks>
+  </task>
+
+  <task id="Root3">
+    <subtasks id="root3">
+      <step name="step1" task="Abs2"/>
+      <step name="step2" task="Prim4"/>
+    </subtasks>
+  </task>
+
+  <task id="Prim1">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim2">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim3">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim4">
+    <binding slot="$this.external" value="true"/>
+  </task>
+  <task id="Prim5">
+    <input name="input1" type="number"/>
+    <binding slot="$this.external" value="true"/>
+  </task>
+
+  <!-- test test/RecogTop2 -->
+
+  <task id="Top2">
+    <subtasks id="top2" ordered="false">
+      <step name="step1" task="Prim6"/>
+      <step name="step2" task="Prim6"/>
+    </subtasks>
+  </task>
+
+  <task id="Prim6"/>
+  
+  <task id="InverseBinding">
+    <input name="input" type="number"/>
+    <subtasks id="inverseBinding">
+      <step name="step1" task="InversePrim"/>
+      <binding slot="$step1.input" value="f($this.input)"/>
+      <binding slot="$this.input" value="$this.input == undefined ? $step1.input : undefined"/>
+    </subtasks>
+  </task>
+
+  <task id="InversePrim">
+    <input name="input" type="number"/>
+  </task>
+  
   <script init="true">
   
     // for BindingsValueTest
     var test;
+    
+    // for InverseBinding
+    function f (n) { return n; }
     
     // number of times A needs to be done to succeed (-1 means never)
     var A = -1;

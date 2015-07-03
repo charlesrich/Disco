@@ -5,6 +5,5 @@
 # Runs the given script file and compares resulting temporary log with
 # corresponding test log file <filename>.test, if it exists
 #
-this=$( cd "$( dirname "$0" )" && pwd )
-dir=$(dirname `which disco`)
-"$dir/../../task/bin/_run" com.parc.callcenter.CallCenterAgent "$1" "$this/../class" class ../disco/class lib/msv-rng.jar
+dir="`dirname $0`"
+"$dir/../../../task/bin/_run" com.parc.callcenter.CallCenterAgent "$1" class ../disco/class lib/msv-rng.jar ../examples/callcenter/class

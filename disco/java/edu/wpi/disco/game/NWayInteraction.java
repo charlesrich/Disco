@@ -258,7 +258,7 @@ public class NWayInteraction implements Runnable {
 	            console.setInteraction(i);
 	            console.init(i.getDisco());
 	         }
-	         a.respond(i, false, false);
+	         a.respond(i, false, false, true);
 	         tries++;
 	         // short circuit for obvious case
 	         if ((responses == 0) && tries > activeActors.size() - 1) break;
@@ -271,7 +271,7 @@ public class NWayInteraction implements Runnable {
 	         console.respond(i);
 	      }
 	      else if (!player.getName().equals(a.getName())) {
-	         player.respond(i, false, false);
+	         player.respond(i, false, false, true);
 	         generateTTSay();  // TODO find better place for this? trying to catch "fortuitous completions" of tasks
 	         try { Thread.sleep(1500); } catch(InterruptedException e) { /* continue on wake */ }
 	      }

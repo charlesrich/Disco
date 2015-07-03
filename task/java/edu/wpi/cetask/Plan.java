@@ -8,12 +8,6 @@ package edu.wpi.cetask;
 import java.io.PrintStream;
 import java.util.*;
 
-// NB supports subplans not only from decompositions
-
-/**
- * @author rich
- *
- */
 public class Plan {
    
    private final Task goal;
@@ -353,7 +347,7 @@ public class Plan {
    
    private  boolean isLivePlan () {
       return goal.getSuccess() == null && isLiveAchieved() && 
-            !Utils.isTrue(isAchieved()) &&
+            !(getType().isSufficient() && Utils.isTrue(isAchieved())) &&
             (parent == null || parent.isLivePlan());
    }
 
@@ -366,9 +360,8 @@ public class Plan {
    }
    
    private boolean isAchievedSufficient () {
-      return isSucceeded() ||
-          (getType().isSufficient() && isLiveAchieved() && 
-                Utils.isTrue(isAchieved()));
+      return isSucceeded() || 
+         (getType().isSufficient() && isLiveAchieved() && Utils.isTrue(isAchieved()));
    }
 
    /**
@@ -740,7 +733,7 @@ public class Plan {
       }
       // remove all output values (including success and when)
       // do not know what input values to remove because no dependencies
-      for (String name : goal.getType().getOutputNames()) 
+      for (String name : goal.getType().outputNames) 
          goal.deleteSlotValue(name);
       goal.engine.clearLiveAchieved();
    }
@@ -905,6 +898,31 @@ public class Plan {
       else return false;
    }
    
+   /**
+    * Use this method instead of {@link Task#setSlotValue(String,Object)}
+    * when the goal task is not a step in a higher-level decomposition to force
+    * immediate recursive updating of the bindings in the decomposition
+    * of this plan, if any.
+    * <p>
+    * Note this is usually only required when manipulating plans <em>outside</em>
+    * of the discourse state, since otherwise updating of the bindings will
+    * be triggered by the liveness checking that the agent does on every tick.
+    */
+   public Object setSlotValue (String name, Object value) {
+      goal.setSlotValue(name, value, true);
+      if ( decomp != null ) decomp.updateBindings(true, null, null, null);
+      return value;
+   }   
+
+   /**
+    * Use this method instead of {@link Task#deleteSlotValue(String)} as
+    * discussed in {@link #setSlotValue(String,Object)}
+    */
+   public void deleteSlotValue (String name) {
+      goal.deleteSlotValue(name);
+      if ( decomp != null ) decomp.updateBindings(true, null, "this", name);
+   }
+     
    private List<Decomposition> failed = Collections.emptyList();
    
    private boolean planned; // for procedural decomposition

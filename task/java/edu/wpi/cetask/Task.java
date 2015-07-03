@@ -5,13 +5,16 @@
  */
 package edu.wpi.cetask;
 
+import edu.wpi.cetask.Description.Input;
+import edu.wpi.cetask.Description.Output;
+import edu.wpi.cetask.Description.Slot;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
+import edu.wpi.cetask.TaskClass.Grounding;
+import edu.wpi.cetask.TaskClass.Postcondition;
+import edu.wpi.cetask.TaskClass.Precondition;
 import java.text.DateFormat;
 import java.util.*;
 import javax.script.Bindings;
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Postcondition;
-import edu.wpi.cetask.TaskClass.Precondition;
-import edu.wpi.cetask.TaskClass.Slot;
 
 /**
  * Representation for instances of a task class.
@@ -89,7 +92,8 @@ public class Task extends Instance {
       if ( isScriptable(name) ) {
          Object value = engine.get(bindings.get("$this"), name);
          return engine.isDefined(value) ? value : null;
-      } else return eval("$this."+name, "getSlotValue"); 
+         // super.eval below to avoid returning cached value in clonedInputs
+      } else return super.eval("$this."+name, "getSlotValue"); 
    }
 
    private void checkIsSlot (String name) {
@@ -97,12 +101,13 @@ public class Task extends Instance {
          throw new IllegalArgumentException(name+" is not slot of "+getType());
    }
    
-   private Boolean getSlotValueBoolean (String name) {
+   protected Boolean getSlotValueBoolean (String name) {
       checkIsSlot(name);
       if ( isScriptable(name) ) {
          Object value = engine.get(bindings.get("$this"), name);
          return engine.isDefined(value) ? (Boolean) value : null;
-      } else return evalCondition("$this."+name, "getSlotValue"); 
+         // super.evalCondition below to avoid returning cached value in clonedInputs
+      } else return super.evalCondition("$this."+name, "getSlotValueBoolean"); 
    }
    
    private boolean isScriptable (String name) {
@@ -113,7 +118,7 @@ public class Task extends Instance {
 
    /**
     * Return the string obtained by calling <em>JavaScript</em> toString method 
-    * on value of named slot.   Good for debugging output.
+    * on value of given slot.   Good for debugging output.
     * 
     * @see TaskEngine#toString(Object)
     */
@@ -134,8 +139,8 @@ public class Task extends Instance {
          engine.isDefined(engine.get(bindings.get("$this"), name)) 
          // note using !== (not ===) below b/c null==undefined in JavaScript
          : evalCondition("$this."+name+" !== undefined", "isDefinedSlot");
-   }   
-  
+   }     
+   
    // see Decomposition
    private boolean modified = true;
    boolean isModified () { return modified; }
@@ -160,10 +165,10 @@ public class Task extends Instance {
       setSlotValue(name, value, true);
       return value;
    }   
-  
+   
    /**
     * Set the value of named slot to given value.<br>
-    * 
+    *
     * @see #setSlotValue(String,Object)
     */
    public void setSlotValue (String name, Object value, boolean check) { 
@@ -174,6 +179,7 @@ public class Task extends Instance {
          if ( engine.isScriptable(value) ) {
             modified = true;
             engine.put(bindings.get("$this"), name, value);
+            if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
          } else 
             synchronized (bindings) {
                try {
@@ -199,7 +205,7 @@ public class Task extends Instance {
             ( type.equals("number") && value instanceof Number ) )
          return true;
       Slot slot = getType().getSlot(name);
-      if ( slot.isOptional() && value == null ) return true;
+      if ( slot instanceof Input && ((Input) slot).isOptional() && value == null ) return true;
       if ( slot.getJava() != null ) return slot.getJava().isInstance(value);
       if ( engine.getScriptEngine() instanceof JintScriptEngine // for Unity only
             && Utils.startsWith(type, "Packages.") )
@@ -242,7 +248,7 @@ public class Task extends Instance {
    static String makeExpression (String self, TaskClass type, String name, 
                                  String value, boolean onlyDefined) {
       StringBuilder buffer = new StringBuilder();
-      buffer.append("$$value = ").append(value).append(';');
+      buffer.append("$$value = (").append(value).append(");");
       if ( onlyDefined ) 
          buffer.append("if ( $$value == undefined ) $$value = true; else ");
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
@@ -262,8 +268,8 @@ public class Task extends Instance {
    private static String checkExpression (TaskClass task, String name) {
       String type = task.getSlotType(name);
       return type == null ? "true" :
-          // allow any slot to be set to null (for "optional" inputs)
-          ("$$value === null || "+ 
+          // ignore undefined and allow any slot to be set to null (for "optional" inputs)
+          ("$$value == undefined || $$value === null || "+ 
              ("boolean".equals(type) ? "typeof $$value == \"boolean\"" :
                "string".equals(type) ? "typeof $$value == \"string\"" :
                   "number".equals(type) ? "typeof $$value == \"number\"" :
@@ -280,11 +286,10 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(expression, extra, where) )
+         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), extra, where) )
             failCheck(name, expression, where);
-         else  modified = true;
-      } 
-      finally { extra.remove("$$value"); extra.remove("$$this"); }
+         else modified = true;
+      } finally { extra.remove("$$value"); extra.remove("$$this"); }
    }
    
    void setSlotValueScript (String name, Compiled compiled, String where,
@@ -293,10 +298,8 @@ public class Task extends Instance {
          extra.put("$$this", bindings.get("$this"));
          if ( !evalCondition(compiled, extra, where) )
             failCheck(name, "compiled script", where);
-         else  modified = true;
-
-      } 
-      finally { extra.remove("$$value"); extra.remove("$$this"); }
+         else modified = true;
+      } finally { extra.remove("$$value"); extra.remove("$$this"); }
    }
    
    /**
@@ -306,14 +309,20 @@ public class Task extends Instance {
     */
    public void deleteSlotValue (String name) {
       checkIsSlot(name);
-      eval("delete $this."+name, "deleteSlotValue");
+      if ( engine.isScriptable() ) {
+         engine.delete(bindings.get("$this"), name);
+         if ( clonedInputs != null ) engine.delete(clonedInputs, name); 
+      } else { 
+         super.eval("delete $this."+name, "deleteSlotValue"); // not clonedInputs
+         if ( clonedInputs != null ) eval("delete $this."+name, "deleteSlotValue");
+      }
       getType().updateBindings(this);
       modified = true;
    }
-   
+  
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
-      return condition == null ? null : condition.eval(this);
+      return condition == null ? null : condition.evalCondition(this);
    }
    
    private Boolean achieved;
@@ -332,7 +341,7 @@ public class Task extends Instance {
       if ( condition == null ) return null;
       Boolean achieved;
       if ( !getType().hasModifiedInputs() || !occurred() )
-         achieved = condition.eval(this);
+         achieved = condition.evalCondition(this);
       else {
          if ( clonedInputs == null ) // not checking each modified inputs
             throw new IllegalStateException("Modified inputs have not been cloned: "+this);
@@ -340,7 +349,7 @@ public class Task extends Instance {
             Object old = bindings.get("$this");
             try {
                bindings.put("$this", clonedInputs);
-               achieved = condition.eval(this);
+               achieved = condition.evalCondition(this);
             } finally { bindings.put("$this", old); } 
          }
       }
@@ -378,7 +387,7 @@ public class Task extends Instance {
     * @see #getSlotValue(String)
     */
    public boolean isDefinedInputs() {
-      for (String name : getType().getDeclaredInputNames())
+      for (String name : getType().declaredInputNames)
          if ( !isDefinedSlot(name) ) return false;
       return true;
    }
@@ -390,7 +399,7 @@ public class Task extends Instance {
     * @see #getSlotValue(String)
     */
    public boolean isDefinedOutputs() {
-      for (String name : getType().getDeclaredOutputNames())
+      for (String name : getType().declaredOutputNames)
          if ( !isDefinedSlot(name) ) return false;
       return true;
    }
@@ -586,7 +595,7 @@ public class Task extends Instance {
       return decomps; 
    }
 
-   void updateBindings () {
+   void updateBindingsTask () {
       // 2018-ext bindings on task
       getType().updateBindings(this);
    }
@@ -618,9 +627,9 @@ public class Task extends Instance {
    public boolean matches (Task goal) {
       if ( goal == this ) return true;
       if ( !getType().equals(goal.getType()) ) return false;
-      for (String name : getType().getInputNames())
+      for (String name : getType().inputNames)
          if ( !matchesSlot(goal, name) ) return false;
-      for (String name : getType().getOutputNames())
+      for (String name : getType().outputNames)
          if ( !matchesSlot(goal, name) ) return false;
       return true;
    }
@@ -673,10 +682,14 @@ public class Task extends Instance {
          throw new IllegalArgumentException("Cannot copy slot values from "+
                from.getType()+" to "+getType()); 
       boolean overwrite = false;
-      for (String name : getType().getInputNames())
+      for (String name : getType().inputNames)
          overwrite = copySlotValue(from, name, name, true, false) || overwrite;
-      for (String name : getType().getOutputNames())
+      for (String name : getType().outputNames)
          overwrite = copySlotValue(from, name, name, true, false) || overwrite;
+      if ( from.clonedInputs != null ) {
+         if ( clonedInputs != null ) overwrite = true;
+         clonedInputs = from.clonedInputs;
+      }
       return overwrite;
    }
    
@@ -724,12 +737,11 @@ public class Task extends Instance {
    
    protected  void evalIf (Plan plan) { if ( isSystem() ) eval(plan); }
    
-   protected void eval (Plan plan) {
+   // public for Console.execute()
+   public void eval (Plan plan) {
       TaskClass type = getType();
-      // clone and cache modified inputs before grounding script executed
-      for (String name : type.getDeclaredInputNames())
-         if ( type.getModifiedOutput(name) != null ) cloneInput(name);
-      Script script = getScript();
+      cloneInputs(); //  cache modified inputs before grounding script executed
+      Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
             try { 
@@ -739,10 +751,11 @@ public class Task extends Instance {
          }
       // set outputs to modified inputs
       if ( type.getPostcondition() != null )
-         for (String name : type.getDeclaredInputNames()) {
-            String modified = type.getModifiedOutput(name);
+         for (Input input : type.declaredInputs) {
+            Output modified = input.getModified();
             if ( modified != null ) 
-               engine.put(clonedInputs, modified, getSlotValue(modified));
+               engine.put(clonedInputs, modified.getName(), 
+                     getSlotValue(modified.getName()));
       }
    }
    
@@ -764,15 +777,15 @@ public class Task extends Instance {
 
    private void modifiedOutputs () {
       TaskClass type = getType();
-      for (String name : type.getDeclaredInputNames()){
-         String modified = type.getModifiedOutput(name);
+      for (Input input : type.declaredInputs){
+         Output modified = input.getModified();
          if ( modified != null ) {
-            Object input = getSlotValue(name);
-            Object output = getSlotValue(modified);
+            Object value = getSlotValue(input.getName());
+            Object output = getSlotValue(modified.getName());
             // propagate modified input object to output
-            if ( output == null ) setSlotValue(modified, input); 
-            else if ( output != input ) 
-               throw new IllegalStateException("Output of modified input not identical "+name);
+            if ( output == null ) setSlotValue(modified.getName(), value); 
+            else if ( output != value ) 
+               throw new IllegalStateException("Output of modified input not identical "+input.getName());
          }
       }
    }
@@ -781,12 +794,25 @@ public class Task extends Instance {
    private Object clonedInputs;  
    
    /**
-    * Clone and cache copy of named input <em>before</em> modification (for
-    * use evaluating postconditions).  Note that for reported actions by
+    * Clone and cache copy of all modified inputs <em>before</em> modification (for
+    * use in evaluating postconditions).  Note that for reported actions by
     * user, this method should be called before done method.
+    * 
+    * @see #cloneInput(String)
+    */
+   public void cloneInputs () {
+      for (Input input : getType().declaredInputs)
+         if ( input.getModified() != null ) cloneInput(input.getName());
+   }
+   
+   /**
+    * Clone and cache copy of named input. 
+    * 
+    * @see #cloneInputs()
     */
    public void cloneInput (String name) {
-      if ( getType().getModifiedOutput(name) == null )
+      Slot slot = getType().getSlot(name);
+      if ( slot == null || !(slot instanceof Input) || ((Input) slot).getModified() == null )
          throw new IllegalArgumentException("Not a modified input: "+name);
       if ( clonedInputs == null ) 
          clonedInputs = eval(cloneThis, compiledCloneThis, "cloneInput");
@@ -806,8 +832,8 @@ public class Task extends Instance {
    /**
     * Return appropriate and applicable script to ground this primitive task, or null if none.
     */
-   public Script getScript () {
-      Script script = getType().getScript();
+   public Grounding getGrounding () {
+      Grounding script = getType().getGrounding();
       return script == null ? null : 
          Utils.isFalse(script.isApplicable(this)) ? null : script;
    }
@@ -889,30 +915,47 @@ public class Task extends Instance {
       return buffer.length() == 0 ? id : buffer.insert(0, '(').insert(0, id).append(')').toString();
    }
    
-   static private final Object modifiedOutput = new Object(),
-         // both undefined and null in JavaScript get returned as null in Java
-         undefined = new Object();
+   static private final Object undefined = new Object();
+   
+   private static class Duplicate {
+      private final String string;
+      private Duplicate (String string) { this.string = string; }
+      @Override
+      public String toString () { return string; }
+   }
    
    public List<Object> getDeclaredSlotValues () {
       List<Object> list = new ArrayList<Object>();
       TaskClass type = getType();
-      for (String name : type.getDeclaredInputNames())
+      for (String name : type.declaredInputNames)
          list.add(getSlotValueIf(name));
-      for (String name : type.getDeclaredOutputNames())
-         // suppress modified output objects, since must be identical to input
-         list.add(type.getModifiedInput(name) == null ? getSlotValueIf(name) : modifiedOutput);
-       return list;
+      for (Output output : type.declaredOutputs) {
+         Object value = getSlotValueIf(output.getName());
+         Input input = type.getModifiedInput(output);
+         if ( input != null ) {
+            Object old = getSlotValueIf(input.getName());
+            String string;
+            list.add( (old == undefined || value == undefined) ? value :
+               Utils.equals(string = toString(old), toString(value)) ? new Duplicate(string) : value);
+         } else list.add(value);
+      }
+      return list;
    }
 
    private Object getSlotValueIf (String name) {
-      return isDefinedSlot(name) ? getSlotValue(name) : undefined;
+      return isDefinedSlot(name) ? 
+         ( isScriptable(name) ? 
+            ( clonedInputs != null ? engine.get(clonedInputs, name) :
+               getSlotValue(name) )
+            : eval("$this."+name, "getSlotValueIf") )
+         : undefined;
    }
    
    protected StringBuilder argListBuilder (List<Object> args) {
       for (int i = args.size(); i-- > 0;) { 
          Object arg = args.get(i);
-         // trim undefined or modified output args from end
-         if ( arg == undefined || arg == modifiedOutput ) args.remove(i);
+         // trim undefined slots and duplicate printing modified outputs from end
+         if ( arg == undefined || arg instanceof Duplicate ) args.remove(i);
          else break;
       }
       StringBuilder buffer = new StringBuilder();
@@ -920,7 +963,7 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined || arg == modifiedOutput ) buffer.append(toString(arg));
+         if ( arg != undefined ) buffer.append(toString(arg));
       }
       return buffer;
    }
@@ -933,9 +976,9 @@ public class Task extends Instance {
    protected String toStringVerbose () { 
       StringBuilder buffer = new StringBuilder(super.toStringVerbose()).append("={ ");
       boolean first = true;
-      for (String name : getType().getInputNames()) 
+      for (String name : getType().inputNames) 
          first = appendSlot(buffer, name, first);
-      for (String name : getType().getOutputNames()) 
+      for (String name : getType().outputNames) 
          if ( !name.equals("when") ) first = appendSlot(buffer, name, first);
       // handle 'when' specially (but not 'success')
       if ( TaskEngine.DEBUG && isDefinedSlot("when") ) {
@@ -983,8 +1026,8 @@ public class Task extends Instance {
 
    protected String formatTask (String format, String key) { 
       TaskClass type = getType();
-      List<String> inputs = type.getDeclaredInputNames(),
-         outputs = type.getDeclaredOutputNames();
+      List<String> inputs = type.declaredInputNames,
+         outputs = type.declaredOutputNames;
       int inputsSize = inputs.size(), outputsSize = outputs.size();
       if ( format != null ) {
          Object[] slots = new Object[inputsSize+outputsSize];

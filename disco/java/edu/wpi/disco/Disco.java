@@ -9,15 +9,12 @@ import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.Recognition.Explanation;
 import edu.wpi.disco.lang.*;
-
 import org.iso_relax.verifier.Schema;
 import org.w3c.dom.Document;
 import org.xml.sax.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 
@@ -43,7 +40,7 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.9";
+   public static String VERSION = "1.10";
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
@@ -481,16 +478,57 @@ public class Disco extends TaskEngine {
          Iterator<Plan> tops = getTops().iterator();
          while (tops.hasNext()) {
             top = tops.next();
-            if ( !tried.contains(top) )
-               explanations.addAll(recognition.recognize(top, null));
+            if ( !tried.contains(top) ) 
+               // accumulate in single Recognition instance
+               explanations = recognition.recognize(top, null);
          }
          if ( !explanations.isEmpty() ) return explanations;
          // as last resort, consider all toplevel task types in engine
-         TaskClass type = occurrence.getType();
          for (TaskClass task : getTopClasses()) 
-            if ( type.isPathFrom(task) ) 
-               explanations.addAll(
-                     recognition.recognize(new Plan(task.newInstance()), null));
+            if ( occurrence.isPathFrom(task) ) 
+               // accumulate in single Recognition instance
+               explanations = recognition.recognize(new Plan(task.newInstance()), null);
+      }
+      // TODO See last test in test/RecogTop1 which does not yet work because it requires
+      // "putting back" the ambiguous case removed here.  Solution is to check, whenever
+      // a new toplevel plan is started, whether it can be recognized as starting a parent
+      // top of immediately preceding top and, if so, build the right structure
+      if ( explanations.size() > 1 ) {
+         // remove ambiguity due to nested toplevel tasks
+         List<Explanation> candidates = Collections.emptyList();
+         // find explanations that contribute* to all other explanations
+         // that do not contribute* to it
+         outer: for (Explanation e : explanations) {
+            for (Explanation other : explanations) {
+               if ( other.focus != e.focus && 
+                     ( other.start == null || e.start == null
+                       || (!other.start.getGoal().isPathFrom(e.start.getType()) &&  
+                           !e.start.getGoal().isPathFrom(other.start.getType()) ) ) ) 
+                  continue outer;
+            }
+            if ( candidates.isEmpty() ) candidates = new ArrayList<Explanation>(explanations.size());
+            candidates.add(e);
+         }
+         if ( !candidates.isEmpty() ) {
+            if ( TRACE ) {
+               getOut().println("Reducing ambiguity of "+explanations.size()+
+                     " to highest toplevel(s)");
+               for (Explanation e : explanations) getOut().println(e);
+            }
+            if ( candidates.size() > 1 ) {              
+               // remove candidates that contribute* to another candidate
+               // i.e., prefer highest level candidate(s)
+               List<Explanation> highest = new ArrayList<Explanation>(candidates);
+               for (Explanation c : candidates) {
+                  for (Explanation other : candidates)
+                     if ( other.focus != c.focus && other.start != null && c.start != null
+                           && other.start.getGoal().isPathFrom(c.start.getType()) )
+                        highest.remove(other);
+               }
+               candidates = highest;
+            }
+            explanations = candidates;
+         }
       }
       return explanations;
    }
@@ -892,6 +930,13 @@ public class Disco extends TaskEngine {
       quotedOr = Pattern.compile("\\\\\\|");         
  
    /**
+    * If true, then {@link #getAlternative(String,String,boolean)} uses randomness instead of counting.
+    */
+   public static boolean RANDOM_ALTERNATIVES = false;
+   
+   private static Random random;
+   
+   /**
     * Utility function for sequencing through alternatives using | separators (which
     * may be quoted with backslash).  Used for task formatting strings,
     * translation tables and {@link edu.wpi.disco.lang.Say}.
@@ -900,6 +945,8 @@ public class Disco extends TaskEngine {
     * @param value string with alternatives (may have only one)
     * @param advance whether to advance count afterward
     * @return chosen alternative
+    * 
+    * @see #RANDOM_ALTERNATIVES
     */
    public String getAlternative (String key, String value, boolean advance) {
       if ( value == null || value.indexOf('|') < 0 ) return value; // early exit
@@ -915,14 +962,19 @@ public class Disco extends TaskEngine {
          if ( ++end < value.length() )
             // add trailing alternative, if any
             alts.add(value.substring(end, value.length()));
-         key += "@getAlternative";
-         int alt = (Integer) getUserModel(key, 0);
-         value = alts.get(alt);
-         // advance to next alternative
-         if ( advance ) {
-            alt = (alt+1) % alts.size();
-            putUserModel(key, alt);
-         } 
+         if ( RANDOM_ALTERNATIVES ) {
+            if ( random == null ) random = new Random();
+            value = alts.get(random.nextInt(alts.size()));
+         } else {
+            key += "@getAlternative";
+            int alt = (Integer) getUserModel(key, 0);
+            value = alts.get(alt);
+            // advance to next alternative
+            if ( advance ) {
+               alt = (alt+1) % alts.size();
+               putUserModel(key, alt);
+            } 
+         }
       }
       // fix quoted or's, if any
       quotedOr.matcher(value).replaceAll("\\|");

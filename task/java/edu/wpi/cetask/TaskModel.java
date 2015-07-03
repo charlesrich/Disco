@@ -11,11 +11,25 @@ import java.util.*;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import org.w3c.dom.Node;
+import edu.wpi.cetask.TaskClass.Grounding;
 
 public class TaskModel extends Description {
    
-   TaskModel (Node node, TaskEngine engine, XPath xpath) { 
-      super(node, engine, xpath);     
+   TaskModel (Node node, XPath xpath, TaskEngine engine) { 
+      this(node, xpath, parseAbout(node, xpath), engine);
+   }
+   
+   public TaskModel (String namespace, TaskEngine engine) {
+      this(null, null, namespace, engine);
+   }
+   
+   private TaskModel (Node node, XPath xpath, String namespace, TaskEngine engine) {
+      super(node, xpath, namespace, engine);
+      if ( namespace != null ) {
+         if ( engine.models.get(namespace) != null ) 
+            getErr().println("WARNING: redefining task model "+namespace);
+         engine.models.put(namespace, this);
+      }
    }
    
    private URL source; 
@@ -26,19 +40,19 @@ public class TaskModel extends Description {
    
    final Map<String,TaskClass> tasks = new HashMap<String,TaskClass>();
    
-   public Collection<TaskClass> getTaskClasses () { return tasks.values(); }
+   public Collection<TaskClass> getTaskClasses () { return Collections.unmodifiableCollection(tasks.values()); }
    
    public TaskClass getTaskClass (String id) { return tasks.get(id); }
 
    final Map<String,DecompositionClass> decomps = new HashMap<String,DecompositionClass>();
 
-   public Collection<DecompositionClass> getDecompositionClasses () { return decomps.values(); }
+   public Collection<DecompositionClass> getDecompositionClasses () { return Collections.unmodifiableCollection(decomps.values()); }
    
    public DecompositionClass getDecompositionClass (String id) { return decomps.get(id); }
    
-   List<Script> scripts = Collections.emptyList();
+   List<Grounding> scripts = Collections.emptyList();
    
-   public List<Script> getScripts () { return scripts; }
+   public List<Grounding> getGroundingAll () { return scripts; }
    
    @Override
    public String toString () { return getNamespace(); }
@@ -72,9 +86,11 @@ public class TaskModel extends Description {
       return value == null ? defaultValue : (Double) Double.parseDouble(value);
    }
    
+
    public Boolean getProperty (String key, Boolean defaultValue) {
+      // note this method should *not* call TaskClass.isTop()!
       String value = getProperty(key);
-      return value == null ? defaultValue : (Boolean) Utils.parseBoolean(value);
+      return value == null ? defaultValue : (Boolean) Utils.parseBoolean(value);   
    }
    
    public String removeProperty (String key) {
@@ -102,7 +118,15 @@ public class TaskModel extends Description {
    }
    
    public void setProperty (String key, boolean value) {
-      setProperty(key, Boolean.toString(value));
+      if ( key.endsWith("@top") ) {
+         TaskClass task = getTaskClass(key.substring(0, key.length()-4));
+         if ( task != null ) {
+            // make sure list stays consistent with property
+            boolean contains = engine.topClasses.contains(task); 
+            if ( value && !contains ) engine.topClasses.add(task);
+            else if ( !value && contains ) engine.topClasses.remove(task);
+         } else setProperty(key, Boolean.toString(value)); // not loaded yet
+      } else setProperty(key, Boolean.toString(value));
    }
    
    public void storeProperties () {
@@ -123,6 +147,16 @@ public class TaskModel extends Description {
    
    private final List<String> ids = new ArrayList<String>();
    
+   protected static String getPropertyId (String id) {
+         return (id.startsWith("edu.wpi.disco.lang.") ?
+            // spare users typing this prefix in properties files
+            id.substring(19) : id).replace('$', '.');
+   }
+      
+   protected static String parseId (Node node, XPath xpath) {
+         return xpath(node, xpath, "./@id");
+   }
+   
    /**
     * Base class for members of task model with id's
     */
@@ -138,27 +172,31 @@ public class TaskModel extends Description {
        */
       public String getId () { return id; }
 
-
       /**
        * @return the qualified name of this member
        */
       public QName getQName () { return qname; }
       
       protected Member (Node node, XPath xpath) { 
-         super(node, TaskModel.this.engine, xpath);
-         String id = xpath("./@id");
-         this.id = id.length() > 0 ? id : "**ROOT**";
-         qname = new QName(getNamespace(), id);
-         ids.add(id);
+         this(node, xpath, parseId(node, xpath));
+      }
+     
+      // placeholder for creating members without XML
+      protected Member (String id) {
+         this(null, null, id);
       }
       
+      protected Member (Node node, XPath xpath, String id) {
+         super(node, xpath, TaskModel.this.getNamespace(), TaskModel.this.engine);
+         this.id = id;
+         qname = new QName(TaskModel.this.getNamespace(), id);
+         simpleName = Utils.getSimpleName(id);
+         ids.add(id);  
+      }
+    
       public TaskModel getModel () { return TaskModel.this; }   
       
-      public String getPropertyId () {
-         return (id.startsWith("edu.wpi.disco.lang.") ?
-            // spare users typing this prefix in properties files
-            id.substring(19) : id).replace('$', '.');
-      }
+      public String getPropertyId () { return TaskModel.getPropertyId(id); }
      
       public String getProperty (String key) {         
         return TaskModel.this.getProperty(getPropertyId()+key);
@@ -254,12 +292,19 @@ public class TaskModel extends Description {
       public boolean equals (Object object) {
          return object instanceof Member
            // works across different engines
+           && namespace != null
            && namespace.equals(((Member) object).getNamespace()) 
            && id.equals(((Member) object).getId());
       }
       
       @Override
-      public int hashCode () { return node.hashCode(); }
+      public int hashCode () {
+         final int prime = 31;
+         int result = 1;
+         result = prime * result + ((namespace == null) ? 0 : namespace.hashCode());
+         result = prime * result + ((id == null) ? 0 : id.hashCode());
+         return result;
+      }
       
       /**
        * A task or decomposition class is internal if its id starts with an underscore.  
@@ -272,11 +317,29 @@ public class TaskModel extends Description {
          return getProperty("@internal", getId().charAt(0) == '_');
       }
       
-      protected PrintStream getOut () { return engine.getOut(); }
+      private final String simpleName;
+
+      @Override
+      public String toString () {
+         // for readability, suppress namespace for unambiguous id's
+         try { 
+            engine.getTaskClass(getId());
+            return simpleName;
+         } catch (TaskEngine.AmbiguousIdException e) { return '{'+getNamespace()+'}'+getId(); } 
+      }
+    }
+   
+   public static class Init extends Script {
+
+      Init (Node node, XPath xpath, TaskEngine engine) {
+         this(parseText(node, xpath), engine);
+      }
       
-      protected PrintStream getErr () { return engine.getErr(); }
-
-
+      public Init (String script, TaskEngine engine) {
+         super(script, null); // don't compile
+      }
+      
+      @Override
+      public TaskModel getEnclosing () { return (TaskModel) super.getEnclosing(); }      
    }
-  
 }

@@ -39,6 +39,10 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
       throw new RuntimeException("Unimplemented"); 
    }
     
+   void delete (Object object, String field) { 
+      throw new RuntimeException("Unimplemented"); 
+   }
+   
    @SuppressWarnings("unused")
    public Object invokeMethod (Object thiz, String name, Object... args) 
          throws ScriptException, NoSuchMethodException {

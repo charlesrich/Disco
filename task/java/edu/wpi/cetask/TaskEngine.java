@@ -6,18 +6,15 @@
 package edu.wpi.cetask;
 
 import com.sun.msv.verifier.jarv.TheFactoryImpl;
-
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-
+import edu.wpi.cetask.TaskClass.Grounding;
+import edu.wpi.cetask.TaskModel.Init;
 import org.iso_relax.verifier.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import javax.imageio.metadata.IIOMetadataNode;
 import javax.script.*;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.*;
@@ -99,6 +96,7 @@ public class TaskEngine {
          Task.compiledCloneThis = compile(Task.cloneThis, "compiledCloneThis");
          Task.compiledCloneSlot = compile(Task.cloneSlot, "compiledCloneSlot");
       }
+      rootClass = new TaskClass(this, "**ROOT*"); // after scriptEngine initialized	
       try { 
          // load functions used in equals and hashCode into global scope
          eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
@@ -116,12 +114,21 @@ public class TaskEngine {
    }
    
    /**
-    * See the field of given Javascript object. See LiveConnect documentation
+    * Set the field of given Javascript object. See LiveConnect documentation
     * for conversion of value from Java to Javascript.
     */
    public void put (Object object, String field, Object value) {
       scriptEngine.put(object, field, value);
    }
+
+   /**
+    * Delete the field of given Javascript object.
+    */
+   public void delete (Object object, String field) {
+      scriptEngine.delete(object, field);
+   }
+   
+   boolean isScriptable () { return scriptEngine.isScriptable(); }
    
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
 
@@ -288,7 +295,7 @@ public class TaskEngine {
         catch (Exception e) { throw new RuntimeException(e); }
    }
    
-   private final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
+   final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
    
    // default properties for all task models
    final protected Properties properties = new Properties();
@@ -506,30 +513,31 @@ public class TaskEngine {
       }
       TaskModel model = newTaskModel(document, xpath, xmlns);
       model.setSource(source);
-      String namespace = model.getNamespace();
-      if ( models.get(namespace) != null ) 
-         getErr().println("WARNING: redefining task model "+namespace);
-      models.put(namespace, model);  
       // to catch global engine properties in individual model files
       if ( properties != null ) this.properties.putAll(properties);
-      // cache task classes
-      for (Node task : model.xpathNodes("./n:task")) 
-         model.tasks.put(((Element) task).getAttribute("id"), 
-                         new TaskClass(task, model, model.xpath));
-      // cache nested decomposition classes (after all task classes cached)
+      // create task classes
+      for (Node task : model.xpathNodes("./n:task"))
+         new TaskClass(task, model.xpath, model); 
+      // create nested decomposition classes (after all task classes created)
       for (TaskClass task : model.getTaskClasses())
          for (Node subtasks : task.xpathNodes("./n:subtasks"))
-            new DecompositionClass(subtasks, model, task, model.xpath); 
-      // cache toplevel decomposition classes
+            new DecompositionClass(subtasks, model.xpath, model, task); 
+      // create toplevel decomposition classes
       for (Node subtasks : model.xpathNodes("./n:subtasks"))
-         new DecompositionClass(subtasks, model, null, model.xpath); 
+         new DecompositionClass(subtasks, model.xpath, model, null); 
       clearLiveAchieved();
       // cache toplevel scripts and evaluate initialization script
       for (Node node : model.xpathNodes("./n:script")) {
-         if ( model.scripts.isEmpty() ) model.scripts = new ArrayList<Script>(2);
-         Script script = new Script(node, this, null, model.xpath);
-         model.scripts.add(script);
-         if ( script.isInit() ) eval(script.getText(), model+" init");
+         if ( model.scripts.isEmpty() ) model.scripts = new ArrayList<Grounding>(2);
+         if ( Utils.parseBoolean(Description.xpath(node, model.xpath, "./@init")) ) { 
+            Init script = new Init(node, model.xpath, this);
+            script.setEnclosing(model);
+            eval(script.getScript(), model.getNamespace()+" init");
+         } else {
+            Grounding script = new Grounding(node, model.xpath, this);
+            script.setEnclosing(model); 
+            model.scripts.add(script);
+         }
       }
       // after script evaluation (since conditions evaluated below)
       if ( isRecognition() ) 
@@ -565,7 +573,7 @@ public class TaskEngine {
    }
    
    protected TaskModel newTaskModel (Document document, XPath xpath, String xmlns) {
-      return new TaskModel(document.getDocumentElement(), this, xpath);
+      return new TaskModel(document.getDocumentElement(), xpath, this);
    }
    
    protected Properties loadProperties (String source, String extension) {
@@ -604,7 +612,7 @@ public class TaskEngine {
    /**
     * Return collection of task models loaded into this engine.
     */
-   public Collection<TaskModel> getModels () { return models.values(); }
+   public Collection<TaskModel> getModels () { return Collections.unmodifiableCollection(models.values()); }
 
    /**
     * Return unique task class, if any, identified by given qualified name
@@ -620,6 +628,7 @@ public class TaskEngine {
     * @param id
     * @return task class or null if none
     * @throws AmbiguousIdException
+    * @throws IllegalArgumentException if id is a decomposition class
     */
    public TaskClass getTaskClass (String id) {
       TaskModel.Member member = getMember(id);
@@ -681,9 +690,9 @@ public class TaskEngine {
       if ( thisType == null )
          throw new IllegalArgumentException("Task class not found: "+id);
       Task thisTask = thisType.newInstance();
-      for (String name : type.getInputNames())  
+      for (String name : type.inputNames)  
          copySlotValue(task, thisTask, name);
-      for (String name : type.getOutputNames())
+      for (String name : type.outputNames)
          copySlotValue(task, thisTask, name);
       return thisTask;
    }
@@ -737,11 +746,10 @@ public class TaskEngine {
    
    protected Plan getRoot () { return root; }
    
+   private final TaskClass rootClass;
+         
    public void clear () {
-      // TODO find better dummy Node type?
-      Node node = new IIOMetadataNode("*ROOT*");
-      root = new Plan(new TaskClass(node, new TaskModel(node, this, xpath), xpath)
-                     .newInstance()); 
+      root = new Plan(rootClass.newInstance()); 
       focus = null;
       if ( cacheLive != null ) clearLiveAchieved(); // called from constructor
    }
@@ -838,7 +846,7 @@ public class TaskEngine {
       cacheLive.put(plan, live);
       // to make sure bindings that do not depend on other bindings
       // are updated before plugins run or task executed
-      if ( live ) plan.getGoal().updateBindings();
+      if ( live ) plan.getGoal().updateBindingsTask();
       return live;
    }
    
@@ -1069,6 +1077,8 @@ public class TaskEngine {
    // for extension to plan recognition with interpolation of decompositions
 
    // package permission for TaskClass
+   // note this list includes primitives, because there is no way to know
+   // if they won't be decomposed by later loaded library--see getTopClasses()
    final List<TaskClass> topClasses = new ArrayList<TaskClass>(); 
    
    /**
@@ -1077,13 +1087,21 @@ public class TaskEngine {
    public boolean isRecognition () { return false; }
 
    /**
-    * Returns unmodifiable list of task classes which can serve as root of plan
-    * recognition. Typically this is because they do not contribute to any other
-    * task classes. However, this can be overridden by @top property in library.
+    * Returns unmodifiable list of non-primitive task classes which can serve as root of plan
+    * recognition. By default, these are classes that do not contribute to any other task classes.
+    * However, this can be overridden by @top property in library.
     * 
     * @see TaskClass#isTop()
+    * @see TaskClass#setTop(boolean)
     */
    public List<TaskClass> getTopClasses () { 
+      for (TaskClass task : topClasses)
+         if ( task.isPrimitive() ) {
+            List<TaskClass> tops = new ArrayList<TaskClass>(topClasses.size());
+            for (TaskClass top : topClasses)
+               if ( !top.isPrimitive() ) tops.add(top);
+            return tops;
+         }
       return Collections.unmodifiableList(topClasses); 
    }
 }

@@ -6,8 +6,8 @@
 package edu.wpi.disco.plugin;
 
 import java.util.*;
-
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.*;
@@ -24,16 +24,18 @@ public class AskWhatNoBindingPlugin extends Agenda.Plugin {
       Task goal = plan.getGoal();
       if ( goal.isPrimitive() || goal.isDefinedInputs() ) return null;
       DecompositionClass decomp = plan.getDecompositionClass();
-      for (String input : goal.getType().getDeclaredInputNames()) 
-         if ( getGenerateProperty(Ask.What.class, goal, input) &&
-               !goal.isDefinedSlot(input) && 
+      for (Input input : goal.getType().getDeclaredInputs()) {
+         String name = input.getName();
+         if ( getGenerateProperty(Ask.What.class, goal, name) &&
+               !input.isDefinedSlot(goal) && 
                // if no decomp yet, could be waiting for input to 
                // evaluate applicability condition
                // if this is not desired behavior, inhibit with
                // @generate=false property
-               (decomp == null || !decomp.hasBinding(input)) )
+               (decomp == null || !decomp.hasBinding(name)) )
             return Collections.singletonList(
-                new Plugin.Item(new Ask.What(getDisco(), self(), goal, input), plan));
+                new Plugin.Item(new Ask.What(getDisco(), self(), goal, name), plan));
+      }
       return null;
    }
 

@@ -1,0 +1,49 @@
+    # May 6, 2015 9:30:44 PM - TaskEngine 1.6 / Disco 1.9
+    Welcome to Disco! (Type 'help' for command list)
+  > next false
+  > load models/Test.xml
+  > eval $disco.getTaskClass("InverseBinding").setTop(true)
+    # Returned 'null'
+  > execute InversePrim / 6
+    User execute InversePrim on 6.0.
+  > history
+
+[Achieve InverseBinding on 6.0] -done <-focus
+   User execute InversePrim on 6.0.
+
+  > clear
+  > task InverseBinding / 8
+    User says "Let's achieve InverseBinding on 8.0."
+  > next
+    Agent execute InversePrim on 8.0.
+    Agent says "Ok."
+  > clear
+  > next false
+  > task InverseBinding / 9
+    User says "Let's achieve InverseBinding on 9.0."
+  > history
+
+[Achieve InverseBinding on 9.0] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9.0."
+   [Execute InversePrim on 9.0] -live
+
+  > execute InversePrim / 6
+    User execute InversePrim on 6.0.
+  > history
+
+[Achieve InverseBinding on 9.0] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9.0."
+   User execute InversePrim on 6.0.
+   [Execute InversePrim on 9.0] -live
+
+  > verbose
+    # Writing new keys to /tmp/InverseBinding1.translate.properties
+  > history
+
+[Achieve InverseBinding on 9.0 by inverseBinding] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9.0."
+   User execute InversePrim on 6.0. -unexplained
+   [step1: Execute InversePrim on 9.0] -live
+
+  > quit
+    

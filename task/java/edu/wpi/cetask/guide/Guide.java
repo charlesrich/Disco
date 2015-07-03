@@ -6,7 +6,8 @@
 package edu.wpi.cetask.guide;
 
 import edu.wpi.cetask.*;
-
+import edu.wpi.cetask.TaskClass.Grounding;
+import edu.wpi.cetask.TaskClass.Input;
 import java.util.*;
 
 public class Guide extends Shell {
@@ -164,7 +165,7 @@ public class Guide extends Shell {
       Task task = plan.getGoal();
       // note for compatibility with published CETask paper, only
       // offer to do task if there is a script defined
-      return plan.isLive() && task.canSystem() && task.getScript() != null
+      return plan.isLive() && task.canSystem() && task.getGrounding() != null
          // TODO ask for input values if needed
          // user can provide inputs using 'task' command
          && task.isDefinedInputs(); 
@@ -302,7 +303,7 @@ public class Guide extends Shell {
       Task occurrence = processTaskIf(args, getProposed(), true);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
-            Script script = occurrence.getScript();
+            Grounding script = occurrence.getGrounding();
             if ( script != null) script.eval(occurrence);
             done(occurrence);
          } else warning("All input values must be defined--ignored.");
@@ -338,10 +339,10 @@ public class Guide extends Shell {
       for (Plan next : live) {
          Task task = next.getGoal();
          TaskClass type = task.getType();
-         for (String name : type.getDeclaredInputNames())
-               if ( !task.isDefinedSlot(name) ) {
+         for (Input input : type.getDeclaredInputs())
+               if ( !task.isDefinedSlot(input.getName()) ) {
                   propose(next);
-                  respondq("what@word", type, name);
+                  respondq("what@word", type, input.getName());
                   return;
                }
       }

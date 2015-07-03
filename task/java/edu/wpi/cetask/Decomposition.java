@@ -98,6 +98,7 @@ public class Decomposition extends Instance {
                new Step(type, engine, this, name);
       } catch (NoSuchMethodException e) { throw new RuntimeException(e); }
       Plan plan = new Plan(step);
+      step.setPlan(plan);
       plan.setOptionalStep(optional);
       putStep(name, plan);
       return plan;
@@ -130,7 +131,7 @@ public class Decomposition extends Instance {
    void retract () {
       if ( goal == null )
          throw new IllegalStateException("Decomposition already retracted");
-      for (String name : goal.getType().getOutputNames())
+      for (String name : goal.getType().outputNames)
          goal.deleteSlotValue(name);
       goal = null;
       synchronized (bindings) { 
@@ -154,7 +155,7 @@ public class Decomposition extends Instance {
    
    public Plan getStep (String name) { return steps.get(name); }
    
-   public Collection<Plan> getSteps () { return steps.values(); }
+   public Collection<Plan> getSteps () { return Collections.unmodifiableCollection(steps.values()); }
    
    /**
     * Return name of step for given plan or null if not a step.
@@ -186,8 +187,11 @@ public class Decomposition extends Instance {
       
       private final String name;
 
-      // note explicit field rather than nested time to support null value
+      // note explicit field rather than inner class to support null value
       private final Decomposition decomp;
+      
+      private /* final */ Plan plan; // can be null (for builtin tasks)
+      void setPlan (Plan plan) { this.plan = plan; }
       
       public String getName () { return name; }
       
@@ -204,33 +208,33 @@ public class Decomposition extends Instance {
          return decomp != null && decomp.getType().isOptionalStep(name);
       }
       
-      private void updateBindings (boolean modified) {
-         if ( decomp != null ) decomp.updateBindings(modified, null, null, null);
+      private void updateBindings () {
+         if ( decomp != null ) decomp.updateBindings(false, null, null, null);
       }
       
       @Override
-      void updateBindings () {
-         super.updateBindings(); // do 2018-ext self bindings first
+      void updateBindingsTask () {
+         super.updateBindingsTask(); // do 2018-ext self bindings first
          // for binding expressions on this step that do not depend on other slots
          if ( decomp != null ) decomp.updateBindings(true, name, null, null);
       }
    
       @Override
       public Object eval (String expression, String where) {
-         updateBindings(false);
+         updateBindings();
          return super.eval(expression, where);
       }
       
       @Override
       protected Object eval (String script, Bindings extra, String where) {
-         updateBindings(false);
+         updateBindings();
          return super.eval(script, extra, where);
       }
   
       @Override
       protected Boolean evalCondition (Compiled compiled, Bindings extra, 
                                        String where) {
-         updateBindings(false);
+         updateBindings();
          return super.evalCondition(compiled, extra, where);
       }
       
@@ -238,60 +242,83 @@ public class Decomposition extends Instance {
     
       @Override
       public Object getSlotValue (String name) {
-         updateBindings(false);
+         updateBindings();
          return super.getSlotValue(name);
       }
       
       @Override
+      protected Boolean getSlotValueBoolean (String name) {
+         updateBindings();
+         return super.getSlotValueBoolean(name);
+      }
+      
+      @Override
+      public String getSlotValueToString (String name) {
+         updateBindings();
+         return super.getSlotValueToString(name);
+      }
+      
+      @Override
       public boolean isDefinedSlot (String name) {
-         updateBindings(false);
+         updateBindings();
          return super.isDefinedSlot(name);
+      }
+      
+      // only setting/removing slot values sets modified bit 
+      // evaluation of conditions, etc., is specified not to have side effects
+
+      @Override
+      public Object setSlotValue (String name, Object value) {
+         super.setSlotValue(name, value);
+         updateBindings(null, null);
+         return value;
+      }
+      
+      @Override
+      public void deleteSlotValue (String name) {
+         super.deleteSlotValue(name);
+         updateBindings(this.name, name);
       }
       
       @Override
       boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
                              boolean onlyDefined, boolean check) {
-         if ( from instanceof Step ) ((Step) from).updateBindings(false);
-         boolean overwrite = super.copySlotValue(from, fromSlot, thisSlot, 
-                                                 onlyDefined, check);
-         updateBindings(true);
+         if ( from instanceof Step ) ((Step) from).updateBindings();
+         boolean overwrite = super.copySlotValue(from, fromSlot, thisSlot, onlyDefined, check);
+         updateBindings(null, null);
          return overwrite;
       }
-      
-      // only setting slot values sets modified bit; evaluation of conditions, etc.
-      // is specified not to have side effects
 
-      @Override
-      public Object setSlotValue (String name, Object value) {
-         super.setSlotValue(name, value);
-         updateBindings(true);
-         return value;
-      }
-      
       @Override
       public void setSlotValueScript (String name, String expression, String where) { 
          super.setSlotValueScript(name, expression, where);
-         updateBindings(true);
+         updateBindings(null, null);
       }
       
       @Override
       void setSlotValueScript (String name, String expression, String where,
             Bindings extra) {
          super.setSlotValueScript(name, expression, where, extra);
-         updateBindings(true);
+         updateBindings(null, null);
       }
       
       @Override
       void setSlotValueScript (String name, Compiled compiled, String where,
             Bindings extra) {
          super.setSlotValueScript(name, compiled, where, extra);
-         updateBindings(true);
+         updateBindings(null, null);
       }
-      
-      @Override
-      public void deleteSlotValue (String name) {
-         super.deleteSlotValue(name);
-         if ( decomp != null ) decomp.updateBindings(true, null, this.name, name);
+     
+      private void updateBindings (String retractedStep, String retractedSlot) {
+          // propagate changed value within current decomp (including goal)
+         if ( this.decomp != null ) this.decomp.updateBindings(true, null, retractedStep, retractedSlot);
+         // propagate changed value down to decomposition of this step, if any
+         // see also set/deleteSlotValue methods on Plan
+         if ( plan != null ) {
+            Decomposition decomp = plan.getDecomposition();
+            // note step name is always "this" here!
+            if ( decomp != null ) decomp.updateBindings(true, null, "this", retractedSlot);
+         }
       }
    }
 }
