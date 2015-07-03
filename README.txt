@@ -63,8 +63,9 @@ shell and look for "build 1.8.0_60-ea-b21" (or similar with number
 higher than 60).
 ******************
 
-The release-java7 folder contains an archived copy of the last release
-of Disco built in Java 7 (using the builtin Rhino JavaScript engine).
+The release-java7 folder and the v1.10 tag (Java 7 Archived Release)
+in GitHub contain an archived copy of the last release of Disco built
+in Java 7 (using the builtin Rhino JavaScript engine).
 
 Note that disco.jar includes all the binary class files in both the
 disco and task projects (but not the libraries for disco/d4g or the
@@ -105,6 +106,8 @@ libraries, including those for speech, but assumes that the task
 source has been compiled.  If you cannot or do not build the disco
 project, then add the precompiled disco.jar as a library of your
 new project.
+
+The current release was built in Eclipse 4.5 (Mars).
 
 ---
 

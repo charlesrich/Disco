@@ -51,8 +51,6 @@ class JintScriptEngine extends ScriptEngineWrapper
       return !( value == null || value == JsUndefined.Instance );
    }
    
-   // the type checks below are doing what LiveConnect does for Rhino
-   
    @Override
    Object get (Object object, String field) {
       JsObject js = (JsObject) object;

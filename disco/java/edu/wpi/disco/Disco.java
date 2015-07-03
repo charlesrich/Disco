@@ -642,7 +642,6 @@ public class Disco extends TaskEngine {
    public void putUserModel (String key, Object value) { userModel.put(key, value); }
 
    // following four methods are useful in task model init scripts
-   // note not using varargs because not supported by version of Rhino in JDK 1.6
    
    /**
     * Remove plugin(s) of given class, if any, from plugins used for generation 

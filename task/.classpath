@@ -9,11 +9,6 @@
 	<classpathentry kind="lib" path="speech/cmu_us_kal.jar"/>
 	<classpathentry kind="lib" path="speech/en_us.jar"/>
 	<classpathentry kind="lib" path="speech/cmulex.jar"/>
-	<classpathentry kind="lib" path="lib/js.jar" sourcepath="/jint/lib/sun.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://www.mozilla.org/rhino/apidocs"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/mono/mscorlib.jar"/>
 	<classpathentry kind="lib" path="lib/mono/Jint.jar"/>

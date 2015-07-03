@@ -16,26 +16,19 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
    public static ScriptEngineWrapper getScriptEngine () {
       ScriptEngineManager mgr = new ScriptEngineManager();
-      ScriptEngineWrapper wrapper = null;
-      ScriptEngine engine = null;
       for (ScriptEngineFactory factory : mgr.getEngineFactories()) 
-         if ( factory.getNames().contains("ECMAScript") ) {
-            if ( factory instanceof NashornScriptEngineFactory ) {
-               wrapper = new NashornScriptEngine(engine =
-                     ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS));
-               break;
-            } else if ( RhinoScriptEngine.thisPackage != null ) {
-               wrapper = new RhinoScriptEngine(engine = factory.getScriptEngine());
-               break;
-            }
+         if ( factory.getNames().contains("ECMAScript") 
+        		 && factory instanceof NashornScriptEngineFactory ) {
+             ScriptEngine engine = ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS);
+             engine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+        	 return new NashornScriptEngine(engine);
          }
-      if ( engine != null ) engine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-      else if ( JintScriptEngine.EXISTS ) { 
-         wrapper = new JintScriptEngine();
-         wrapper.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+      if ( JintScriptEngine.EXISTS ) { 
+    	  ScriptEngineWrapper wrapper = new JintScriptEngine();
+    	  wrapper.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+    	  return wrapper;
       }
-      if ( wrapper == null ) throw new IllegalStateException("No recognized JavaScript engine found!"); 
-      return wrapper;
+      throw new IllegalStateException("No recognized JavaScript engine found!"); 
    }
    
    // these three methods added to handle type coercion from Jint
