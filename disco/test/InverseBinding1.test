@@ -5,45 +5,45 @@
   > eval $disco.getTaskClass("InverseBinding").setTop(true)
     # Returned 'null'
   > execute InversePrim / 6
-    User execute InversePrim on 6.0.
+    User execute InversePrim on 6.
   > history
 
-[Achieve InverseBinding on 6.0] -done <-focus
-   User execute InversePrim on 6.0.
+[Achieve InverseBinding on 6] -done <-focus
+   User execute InversePrim on 6.
 
   > clear
   > task InverseBinding / 8
-    User says "Let's achieve InverseBinding on 8.0."
+    User says "Let's achieve InverseBinding on 8."
   > next
-    Agent execute InversePrim on 8.0.
+    Agent execute InversePrim on 8.
     Agent says "Ok."
   > clear
   > next false
   > task InverseBinding / 9
-    User says "Let's achieve InverseBinding on 9.0."
+    User says "Let's achieve InverseBinding on 9."
   > history
 
-[Achieve InverseBinding on 9.0] -accepted -live <-focus
-   User says "Let's achieve InverseBinding on 9.0."
-   [Execute InversePrim on 9.0] -live
+[Achieve InverseBinding on 9] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9."
+   [Execute InversePrim on 9] -live
 
   > execute InversePrim / 6
-    User execute InversePrim on 6.0.
+    User execute InversePrim on 6.
   > history
 
-[Achieve InverseBinding on 9.0] -accepted -live <-focus
-   User says "Let's achieve InverseBinding on 9.0."
-   User execute InversePrim on 6.0.
-   [Execute InversePrim on 9.0] -live
+[Achieve InverseBinding on 9] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9."
+   User execute InversePrim on 6.
+   [Execute InversePrim on 9] -live
 
   > verbose
     # Writing new keys to /tmp/InverseBinding1.translate.properties
   > history
 
-[Achieve InverseBinding on 9.0 by inverseBinding] -accepted -live <-focus
-   User says "Let's achieve InverseBinding on 9.0."
-   User execute InversePrim on 6.0. -unexplained
-   [step1: Execute InversePrim on 9.0] -live
+[Achieve InverseBinding on 9 by inverseBinding] -accepted -live <-focus
+   User says "Let's achieve InverseBinding on 9."
+   User execute InversePrim on 6. -unexplained
+   [step1: Execute InversePrim on 9] -live
 
   > quit
     

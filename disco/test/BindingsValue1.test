@@ -5,11 +5,11 @@
     User says "Let's achieve BindingsValueTest."
     Agent says "Setting test to 1."
   > next
-1
+1.0
     Agent execute BindingsValue on 1.0.
-2
+2.0
     Agent execute BindingsValue on 2.0.
-3
+3.0
     Agent execute BindingsValue on 3.0.
     Agent says "Ok."
   > task BindingsValueTestSubtasks
@@ -17,10 +17,10 @@
     Agent says "Setting test to 1."
   > next
 1
-    Agent execute BindingsValue on 1.0.
-2
+    Agent execute BindingsValue on 1.
+2.0
     Agent execute BindingsValue on 2.0.
-3
+3.0
     Agent execute BindingsValue on 3.0.
     Agent says "Yup."
   > quit

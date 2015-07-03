@@ -35,33 +35,48 @@ public class Task extends Instance {
    @Override
    public TaskClass getType () { return (TaskClass) super.getType(); }
 
+   // for hashing/comparing of Tasks in Agenda.generate()
+
    @Override
-   public boolean equals (Object object) {
-      if ( this == object ) return true;
+   public boolean equals (Object object) {     
       if ( !(object instanceof Task) ) return false;
       Task task = (Task) object;
-      if ( !task.getType().equals(type) ) return false;
-      synchronized (bindings) {
-         try {
-            bindings.put("$$value", task.bindings.get("$this")); 
-            return (Boolean) super.evalCondition(equals, compiledEquals, "equals");
-         } finally { bindings.remove("$$value"); }
-      }
+      if ( type != task.type ) return false;
+      for (Slot slot : getType().getInputs())
+         if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
+            return false;
+      for (Slot slot : getType().getOutputs())
+         if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
+            return false;
+      return true;
    }
 
    @Override 
    public int hashCode () {
-      return type.hashCode() ^
-         eval(hashCode, compiledHashCode, "hashCode").hashCode();
+      int factor = 31;
+      int hash = type.hashCode()*factor;
+      for (Slot slot : getType().getInputs()) {
+         Object value = slot.getSlotValue(this);
+         if ( value != null ) {
+            factor *= 31;
+            hash += value.hashCode()*factor;
+         }
+      }
+      for (Slot slot : getType().getOutputs()) {
+         Object value = slot.getSlotValue(this);
+         if ( value != null ) {
+            factor *= 31;
+            hash += value.hashCode()*factor;
+         }
+      }
+      return hash;
    }
-   
+  
    // see Javascript function definitions in default.js
-   final static String hashCode = "edu.wpi.cetask_helper.hashCode($this)",
-                       cloneThis = "edu.wpi.cetask_helper.clone($this);",
-                       cloneSlot = "$this[$$value] = edu.wpi.cetask_helper.clone($this[$$value]);",
-                       equals = "edu.wpi.cetask_helper.equals($this,$$value)";
-
-   static Compiled compiledEquals, compiledHashCode, compiledCloneThis, compiledCloneSlot;
+   final static String cloneThis = "edu_wpi_cetask_clone($this);",
+                       cloneSlot = "$this[$$value] = edu_wpi_cetask_clone($this[$$value]);";
+                       
+   static Compiled compiledCloneThis, compiledCloneSlot;
    
    /**
     * Return value of the named slot.<br>
@@ -83,15 +98,15 @@ public class Task extends Instance {
     * a pre- or postcondition specifies otherwise.
     * 
     * @see #isDefinedSlot(String)
-    * @see #deleteSlotValue(String)
+    * @see #removeSlotValue(String)
     * @see #isDefinedInputs()
     * @see #isDefinedOutputs()
     */
    public Object getSlotValue (String name) { 
       checkIsSlot(name);
       if ( isScriptable(name) ) {
-         Object value = engine.get(bindings.get("$this"), name);
-         return engine.isDefined(value) ? value : null;
+         Object object = bindings.get("$this");
+         return engine.isDefined(object, name) ? engine.get(object, name) : null;
          // super.eval below to avoid returning cached value in clonedInputs
       } else return super.eval("$this."+name, "getSlotValue"); 
    }
@@ -104,8 +119,8 @@ public class Task extends Instance {
    protected Boolean getSlotValueBoolean (String name) {
       checkIsSlot(name);
       if ( isScriptable(name) ) {
-         Object value = engine.get(bindings.get("$this"), name);
-         return engine.isDefined(value) ? (Boolean) value : null;
+         Object object = bindings.get("$this");
+         return engine.isDefined(object, name) ? (Boolean) engine.get(object, name) : null;
          // super.evalCondition below to avoid returning cached value in clonedInputs
       } else return super.evalCondition("$this."+name, "getSlotValueBoolean"); 
    }
@@ -113,7 +128,7 @@ public class Task extends Instance {
    private boolean isScriptable (String name) {
       // for Java objects (or if could be Java object), must use LiveConnect
       Slot slot = getType().getSlot(name);
-      return TaskEngine.SCRIPTABLE && slot.getType() != null && slot.getJava() == null;
+      return slot.getType() != null && slot.getJava() == null;
    }
 
    /**
@@ -131,14 +146,11 @@ public class Task extends Instance {
     * isDefinedSlot() may return true <em>or</em> false.
     * 
     * @see #getSlotValue(String)
-    * @see #deleteSlotValue(String)
+    * @see #removeSlotValue(String)
     */
    public boolean isDefinedSlot (String name) {
       checkIsSlot(name);
-      return TaskEngine.SCRIPTABLE ?
-         engine.isDefined(engine.get(bindings.get("$this"), name)) 
-         // note using !== (not ===) below b/c null==undefined in JavaScript
-         : evalCondition("$this."+name+" !== undefined", "isDefinedSlot");
+      return engine.isDefined(bindings.get("$this"), name); 
    }     
    
    // see Decomposition
@@ -179,16 +191,17 @@ public class Task extends Instance {
          if ( engine.isScriptable(value) ) {
             modified = true;
             engine.put(bindings.get("$this"), name, value);
-            if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
-         } else 
+         } else { 
             synchronized (bindings) {
                try {
-                  bindings.put("$$value", value); // convert to JavaScript value
+                  bindings.put("$$value", value); 
                   modified = true;
-                  eval("$this."+name+" = $$value;", "setSlotValue"); 
+                  super.eval("$this."+name+" = $$value;", "setSlotValue"); // sic super
                } finally { bindings.remove("$$value"); }
             }
-      } else failCheck(name, value.toString(), "setSlotValue");
+         }
+         if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
+      } else failCheck(name, value == null ? "null" : value.toString(), "setSlotValue");
    }  
       
    protected void checkCircular (String name, Object value) {
@@ -205,7 +218,12 @@ public class Task extends Instance {
             ( type.equals("number") && value instanceof Number ) )
          return true;
       Slot slot = getType().getSlot(name);
-      if ( slot instanceof Input && ((Input) slot).isOptional() && value == null ) return true;
+      // ignore undefined and allow any slot to be set to null (for "optional" inputs)
+      if ( value == null ) {
+         if ( slot instanceof Input && !((Input) slot).isOptional() )
+            getErr().println("WARNING: Setting null value for non-optional input slot "+name+" of "+this);
+         return true;
+      }
       if ( slot.getJava() != null ) return slot.getJava().isInstance(value);
       if ( engine.getScriptEngine() instanceof JintScriptEngine // for Unity only
             && Utils.startsWith(type, "Packages.") )
@@ -213,11 +231,11 @@ public class Task extends Instance {
          catch (ClassNotFoundException e) { return false; }
       synchronized (bindings) {
          try {
-            bindings.put("$$value", value); // convert to JavaScript object
+            bindings.put("$$value", value); 
             return Utils.booleanValue(
-                  eval( // workaround bug: "$$value instanceof Date" returns false
-                        type.equals("Date") ? "$$value.getUTCDate !== undefined" :
-                           ("$$value instanceof "+type),
+                  eval( (type.equals("boolean") || type.equals("string") || type.equals("number")) ?
+                         ("typeof $$value === '"+type+"'") :
+                         ("$$value instanceof "+type), 
                         "checkSlotValue"));
          } finally { bindings.remove("$$value"); }
       }
@@ -232,11 +250,9 @@ public class Task extends Instance {
     */
    public void setSlotValueScript (String name, String expression, String where) {
       // only evaluate expression once (in case of side effects)
-      try {
-         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), where) )
-            failCheck(name, expression, where);
-         else modified = true;
-      } finally { bindings.remove("$$value"); }
+      if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), where) )
+         failCheck(name, expression, where);
+      else modified = true;
    }
 
    void setSlotValueScript (String name, Compiled compiled, String where) {
@@ -246,15 +262,15 @@ public class Task extends Instance {
    }
    
    static String makeExpression (String self, TaskClass type, String name, 
-                                 String value, boolean onlyDefined) {
+         String value, boolean onlyDefined) {
       StringBuilder buffer = new StringBuilder();
-      buffer.append("$$value = (").append(value).append(");");
-      if ( onlyDefined ) 
-         buffer.append("if ( $$value == undefined ) $$value = true; else ");
+      buffer.append("(function(value){");
+      if ( onlyDefined ) buffer.append("if (value == undefined) return true; ");
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
-         // note using [ ] to protect keywords
-         .append(self).append("['").append(name).append("']")
-         .append(" = $$value; $$value = true; } else $$value = false; $$value");
+      // note using [ ] to protect keywords
+      .append(self).append("['").append(name).append("']")
+      .append(" = value; return true;} return false;})(")
+      .append(value).append(")");
       return buffer.toString();
    }
    
@@ -269,13 +285,11 @@ public class Task extends Instance {
       String type = task.getSlotType(name);
       return type == null ? "true" :
           // ignore undefined and allow any slot to be set to null (for "optional" inputs)
-          ("$$value == undefined || $$value === null || "+ 
-             ("boolean".equals(type) ? "typeof $$value == \"boolean\"" :
-               "string".equals(type) ? "typeof $$value == \"string\"" :
-                  "number".equals(type) ? "typeof $$value == \"number\"" :
-                     // work around bug: "$$value instanceof Date" returns false
-                     "Date".equals(type) ? "$$value.getUTCDate !== undefined" :
-                        "$$value instanceof "+type));
+          ("value == undefined || value === null || "+ 
+             ("boolean".equals(type) ? "typeof value == \"boolean\"" :
+               "string".equals(type) ? "typeof value == \"string\"" :
+                  "number".equals(type) ? "typeof value == \"number\"" :
+                        "value instanceof "+type));
    }
    
    /**
@@ -286,12 +300,12 @@ public class Task extends Instance {
                             Bindings extra) {
       try {
          extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), extra, where) )
+         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, true), extra, where) )
             failCheck(name, expression, where);
          else modified = true;
-      } finally { extra.remove("$$value"); extra.remove("$$this"); }
+      } finally { extra.remove("$$this"); }
    }
-   
+  
    void setSlotValueScript (String name, Compiled compiled, String where,
                             Bindings extra) {
       try {
@@ -299,7 +313,7 @@ public class Task extends Instance {
          if ( !evalCondition(compiled, extra, where) )
             failCheck(name, "compiled script", where);
          else modified = true;
-      } finally { extra.remove("$$value"); extra.remove("$$this"); }
+      } finally { extra.remove("$$this"); }
    }
    
    /**
@@ -307,15 +321,10 @@ public class Task extends Instance {
     * 
     * @see #isDefinedSlot(String)
     */
-   public void deleteSlotValue (String name) {
+   public void removeSlotValue (String name) {
       checkIsSlot(name);
-      if ( engine.isScriptable() ) {
-         engine.delete(bindings.get("$this"), name);
-         if ( clonedInputs != null ) engine.delete(clonedInputs, name); 
-      } else { 
-         super.eval("delete $this."+name, "deleteSlotValue"); // not clonedInputs
-         if ( clonedInputs != null ) eval("delete $this."+name, "deleteSlotValue");
-      }
+      engine.remove(bindings.get("$this"), name);
+      if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
       getType().updateBindings(this);
       modified = true;
    }
@@ -430,22 +439,17 @@ public class Task extends Instance {
     * @see #setWhen(long)
     */
    public long getWhen () {
-      try { 
-         return // for some reason, millis get converted to double first 
-               engine.evalDouble("$this.when.getTime()", bindings, "getWhen").longValue(); 
-      } catch (RuntimeException e) { throw e; }
-        catch (Exception e) { throw new RuntimeException(e); }
+      Object value = getSlotValue("when"); 
+      return value == null ? 0 : (Long) value;
    }
 
    /**
-    * Set the time when this task occurred. Javascript instance of Date object
-    * is created with given milliseconds.
+    * Set the time when this task occurred. 
     * 
     * @see #getWhen()
     */
    public void setWhen (long milliseconds) {
-      setSlotValueScript("when", "new Date("+Long.toString(milliseconds)+")", 
-            "setWhen");
+      setSlotValue("when", milliseconds);
    }
    
    /**
@@ -704,25 +708,17 @@ public class Task extends Instance {
    }
    
    boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
-                          boolean onlyDefined, boolean check) {
-      if ( TaskEngine.SCRIPTABLE ) {
-         Object value = engine.get(from.bindings.get("$this"), fromSlot);
-         checkCircular(thisSlot, value);
-         if ( onlyDefined && !engine.isDefined(value) ) return false;
-         if ( check ) checkSlotValue(thisSlot, getType().getSlotType(thisSlot), value);
-         Object task = bindings.get("$this");
-         Object thisValue = engine.get(task, thisSlot);
-         boolean overwrite = engine.isDefined(thisValue);
-         engine.put(task, thisSlot, value);
-         modified = true;
-         return overwrite;
-      } else {
-         if ( onlyDefined && !from.isDefinedSlot(fromSlot) ) return false;
-         boolean overwrite = isDefinedSlot(thisSlot);
-         setSlotValueScript(thisSlot, "$this."+fromSlot, "copySlotValue", 
-               from.bindings);
-         return overwrite;
-      }
+         boolean onlyDefined, boolean check) {
+      Object fromObject = from.bindings.get("$this");
+      if ( onlyDefined && !engine.isDefined(fromObject, fromSlot) ) return false;
+      Object value = engine.get(fromObject, fromSlot);
+      checkCircular(thisSlot, value);
+      if ( check ) checkSlotValue(thisSlot, getType().getSlotType(thisSlot), value);
+      Object task = bindings.get("$this");
+      boolean overwrite = engine.isDefined(task, thisSlot);
+      engine.put(task, thisSlot, value);
+      modified = true;
+      return overwrite;
    }
 
    /**

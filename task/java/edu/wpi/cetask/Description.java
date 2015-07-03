@@ -239,7 +239,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
       /**
        * Make this slot undefined in given task.
        * 
-       * @see Task#deleteSlotValue(String)
+       * @see Task#removeSlotValue(String)
        */
       void deleteSlotValue (Task task);
    }
@@ -278,7 +278,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
       private Script (String script, TaskEngine engine, String where) {
          super(engine, null);
          this.script = script;
-         compiled =  (engine != null && TaskEngine.isCompilable()) ? 
+         compiled =  (engine != null && !TaskEngine.DEBUG) ? 
             engine.compile(script, where) : null;
       }
       

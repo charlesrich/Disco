@@ -1,0 +1,72 @@
+default namespace = "http://www.cs.wpi.edu/~rich/d4g"
+
+namespace xsd = "http://www.w3.org/2001/XMLSchema"
+namespace t = "http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+
+# unfortunately, this requires a file reference
+include "../lib/cea-2018-ext.rnc" {
+
+  start = 
+    element model {
+      attribute about { xsd:anyURI },
+      Description*,
+      # adding Top and Do
+      ( Task | Subtasks | Script | Top | Do )*
+  }
+}
+
+Top =
+ (
+    element say { 
+      attribute actor { xsd:NCName }?,
+      TopBody 
+    }
+ |  element agent { TopBody }
+ |  element user { TopBody }
+ )
+
+TopBody =
+    attribute id { xsd:ID }?,
+    attribute precondition { text }?,
+    SayAttributes,
+    Choices
+
+Say = 
+  element say {
+    attribute actor { xsd:NCName }?,
+    SayBody
+  }
+
+Do = 
+  element do {
+    attribute id { xsd:ID }?,
+    attribute actor { xsd:NCName }?,
+    attribute task { xsd:QName },
+    attribute minOccurs { xsd:nonNegativeInteger }?,
+    attribute maxOccurs { xsd:positiveInteger | "unbounded" }?,
+    attribute applicable { text }?,
+    Choices
+  }
+
+Choices =
+    ( Do | Say | User | Agent )*
+    
+SayAttributes =
+  attribute ref { xsd:NCName } |
+    (
+      attribute text { text }, 
+      attribute eval { text }?, 
+      ( attribute alt { text }? | 
+        ( attribute alt { text } , attribute alt2 { text }? )
+      )
+    )
+    
+User = element user { SayBody }
+
+Agent = element agent { SayBody }
+
+SayBody =
+    attribute id { xsd:ID }?,
+    attribute applicable { text }?, 
+    SayAttributes,
+    Choices

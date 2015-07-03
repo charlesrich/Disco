@@ -83,7 +83,8 @@
     function setDestination (destination) { // called from Unity thread
        // example of debug printout
        // note that toString below should not be needed, but is due to Jint
-       Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       //Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       java.lang.System.out.println("Setting NPC destination to: "+destination); 
        My.Game.NPC.destination = destination.entity.gameObject.transform;
     }
 

@@ -266,7 +266,7 @@ public class TaskClass extends TaskModel.Member {
       public void setSlotValueScript (Task task, String expression, String where) { task.setSlotValueScript(name, expression, where); }
 
       @Override
-      public void deleteSlotValue (Task task) { task.deleteSlotValue(name); }
+      public void deleteSlotValue (Task task) { task.removeSlotValue(name); }
       
       @Override
       public String toString () {
@@ -298,7 +298,7 @@ public class TaskClass extends TaskModel.Member {
          // compute type
          if ( name.equals("success") || name.equals("external") )
             this.type = "boolean";
-         else if ( name.equals("when") ) this.type = "Date";
+         else if ( name.equals("when") ) this.type = "number";
          else {
             String path = "[@name=\""+name+"\"]/@type";
             String type = enclosing.xpath("./n:input"+path+" | "+"./n:output"+path);
@@ -552,6 +552,8 @@ public class TaskClass extends TaskModel.Member {
 
    /**
     * Thread-safe method to create new instance of this task class.
+    * NB: This method must be used in JavaScript instead of directly calling
+    *     builtin constructors!
     */
    public Task newInstance () { 
       try { return isBuiltin() ? newStep(null, null, false) : new Task(this, engine); }
@@ -822,9 +824,8 @@ public class TaskClass extends TaskModel.Member {
          this.slot = slot;
          this.value = value;
          where = TaskClass.this.getId() + " binding for " + slot;
-         String expression = Task.makeExpression("$this", TaskClass.
-               this, slot, value, true);
-         if ( TaskEngine.isCompilable() ) { 
+         String expression = Task.makeExpression("$this", TaskClass.this, slot, value, true);
+         if ( !TaskEngine.DEBUG ) { 
             compiled = engine.compile(expression, where);
             this.expression = null;
          } else { this.expression = expression; compiled = null; }
@@ -838,11 +839,9 @@ public class TaskClass extends TaskModel.Member {
                task.failCheck(slot, "compiled script", where);
             else task.setModified(true);
          } else {
-            try {
-               if ( !task.evalConditionFinal(expression, where) )
-                  task.failCheck(slot, value, where);
-               else task.setModified(true);
-            } finally { task.bindings.remove("$$value"); }
+            if ( !task.evalConditionFinal(expression, where) )
+               task.failCheck(slot, value, where);
+            else task.setModified(true);
          }
       }
       

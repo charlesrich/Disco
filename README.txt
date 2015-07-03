@@ -28,7 +28,6 @@ implementation.
       team
    release
      
-
 The two main toplevel folders, task and disco, are Eclipse Java
 projects containing all of the source code for Disco.  The task
 project is the reference implementation for CETask; the disco project
@@ -47,13 +46,28 @@ edu.wpi.disco.Disco.  You can also run the jar file directly as:
 
      java -jar release/lib/disco.jar
 
-NB: This is pure Java software and requires JRE 1.7 (Java SE 7.0),
-which includes JavaScript.  It has been tested in JRE 1.7 on Windows,
-Mac and Unix (Ubuntu).  NB: Due to accessing an unsupported API for
-the JavaScript interpreter (for efficiency reasons), Disco requires the
-Oracle release of Java, and will not, for example, work with OpenJDK.
+NB: This is pure Java software and is supported only in Java 8 (JRE
+1.8) which includes Nashorn JavaScript (ECMAScript) engine.  It has
+been tested with Java SE 8u60 in the Windows x64, Mac OS X x64 and
+Linux x64 releases from Oracle (java.oracle.com). OpenJDK Java 8
+releases are not available at time of this writing.
 
-Note this jar file includes all the binary class files in both the
+******************
+Due to a bug in Nashorn that was only recently corrected, Disco
+requires Java Version 8u60 Build b21, or higher.  At the time of this
+writing, this version of Java 8 is only available from the Java Early
+Access Releases site at https://jdk8.java.net/download.html.
+
+To see what version you are running, type "java -version" to a command
+shell and look for "build 1.8.0_60-ea-b21" (or similar with number
+higher than 60).
+******************
+
+The release-java7 folder and the v1.10 tag (Java 7 Archived Release)
+in GitHub contain an archived copy of the last release of Disco built
+in Java 7 (using the builtin Rhino JavaScript engine).
+
+Note that disco.jar includes all the binary class files in both the
 disco and task projects (but not the libraries for disco/d4g or the
 speech libraries in task/lib).
 
@@ -92,6 +106,8 @@ libraries, including those for speech, but assumes that the task
 source has been compiled.  If you cannot or do not build the disco
 project, then add the precompiled disco.jar as a library of your
 new project.
+
+The current release was built in Eclipse 4.5 (Mars).
 
 ---
 

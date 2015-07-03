@@ -132,7 +132,7 @@
   
   <task id="ChooseFlavor">
     <input name="flavor" type="Flavor"/>
-    <script> println("["+$this.flavor+" chosen!]"); </script>
+    <script> java.lang.System.out.println("["+$this.flavor+" chosen!]"); </script>
   </task>
   
   <task id="TestBooleanInput">
@@ -319,14 +319,14 @@
        <step name="two" task="BindingsValue"/>
        <step name="three" task="BindingsValue"/>
        <binding slot="$set.text" value="'Setting test to 1'"/>
-       <binding slot="$set.eval" value="'test = 1'"/>
+       <binding slot="$set.eval" value="'test = 1.0'"/>
     </subtasks>
   </task>
     
   <task id="BindingsValue">
     <input name="input" type="number"/>
     <binding slot="$this.input" value="test"/>		
-    <script> println($this.input); test++; </script>
+    <script> java.lang.System.out.println($this.input); test++;</script>
   </task>
   
   <task id="BindingsValueTestSubtasks">
@@ -345,7 +345,7 @@
 
   <task id="BindingsValueStep">
     <input name="input" type="number"/>
-    <script> println($this.input); test++; </script>
+    <script> java.lang.System.out.println($this.input); test++;</script>
   </task>
 
   <task id="BindingsDelete2">

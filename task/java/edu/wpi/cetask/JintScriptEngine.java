@@ -8,9 +8,7 @@ package edu.wpi.cetask;
 import cli.Jint.*;
 import cli.Jint.Expressions.Program;
 import cli.Jint.Native.*;
-
 import java.util.Map.Entry;
-
 import javax.script.*;
 
 // wrapper for Jint to support running CETask/Disco under Mono (for Unity)
@@ -42,23 +40,16 @@ class JintScriptEngine extends ScriptEngineWrapper
       True = bool.get_True();
       False = bool.get_False();
    }
-
-   @Override
-   boolean isScriptable () { return true; }
    
    @Override
    boolean isScriptable (Object value) { return value instanceof JsObject; }
    
    @Override
-   boolean isDefined (Object value) { 
+   boolean isDefined (Object object, String field) {
+      Object value = get(object, field);
       // note null below means "not initialized", not JsNull.Instance
       return !( value == null || value == JsUndefined.Instance );
    }
-   
-   @Override
-   Object undefined () { return JsUndefined.Instance; }
-   
-   // the type checks below are doing what LiveConnect does for Rhino
    
    @Override
    Object get (Object object, String field) {
@@ -85,7 +76,7 @@ class JintScriptEngine extends ScriptEngineWrapper
    }
    
    @Override
-   void delete (Object object, String field) {
+   void remove (Object object, String field) {
       ((JsObject) object).Delete(field);
    }
 
@@ -102,6 +93,24 @@ class JintScriptEngine extends ScriptEngineWrapper
          bindGlobal(bindings);
          return eval(script); 
       } finally { unbindGlobal(bindings); }
+   }
+   
+   @Override
+   public Object eval (String script, ScriptContext context) throws ScriptException {
+      throw new UnsupportedOperationException();
+   }
+   
+   @Override
+   public Object eval (String script) throws ScriptException {
+      try { 
+         if (null != null) throw new JintException(); // to fool compiler
+         return jint.Run(script);
+      } catch (JintException e) { throw new ScriptException(e.toString()); }
+   }
+
+   @Override
+   public Bindings createBindings () {
+      return new SimpleBindings();
    }
    
    // TODO There probably is a more efficient way to do this binding and
@@ -137,14 +146,6 @@ class JintScriptEngine extends ScriptEngineWrapper
    }
 
    @Override
-   public Object eval (String script) throws ScriptException {
-      try { 
-         if (null != null) throw new JintException(); // to fool compiler
-         return jint.Run(script);
-      } catch (JintException e) { throw new ScriptException(e.toString()); }
-   }
-   
-   @Override
    public Boolean evalBoolean (String script, Bindings bindings) 
                   throws ScriptException {
       cli.System.Object value = (cli.System.Object) eval(script, bindings);
@@ -156,22 +157,29 @@ class JintScriptEngine extends ScriptEngineWrapper
    public Double evalDouble (String script, Bindings bindings) 
                   throws ScriptException {
       cli.System.Object value = (cli.System.Object) eval(script, bindings);
-      return value == null ? Double.NaN : new Double(value.ToString());
+      return value == null ? null : new Double(value.ToString());
    }
 
+   @Override
+   public Long evalLong (String script, Bindings bindings) 
+                  throws ScriptException {
+      cli.System.Object value = (cli.System.Object) eval(script, bindings);
+      return value == null ? null : new Long(value.ToString());
+   }
+   
    @Override
    public Compiled compile (String script) throws ScriptException {
       try {
          if (null != null) throw new JintException(); // to fool compiler
-         return new JintCompiled(script);
+         return new CompiledJint(script);
       } catch (JintException e) { throw new ScriptException(e.toString()); }
    }
 
-   private class JintCompiled extends Compiled {
+   private class CompiledJint extends Compiled {
 
       private final Program program;
 
-      public JintCompiled (String script) {
+      public CompiledJint (String script) {
          program = JintEngine.Compile(script, true); //debug info   
       }
 
@@ -185,6 +193,12 @@ class JintScriptEngine extends ScriptEngineWrapper
          finally { unbindGlobal(bindings); }
       }
       
+      @Override
+      public Object eval (ScriptContext context) throws ScriptException {
+         // because eval(Bindings) overridden above
+         throw new UnsupportedOperationException("Not implemented");
+      }
+         
       @Override
       public Boolean evalBoolean (Bindings bindings) throws ScriptException {
          cli.System.Object value = (cli.System.Object) eval(bindings);
@@ -202,6 +216,12 @@ class JintScriptEngine extends ScriptEngineWrapper
       return jint.CallFunction((JsFunction) f.Get(scope), args);
    }
  
+   @Override
+   public Object invokeMethod (Object thiz, String name, Object... args)
+         throws ScriptException, NoSuchMethodException {
+      throw new UnsupportedOperationException("Not implemented");
+   }
+   
    // for testing
    
    public static void main (String[] args) {

@@ -45,7 +45,7 @@
 
   <t:task id="PrintDone">
     <t:binding slot="$this.external" value="false"/>
-    <t:script> println("Done") </t:script>
+    <t:script> java.lang.System.out.println("Done") </t:script>
   </t:task>
 
   <t:script init="true"> 

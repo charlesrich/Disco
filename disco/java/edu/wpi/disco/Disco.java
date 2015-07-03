@@ -40,7 +40,7 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.10";
+   public static String VERSION = "1.11";
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
@@ -642,7 +642,6 @@ public class Disco extends TaskEngine {
    public void putUserModel (String key, Object value) { userModel.put(key, value); }
 
    // following four methods are useful in task model init scripts
-   // note not using varargs because not supported by version of Rhino in JDK 1.6
    
    /**
     * Remove plugin(s) of given class, if any, from plugins used for generation 

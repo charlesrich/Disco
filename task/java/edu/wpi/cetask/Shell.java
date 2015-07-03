@@ -45,6 +45,7 @@ public class Shell {
     */
    public void setOut (PrintStream stream) {
       out = stream;
+      System.setOut(stream);
       getEngine().getScriptEngine().getContext().setWriter(new PrintWriter(stream, true));
    }
    
@@ -54,7 +55,7 @@ public class Shell {
     */
    public void setErr (PrintStream stream) {
       err = stream;
-      getEngine().getScriptEngine().getContext().setErrorWriter(new PrintWriter(stream, true));
+      // note not redirecting system error stream 
    }
    
    final public File log;
@@ -195,12 +196,6 @@ public class Shell {
       printVersion(); out.println();
       engine.setStart(now);
       println(engine.getProperty("shell@welcome"));
-      if ( !TaskEngine.isCompilable() )
-         println("WARNING: "+engine.getScriptEngine()+
-         " conditions are not compiled (will run slower).");
-      if ( !TaskEngine.SCRIPTABLE)
-         println("WARNING: "+engine.getScriptEngine()+
-         " does not use (sun.)org.mozilla.javascript.(internal.)Scriptable and will run slower.");
    }         
    
    private void setErrOut (PrintStream stream) {
@@ -513,7 +508,7 @@ public class Shell {
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
     * variable and use variable in 'done'.
     * 
-    * @param args [&lt;id&gt [&lt;namespace&gt]] [ / &lt;value&gt ]*
+    * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public Task processTask (String args, Plan focus, boolean optional) {
       TaskClass type = focus == null ? null : focus.getType(); 

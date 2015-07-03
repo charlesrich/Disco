@@ -17,7 +17,7 @@ import java.util.*;
  * Interactive console for developing and debugging task models.
  * <p>
  * Do <em>not</em> use this class for integrating Disco as a component into a
- * larger system (see {@link ComponentExample}).
+ * larger system (see ComponentExample in default package).
  * <p>
  * Note: Disco is single threaded. However, to allow for running a debug console
  * alongside a real-time Disco thread, processing of a console commands
@@ -140,6 +140,8 @@ public class Console extends Shell {
       out.println("                          (all slot values required)");
       out.println("    execute [<id> [<namespace>]] [ / <value> ]*");
       out.println("                        - like 'done', except runs script if any");
+      out.println("    instance [<id> [<namespace>]] [ / <value> ]*");
+      out.println("                        - like 'done', except only creates instance and sets $instance");
       out.println("    next [<boolean>]    - end user console turn");
       out.println("                          (boolean turns automatic turn mode on/off)");
       super.help();
@@ -235,7 +237,10 @@ public class Console extends Shell {
       Disco.TRACE = state.length() == 0 || Utils.parseBoolean(state);
    }
    
-   { status.add("history"); status.add("trace"); status.add("reset"); status.add("print"); }
+   { 
+      status.add("history"); status.add("trace"); status.add("reset"); 
+      status.add("print"); status.add("instance"); 
+   }
 
    /* *
     * Equivalent to executing Propose.Should of specified task.
@@ -252,7 +257,7 @@ public class Console extends Shell {
    /**
     * Set this true to cause TTSay actions to be created in history. E.g.,
     * 
-    * <tt> > eval Packages.edu.wpi.disco.Console.TTSay = true </tt> 
+    * <tt> eval Packages.edu.wpi.disco.Console.TTSay = true </tt> 
     */
    public static boolean TTSay;
    
@@ -349,6 +354,17 @@ public class Console extends Shell {
          } else warning("All input values must be defined--ignored.");
       }
       return occurrence;
+   }
+   
+   /**
+    * Create a new instance of specified task class, including slot values.
+    * task. Task class must be specified and unspecified args do not default.
+    * This command is needed to avoid recursive invocation of eval in test cases.
+    */
+   public Task instance (String args) {
+      Task task = processTaskIf(args, null, true);
+      getEngine().setGlobal("$instance", task);
+      return task;
    }
 
    /**

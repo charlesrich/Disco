@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Usage: testall [ <testdir> ] [ <command> ]
+#
+# Calls given <command> (default 'disco' in this dir) on all script files in given
+# test directory <testdir> (default 'test') that have corresponding log files.  
+# Assumes any file with no extension in test directory
+# is a script file.
+#
+this=`dirname $0`
+testdir=test
+command=$this/disco
+if [ "$1" ]; then
+  testdir=$1
+fi
+if [ "$2" ]; then
+  command=$2
+fi
+if [ ! -e "$testdir" ]; then 
+  echo Test directory $testdir does not exist!
+  exit 1
+fi
+all_start=`date +%s`
+result=0
+for f in `find $testdir -maxdepth 1 -name '*.test' -type f -print`
+  do
+    $command ${f%.test}
+    result=`expr $result + $?`
+  done
+all_end=`date +%s`
+if [ $result = 0 ]; then
+  echo "All successful ("`expr $all_end - $all_start` "sec)"
+else
+  echo "Failed $result test(s)!"
+fi
+exit $result

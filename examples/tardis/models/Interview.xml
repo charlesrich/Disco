@@ -396,6 +396,6 @@
       </subtasks>
    </task>
    <task id="ShakeHands">
-      <script> println("[Agent and User Shake Hands now]"); </script>
+      <script> java.lang.System.out.println("[Agent and User Shake Hands now]"); </script>
    </task>
 </taskModel>

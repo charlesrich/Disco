@@ -7,20 +7,20 @@
   > eval a.setSlotValue("input1", new Mutable(8))
     # Returned '[8]'
   > eval a.setSlotValue("input2", 6)
-    # Returned '6.0'
+    # Returned '6'
   > eval p = new edu.wpi.cetask.Plan(a)
-    # Returned '[ModifiedA(,[8],6.0)]'
+    # Returned '[ModifiedA(,[8],6)]'
   > eval p.execute()
     # Returned 'null'
-  > eval println(a)
-ModifiedA(agent,[8],6.0,[14])
+  > eval java.lang.System.out.println(a)
+ModifiedA(agent,[8],6,[14])
     # Returned 'null'
-  > eval a.deleteSlotValue("input1")
+  > eval a.removeSlotValue("input1")
     # Returned 'null'
-  > eval a.deleteSlotValue("output")
+  > eval a.removeSlotValue("output")
     # Returned 'null'
-  > eval println(a)
-ModifiedA(agent,,6.0)
+  > eval java.lang.System.out.println(a)
+ModifiedA(agent,,6)
     # Returned 'null'
   > eval a.getSlotValue("output")
     # Returned 'null'
@@ -30,8 +30,8 @@ ModifiedA(agent,,6.0)
     # Returned '[9]'
   > eval a.setSlotValue("output", new Mutable(9))
     # Returned '[9]'
-  > eval println(a)
-ModifiedA(agent,[9],6.0)
+  > eval java.lang.System.out.println(a)
+ModifiedA(agent,[9],6)
     # Returned 'null'
   > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
     # Returned 'ModifiedJava'
@@ -41,24 +41,24 @@ ModifiedA(agent,[9],6.0)
     # Returned '[ModifiedJava(,[])]'
   > eval p.execute()
     # Returned 'null'
-  > eval println(j)
-ModifiedJava(agent,[],[1.0])
+  > eval java.lang.System.out.println(j)
+ModifiedJava(agent,[],[1])
     # Returned 'null'
-  > eval j.deleteSlotValue("input")
+  > eval j.removeSlotValue("input")
     # Returned 'null'
-  > eval j.deleteSlotValue("output")
+  > eval j.removeSlotValue("output")
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(agent)
     # Returned 'null'
   > eval j.getSlotValue("output")
     # Returned 'null'
   > eval j.setSlotValue("input", new java.util.Vector())
     # Returned '[]'
-  > eval println(j.getSlotValue("input"))
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
 []
     # Returned 'null'
-  > eval println(j)
+  > eval java.lang.System.out.println(j)
 ModifiedJava(agent,[])
     # Returned 'null'
   > eval j = $disco.getTaskClass("ModifiedJava").newInstance()
@@ -68,35 +68,35 @@ ModifiedJava(agent,[])
   > eval v2 = new java.util.Vector(); v2.add(2)
     # Returned 'true'
   > eval j.setSlotValue("input", v1)
-    # Returned '[1.0]'
-  > eval println(j.getSlotValue("input"))
-[1.0]
+    # Returned '[1]'
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
+[1]
     # Returned 'null'
   > eval j.setSlotValue("output", v2)
-    # Returned '[2.0]'
-  > eval println(j.getSlotValue("output"))
-[2.0]
+    # Returned '[2]'
+  > eval java.lang.System.out.println(j.getSlotValue("output"))
+[2]
     # Returned 'null'
-  > eval println(j)
-ModifiedJava(,[1.0],[2.0])
+  > eval java.lang.System.out.println(j)
+ModifiedJava(,[1],[2])
     # Returned 'null'
-  > eval j.deleteSlotValue("output")
+  > eval j.removeSlotValue("output")
     # Returned 'null'
-  > eval println(j)
-ModifiedJava(,[1.0])
+  > eval java.lang.System.out.println(j)
+ModifiedJava(,[1])
     # Returned 'null'
   > eval j.setSlotValue("output", v1)
-    # Returned '[1.0]'
-  > eval println(j)
-ModifiedJava(,[1.0])
+    # Returned '[1]'
+  > eval java.lang.System.out.println(j)
+ModifiedJava(,[1])
     # Returned 'null'
   > eval j.getSlotValue("output").add(3)
     # Returned 'true'
-  > eval println(j)
-ModifiedJava(,[1.0, 3.0])
+  > eval java.lang.System.out.println(j)
+ModifiedJava(,[1, 3])
     # Returned 'null'
-  > eval println(j.getSlotValue("input"))
-[1.0, 3.0]
+  > eval java.lang.System.out.println(j.getSlotValue("input"))
+[1, 3]
     # Returned 'null'
   > quit
     

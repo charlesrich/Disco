@@ -3,37 +3,37 @@
   > load models/Test.xml
   > next false
   > task Default
-    User says "One of us should execute Default on 5.0."
+    User says "One of us should execute Default on 5."
   > history
 
-[Execute Default on 5.0] -accepted -live <-focus
-   User says "One of us should execute Default on 5.0."
+[Execute Default on 5] -accepted -live <-focus
+   User says "One of us should execute Default on 5."
 
   > eval $disco.getFocus().getGoal().setSlotValue("input1", 7)
-    # Returned '7.0'
+    # Returned '7'
   > history
 
-[Execute Default on 7.0] -accepted -live <-focus
-   User says "One of us should execute Default on 5.0."
+[Execute Default on 7] -accepted -live <-focus
+   User says "One of us should execute Default on 5."
 
   > next
-    Agent says "Who should execute Default on 7.0?"
+    Agent says "Who should execute Default on 7?"
   > clear
   > task Default
-    User says "One of us should execute Default on 5.0."
+    User says "One of us should execute Default on 5."
   > eval $disco.getFocus().getGoal().setSlotValue("input1", 7)
-    # Returned '7.0'
-  > eval $disco.getFocus().getGoal().deleteSlotValue("input1")
+    # Returned '7'
+  > eval $disco.getFocus().getGoal().removeSlotValue("input1")
     # Returned 'null'
   > history
 
-[Execute Default on 5.0] -accepted -live <-focus
-   User says "One of us should execute Default on 5.0."
+[Execute Default on 5] -accepted -live <-focus
+   User says "One of us should execute Default on 5."
 
   > eval $disco.getFocus().getGoal().setSlotValue("input2", 9)
-    # Returned '9.0'
+    # Returned '9'
   > next
-    Agent execute Default on 5.0 and 9.0.
+    Agent execute Default on 5 and 9.
     Agent says "Ok."
   > quit
     

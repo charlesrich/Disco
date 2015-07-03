@@ -81,7 +81,7 @@ public class Plan {
    private int repeatStep;
    
    /**
-    * Makes this plan the nth repeated step (maxOccurs > 1).
+    * Makes this plan the nth repeated step (maxOccurs &gt; 1).
     * Useful for procedural decompositions.  
     */
    public void setRepeatStep (int repeatStep) {
@@ -734,13 +734,13 @@ public class Plan {
       // remove all output values (including success and when)
       // do not know what input values to remove because no dependencies
       for (String name : goal.getType().outputNames) 
-         goal.deleteSlotValue(name);
+         goal.removeSlotValue(name);
       goal.engine.clearLiveAchieved();
    }
   
    public void unFail () {
       if ( isFailed() ) {
-         goal.deleteSlotValue("success");
+         goal.removeSlotValue("success");
          failed.clear();
          decomp.setFailed(false);
          if ( parent != null ) parent.unFail();
@@ -915,11 +915,11 @@ public class Plan {
    }   
 
    /**
-    * Use this method instead of {@link Task#deleteSlotValue(String)} as
+    * Use this method instead of {@link Task#removeSlotValue(String)} as
     * discussed in {@link #setSlotValue(String,Object)}
     */
-   public void deleteSlotValue (String name) {
-      goal.deleteSlotValue(name);
+   public void removeSlotValue (String name) {
+      goal.removeSlotValue(name);
       if ( decomp != null ) decomp.updateBindings(true, null, "this", name);
    }
      
