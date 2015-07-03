@@ -1,11 +1,11 @@
     # May 16, 2012 10:20:24 PM - TaskEngine 1.2.1 / Disco 1.4.3
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
-  > eval $disco.addTop($disco.getTaskClass("A").newInstance())
+  > instance A
+  > eval $disco.addTop($instance)
     # Returned '[A]'
-  > 
-  > 
-  > eval $disco.addTop($disco.getTaskClass("IntA").newInstance())
+  > instance IntA
+  > eval $disco.addTop($instance)
     # Returned '[IntA]'
   > next
     Agent says "Should we achieve A?"

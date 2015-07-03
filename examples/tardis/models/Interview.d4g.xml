@@ -166,7 +166,7 @@
  </agent>
 
   <t:task id="ShakeHands">
-    <t:script> println("[Agent and User Shake Hands now]"); </t:script>
+    <t:script> java.lang.System.out.println("[Agent and User Shake Hands now]"); </t:script>
   </t:task>
 
 </model>

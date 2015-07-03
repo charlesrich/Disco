@@ -10,31 +10,31 @@ CE> done B / "x" / 1 / "y" / true
 CE> status
 
 [Achieve A on a number and x producing a number and y by BC] -live <-focus
-   [b: User execute B on x producing 1.0 and y] -succeeded
-   [c: Execute C on a number and 1.0] -live
+   [b: User execute B on x producing 1 and y] -succeeded
+   [c: Execute C on a number and 1] -live
 
 CE> done C / 2 / 1 / 3
-    Completed achieve A on 2.0 and x producing 3.0 and y.
+    Completed achieve A on 2 and x producing 3 and y.
 CE> status
 
-[Achieve A on 2.0 and x producing 3.0 and y by BC] -done
-   [b: User execute B on x producing 1.0 and y] -succeeded
-   [c: User execute C on 2.0 and 1.0 producing 3.0] -done
+[Achieve A on 2 and x producing 3 and y by BC] -done
+   [b: User execute B on x producing 1 and y] -succeeded
+   [c: User execute C on 2 and 1 producing 3] -done
 
 CE> task A
     Let's start to achieve A.
 CE> done B / "x" / 1 / "y"
     Ok.
 CE> done C / 2 / 1 / 3 / false
-    Failed achieve A on 2.0 and x producing 3.0 and y.
+    Failed achieve A on 2 and x producing 3 and y.
 CE> status
 
-[Achieve A on 2.0 and x producing 3.0 and y by BC] -done
-   [b: User execute B on x producing 1.0 and y] -succeeded
-   [c: User execute C on 2.0 and 1.0 producing 3.0] -done
-[Achieve A on 2.0 and x producing 3.0 and y by BC] -failed
-   [b: User execute B on x producing 1.0 and y] -done
-   [c: User execute C on 2.0 and 1.0 producing 3.0] -failed
+[Achieve A on 2 and x producing 3 and y by BC] -done
+   [b: User execute B on x producing 1 and y] -succeeded
+   [c: User execute C on 2 and 1 producing 3] -done
+[Achieve A on 2 and x producing 3 and y by BC] -failed
+   [b: User execute B on x producing 1 and y] -done
+   [c: User execute C on 2 and 1 producing 3] -failed
 
 CE> quit
     Goodbye.

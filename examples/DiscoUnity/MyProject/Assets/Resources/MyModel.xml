@@ -45,8 +45,8 @@
    <task id="GoTo">
       <input name="destination" type="Destination"/>
       <postcondition sufficient="true">
-        at($this.destination.entity)
-      </postcondition>
+       at($this.destination.entity)
+    </postcondition>
       <subtasks id="goto">
          <step name="set" task="SetDestination"/>
          <step name="arrived" task="Wait"/>
@@ -82,7 +82,8 @@
     function setDestination (destination) { // called from Unity thread
        // example of debug printout
        // note that toString below should not be needed, but is due to Jint
-       Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       //Debug.Log("Setting NPC destination to: "+destination.toString()); 
+       java.lang.System.out.println("Setting NPC destination to: "+destination); 
        My.Game.NPC.destination = destination.entity.gameObject.transform;
     }
 

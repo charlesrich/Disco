@@ -30,12 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.6";
-   
-   // DESIGN NOTE: There may be multiple instances of TaskEngine, but they
-   //              must all have the same type of ScriptEngine
-   
-   static boolean SCRIPTABLE, INVOCABLE, COMPILABLE;
+   public static String VERSION = "1.7";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
@@ -43,9 +38,6 @@ public class TaskEngine {
    
    // for synchronization in Task.done(); overridden by Disco
    protected Object synchronizer = new Object(); 
-
-   // better to detect Javascript typos when interpreted than failed compilation
-   public static boolean isCompilable () { return COMPILABLE && !DEBUG; }
    
    private String platform, deviceType;
    
@@ -75,32 +67,19 @@ public class TaskEngine {
    
    public TaskEngine () {
       ENGINE = this;
-      ScriptEngineManager mgr = new ScriptEngineManager();
-      ScriptEngine rhino = mgr.getEngineByName("ECMAScript");
-      if ( rhino != null ) scriptEngine = new RhinoScriptEngine(rhino);
-      else if ( JintScriptEngine.EXISTS ) { 
-         // for Mono need to instantiate Jint engine manually
-         scriptEngine = new JintScriptEngine();
-         scriptEngine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
-      } else throw new IllegalStateException("No ECMAScript engine found!");
-      // check implementation-dependent properties of script engine
-      COMPILABLE = scriptEngine instanceof Compilable;
-      INVOCABLE = scriptEngine instanceof Invocable;
-      SCRIPTABLE = scriptEngine.isScriptable();
+      scriptEngine = ScriptEngineWrapper.getScriptEngine();
       try { loadDefaultProperties(); }
       catch (IOException e) { throw new RuntimeException(e); }
       defaultProperties();
-      if ( COMPILABLE && Task.compiledEquals != null ) {
-         Task.compiledEquals = compile(Task.equals, "compiledEquals");
-         Task.compiledHashCode = compile(Task.hashCode, "compiledHashCode");
+      if ( Task.compiledCloneThis != null ) {
          Task.compiledCloneThis = compile(Task.cloneThis, "compiledCloneThis");
          Task.compiledCloneSlot = compile(Task.cloneSlot, "compiledCloneSlot");
       }
       rootClass = new TaskClass(this, "**ROOT*"); // after scriptEngine initialized	
       try { 
          // load functions used in equals and hashCode into global scope
-         eval(TaskEngine.class.getResourceAsStream("default.js"), "default.js");
-         // note JSON is included in Rhino for JDK 1.7
+         scriptEngine.eval(
+               Utils.toString(TaskEngine.class.getResourceAsStream("default.js")));
       } catch (Exception e) { getErr().println(e); }
       clear();  // after default.js loaded
    }
@@ -121,21 +100,19 @@ public class TaskEngine {
       scriptEngine.put(object, field, value);
    }
 
-   /**
-    * Delete the field of given Javascript object.
-    */
-   public void delete (Object object, String field) {
-      scriptEngine.delete(object, field);
+   public boolean isDefined (Object object, String field) { 
+      return scriptEngine.isDefined(object, field); 
    }
    
-   boolean isScriptable () { return scriptEngine.isScriptable(); }
+   /**
+    * Remove the field of given Javascript object.
+    */
+   public void remove (Object object, String field) {
+      scriptEngine.remove(object, field);
+   }
    
    boolean isScriptable (Object value) { return scriptEngine.isScriptable(value); }
-
-   boolean isDefined (Object value) { return scriptEngine.isDefined(value); }
-   
-   Object undefined () { return scriptEngine.undefined(); }
-   
+ 
    // for extensions
 
    protected void loadDefaultProperties () throws IOException {
@@ -163,17 +140,12 @@ public class TaskEngine {
       }
       if ( value == null || value instanceof Number || value instanceof String ) 
          return value+"";
-      if ( INVOCABLE && SCRIPTABLE ) 
-         try {
-            return scriptEngine.isScriptable(value) ?
-               (String) scriptEngine.invokeFunction("edu_wpi_cetask_toString", value) :
+      try {
+         return scriptEngine.isScriptable(value) ?
+            (String) scriptEngine.invokeFunction("edu_wpi_cetask_toString", value) :
                value+"";
-         } catch (ScriptException e) { throw new RuntimeException(e); }         
-           catch (NoSuchMethodException e) { throw new RuntimeException(e); }
-      // do it the slow way
-      Bindings bindings = new SimpleBindings();
-      bindings.put("$$value", value);
-      return (String) eval("$$value+''", bindings, "toString");
+      } catch (ScriptException e) { throw new RuntimeException(e); }         
+        catch (NoSuchMethodException e) { throw new RuntimeException(e); }
    }
 
    private long tick = 0;
@@ -210,13 +182,14 @@ public class TaskEngine {
    
    public Task getLastOccurrence () { return last; }
    
-   /* DESIGN NOTE: We are using the GLOBAL_SCOPE here because the 'bindings'
-    * arguments temporarily rebind the ENGINE_SCOPE with the instance information.
+   /**
+    * Evaluate in using default (global) context (not in any task instance)
     */
-   
    public Object eval (String script, String where) {
-      return eval(script, scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE), 
-                 where);
+      try { return scriptEngine.eval(script); }
+      catch (ScriptException e) {
+         if ( DEBUG ) getErr().println(script);
+         throw newRuntimeException(e, where); } 
    }
 
    public Object eval (String script, Bindings bindings, String where) {
@@ -235,8 +208,10 @@ public class TaskEngine {
    }
 
    Boolean evalBoolean (String script, String where) {
-      return evalBoolean(script, scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE), 
-                         where);
+      if ( script == null || script.length() == 0 ) return null;
+      try { return (Boolean) scriptEngine.eval(script); }
+      catch (ScriptException e) { throw newRuntimeException(e, where); } 
+      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
    Boolean evalBoolean (String script, Bindings bindings, String where) {
@@ -252,8 +227,10 @@ public class TaskEngine {
       catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
-   public void importPackage (String pkg) {
-      eval("importPackage("+pkg+")", "importPackage");
+   Long evalLong (String script, Bindings bindings, String where) {
+      try { return scriptEngine.evalLong(script, bindings); } 
+      catch (ScriptException e) { throw newRuntimeException(e, where); } 
+      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
    public void setGlobal (String variable, Object value) {
@@ -277,7 +254,7 @@ public class TaskEngine {
    }
    
    public Compiled compile (String script, String where) {
-      if ( !COMPILABLE || script.length() == 0 ) return null;
+      if ( script.length() == 0 ) return null;
       try { return scriptEngine.compile(script); } 
       catch (ScriptException e) { 
          getErr().println("WARNING: Javascript syntax error in "+where               +"\n"+e);
@@ -286,13 +263,10 @@ public class TaskEngine {
       }
    }
   
-   public Object newObject () {
-      try {
-         return TaskEngine.INVOCABLE ? 
-            scriptEngine.invokeFunction("edu_wpi_cetask_newObject") : 
-               eval("new Object()", "newObject");
-      } catch (RuntimeException e) { throw e; }
-        catch (Exception e) { throw new RuntimeException(e); }
+   public Object newObject () { 
+      try { return scriptEngine.invokeFunction("Object"); }
+      // should never have exception
+      catch (Exception e) { throw new IllegalStateException(e); }
    }
    
    final Map<String,TaskModel> models = new HashMap<String,TaskModel>(); 
@@ -401,7 +375,7 @@ public class TaskEngine {
    
    /**
     * Load, parse, validate and return task model from specified XML document.  Loads the
-    * first toplevel <taskModel> element. Validation errors written to error output.
+    * first toplevel &lt;taskModel&gt; element. Validation errors written to error output.
     * Also loads associated properties file(s), if they exist.
     * 
     * <em>NB:</em> This implementation does not support forward or circular 
@@ -625,9 +599,8 @@ public class TaskEngine {
     * Return the unique task class, if any, in currently loaded task models
     * which is identified by given id.
     *  
-    * @param id
     * @return task class or null if none
-    * @throws AmbiguousIdException
+    * @throws AmbiguousIdException if id in more than one model
     * @throws IllegalArgumentException if id is a decomposition class
     */
    public TaskClass getTaskClass (String id) {
@@ -640,9 +613,8 @@ public class TaskEngine {
     * Return the unique decomposition class, if any, in currently loaded task models
     * which is identified by given id.
     *  
-    * @param id
     * @return decomposition class or null if none
-    * @throws AmbiguousIdException
+    * @throws AmbiguousIdException if id in more than one model
     */
    public DecompositionClass getDecompositionClass (String id) {
       TaskModel.Member member = getMember(id);
@@ -698,26 +670,16 @@ public class TaskEngine {
    }
    
    private void copySlotValue (Task from, Task to, String name) {
-      if ( SCRIPTABLE ) {
-         Object value = scriptEngine.get(from.bindings.get("$this"), name);
-         if ( isDefined(value) ) {
-            Object javaValue = from.getSlotValue(name);
-            if ( javaValue instanceof Task ) {
-               to.setSlotValue(name, copy((Task) javaValue));
-            } else scriptEngine.put(to.bindings.get("$this"), name, value);
-         }
-      } else {
-         if ( from.isDefinedSlot(name) ) {
-            Object value = from.getSlotValue(name);
-            if ( value instanceof Task ) 
-               to.setSlotValue(name, copy((Task) value));
-            else
-               to.setSlotValueScript(name, "$this."+name, "copySlotValue", 
-                     from.bindings);
-         } 
+      Object object = from.bindings.get("$this");
+      if ( isDefined(object, name) ) {
+         Object javaValue = from.getSlotValue(name);
+         if ( javaValue instanceof Task ) {
+            to.setSlotValue(name, copy((Task) javaValue));
+         } else 
+            scriptEngine.put(to.bindings.get("$this"), name, scriptEngine.get(object, name));
       }
    }
-   
+
    // for extension
    public String getExternalName () { return "user"; }
    public String getSystemName () { return "system"; } 
@@ -989,7 +951,7 @@ public class TaskEngine {
     * Shift focus to the given plan or null.
     * 
     * @return true iff this is an "unexpected focus shift" in the sense of Lesh,
-    *         Rich & Sidner's UM'01 paper, i.e., we are leaving the current
+    *         Rich and Sidner's UM'01 paper, i.e., we are leaving the current
     *         focus when it is started but not done.
     *         
     * @see #getFocus()        

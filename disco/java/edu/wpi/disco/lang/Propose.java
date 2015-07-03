@@ -457,7 +457,7 @@ public interface Propose {
                // note there is currently no way to remember rejection of a value
                if ( isDefinedSlot("value") ) {
                   if ( nested.isDefinedSlot(slot) && nested.getSlotValue(slot).equals(getValue()) )
-                     nested.deleteSlotValue(slot);
+                     nested.removeSlotValue(slot);
                } else // set given undefined optional slot to null
                   setOptional(nested, (Input) nested.getType().getSlot(slot)); 
             } else if ( !isDefinedSlot("value") ) {

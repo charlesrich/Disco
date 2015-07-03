@@ -37,7 +37,7 @@
         </jar>
         <delete dir="${env.TMPDIR}/disco-api"/>
         <javadoc destdir="${env.TMPDIR}/disco-api"
-            access="protected" additionalparam="-J-Xmx256m " 
+            access="protected" additionalparam="-J-Xmx256m -Xdoclint:all,-missing" 
             author="true" 
             classpath="../task/speech/en_us.jar:../task/speech/cmulex.jar:../task/speech/freetts.jar:../task/lib/js.jar:../task/class:../task/speech/cmu_us_kal.jar:../task/speech/jsapi.jar:../task/lib/msv-rng.jar:../task/speech/tags.jar:../task/speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar:../task/speech/sphinx4.jar:../task/lib/mono/Jint.jar" 
             doctitle="DISCO - Collaborative Discourse Manager" 

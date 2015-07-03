@@ -37,7 +37,7 @@ public abstract class InteractableObject extends EmbodiedObject {
 	}
 
 	/**
-	 * @return <code>true</code> iff we should display a menu listing the actions from {@link getActions()}
+	 * @return <code>true</code> iff we should display a menu listing the actions from {@link #getActions()}
 	 */
 	public boolean shouldShowActions () {
 		return showMenu;

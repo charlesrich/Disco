@@ -1,0 +1,17 @@
+#!/bin/bash
+# 
+# Usage: validate <filename> <schema>
+# 
+# Check the given XML file against the given schema URI.
+dir="`pwd`"
+cd "`dirname $0`/.."
+file="$1"
+if [[ $file != /* ]]; then file="$dir/$1"; fi
+case `uname -s` in
+CYGWIN* ) 
+    java -cp "$(cygpath -w lib/disco.jar)" 'edu.wpi.disco.Disco$Validate' "$(cygpath -w "$file")" "$2"
+    ;;
+  *)
+    java -cp "lib/disco.jar" 'edu.wpi.disco.Disco$Validate' "$file" "$2"
+    ;;
+esac

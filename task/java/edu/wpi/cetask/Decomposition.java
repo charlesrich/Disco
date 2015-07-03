@@ -132,11 +132,11 @@ public class Decomposition extends Instance {
       if ( goal == null )
          throw new IllegalStateException("Decomposition already retracted");
       for (String name : goal.getType().outputNames)
-         goal.deleteSlotValue(name);
+         goal.removeSlotValue(name);
       goal = null;
       synchronized (bindings) { 
-         bindings.put("$this", null); 
-         bindings.put("$plan", null); 
+         bindings.remove("$this"); 
+         bindings.remove("$plan"); 
       }
    }
    
@@ -275,8 +275,8 @@ public class Decomposition extends Instance {
       }
       
       @Override
-      public void deleteSlotValue (String name) {
-         super.deleteSlotValue(name);
+      public void removeSlotValue (String name) {
+         super.removeSlotValue(name);
          updateBindings(this.name, name);
       }
       

@@ -27,13 +27,14 @@ abstract class Instance {
          throw new IllegalArgumentException("Type of instance cannot be null");
       this.type = type;
       this.engine = engine;
+      bindings = engine.getScriptEngine().createBindings();
       // $id and $model are future extensions to standard
       bindings.put("$id", type.getId());
       bindings.put("$model", type.getNamespace());
    }
    
    // store slot values in JavaScript form
-   protected final Bindings bindings = new SimpleBindings();
+   protected final Bindings bindings;
    
    public Object eval (String expression, String where) {
       return eval(expression, bindings, where);
@@ -52,7 +53,7 @@ abstract class Instance {
    public void eval (String expression, Object value, String where) {
       synchronized (bindings) {
          try {
-            bindings.put("$$value", value); // convert to JavaScript value
+            bindings.put("$$value", value); 
             eval(expression, bindings, where);
          } finally { bindings.remove("$$value"); }
       }

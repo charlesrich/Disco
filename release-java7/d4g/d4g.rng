@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="http://www.cs.wpi.edu/~rich/d4g" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <!-- unfortunately, this requires a file reference -->
+  <include href="cea-2018-ext.rng">
+    <start>
+      <element name="model">
+        <attribute name="about">
+          <data type="anyURI"/>
+        </attribute>
+        <zeroOrMore>
+          <ref name="Description"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <!-- adding Top and Do -->
+          <choice>
+            <ref name="Task"/>
+            <ref name="Subtasks"/>
+            <ref name="Script"/>
+            <ref name="Top"/>
+            <ref name="Do"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </start>
+  </include>
+  <define name="Top">
+    <choice>
+      <element name="say">
+        <optional>
+          <attribute name="actor">
+            <data type="NCName"/>
+          </attribute>
+        </optional>
+        <ref name="TopBody"/>
+      </element>
+      <element name="agent">
+        <ref name="TopBody"/>
+      </element>
+      <element name="user">
+        <ref name="TopBody"/>
+      </element>
+    </choice>
+  </define>
+  <define name="TopBody">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="precondition"/>
+    </optional>
+    <ref name="SayAttributes"/>
+    <ref name="Choices"/>
+  </define>
+  <define name="Say">
+    <element name="say">
+      <optional>
+        <attribute name="actor">
+          <data type="NCName"/>
+        </attribute>
+      </optional>
+      <ref name="SayBody"/>
+    </element>
+  </define>
+  <define name="Do">
+    <element name="do">
+      <optional>
+        <attribute name="id">
+          <data type="ID"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="actor">
+          <data type="NCName"/>
+        </attribute>
+      </optional>
+      <attribute name="task">
+        <data type="QName"/>
+      </attribute>
+      <optional>
+        <attribute name="minOccurs">
+          <data type="nonNegativeInteger"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="maxOccurs">
+          <choice>
+            <data type="positiveInteger"/>
+            <value>unbounded</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="applicable"/>
+      </optional>
+      <ref name="Choices"/>
+    </element>
+  </define>
+  <define name="Choices">
+    <zeroOrMore>
+      <choice>
+        <ref name="Do"/>
+        <ref name="Say"/>
+        <ref name="User"/>
+        <ref name="Agent"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="SayAttributes">
+    <choice>
+      <attribute name="ref">
+        <data type="NCName"/>
+      </attribute>
+      <group>
+        <attribute name="text"/>
+        <optional>
+          <attribute name="eval"/>
+        </optional>
+        <choice>
+          <optional>
+            <attribute name="alt"/>
+          </optional>
+          <group>
+            <attribute name="alt"/>
+            <optional>
+              <attribute name="alt2"/>
+            </optional>
+          </group>
+        </choice>
+      </group>
+    </choice>
+  </define>
+  <define name="User">
+    <element name="user">
+      <ref name="SayBody"/>
+    </element>
+  </define>
+  <define name="Agent">
+    <element name="agent">
+      <ref name="SayBody"/>
+    </element>
+  </define>
+  <define name="SayBody">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="applicable"/>
+    </optional>
+    <ref name="SayAttributes"/>
+    <ref name="Choices"/>
+  </define>
+</grammar>

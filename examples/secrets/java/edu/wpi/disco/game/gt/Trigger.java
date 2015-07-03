@@ -12,7 +12,7 @@ import java.util.*;
 
 /**
  * A generic invisible trigger object. On creation the trigger is inactive and
- * must be enabled by calling {@link activate()}
+ * must be enabled by calling {@link #activate()}
  */
 public abstract class Trigger extends InteractableObject {
 	/** Name of action to display. Subclasses should supply value. */

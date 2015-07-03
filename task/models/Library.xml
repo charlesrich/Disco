@@ -76,7 +76,7 @@
 
   <task id="CheckOut">
     <input name="book" type="Book"/>
-    <script> println("["+$this.book.title+" checked out!]"); </script>
+    <script> java.lang.System.out.println("["+$this.book.title+" checked out!]"); </script>
   </task>
 
   <script init="true">

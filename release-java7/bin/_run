@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Usage: _run <main> <filename> <cp1> <cp2> ...
+#
+# Helper to run the given script file using given main class and added classpath elements
+# to compare resulting temporary log with corresponding test log file <filename>.test, 
+# if it exists. 
+#
+# Note that if <filename> does not exist, but <filename>.test does exist, then <filename> is
+# automatically generated in the tmp directory using grep and prompt "  >" (disco only).
+#
+# Note this runs headless by default (to avoid grabbing focus for test case). 
+# Applications that use this script and require a window should use
+# System.setProperty("java.awt.headless", "false").
+#
+start=`date +%s`
+dir="`dirname $0`/.."
+main="$1"
+filename="$2"
+shift 2
+cp="$CLASSPATH"
+tmp=/tmp
+uname=`uname -s`
+for arg in "$@"
+  do
+    if [ "$cp" ]; then cp="$cp:"; fi
+    if [[ $arg = /* ]]; then
+      cp="$cp$arg"
+    else
+      cp="$cp$dir/$arg"
+    fi
+  done
+if [[ $uname == CYGWIN* ]]; then 
+  cp="$(cygpath -wp "$cp")"
+  tmp="$(cygpath -w "$tmp")"
+fi
+if [ "$filename" ]; then
+  good="$filename.test"
+  base=`basename "$filename"`
+  arg="$tmp/$base"
+  if [ -f "$good" ]; then
+     if [ -f "$filename" ]; then
+       cp -f "$filename" "$arg"
+     else 
+       grep "  >" "$good" > "$arg"
+     fi
+  else arg="$filename"; fi
+  java -Xms128m -Xmx512m -Djava.awt.headless=true -Djava.io.tmpdir="$tmp" -cp "$cp" "$main" "$arg"
+else
+  java -Xms128m -Xmx512m -Djava.awt.headless=true -Djava.io.tmpdir="$tmp" -cp "$cp" "$main"
+fi
+end=`date +%s`
+if [ "$filename" ]; then
+  # keep all test cases in Unix lines
+  if [[ $uname == CYGWIN* ]]; then dos2unix -q "$arg.test"; fi
+  if [ -f "$good" ]; then 
+    # ignore comments and blank lines (Unix and Windows)
+    diff -qBI "^.$\|\#" --strip-trailing-cr "$arg.test" "$good"
+    diff=$?
+    if [ $diff = 0 ]; then echo "Succeed" $base "("`expr $end - $start` "sec)" ; fi
+    exit $diff
+  fi
+fi

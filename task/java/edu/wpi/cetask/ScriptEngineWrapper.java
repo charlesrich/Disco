@@ -7,58 +7,56 @@ package edu.wpi.cetask;
 
 import java.io.Reader;
 import javax.script.*;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 // wrapper for script engine used in TaskEngine 
 // a complete implementation of ScriptEngine is not required
 
-abstract class ScriptEngineWrapper extends AbstractScriptEngine {
-
-   // these two methods added to handle type coercion from Jint
-   public abstract Boolean evalBoolean (String script, Bindings bindings) 
-                   throws ScriptException;
+public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    
-   public abstract Double evalDouble (String script, Bindings bindings) 
-                   throws ScriptException;
-   
-   boolean isScriptable () { return false; }
-   boolean isScriptable (Object value) { return false; }
-   
-   // following four methods only used for scriptable engines
-   
-   boolean isDefined (Object value) { 
-      throw new RuntimeException("Unimplemented"); 
+   public static ScriptEngineWrapper getScriptEngine () {
+      ScriptEngineManager mgr = new ScriptEngineManager();
+      for (ScriptEngineFactory factory : mgr.getEngineFactories()) 
+         if ( factory.getNames().contains("ECMAScript") 
+        		 && factory instanceof NashornScriptEngineFactory ) {
+             ScriptEngine engine = ((NashornScriptEngineFactory) factory).getScriptEngine(NashornScriptEngine.OPTIONS);
+             engine.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+        	 return new NashornScriptEngine(engine);
+         }
+      if ( JintScriptEngine.EXISTS ) { 
+    	  ScriptEngineWrapper wrapper = new JintScriptEngine();
+    	  wrapper.setBindings(mgr.getBindings(), ScriptContext.GLOBAL_SCOPE);
+    	  return wrapper;
+      }
+      throw new IllegalStateException("No recognized JavaScript engine found!"); 
    }
    
-   Object undefined () { throw new RuntimeException("Unimplemented");  }
+   // these three methods added to handle type coercion from Jint
    
-   Object get (Object object, String field) {
-      throw new RuntimeException("Unimplemented"); 
-   }
-   
-   void put (Object object, String field, Object value) { 
-      throw new RuntimeException("Unimplemented"); 
-   }
-    
-   void delete (Object object, String field) { 
-      throw new RuntimeException("Unimplemented"); 
-   }
-   
-   @SuppressWarnings("unused")
-   public Object invokeMethod (Object thiz, String name, Object... args) 
-         throws ScriptException, NoSuchMethodException {
-      throw new RuntimeException("Unimplemented");
+   public Boolean evalBoolean (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Boolean) eval(script, bindings);
    }
 
-   @SuppressWarnings("unused")
-   public Object invokeFunction (String name, Object... args) 
-         throws ScriptException, NoSuchMethodException {
-      throw new RuntimeException("Unimplemented");
-   }
-   
-   public Compiled compile (String script) throws ScriptException {
-      throw new ScriptException("Unimplemented"); 
+   public Double evalDouble (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Double) eval(script, bindings);
    }
 
+   public Long evalLong (String script, Bindings bindings) 
+                  throws ScriptException {
+      return (Long) eval(script, bindings);
+   }
+ 
+   abstract boolean isScriptable (Object value);
+   abstract boolean isDefined (Object object, String field); 
+   abstract Object get (Object object, String field); 
+   abstract void put (Object object, String field, Object value); 
+   abstract void remove (Object object, String field); 
+   abstract public Object invokeFunction (String name, Object... args) 
+         throws ScriptException, NoSuchMethodException;
+   abstract public Compiled compile (String script) throws ScriptException;
+   
    protected abstract class Compiled extends CompiledScript {
 
       // this method added to handle type coercion from Jint
@@ -66,53 +64,95 @@ abstract class ScriptEngineWrapper extends AbstractScriptEngine {
 
       @Override
       public ScriptEngine getEngine () { return ScriptEngineWrapper.this; }
-
-      @Override
-      @Deprecated
-      public Object eval (ScriptContext context) {
-         throw new RuntimeException("Unimplemented");
-      }
    }
   
+   protected abstract static class JSR_223 extends ScriptEngineWrapper {
+      
+      protected final ScriptEngine jsr;
+      
+      protected JSR_223 (ScriptEngine jsr) {
+         this.jsr = jsr;
+      }
+
+      @Override
+      public Bindings createBindings () {
+        return jsr.createBindings();
+      }
+      
+      @Override
+      boolean isScriptable (Object value) { return true; }
+   
+      @Override
+      public Bindings getBindings (int scope) { return jsr.getBindings(scope); }
+
+      @Override
+      public ScriptContext getContext () { return jsr.getContext(); }
+
+      @Override
+      public void setContext (ScriptContext context) { jsr.setContext(context); }
+
+      @Override
+      public Object eval (String script, ScriptContext context) throws ScriptException {
+         return jsr.eval(script, context);
+      }
+
+      @Override
+      public Object eval (String script) throws ScriptException {
+         return jsr.eval(script);
+      }
+      
+      @Override
+      public Compiled compile (String script) throws ScriptException {
+         return new CompiledJRS_223((Compilable) jsr, script);
+      }
+   }
+   
+   protected class CompiledJRS_223 extends Compiled {
+
+      private final CompiledScript compiled;
+
+      public CompiledJRS_223 (Compilable jsr, String script) throws ScriptException {
+         compiled = jsr.compile(script);
+      }
+
+      @Override
+      public Object eval (ScriptContext context) throws ScriptException {
+         return compiled.eval(context);
+      }
+
+      @Override
+      public Boolean evalBoolean (Bindings bindings) throws ScriptException {
+         return (Boolean) eval(bindings);
+      }
+   }
+   
    // unused methods
 
    @Override
    @Deprecated
    public ScriptEngineFactory getFactory () {
-      throw new RuntimeException("Unimplemented");
-   }
-  
-   @Override
-   @Deprecated
-   public Object eval (String script, ScriptContext context) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Override
    @Deprecated
    public Object eval (Reader reader, ScriptContext context) {
-      throw new RuntimeException("Unimplemented");
-   }
-
-   @Override
-   @Deprecated
-   public Bindings createBindings () {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Deprecated
    public CompiledScript compile (Reader script) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
    
    @Deprecated
    public <T> T getInterface (Class<T> clasz) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
    @Deprecated
    public <T> T getInterface (Object thiz, Class<T> clasz) {
-      throw new RuntimeException("Unimplemented");
+      throw new UnsupportedOperationException("Unimplemented");
    }
 
 }
