@@ -34,8 +34,9 @@ theory as Collagen, this paper is a useful reference.
 
    HansonRich2010_AIIDE.pdf:
 
-P. Hanson and C. Rich. "A Modal Approach to Integrating Dialogue and
-Action." Submitted to AIIDE 2010.
+P. Hanson and C. Rich. "A modal approach to integrating dialogue and
+action." In AAAI Conference on Artificial Intelligence and Interactive Digital
+Entertainment, Palo Alto, CA, Oct. 2010.
 
 This paper describes Disco for Games (D4g), which is built on top
 of Disco, and describes some aspects of Disco along the way.
@@ -61,17 +62,17 @@ interpretation, especially as related to interruptions.
 
    LeshRichSidner1999_UM.pdf:
 
-N. Lesh, C. Rich, and C. Sidner. Using plan recognition in
-human-computer collaboration. In Proc. 7th Int. Conf. on User
+N. Lesh, C. Rich, and C. Sidner. "Using plan recognition in
+human-computer collaboration." In Proc. 7th Int. Conf. on User
 Modelling, pages 23–32, Banff, Canada, June 1999.
 
 This paper describes how the plan recognition algorithm builtin into
-CETask works.
+Disco works.
 
    Sidner1994_AAAI.pdf:
 
-C. Sidner. "An Artificial Discourse Language for Collaborative
-Negotiation." in Proceedings of the Twelfth National Conference on
+C. Sidner. "An artificial discourse language for collaborative
+negotiation." In Proceedings of the Twelfth National Conference on
 Artificial Intelligence, MIT Press, Cambridge, MA, Vol 1, pgs.
 814-819, 1994.
 
@@ -83,5 +84,32 @@ C. Rich and C. Sidner.  DiamondHelp: A generic collaborative task
 guidance system.  AI Magazine, 28(2), Summer 2007.
 
 This paper describes an menu-based dialogue application built using
-Collagen.   
+Collagen.
+
+   NooraeiRichSidner2014_ACHI.pdf:
+
+B. Nooraei, C. Rich and C. Sidner. "A real-time architecture for
+embodied conversational Agents: Beyond turn-taking." In 7th
+Int. Conf. on Advances in Computer-Human Interactions, Barcelona,
+Spain, May 23-27, 2014.
+
+This paper describes how Disco was integrated into a real-time
+architecture.
+
+    RickelEtAl2002_ITS.pdf:
+
+J. Rickel et al. "Collaborative discourse theory as a foundation for
+tutorial dialogue." In Proc. Sixth International Conference on
+Intelligent Tutoring Systems, pp. 542-551, Springer-Verlag, June 2002.
+
+    GroszSidner1986_CL.pdf:
+
+B. Grosz and C. Sidner. "Attention, intentions, and the structure of
+discourse." Computational Linguistics, Volume 12, Number 3, 1986.
+
+This is the primary reference paper for the theoretical foundations
+underlying Disco.
+
+
+
 
