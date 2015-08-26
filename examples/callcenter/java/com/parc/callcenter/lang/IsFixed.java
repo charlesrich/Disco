@@ -5,7 +5,9 @@ import edu.wpi.disco.Disco;
 import edu.wpi.disco.lang.*;
 
 public class IsFixed extends Utterance {
-   
+	 
+  // also see required task definition in models/CallCenter.d4g.xml
+
   public static TaskClass CLASS; // required
   
   // constructor for general use

@@ -1,0 +1,11 @@
+    # Aug 26, 2015 12:00:08 PM - TaskEngine 1.7 / Disco 1.11
+    Welcome to Disco! (Type 'help' for command list)
+    Agent says "Please hold for the next operator."
+  > load models/CallCenter.xml
+  > execute com.parc.callcenter.lang.IsFixed
+    Caller says "IsFixed."
+    Agent says "Ok."
+  > eval FIXED
+    # Returned 'true'
+  > quit
+    
