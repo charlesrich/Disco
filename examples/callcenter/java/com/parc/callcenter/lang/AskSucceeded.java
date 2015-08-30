@@ -6,12 +6,14 @@ import edu.wpi.disco.lang.*;
 
 public class AskSucceeded extends Ask.Nested {
    
+   // also see required task definition in models/CallCenter.d4g.xml
+	
    // all of this boiler plate with constructors is needed to fit in with
    // implementation scheme of the rest of the Propose/Ask utterance types
    
    // this is very similar to Ask.Should (will probably add an abstract
    //  class to capture shared code)
-   
+
    // TODO: need to provide a method to extend classification logic
    // in Propose.Should.newInstance() to coerce instances of
    // Propose.Should(Propose.Succeeded) into AskSucceeded.  This is a minor

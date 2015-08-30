@@ -51,4 +51,12 @@
    <task id="com.parc.callcenter.lang.AskSucceeded">
       <input name="goal" type="Packages.edu.wpi.cetask.Task"/>
    </task>
+   <task id="com.parc.callcenter.lang.IsFixed">
+      <script> FIXED = true </script>
+   </task>
+   <script init="true">
+  
+    var FIXED = false; // see IsFixed
+  
+  </script>
 </taskModel>
