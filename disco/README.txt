@@ -51,6 +51,13 @@ README file for the toplevel directory of Disco.
    .classpath   Eclipse (Kepler) configuration file 
    .project     Eclipse (Kepler) configuration file
 
+NB: This is pure Java software and is supported only in Java 8 (JRE
+1.8) which includes the Nashorn JavaScript (ECMAScript) engine. Due to
+a bug in early versions of Nashorn, this software requires Java
+Version 8u60 or higher.  It has been tested with Java SE 8u60 in the
+Windows x64, Mac OS X x64 and Linux x64 releases from Oracle
+(java.oracle.com). OpenJDK Java 8 releases are not available at time
+of this writing.
 
 RELEASE NOTES FOR DISCO 1.6 - Released June, 2012
 

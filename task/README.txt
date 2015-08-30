@@ -24,8 +24,13 @@ This is an implementation of a "task engine," as depicted in
 Figure 4 of the ANSI/CEA-2018 Task Model Description (CE TASK 1.0)
 standard, which may be purchased at http://ce.org/cea-2018.
 
-NB: This software requires JRE 1.7 (Java SE 7.0), which includes
-JavaScript.
+NB: This is pure Java software and is supported only in Java 8 (JRE
+1.8) which includes the Nashorn JavaScript (ECMAScript) engine. Due to
+a bug in early versions of Nashorn, this software requires Java
+Version 8u60 or higher.  It has been tested with Java SE 8u60 in the
+Windows x64, Mac OS X x64 and Linux x64 releases from Oracle
+(java.oracle.com). OpenJDK Java 8 releases are not available at time
+of this writing.
 
 Basically, this system implements a simple command line interface,
 edu.wpi.cetask.guide.Guide, which uses the task engine
