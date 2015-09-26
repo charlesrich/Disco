@@ -132,7 +132,7 @@ public class Say extends Utterance {
          if ( text != null ) {
             if ( frozen == null ) {
                text = (String) eval(text, "Say.Expression");
-               if ( occurred() ) frozen = text;
+               if ( isOccurred() ) frozen = text;
             } else text = frozen;
          }
          return text == null ? "..." : text; 
@@ -159,7 +159,7 @@ public class Say extends Utterance {
          @Override
          public boolean interpret (Plan contributes, boolean continuation) {
             boolean explained = super.interpret(contributes, continuation);
-            if ( occurred() ) eval(getEval(), "Say.Expression.Eval");
+            if ( isOccurred() ) eval(getEval(), "Say.Expression.Eval");
             return explained;
          }
       } 
@@ -187,7 +187,7 @@ public class Say extends Utterance {
       @Override
       public boolean interpret (Plan contributes, boolean continuation) {
          boolean explained = super.interpret(contributes, continuation);
-         if ( occurred() ) eval(getEval(), "Say.Eval");
+         if ( isOccurred() ) eval(getEval(), "Say.Eval");
          return explained;
       }
    }

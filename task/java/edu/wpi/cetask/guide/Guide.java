@@ -130,7 +130,7 @@ public class Guide extends Shell {
       Plan focus = getEngine().getFocus();
       Plan top;
       if ( focus != null ) {
-         if ( focus.isDone() && !focus.occurred() ) {
+         if ( focus.isDone() && !focus.isOccurred() ) {
             respond("completed@word", focus);
             return true;
          } else if ( focus.isFailed() ) {
@@ -277,7 +277,7 @@ public class Guide extends Shell {
             occurrence.copySlotValues(task);
       }
       if ( occurrence.isDefinedInputs() ) { 
-         Plan match = getEngine().done(occurrence);
+         Plan match = getEngine().occurred(occurrence);
          if ( match != null ) {
             if ( !completed() ) respond("ok@word");
             setFocus(match);

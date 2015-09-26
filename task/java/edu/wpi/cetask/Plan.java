@@ -297,7 +297,7 @@ public class Plan {
       }
    }
    
-   public boolean occurred () { return goal.occurred(); }
+   public boolean isOccurred () { return goal.isOccurred(); }
    
    /**
     * Tests whether plans which require this plan should become live.
@@ -307,7 +307,7 @@ public class Plan {
     * @see #isExhausted()
     */
    public boolean isDone () {
-      return ( occurred() || isSucceeded() || isComplete() ) && !isFailed();
+      return ( isOccurred() || isSucceeded() || isComplete() ) && !isFailed();
    }
    
    public boolean isFailed () {
@@ -353,7 +353,7 @@ public class Plan {
 
    // isLivePlan except for achieved
    private boolean isLiveAchieved () {
-      return !occurred() && !Utils.isFalse(goal.getShould()) 
+      return !isOccurred() && !Utils.isFalse(goal.getShould()) 
          && !isPassed() && !isBlocked()
          && (isStarted() || !Utils.isFalse(isApplicable()))
          && !isFailed();
@@ -547,7 +547,7 @@ public class Plan {
     * starter {@link Task#isStarter(Plan)} for this plan.
     */
    public boolean isStarted () {
-      if ( started || occurred() ) return true;
+      if ( started || isOccurred() ) return true;
       for (Plan child : children)
          if ( child.goal.isStarter(this) && child.isStarted() ) return true;
       return false;
@@ -597,7 +597,7 @@ public class Plan {
    
    private boolean isMooted () {
       return parent != null && 
-        ( parent.occurred() || parent.isSucceeded() || parent.isMooted());
+        ( parent.isOccurred() || parent.isSucceeded() || parent.isMooted());
    }
    
    /**
@@ -607,7 +607,7 @@ public class Plan {
     */
    public boolean isExpected () {
       return contributes &&
-         !( occurred()  
+         !( isOccurred()  
             || goal.getSuccess() != null // already succeeded or failed
             // don't expect if sufficient postcondition currently true
             || isAchievedSufficient()

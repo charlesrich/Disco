@@ -30,13 +30,13 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.7";
+   public static String VERSION = "1.8";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
    // TODO  Allow single task model to be shared among instances of TaskEngine
    
-   // for synchronization in Task.done(); overridden by Disco
+   // for synchronization in Task.occurred(); overridden by Disco
    protected Object synchronizer = new Object(); 
    
    private String platform, deviceType;
@@ -846,14 +846,14 @@ public class TaskEngine {
     * 
     * @see Plan#execute()
     */
-   public Plan done (Task occurrence) {
+   public Plan occurred (Task occurrence) {
       // leave "success" undefined (see doc for Task.isDefinedOutputs)
-      return done(true, occurrence, null);
+      return occurred(true, occurrence, null);
    }
  
    // factorization of done below is to support extension in Disco
    
-   public Plan done (boolean external, Task occurrence, Plan contributes) { 
+   public Plan occurred (boolean external, Task occurrence, Plan contributes) { 
       occurrence.setExternal(external);
       // do explanation before evaluating scripts, since expectations are in
       // terms of state of world before execution
@@ -861,13 +861,13 @@ public class TaskEngine {
       // check for continuation before setWhen
       boolean continuation = contributes != null && contributes.isStarted();
       // sic evalIf, since overridden in Utterance
-      if ( external ) { occurrence.done(); occurrence.evalIf(contributes); } 
+      if ( external ) { occurrence.occurred(); occurrence.evalIf(contributes); } 
       else occurrence.execute(contributes);
-      done(occurrence, contributes, continuation);     
+      occurred(occurrence, contributes, continuation);     
       return contributes;
    }
 
-   protected Plan done (Task occurrence, Plan contributes, boolean continuation) {
+   protected Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
       interpret(occurrence, contributes, continuation);
       return contributes;
    }

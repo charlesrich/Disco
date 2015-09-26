@@ -711,7 +711,7 @@ public class DecompositionClass extends TaskModel.Member {
       private void update (Decomposition decomp, int depth, 
                            String retractedStep, String retractedSlot) {
          Task target = getTask(decomp, step); 
-         if ( target.occurred() ) return; // never update slot after occurrence
+         if ( target.isOccurred() ) return; // never update slot after occurrence
          if ( depth > MAX_BINDING_DEPTH )
             throw new IllegalStateException(where + " stopped at depth "+ depth
                   +" (probably circular bindings)");

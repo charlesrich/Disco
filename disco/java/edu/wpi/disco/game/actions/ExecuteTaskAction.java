@@ -46,7 +46,7 @@ public class ExecuteTaskAction extends Action {
 				task.setSlotValue(key, slotValues.get(key));
 			}
 		}
-		task.done(true);
+		task.occurred(true);
 		// execute script, if any 
 		Grounding script = task.getGrounding();
 		if ( script != null ) script.eval(task);
