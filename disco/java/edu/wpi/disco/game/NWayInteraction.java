@@ -186,7 +186,7 @@ public class NWayInteraction implements Runnable {
 						occurrence = disco.copy(occurrence);
 						contributes = null; // need to recognize in other engines
 					}
-					i.doneSilent(i.getExternal().equals(a), occurrence, contributes);
+					i.occurredSilent(i.getExternal().equals(a), occurrence, contributes);
 				} catch (IllegalArgumentException e) {} // ignore if no such task in that engine
 			}
 		}

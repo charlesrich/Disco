@@ -349,7 +349,7 @@ public class Task extends Instance {
       Postcondition condition = getType().getPostcondition();
       if ( condition == null ) return null;
       Boolean achieved;
-      if ( !getType().hasModifiedInputs() || !occurred() )
+      if ( !getType().hasModifiedInputs() || !isOccurred() )
          achieved = condition.evalCondition(this);
       else {
          if ( clonedInputs == null ) // not checking each modified inputs
@@ -455,7 +455,7 @@ public class Task extends Instance {
    /**
     * Test whether this task instance occurred.
     */
-   public boolean occurred () { return isDefinedSlot("when"); }
+   public boolean isOccurred () { return isDefinedSlot("when"); }
       
    /**
     * Get the value of the predefined 'success' slot 
@@ -727,7 +727,7 @@ public class Task extends Instance {
     * @see TaskEngine#done(Task)
     */
    void execute (Plan plan) {
-      done(false); // before script executed
+      occurred(false); // before script executed
       eval(plan);
    }
    
@@ -755,14 +755,16 @@ public class Task extends Instance {
       }
    }
    
-   public void done (boolean external) {
+   public void occurred (boolean external) {
       synchronized (engine.synchronizer) {
          setExternal(external); 
-         done();
+         occurred();
       }
    }
    
-   public void done () {
+   public void occurred () {
+	  if ( !isDefinedSlot("external") ) 
+		  throw new IllegalStateException("Occurrence must have external slot value "+this);
       modifiedOutputs();
       synchronized (engine.synchronizer) {
          setWhen(System.currentTimeMillis());

@@ -106,7 +106,7 @@ public class ComponentExample {
    }
    
    private void user (Task task, Plan contributes) {
-      interaction.done(true, task, contributes);
+      interaction.occurred(true, task, contributes);
    }
    
    private Task newInstance (String task) { 

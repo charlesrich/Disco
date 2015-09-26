@@ -40,7 +40,7 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.11";
+   public static String VERSION = "1.12";
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
@@ -359,8 +359,8 @@ public class Disco extends TaskEngine {
    }
    
    @Override
-   public Plan done (Task occurrence) { 
-      return interaction.doneSilent(true, occurrence, null);
+   public Plan occurred (Task occurrence) { 
+      return interaction.occurredSilent(true, occurrence, null);
    }
    
    /* *
@@ -368,7 +368,7 @@ public class Disco extends TaskEngine {
     * algorithm (but still not including decomposition choice interpolation).
     */
    @Override
-   public Plan done (Task occurrence, Plan contributes, boolean continuation) {
+   public Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
       Segment top = getSegment();
       if ( contributes == null && top.isInterruption() && top.getPlan().isExhausted() ) {
          // special case for automatically popping exhausted interruptions
@@ -846,7 +846,7 @@ public class Disco extends TaskEngine {
     * use in history.
     */
    public String toHistoryString (Task task) {
-      return task instanceof Utterance && task.occurred() ?
+      return task instanceof Utterance && task.isOccurred() ?
          task.format() : // already cached
          toHistoryString(task, null, false);
    }
@@ -883,7 +883,7 @@ public class Disco extends TaskEngine {
     *        rules with alternative choices or other properties that change.
     */
    public String formatUtterance (Utterance utterance, boolean capitalize, boolean endSentence, boolean freeze) {
-      String formatted = utterance.occurred() ? translate(utterance.formatTask(), utterance) 
+      String formatted = utterance.isOccurred() ? translate(utterance.formatTask(), utterance) 
                : translate(utterance);
       if ( capitalize || endSentence ) {
          StringBuilder buffer = new StringBuilder(formatted);
@@ -891,7 +891,7 @@ public class Disco extends TaskEngine {
          if ( endSentence ) Utils.endSentence(buffer);
          formatted = buffer.toString();
       }
-      if ( freeze || utterance.occurred() ) putUtterance(utterance, formatted);
+      if ( freeze || utterance.isOccurred() ) putUtterance(utterance, formatted);
       return formatted;
    }
    
@@ -921,7 +921,7 @@ public class Disco extends TaskEngine {
       // that don't need to quote |'s in Javascript
       return ((Disco) task.engine).getAlternative(format, // raw format string is key 
           evalFormat(task, format, where), 
-          task.occurred());   
+          task.isOccurred());   
    }
    
    private static final Pattern
@@ -1025,7 +1025,7 @@ public class Disco extends TaskEngine {
     
    @Override
    public String format (Task task) {
-      if ( task instanceof Utterance && task.occurred() ) {
+      if ( task instanceof Utterance && task.isOccurred() ) {
          // might be goal utterance
          String translated = utteranceFormat.get(task);
          return translated == null ? task.formatTask() : translated;

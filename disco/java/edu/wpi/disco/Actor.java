@@ -73,7 +73,7 @@ public abstract class Actor {
    
    /**
     * Thread-safe method to take a turn in given interaction. <em>Note:</em>
-    * Actor should call {@link Interaction#done(boolean,Task,Plan)} as each
+    * Actor should call {@link Interaction#occurred(boolean,Task,Plan)} as each
     * task in turn is executed.  
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)

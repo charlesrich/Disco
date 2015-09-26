@@ -117,7 +117,7 @@ public class DiscoComponent extends eu.semaine.components.Component {
           for (int i=0;i<answers.length;++i) {
              StringBuilder buffer = new StringBuilder();
              Utterance utterance = (Utterance)items.get(i).task;
-             formatted[i] = utterance.occurred() ? utterance.formatTask() :
+             formatted[i] = utterance.isOccurred() ? utterance.formatTask() :
                 console.getEngine().translate(utterance);
              buffer.append(Utils.capitalize(formatted[i]));
              Utils.endSentence(buffer);
@@ -212,8 +212,8 @@ public class DiscoComponent extends eu.semaine.components.Component {
 	   synchronized (nway){ // not needed? Since done and doneUtterance already synch'd on interaction
                 gui.disableAllButNot(choice);
                 Plugin.Item item = items.get(choice);
-                interview.getDisco().getInteraction().doneUtterance((Utterance) item.task, null, formatted[choice]);
-                interview.done(true, item.task, item.contributes);
+                interview.getDisco().getInteraction().occurredUtterance((Utterance) item.task, null, formatted[choice]);
+                interview.occurred(true, item.task, item.contributes);
             }
             
         }

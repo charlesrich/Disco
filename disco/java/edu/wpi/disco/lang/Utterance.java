@@ -69,7 +69,7 @@ public abstract class Utterance extends Decomposition.Step {
    @Override
    protected Boolean checkAchieved () {
       // postconditions for utterances, such as proposals, only relevant for goals
-      return occurred() ? null : super.checkAchieved();
+      return isOccurred() ? null : super.checkAchieved();
    }
 
    protected void reconcileStack (Plan contributes, boolean continuation) {
@@ -86,7 +86,7 @@ public abstract class Utterance extends Decomposition.Step {
    @Override
    public final String toString () {
       if ( TaskEngine.VERBOSE ) return toStringVerbose();
-      if ( !occurred() ) return toStringUtterance();
+      if ( !isOccurred() ) return toStringUtterance();
       String string = getDisco().getToString(this);
       if ( string != null ) return string;
       string = toStringUtterance();

@@ -56,7 +56,7 @@ public class Console extends Shell {
    /**
     * Thread-safe method for notifying console that task has occurred.
     */
-   public void done (Task occurrence) { 
+   public void occurred (Task occurrence) { 
       synchronized (interaction) { 
          // print out all occurrences in shell
          if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
@@ -250,7 +250,7 @@ public class Console extends Shell {
    public void task (String args) {
       Task should = processTaskIf(args, null, false);
       if ( should != null ) 
-         interaction.done(true, 
+         interaction.occurred(true, 
                Propose.Should.newInstance(getEngine(), true, should), null); 
    }
    
@@ -292,7 +292,7 @@ public class Console extends Shell {
                if ( line.length() == 0 ) { 
                   command = null; 
                   if (TTSay) 
-                     interaction.done(false, new TTSay(getEngine(), items, null), null);
+                     interaction.occurred(false, new TTSay(getEngine(), items, null), null);
                   break; 
                }
                if ( "quit".equals(line) ) throw new Quit();
@@ -300,7 +300,7 @@ public class Console extends Shell {
                   int choice = Integer.parseInt(line.trim());
                   interaction.choose(items, choice, formatted[choice-1]);
                   if (TTSay) 
-                     interaction.done(false, new TTSay(getEngine(), items, choice-1), null);
+                     interaction.occurred(false, new TTSay(getEngine(), items, choice-1), null);
                   break;
                } catch (NumberFormatException e) { println("Not a number!"); }
                  catch (IndexOutOfBoundsException e) { println("Number not in menu!"); }
@@ -350,7 +350,7 @@ public class Console extends Shell {
          if ( occurrence.isDefinedInputs() ) {
             boolean external = !Utils.isFalse(occurrence.getExternal());
             if ( !external ) command = null; // keep user turn
-            interaction.done(external, occurrence, null); 
+            interaction.occurred(external, occurrence, null); 
          } else warning("All input values must be defined--ignored.");
       }
       return occurrence;

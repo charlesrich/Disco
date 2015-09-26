@@ -258,34 +258,34 @@ public class Interaction extends Thread {
     * @param occurrence task that has occurred
     * @param contributes plan to which this task contributes, or null
     * 
-    * @see #doneUtterance(Utterance,Plan,String)
+    * @see #occurredUtterance(Utterance,Plan,String)
     */
-   public synchronized void done (boolean external, Task occurrence, Plan contributes) {
-      doneSilent(external, occurrence, contributes);
-      if ( console != null ) console.done(occurrence);
+   public synchronized void occurred (boolean external, Task occurrence, Plan contributes) {
+      occurredSilent(external, occurrence, contributes);
+      if ( console != null ) console.occurred(occurrence);
    }   
    
    /**
-    * Variant of {@link #done(boolean,Task,Plan)}, used in {@link
+    * Variant of {@link #occurred(boolean,Task,Plan)}, used in {@link
     * #choose(List,int,String)}, to notify interaction that given
     * utterance has occurred. Thread-safe.
     * 
     * @param formatted corresponding formatted string, or null
     */
-   public synchronized void doneUtterance (Utterance utterance, Plan contributes,
+   public synchronized void occurredUtterance (Utterance utterance, Plan contributes,
                                           String formatted) {
       disco.putUtterance(utterance, formatted);
-      done(true, utterance, contributes);
+      occurred(true, utterance, contributes);
    }
    
    /**
-    * Variant of {@link #done(boolean,Task,Plan)}, used in
+    * Variant of {@link #occurred(boolean,Task,Plan)}, used in
     * {@link edu.wpi.disco.game.NWayInteraction}, that does not print to
     * console. Thread-safe.
     */
-   public synchronized Plan doneSilent (boolean external, Task occurrence, Plan contributes) {
+   public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes) {
       responded = true;
-      return disco.done(external, occurrence, contributes);
+      return disco.occurred(external, occurrence, contributes);
    }
    
    /**
@@ -302,7 +302,7 @@ public class Interaction extends Thread {
       if ( i > 0 && i <= items.size() ) {
          Plugin.Item item = items.get(i-1);
          // make sure history shows same alternative as menu selection
-         doneUtterance((Utterance) item.task, item.contributes, formatted);
+         occurredUtterance((Utterance) item.task, item.contributes, formatted);
       } else throw new IndexOutOfBoundsException();
    }
    

@@ -145,11 +145,11 @@ public class Agent extends Actor {
             if ( ok ) item = newOk(disco);
             else return false;
          }
-         done(interaction, item, retry);
+         occurred(interaction, item, retry);
          if ( item.task instanceof Utterance) return true; // end of turn
       }
       // maximum number of non-utterances
-      if ( ok ) done(interaction, newOk(disco), retry);
+      if ( ok ) occurred(interaction, newOk(disco), retry);
       return true;
    }
    
@@ -196,9 +196,9 @@ public class Agent extends Actor {
     * 
     * @param retry try other decompositions if failure (see {@link #retry(Disco)})
     */
-   public void done (Interaction interaction, Plugin.Item item, boolean retry) { 
+   public void occurred (Interaction interaction, Plugin.Item item, boolean retry) { 
       synchronized (interaction) { // typically used in dialogue loop
-         interaction.done(this == interaction.getExternal(), 
+         interaction.occurred(this == interaction.getExternal(), 
                item.task, item.contributes);
          if ( item.task instanceof Utterance ) { // after occurred
             lastUtterance = (Utterance) item.task;
