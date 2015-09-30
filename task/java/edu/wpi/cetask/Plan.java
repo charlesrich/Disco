@@ -478,7 +478,7 @@ public class Plan {
     * Test whether any required plans in this plan or recursively through parent
     * are not done and therefore block this plan from becoming live.
     */
-   private boolean isBlocked () {
+   public boolean isBlocked () {
 	  return !isRequiredDone() || ( parent != null && parent.isBlocked() );
    }
    
