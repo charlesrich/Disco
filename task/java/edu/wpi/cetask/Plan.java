@@ -384,7 +384,7 @@ public class Plan {
    /**
     * Tests whether this plan is ready for execution based on its predecessors being done
     * and the precondition of the goal not being false.  Note that this does <em>not</em>
-    * imply that of its inputs are defined.
+    * imply that all of its inputs are defined.
     */
    public boolean isLive () {
       Boolean live = goal.engine.isLive(this); // check cached value
