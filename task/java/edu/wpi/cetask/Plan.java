@@ -344,22 +344,24 @@ public class Plan {
       return ( isOccurred() || isSucceeded() || isComplete() ) && !isFailed();
    }
 
-	/**
-	 * Tests whether the postcondition of the goal evaluated to false
-	 * immediately after execution of this plan was completed.
-	 */
-	public boolean isFailed () {
-		return Utils.isFalse(goal.getSuccess());
-	}
+   /**
+    * Tests whether the postcondition of the goal evaluated to false
+    * immediately after execution of this plan was completed.
+    */
+   public boolean isFailed () {
+	   return Utils.isFalse(goal.getSuccess());
+   }
 
-	/**
-	 * Tests whether the postcondition of the goal evaluated to true immediately
-	 * after execution of this plan was completed, or for sufficient
-	 * postconditions, while this plan was live.
-	 */
-	public boolean isSucceeded () {
-		return Utils.isTrue(goal.getSuccess());
-	}
+   /**
+    * Tests whether the postcondition of the goal evaluated to true immediately
+    * after execution of this plan was completed, or for sufficient
+    * postconditions, while this plan was live.  Note that for non-sufficient
+    * postconditions, the fact that the postcondition evaluated to true
+    * does not guarantee that the task "really" succeeded.
+    */
+   public boolean isSucceeded () {
+	   return Utils.isTrue(goal.getSuccess());
+   }
 
    public Boolean isApplicable () {
       synchronized (goal.bindings) {
