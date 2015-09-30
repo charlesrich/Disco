@@ -52,6 +52,23 @@ public class Plan {
       
    public final static String FOCUS_NOTE = "<-focus";
    
+   // mutually exclusive states
+   public enum Status { DONE, FAILED, LIVE, IN_PROGRESS, INAPPLICABLE, FUTURE }
+   
+   public Status getStatus () {
+	   return isDone() ? Status.DONE :
+		   isFailed() ? Status.FAILED :
+			   isLive() ? ( isStarted() ? Status.IN_PROGRESS : Status.LIVE ) :
+				   isNotBlocked() ? Status.INAPPLICABLE : Status.FUTURE;
+   }
+   
+   /**
+    * Returns true if all required plans (recursively through parent) are done.
+    */
+   private boolean isNotBlocked () {
+	  return !isBlocked() && ( parent == null || !parent.isNotBlocked() );
+   }
+   
    private boolean optionalStep;
    
    /**
@@ -424,7 +441,7 @@ public class Plan {
       return false;
    }
    
-   public boolean isBlocked () {
+   private boolean isBlocked () {
       for (Plan plan : required)
          if ( !isRepeatStep() && plan.isOptionalStep() && plan.isOptional() ) { 
             if ( plan.isBlocked() ) return true; 
@@ -432,15 +449,15 @@ public class Plan {
       return false;
    }
    
-    /**
+   /**
     * Test if this plan has live children.
     * 
     * @see #hasLiveDescendants()
     */
    public boolean hasLive () {
-      for (Plan child : children)
-         if ( child.isLive() ) return true;
-      return false;
+	   for (Plan child : children)
+		   if ( child.isLive() ) return true;
+	   return false;
    }
 
    /**
