@@ -211,10 +211,10 @@ public class Disco extends TaskEngine {
    private Segment lastShift; // last shifted segment or null
 
    private Segment getLastShift () {
-      for (int i = stack.size(); i-- > 1;)
-         if (stack.get(i).isShift())
-            return stack.get(i);
-      return null;
+	   for (int i = stack.size(); i-- > 1;)
+		   if (stack.get(i).isShift())
+			   return stack.get(i);
+	   return null;
    }
 	
    /*
@@ -222,8 +222,8 @@ public class Disco extends TaskEngine {
     * focus shift (see docs/LeshRichSidner2001_UM.pdf)
     */
    public boolean isLastShift () {
-      Segment shift = getLastShift();
-      return shift != null && shift != lastShift;
+	   Segment shift = getLastShift();
+	   return shift != null && shift != lastShift;
    }
 
    /**
@@ -325,23 +325,15 @@ public class Disco extends TaskEngine {
 
    @Override
    public void pop() {
-      if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
-      Segment segment = stack.pop();
-      Plan plan = segment.getPlan();
-      if ( TRACE ) getOut().println("Pop: " + segment);
-      if ( !isEmpty() ) {
-         Segment focus = getSegment();
-         //System.out.println("POPPED " + segment + " FOCUS " + focus);///////////
-         // toplevel plan never shift and ignore popping of implicit acceptance
-         if ( !(isTop(focus.getPlan()) || (plan.getGoal() instanceof Accept)) )
-            focus.setShift(!plan.isPoppable());
-         if ( segment.isShift() ) segment.setShift(false); // part of same shift
-      }
-      if ( !(plan.isDone() || plan.isFailed()) ) {
-         // see reconcileStack for implicit acceptance
-         if ( plan.getGoal() instanceof Accept ) segment.remove();
-         else segment.stop();
-      }
+	   if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
+	   Segment segment = stack.pop();
+	   Plan plan = segment.getPlan();
+	   if ( TRACE ) getOut().println("Pop: " + segment);
+	   if ( !(plan.isDone() || plan.isFailed()) ) {
+		   // see reconcileStack for implicit acceptance
+		   if ( plan.getGoal() instanceof Accept ) segment.remove();
+		   else segment.stop();
+	   }
    }
    
    /**
@@ -598,17 +590,20 @@ public class Disco extends TaskEngine {
             top = getTop(focus);
          }
          if ( top == target ) { 
-            while (pop-- > 0) pop(); // do the popping for real
+            while (pop-- > 0) {
+            	pop(); // do the popping for real
+            	getSegment().setShift(false); // not a shift any more
+            }
          } else {
             // start new toplevel goal or interruption 
             push(target, continuation);
          }
       } else push(target, continuation);
-      reconcileStack(occurrence, getFocus(), contributes, continuation);
+      reconcileStack(occurrence, getFocus(), contributes, continuation, false);
     }
    
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
-         boolean continuation) {
+         boolean continuation, boolean shift) {
       if ( focus != contributes ) {
          Stack<Plan> path = focus.pathToDescendant(contributes);
          if ( path == null ) {
@@ -623,17 +618,26 @@ public class Disco extends TaskEngine {
                   }
                } // TODO extend for other types of proposals
             }
+            if ( !focus.isPoppable() ) shift = true;
             pop();
             // recursion must end since focus and contributes have same top
-            reconcileStack(occurrence, getFocus(), contributes, continuation);
+            reconcileStack(occurrence, getFocus(), contributes, continuation, shift);
          } else {
             // push to contributes
             // if contributes is continuation, then so are all parents
-            while ( !path.isEmpty() ) push(path.pop(), continuation);
+            while ( !path.isEmpty() ) {
+            	push(path.pop(), continuation);
+            	if ( shift ) {
+            		getSegment().setShift(true);
+            		shift = false;
+            	}
+            }
             // suppress singleton segments
             if ( contributes.getType() != occurrence.getType()
-                  || !contributes.getChildren().isEmpty() || !contributes.isDone() )
-               push(contributes, continuation);
+                  || !contributes.getChildren().isEmpty() || !contributes.isDone() ) {
+            	push(contributes, continuation);
+            	if ( shift ) getSegment().setShift(true);
+            }
          }
       }
    }
