@@ -218,7 +218,7 @@ public class Disco extends TaskEngine {
    }
 	
    /*
-    * Test whether interpretation of last occurrence resulted in an unexpected
+    * Test whether interpretation of last occurrence resulted in an unnecessary
     * focus shift (see docs/LeshRichSidner2001_UM.pdf)
     */
    public boolean isLastShift () {
@@ -618,8 +618,8 @@ public class Disco extends TaskEngine {
                   }
                } // TODO extend for other types of proposals
             }
-            if ( !focus.isPoppable() ) shift = true;
             pop();
+            shift = !focus.isPoppable(); // can stop being a shift
             // recursion must end since focus and contributes have same top
             reconcileStack(occurrence, getFocus(), contributes, continuation, shift);
          } else {

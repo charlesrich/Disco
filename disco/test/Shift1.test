@@ -1,0 +1,100 @@
+    # Oct 7, 2015 12:55:37 PM - TaskEngine 1.8 / Disco 1.12
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > next false
+  > task ShiftA
+    User says "Let's achieve ShiftA."
+  > history
+
+[Achieve ShiftA] -accepted -live <-focus
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -live
+   [Execute ShiftI] -live
+
+  > eval $disco.isLastShift()
+    # Returned 'false'
+  > done ShiftE
+    User execute ShiftE.
+  > history
+
+[Achieve ShiftA] -accepted -live
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -live
+      [Achieve ShiftC] -live <-focus
+         User execute ShiftE.
+         [Execute ShiftF] -live
+      [Achieve ShiftD] -live
+   [Execute ShiftI] -live
+
+  > eval $disco.isLastShift()
+    # Returned 'false'
+  > done ShiftG
+    User execute ShiftG.
+  > history
+
+[Achieve ShiftA] -accepted -live
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -live
+      [Achieve ShiftC] -live -stopped
+         User execute ShiftE.
+      [Achieve ShiftD] -live -shift <-focus
+         User execute ShiftG.
+         [Execute ShiftH] -live
+   [Execute ShiftI] -live
+
+  > eval $disco.isLastShift()
+    # Returned 'true'
+  > done ShiftH
+    User execute ShiftH.
+  > history
+
+[Achieve ShiftA] -accepted -live
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -live
+      [Achieve ShiftC] -live -stopped
+         User execute ShiftE.
+      [Achieve ShiftD] -done -shift <-focus
+         User execute ShiftG.
+         User execute ShiftH.
+   [Execute ShiftI] -live
+
+  > eval $disco.isLastShift()
+    # Returned 'false'
+  > done ShiftF
+    User execute ShiftF.
+  > history
+
+[Achieve ShiftA] -accepted -live
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -done
+      [Achieve ShiftC] -done
+         User execute ShiftE.
+      [Achieve ShiftD] -done -shift
+         User execute ShiftG.
+         User execute ShiftH.
+      [Achieve ShiftC] -done <-focus
+         User execute ShiftF.
+   [Execute ShiftI] -live
+
+  > eval $disco.isLastShift()
+    # Returned 'false'
+  > done ShiftI
+    User execute ShiftI.
+  > history
+
+[Achieve ShiftA] -accepted -done <-focus
+   User says "Let's achieve ShiftA."
+   [Achieve ShiftB] -done
+      [Achieve ShiftC] -done
+         User execute ShiftE.
+      [Achieve ShiftD] -done -shift
+         User execute ShiftG.
+         User execute ShiftH.
+      [Achieve ShiftC] -done
+         User execute ShiftF.
+   User execute ShiftI.
+
+  > eval $disco.isLastShift()
+    # Returned 'false'
+  > quit
+    
