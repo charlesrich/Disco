@@ -331,8 +331,10 @@ public class Disco extends TaskEngine {
       if ( TRACE ) getOut().println("Pop: "+segment);
       if ( !isEmpty() ) {
          Segment focus = getSegment();
-         if ( isTop(focus.getPlan()) ) // never consider toplevel plan to be shift
+         // toplevel plan never shift and ignore popping of implicit acceptance
+         if ( !(isTop(focus.getPlan()) || (plan.getGoal() instanceof Accept)) )
              focus.setShift(!plan.isPoppable());
+         if ( segment.isShift() ) segment.setShift(false); // part of same shift
       }
       if ( !(plan.isDone() || plan.isFailed()) ) {
          // see reconcileStack for implicit acceptance
