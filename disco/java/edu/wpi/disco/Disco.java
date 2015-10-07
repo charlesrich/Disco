@@ -208,6 +208,24 @@ public class Disco extends TaskEngine {
    private Stack<Segment> stack;
    public Stack<Segment> getStack () { return stack; }
    
+   private Segment lastShift; // last shifted segment or null
+
+   private Segment getLastShift () {
+      for (int i = stack.size(); i-- > 1;)
+         if (stack.get(i).isShift())
+            return stack.get(i);
+      return null;
+   }
+	
+   /*
+    * Test whether interpretation of last occurrence resulted in an unexpected
+    * focus shift (see docs/LeshRichSidner2001_UM.pdf)
+    */
+   public boolean isLastShift () {
+      Segment shift = getLastShift();
+      return shift != null && shift != lastShift;
+   }
+
    /**
     * Test whether discourse stack is empty
     */
@@ -309,8 +327,13 @@ public class Disco extends TaskEngine {
    public void pop () {
       if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
       Segment segment = stack.pop();
-      if ( TRACE ) getOut().println("Pop: "+segment);
       Plan plan = segment.getPlan();
+      if ( TRACE ) getOut().println("Pop: "+segment);
+      if ( !isEmpty() ) {
+         Segment focus = getSegment();
+         if ( isTop(focus.getPlan()) ) // never consider toplevel plan to be shift
+             focus.setShift(!plan.isPoppable());
+      }
       if ( !(plan.isDone() || plan.isFailed()) ) {
          // see reconcileStack for implicit acceptance
          if ( plan.getGoal() instanceof Accept ) segment.remove();
@@ -535,6 +558,7 @@ public class Disco extends TaskEngine {
   
    @Override
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
+      lastShift = getLastShift(); // cache before stack changed
       boolean explained = super.interpret(occurrence, contributes, continuation);
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 
@@ -787,6 +811,7 @@ public class Disco extends TaskEngine {
             printedTops.add(getTop(plan));
             if ( segment.isContinuation() ) stream.print(" -continuation");
             if ( segment.isInterruption() ) stream.print(" -interruption");
+            if ( segment.isShift() ) stream.print(" -shift");
             if ( plan.isLive() && segment.isStopped() ) stream.print(" -stopped");
             // note ignoring temporary Accept's to avoid novice confusion
             if ( segment.getPlan() == getFocus(true) && stack.contains(segment) )
