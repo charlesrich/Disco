@@ -208,6 +208,24 @@ public class Disco extends TaskEngine {
    private Stack<Segment> stack;
    public Stack<Segment> getStack () { return stack; }
    
+   private Segment lastShift; // last shifted segment or null
+
+   private Segment getLastShift () {
+	   for (int i = stack.size(); i-- > 1;)
+		   if (stack.get(i).isShift())
+			   return stack.get(i);
+	   return null;
+   }
+	
+   /*
+    * Test whether interpretation of last occurrence resulted in an unnecessary
+    * focus shift (see docs/LeshRichSidner2001_UM.pdf)
+    */
+   public boolean isLastShift () {
+	   Segment shift = getLastShift();
+	   return shift != null && shift != lastShift;
+   }
+
    /**
     * Test whether discourse stack is empty
     */
@@ -306,16 +324,16 @@ public class Disco extends TaskEngine {
    }
 
    @Override
-   public void pop () {
-      if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
-      Segment segment = stack.pop();
-      if ( TRACE ) getOut().println("Pop: "+segment);
-      Plan plan = segment.getPlan();
-      if ( !(plan.isDone() || plan.isFailed()) ) {
-         // see reconcileStack for implicit acceptance
-         if ( plan.getGoal() instanceof Accept ) segment.remove();
-         else segment.stop();
-      }
+   public void pop() {
+	   if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
+	   Segment segment = stack.pop();
+	   Plan plan = segment.getPlan();
+	   if ( TRACE ) getOut().println("Pop: " + segment);
+	   if ( !(plan.isDone() || plan.isFailed()) ) {
+		   // see reconcileStack for implicit acceptance
+		   if ( plan.getGoal() instanceof Accept ) segment.remove();
+		   else segment.stop();
+	   }
    }
    
    /**
@@ -535,6 +553,7 @@ public class Disco extends TaskEngine {
   
    @Override
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
+      lastShift = getLastShift(); // cache before stack changed
       boolean explained = super.interpret(occurrence, contributes, continuation);
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 
@@ -571,17 +590,20 @@ public class Disco extends TaskEngine {
             top = getTop(focus);
          }
          if ( top == target ) { 
-            while (pop-- > 0) pop(); // do the popping for real
+            while (pop-- > 0) {
+            	pop(); // do the popping for real
+            	getSegment().setShift(false); // not a shift any more
+            }
          } else {
             // start new toplevel goal or interruption 
             push(target, continuation);
          }
       } else push(target, continuation);
-      reconcileStack(occurrence, getFocus(), contributes, continuation);
+      reconcileStack(occurrence, getFocus(), contributes, continuation, false);
     }
    
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
-         boolean continuation) {
+         boolean continuation, boolean shift) {
       if ( focus != contributes ) {
          Stack<Plan> path = focus.pathToDescendant(contributes);
          if ( path == null ) {
@@ -597,16 +619,25 @@ public class Disco extends TaskEngine {
                } // TODO extend for other types of proposals
             }
             pop();
+            shift = !focus.isPoppable(); // can stop being a shift
             // recursion must end since focus and contributes have same top
-            reconcileStack(occurrence, getFocus(), contributes, continuation);
+            reconcileStack(occurrence, getFocus(), contributes, continuation, shift);
          } else {
             // push to contributes
             // if contributes is continuation, then so are all parents
-            while ( !path.isEmpty() ) push(path.pop(), continuation);
+            while ( !path.isEmpty() ) {
+            	push(path.pop(), continuation);
+            	if ( shift ) {
+            		getSegment().setShift(true);
+            		shift = false;
+            	}
+            }
             // suppress singleton segments
             if ( contributes.getType() != occurrence.getType()
-                  || !contributes.getChildren().isEmpty() || !contributes.isDone() )
-               push(contributes, continuation);
+                  || !contributes.getChildren().isEmpty() || !contributes.isDone() ) {
+            	push(contributes, continuation);
+            	if ( shift ) getSegment().setShift(true);
+            }
          }
       }
    }
@@ -787,6 +818,7 @@ public class Disco extends TaskEngine {
             printedTops.add(getTop(plan));
             if ( segment.isContinuation() ) stream.print(" -continuation");
             if ( segment.isInterruption() ) stream.print(" -interruption");
+            if ( segment.isShift() ) stream.print(" -shift");
             if ( plan.isLive() && segment.isStopped() ) stream.print(" -stopped");
             // note ignoring temporary Accept's to avoid novice confusion
             if ( segment.getPlan() == getFocus(true) && stack.contains(segment) )

@@ -232,7 +232,7 @@ public class Guide extends Shell {
    private void setFocus (Plan focus) {
       Plan old = getEngine().getFocus();
       if ( getEngine().setFocus(focus) && !old.isFailed() ) 
-         // unexpected focus shift
+         // unnecessary focus shift
          respond("shift@word", old);
    }
    

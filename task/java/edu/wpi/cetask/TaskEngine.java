@@ -950,8 +950,8 @@ public class TaskEngine {
    /**
     * Shift focus to the given plan or null.
     * 
-    * @return true iff this is an "unexpected focus shift" in the sense of Lesh,
-    *         Rich and Sidner's UM'01 paper, i.e., we are leaving the current
+    * @return true iff this is an "unnecessary focus shift" in the sense of 
+    *         docs/LeshRichSidner2001_UM.pdf, i.e., we are leaving the current
     *         focus when it is started but not done.
     *         
     * @see #getFocus()        

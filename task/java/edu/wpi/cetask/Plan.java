@@ -416,7 +416,7 @@ public class Plan {
 
    /**
     * Tests whether popping plan from the stack would constitute an
-    * unnecessary focus shift.
+    * unnecessary focus shift (see docs/LeshRichSidner2001.pdf)
     * 
     * @return true iff popping would <em>not</em> be an unnecessary focus
     *         shift.
