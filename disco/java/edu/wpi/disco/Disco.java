@@ -324,16 +324,17 @@ public class Disco extends TaskEngine {
    }
 
    @Override
-   public void pop () {
+   public void pop() {
       if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
       Segment segment = stack.pop();
       Plan plan = segment.getPlan();
-      if ( TRACE ) getOut().println("Pop: "+segment);
+      if ( TRACE ) getOut().println("Pop: " + segment);
       if ( !isEmpty() ) {
          Segment focus = getSegment();
+         //System.out.println("POPPED " + segment + " FOCUS " + focus);///////////
          // toplevel plan never shift and ignore popping of implicit acceptance
          if ( !(isTop(focus.getPlan()) || (plan.getGoal() instanceof Accept)) )
-             focus.setShift(!plan.isPoppable());
+            focus.setShift(!plan.isPoppable());
          if ( segment.isShift() ) segment.setShift(false); // part of same shift
       }
       if ( !(plan.isDone() || plan.isFailed()) ) {
