@@ -494,6 +494,8 @@ public class Shell {
       Task occurrence = processTask(args, focus, true);
       if ( occurrence == null ) 
          warning("Missing task argument (and no focus).");
+      else if ( focus != null && focus.getGoal().matches(occurrence) )
+         occurrence.copySlotValues(focus.getGoal());
       return occurrence;
    }
    
