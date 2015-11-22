@@ -300,7 +300,10 @@
     Bag.id = 0;
 
     Bag.prototype.toString = function () {
-       return "bag"+this.id+"["+this.contents+"]";
+       return "bag"+
+          ( Packages.edu.wpi.cetask.TaskEngine.DEBUG ?
+             (this.id+"["+this.contents+"]")
+             : "" );
     }
        
   </script>
