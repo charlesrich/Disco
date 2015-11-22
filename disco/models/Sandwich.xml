@@ -145,7 +145,7 @@
       $this.sandwich.top == $this.top &amp;&amp; $this.sandwich.bottom == $this.bottom
     </postcondition>
     <script>
-      $this.output = new Sandwich($this.top, $this.bottom);
+      $this.sandwich = new Sandwich($this.top, $this.bottom);
     </script>
   </task>
 
@@ -231,7 +231,7 @@
     // class and instances for Egg (subtype of Addable)
     
     function Egg (name) {
-       Addable(name);
+       Addable.call(this, name);
        this.isBoiled = false;
        this.isSliced = false;
     }
@@ -240,7 +240,7 @@
        return (this.isBoiled ? "boiled " : "")+(this.isSliced ? "sliced " : "")+this.name;
     }
 
-    EGG = new Egg("egg");
+    var EGG = new Egg("egg");
 
     // class for kind of sandwich
 
