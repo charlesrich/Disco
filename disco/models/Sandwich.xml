@@ -197,7 +197,10 @@
     Bread.id = 0;
 
     Bread.prototype.toString = function () {
-      return "bread"+this.id+"["+this.spreadables+";"+this.addables+"]";
+       return "bread"+
+          ( Packages.edu.wpi.cetask.TaskEngine.DEBUG ?
+             (this.id+"["+this.spreadables+";"+this.addables+"]")
+             : "" );
     }
 
     Bread.prototype.contains = function (object) {
@@ -261,7 +264,10 @@
     }
 
     Sandwich.prototype.toString = function () {
-       return (this.isCut ? "cut " : "")+"sandwich["+this.top+","+this.bottom+"]";
+       return (this.isCut ? "cut " : "")+"sandwich"+
+          ( Packages.edu.wpi.cetask.TaskEngine.DEBUG ?
+             ("["+this.top+","+this.bottom+"]")
+             : "" );
     }    
     
     Sandwich.prototype.contains = function (object) {
