@@ -88,7 +88,7 @@
       <step name="slice" task="SliceEgg"/>
       <step name="egg" task="Add"/>
       <step name="salt" task="Add"/>
-      <step name="pickle" task="Add"/>
+      <step name="pickles" task="Add"/>
       <step name="press" task="Press"/>
       <applicable> $this.kind == Kind.ENUM.EGG </applicable>
 
@@ -97,21 +97,22 @@
       <binding slot="$slice.external" value="true"/>
       <binding slot="$egg.external" value="true"/>
       <binding slot="$salt.external" value="true"/>
-      <binding slot="$pickle.external" value="false"/>
+      <binding slot="$pickles.external" value="false"/>
       <binding slot="$press.external" value="true"/>
 
-      <binding slot="$boil.egg" value="EGG"/>
+      <binding slot="$boil.egg"
+               value="$boil.egg == undefined ? new Egg() : $boil.undefined"/>
       <binding slot="$slice.egg" value="$boil.output"/>
       <binding slot="$egg.bread"
                value="$egg.bread == undefined ? new Bread() : $egg.bread"/>
       <binding slot="$egg.addable" value="$slice.output"/>
       <binding slot="$salt.bread" value="$egg.output"/>
       <binding slot="$salt.addable" value="Addable.ENUM.SALT"/>
-      <binding slot="$pickle.bread" value="$salt.output"/>
-      <binding slot="$pickle.addable" value="Addable.ENUM.PICKLE"/>
+      <binding slot="$pickles.bread" value="$salt.output"/>
+      <binding slot="$pickles.addable" value="Addable.ENUM.PICKLES"/>
       <binding slot="$press.top"
                value="$press.top == undefined ? new Bread() : $press.top"/>
-      <binding slot="$press.bottom" value="$pickle.output"/>
+      <binding slot="$press.bottom" value="$pickles.output"/>
       <binding slot="$this.sandwich" value="$press.sandwich"/>
     </subtasks>
 
@@ -184,8 +185,12 @@
 
 <script init="true">
 
-    // the simulated world model
-    
+    // The simulated world model
+
+    // Note that this model is somewhat complex because we are modeling the world
+    // as having modifiable objects (side effects), namely Bread, Egg, Sandwich
+    // and Bag classes.
+
     // class for slice of bread
 
     function Bread () {
@@ -203,11 +208,36 @@
              : "" );
     }
 
+    // Note that clone method only needed for objects used in modified inputs and
+    // only when default shallow copy is not adequate.  Also, in the task model
+    // above, none of the postconditions actually compares the old
+    // with the new version of an modified object, but we are doing this correctly
+    // here as a pedagogical example
+
+    Bread.prototype.clone = function () {
+      var copy = Object.create(Bread.prototype);
+      copy.id = this.id;  // do not change id
+      // deeper copy needed 
+      copy.spreadables = this.spreadables.slice(0);
+      copy.addables = this.addables.slice(0);
+      for (i = 0; i &lt; this.addables.length; i++)
+         if ( this.addables[i] instanceof Egg )
+            this.addables[i] = this.addables[i].clone();
+      return copy;
+    }
+
     Bread.prototype.contains = function (object) {
        return this.spreadables.indexOf(object) >= 0
-          || this.addables.indexOf(object) >= 0;
+         || this.addables.indexOf(object) >= 0;
     }
- 
+
+    Bread.prototype.getEgg = function () {
+       for (i = 0; i &lt; this.addables.length; i++)
+         if ( this.addables[i] instanceof Egg )
+            return this.addables[i];
+      return null;
+    }
+      
     // class and instances for things to spread on bread
 
     function Spreadable (name) { this.name = name; }
@@ -224,30 +254,42 @@
     // class and instances for things to add to bread
     
     function Addable (name) { this.name = name; }
+    
     Addable.prototype.toString = function () { return this.name; }
 
     Addable.ENUM = {
-       PICKLE : new Addable("pickle"),
+       PICKLES : new Addable("pickles"),
        SALT : new Addable("salt")
     }
 
-    // class and instances for Egg (subtype of Addable)
+    // class for Egg (subtype of Addable)
     
-    function Egg (name) {
-       Addable.call(this, name);
+    function Egg () {
+       Addable.call(this, "egg");
+       this.id = ++Egg.id;
        this.isBoiled = false;
        this.isSliced = false;
     }
        
+    Egg.id = 0;
+    
     Egg.prototype.toString = function () {
-       return (this.isBoiled ? "boiled " : "")+(this.isSliced ? "sliced " : "")+this.name;
+       return ((this.isBoiled ? "boiled " : "")+(this.isSliced ? "sliced " : ""))+"egg"+
+          (Packages.edu.wpi.cetask.TaskEngine.DEBUG ? this.id : "");
     }
 
-    var EGG = new Egg("egg");
+    Egg.prototype.clone = function () {
+      var copy = Object.create(Egg.prototype);
+      copy.id = this.id;  // do not change id
+      copy.boiled = this.boiled;
+      copy.sliced = this.sliced;
+      return copy;
+    }
 
     // class for kind of sandwich
 
     function Kind (name) { this.name = name; }
+    
     Kind.prototype.toString = function () { return this.name; }
 
     Kind.ENUM = {
@@ -270,8 +312,21 @@
              : "" );
     }    
     
+    Sandwich.prototype.clone = function () {
+      var copy = Object.create(Sandwich.prototype);
+      // deeper copy needed
+      copy.top = this.top.clone();
+      copy.bottom = this.bottom.clone();
+      copy.cut = this.cut;
+      return copy;
+    }
+
     Sandwich.prototype.contains = function (object) {
       return this.top.contains(object) || this.bottom.contains(object);
+    }
+
+    Sandwich.prototype.getEgg = function () {
+       return this.top.getEgg() == null ? this.bottom.getEgg() : this.top.getEgg();
     }
 
     // define what goes in each kind of sandwich---a planner could in principle
@@ -283,9 +338,11 @@
              return this.contains(Spreadable.ENUM.PEANUT_BUTTER) 
                 &amp;&amp; this.contains(Spreadable.ENUM.STRAWBERRY_JAM);
           case Kind.ENUM.EGG:
-             return this.contains(EGG) &amp;&amp; EGG.isBoiled &amp;&amp; EGG.isSliced
+             return this.getEgg() != null
+                &amp;&amp; this.getEgg().isBoiled 
+                &amp;&amp; this.getEgg().isSliced
                 &amp;&amp; this.contains(Addable.ENUM.SALT)
-                &amp;&amp; this.contains(Addable.ENUM.PICKLE);
+                &amp;&amp; this.contains(Addable.ENUM.PICKLES);
           default: return false;
        }
     }
@@ -305,6 +362,14 @@
              (this.id+"["+this.contents+"]")
              : "" );
     }
+
+    Bag.prototype.clone = function () {
+      var copy = Object.create(Bag.prototype);
+      copy.id = this.id;  // do not change id
+      // deeper copy needed
+      copy.contents = this.contents == null ? null : this.contents.clone();
+      return copy;
+    }         
        
   </script>
   
