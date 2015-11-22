@@ -160,7 +160,7 @@
     <input name="sandwich" type="Sandwich"/>
     <input name="bag" type="Bag" modified ="output"/>
     <output name="output" type="Bag"/>
-    <postcondition> $this.output.contents ==$this.sandwich </postcondition>
+    <postcondition> $this.output.contents == $this.sandwich </postcondition>
     <script> $this.bag.contents = $this.sandwich; </script>
   </task>
 
