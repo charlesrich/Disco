@@ -341,12 +341,30 @@ public class Console extends Shell {
                   focus);
       }
       return task;
+   } 
+   
+   /**
+    * Like 'done', but first executes script associated with primitive task, if
+    * any. Convenient for running simulations.
+    * 
+    * @see #done(String)
+    */
+   public void execute (String args) {
+      Plan focus = getEngine().getFocus(true);
+      Task task = processTaskIf(args, focus, true);
+      if ( !task.isPrimitive() ) {
+         err.println("Execute not allowed for non-primitive tasks.");
+         return;
+      }
+      if ( !(task instanceof Utterance) ) { // see Interaction.done
+         task.setExternal(true); // must be set before eval
+         task.eval(new Plan(task));
+      }
+      done(task, focus); 
    }
-
+   
    private Task done (Task occurrence, Plan focus) {
       if ( occurrence != null ) {
-         if ( focus != null && focus.getGoal().matches(occurrence) )
-            occurrence.copySlotValues(focus.getGoal());
          if ( occurrence.isDefinedInputs() ) {
             boolean external = !Utils.isFalse(occurrence.getExternal());
             if ( !external ) command = null; // keep user turn
@@ -381,26 +399,6 @@ public class Console extends Shell {
          this.respond = Utils.parseBoolean(respond);
          if ( !this.respond ) command = null; // prevent response now
       }
-   }
-
-   /**
-    * Like 'done', but first executes script associated with primitive task, if
-    * any. Convenient for running simulations.
-    * 
-    * @see #done(String)
-    */
-   public void execute (String args) {
-      Plan focus = getEngine().getFocus();
-      Task task = processTaskIf(args, focus, true);
-      if ( !task.isPrimitive() ) {
-         err.println("Execute not allowed for non-primitive tasks.");
-         return;
-      }
-      if ( !(task instanceof Utterance) ) { // see Interaction.done
-         task.setExternal(true); // must be set before eval
-         task.eval(new Plan(task));
-      }
-      done(task, focus); 
    }
 
    private File translate;

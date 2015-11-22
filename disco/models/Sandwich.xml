@@ -1,0 +1,302 @@
+<taskModel about="urn:disco.wpi.edu:examples:Sandwich" xmlns="http://ce.org/cea-2018">
+  <!-- 
+       This is the example used in study for following paper submitted to AAMAS 2016:
+
+       M. Shayganfar, C. Rich and C. Sidner, "Appraisal in Human-Robot Collaboration".
+
+       See picture in Sandwich.pdf.  Note Mary is "system", subject is "user".
+  -->
+
+  <task id="PreparePicnic">
+    <output name="pbj" type="Bag"/>
+    <output name="egg" type="Bag"/>
+    <postcondition>
+      $this.pbj.contents != null &amp;&amp; $this.pbj.contents.isKind(Kind.ENUM.PBJ)
+      $this.egg.contents != null &amp;&amp; $this.egg.contents.isKind(Kind.ENUM.EGG) 
+      &amp;&amp; $this.pbj.contents.isCut 
+      &amp;&amp; $this.egg.contents.isCut 
+    </postcondition>
+    
+    <subtasks id="picnic">
+      <step name="pbj" task="PrepareSandwich"/>
+      <step name="egg" task="PrepareSandwich"/>
+
+      <binding slot="$pbj.who" value="false"/>
+      <binding slot="$pbj.kind" value="Kind.ENUM.PBJ"/>
+      <binding slot="$egg.who" value="true"/>
+      <binding slot="$egg.kind" value="Kind.ENUM.EGG"/>
+      <binding slot="$this.pbj" value="$pbj.bag"/>
+      <binding slot="$this.egg" value="$egg.bag"/>
+    </subtasks>
+  </task>
+
+  <task id="PrepareSandwich">
+    <input name="kind" type="Kind"/>
+    <!-- we need input here to pass through who should do the cut and bag -->
+    <input name="who" type="boolean"/>
+    <output name="bag" type="Bag"/>
+    <postcondition>
+      $this.bag.contents != null &amp;&amp; $this.bag.contents.isCut
+    </postcondition>
+    
+    <subtasks id="prepare">
+      <step name="make" task="MakeSandwich"/>
+      <step name="cut" task="CutSandwich"/>
+      <step name="bag" task="BagSandwich"/>
+
+      <binding slot="$cut.external" value="$this.who"/>
+      <binding slot="$bag.external" value="$this.who"/>
+      <binding slot="$make.kind" value="$this.kind"/>
+      <binding slot="$cut.sandwich" value="$make.sandwich"/>
+      <binding slot="$bag.sandwich" value="$cut.output"/>
+      <binding slot="$bag.bag"
+               value="$bag.bag == undefined ? new Bag() : undefined"/>
+      <binding slot="$this.bag" value="$bag.output"/>
+    </subtasks>
+  </task>
+
+  <task id="MakeSandwich">
+    <!-- an input is need for applicability condition -->
+    <input name="kind" type="Kind"/>
+    <output name="sandwich" type="Sandwich"/>
+    
+    <subtasks id="pbj" ordered="false">
+      <step name="top" task="Spread"/>
+      <step name="bottom" task="Spread"/>
+      <step name="press" task="Press" requires="top bottom"/>
+      <applicable> $this.kind == Kind.ENUM.PBJ </applicable>
+
+      <binding slot="$top.external" value="true"/>
+      <binding slot="$bottom.external" value="true"/>
+      <binding slot="$press.external" value="true"/>
+
+      <!-- default values for bread slices -->
+      <binding slot="$top.bread"
+               value="$top.bread == undefined ? new Bread() : $top.bread"/>
+      <binding slot="$bottom.bread"
+               value="$bottom.bread == undefined ? new Bread() : $bottom.bread"/>
+      <binding slot="$top.spreadable" value="Spreadable.ENUM.PEANUT_BUTTER"/>
+      <binding slot="$bottom.spreadable" value="Spreadable.ENUM.STRAWBERRY_JAM"/>
+      <binding slot="$press.top" value="$top.output"/>
+      <binding slot="$press.bottom" value="$bottom.output"/>
+      <binding slot="$this.sandwich" value="$press.sandwich"/>
+    </subtasks>
+    
+    <subtasks id="egg">
+      <step name="water" task="BoilWater"/>
+      <step name="boil" task="BoilEgg"/>
+      <step name="slice" task="SliceEgg"/>
+      <step name="egg" task="Add"/>
+      <step name="salt" task="Add"/>
+      <step name="pickle" task="Add"/>
+      <step name="press" task="Press"/>
+      <applicable> $this.kind == Kind.ENUM.EGG </applicable>
+
+      <binding slot="$water.external" value="true"/>
+      <binding slot="$boil.external" value="true"/>
+      <binding slot="$slice.external" value="true"/>
+      <binding slot="$egg.external" value="true"/>
+      <binding slot="$salt.external" value="true"/>
+      <binding slot="$pickle.external" value="false"/>
+      <binding slot="$press.external" value="true"/>
+
+      <binding slot="$boil.egg" value="EGG"/>
+      <binding slot="$slice.egg" value="$boil.output"/>
+      <binding slot="$egg.bread"
+               value="$egg.bread == undefined ? new Bread() : $egg.bread"/>
+      <binding slot="$egg.addable" value="$slice.output"/>
+      <binding slot="$salt.bread" value="$egg.output"/>
+      <binding slot="$salt.addable" value="Addable.ENUM.SALT"/>
+      <binding slot="$pickle.bread" value="$salt.output"/>
+      <binding slot="$pickle.addable" value="Addable.ENUM.PICKLE"/>
+      <binding slot="$press.top"
+               value="$press.top == undefined ? new Bread() : $press.top"/>
+      <binding slot="$press.bottom" value="$pickle.output"/>
+      <binding slot="$this.sandwich" value="$press.sandwich"/>
+    </subtasks>
+
+  </task>
+
+  <!-- primitives -->
+  
+  <task id="Spread">
+    <input name="bread" type="Bread" modified ="output"/>
+    <input name="spreadable" type="Spreadable"/>
+    <output name="output" type="Bread"/>
+    <postcondition> $this.output.contains($this.spreadable) </postcondition>
+    <script> $this.bread.spreadables.push($this.spreadable); </script>
+  </task>
+  
+  <task id="Add">
+    <input name="bread" type="Bread" modified="output"/>
+    <input name="addable" type="Addable"/>
+    <output name="output" type="Bread"/>
+    <postcondition> $this.output.contains($this.addable) </postcondition>
+    <script> $this.bread.addables.push($this.addable); </script>
+  </task>
+  
+  <task id="Press">
+    <input name="top" type="Bread"/>
+    <input name="bottom" type="Bread"/>
+    <output name="sandwich" type="Sandwich"/>
+    <!-- you could get fancy here and check that given bread slices not already
+         part of some other sandwich, but that would require more domain structure -->
+    <postcondition>
+      $this.sandwich.top == $this.top &amp;&amp; $this.sandwich.bottom == $this.bottom
+    </postcondition>
+    <script>
+      $this.output = new Sandwich($this.top, $this.bottom);
+    </script>
+  </task>
+
+  <task id="CutSandwich">
+    <input name="sandwich" type="Sandwich" modified="output"/>
+    <output name="output" type="Sandwich"/>
+    <postcondition> $this.output.isCut </postcondition>
+    <script> $this.sandwich.isCut = true; </script>
+  </task>
+  
+  <task id="BagSandwich">
+    <input name="sandwich" type="Sandwich"/>
+    <input name="bag" type="Bag" modified ="output"/>
+    <output name="output" type="Bag"/>
+    <postcondition> $this.output.contents ==$this.sandwich </postcondition>
+    <script> $this.bag.contents = $this.sandwich; </script>
+  </task>
+
+  <!-- we are choosing not to model detail of water, pot, putting eggs in, etc. -->
+  
+  <task id="BoilWater"/>
+
+  <task id="BoilEgg">
+    <input name="egg" type="Egg" modified="output"/>
+    <output name="output" type="Egg"/>
+    <postcondition> $this.output.isBoiled </postcondition>
+    <script> $this.egg.isBoiled = true; </script>
+  </task>
+
+  <task id="SliceEgg">
+    <input name="egg" type="Egg" modified="output"/>
+    <output name="output" type="Egg"/>
+    <postcondition> $this.output.isSliced </postcondition>
+    <script> $this.egg.isSliced = true; </script>
+  </task>
+
+<script init="true">
+
+    // the simulated world model
+    
+    // class for slice of bread
+
+    function Bread () {
+       this.id = ++Bread.id;
+       this.spreadables = []
+       this.addables = []
+    }
+
+    Bread.id = 0;
+
+    Bread.prototype.toString = function () {
+      return "bread"+this.id+"["+this.spreadables+";"+this.addables+"]";
+    }
+
+    Bread.prototype.contains = function (object) {
+       return this.spreadables.indexOf(object) >= 0
+          || this.addables.indexOf(object) >= 0;
+    }
+ 
+    // class and instances for things to spread on bread
+
+    function Spreadable (name) { this.name = name; }
+    Spreadable.prototype.toString = function () { return this.name; }
+
+    // make Disco enum so that user menu will be automatically generated
+
+    Spreadable.ENUM = {
+       PEANUT_BUTTER : new Spreadable("peanut butter"),
+       STRAWBERRY_JAM : new Spreadable("strawberry jam"),
+       ORANGE_MARMELADE : new Spreadable("orange marmelade")
+    }
+
+    // class and instances for things to add to bread
+    
+    function Addable (name) { this.name = name; }
+    Addable.prototype.toString = function () { return this.name; }
+
+    Addable.ENUM = {
+       PICKLE : new Addable("pickle"),
+       SALT : new Addable("salt")
+    }
+
+    // class and instances for Egg (subtype of Addable)
+    
+    function Egg (name) {
+       Addable(name);
+       this.isBoiled = false;
+       this.isSliced = false;
+    }
+       
+    Egg.prototype.toString = function () {
+       return (this.isBoiled ? "boiled " : "")+(this.isSliced ? "sliced " : "")+this.name;
+    }
+
+    EGG = new Egg("egg");
+
+    // class for kind of sandwich
+
+    function Kind (name) { this.name = name; }
+    Kind.prototype.toString = function () { return this.name; }
+
+    Kind.ENUM = {
+       PBJ : new Kind("peanut butter and jelly"),
+       EGG : new Kind("egg")
+    }
+    
+    // class for sandwich
+    
+    function Sandwich (top, bottom) {
+       this.top = top;
+       this.bottom = bottom;
+       this.isCut = false;
+    }
+
+    Sandwich.prototype.toString = function () {
+       return (this.isCut ? "cut " : "")+"sandwich["+this.top+","+this.bottom+"]";
+    }    
+    
+    Sandwich.prototype.contains = function (object) {
+      return this.top.contains(object) || this.bottom.contains(object);
+    }
+
+    // define what goes in each kind of sandwich---a planner could in principle
+    // take this type of information and derive the recipes above
+
+    Sandwich.prototype.isKind = function (kind) {
+       switch (kind) {
+          case Kind.ENUM.PBJ:
+             return this.contains(Spreadable.ENUM.PEANUT_BUTTER) 
+                &amp;&amp; this.contains(Spreadable.ENUM.STRAWBERRY_JAM);
+          case Kind.ENUM.EGG:
+             return this.contains(EGG) &amp;&amp; EGG.isBoiled &amp;&amp; EGG.isSliced
+                &amp;&amp; this.contains(Addable.ENUM.SALT)
+                &amp;&amp; this.contains(Addable.ENUM.PICKLE);
+          default: return false;
+       }
+    }
+
+    // class for ziploc bag
+
+    function Bag () {
+       this.id = ++Bag.id;
+       this.contents = null;
+    }
+
+    Bag.id = 0;
+
+    Bag.prototype.toString = function () {
+       return "bag"+this.id+"["+this.contents+"]";
+    }
+       
+  </script>
+  
+</taskModel>
