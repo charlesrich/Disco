@@ -42,7 +42,7 @@
     Agent says "Ok."
   > history
 
-[Prepare a picnic] -accepted -done
+[Prepare a picnic] -accepted -succeeded
    User says "Let's prepare a picnic."
    [Prepare a peanut butter and jelly sandwich] -done
       [Make a peanut butter and jelly sandwich with strawberry jam] -done
@@ -89,8 +89,8 @@
   > debug
   > history
 
-[PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]])] -accepted -done
-   Propose.Should(user,PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]]))
+[PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]])] -accepted -succeeded
+   Propose.Should(user,PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]))
    [PrepareSandwich(peanut butter and jelly,false,bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]])] -done
       [MakeSandwich(peanut butter and jelly,cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]) by pbj] -done
          [Spread(user,bread5[;],peanut butter,bread5[peanut butter;])] -succeeded
@@ -104,8 +104,8 @@
             Press(user,bread5[peanut butter;],bread6[strawberry jam;],cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]])
       CutSandwich(agent,sandwich[bread5[peanut butter;],bread6[strawberry jam;]],cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]) -succeeded
       BagSandwich(agent,cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]],bag2[null],bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]]) -succeeded
-   [PrepareSandwich(egg,true,bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]])] -done
-      [MakeSandwich(egg,cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]) by egg] -done
+   [PrepareSandwich(egg,true,bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]])] -done
+      [MakeSandwich(egg,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]) by egg] -done
          [BoilWater(user)] -done
             Propose.Should(agent,BoilWater(user))
             BoilWater(user)
@@ -115,22 +115,22 @@
          [SliceEgg(user,egg2,boiled sliced egg2)] -succeeded
             Propose.Should(agent,SliceEgg(user,egg2,boiled sliced egg2))
             SliceEgg(user,egg2,boiled sliced egg2) -succeeded
-         [Add(user,bread7[;],boiled sliced egg2,bread7[;egg2,salt,pickles])] -succeeded
-            Propose.Should(agent,Add(user,bread7[;],boiled sliced egg2,bread7[;egg2,salt,pickles]))
-            Add(user,bread7[;],boiled sliced egg2,bread7[;egg2,salt,pickles]) -succeeded
-         [Add(user,bread7[;boiled sliced egg2],salt,bread7[;egg2,salt,pickles])] -succeeded
-            Propose.Should(agent,Add(user,bread7[;boiled sliced egg2],salt,bread7[;egg2,salt,pickles]))
-            Add(user,bread7[;boiled sliced egg2],salt,bread7[;egg2,salt,pickles]) -succeeded
-         Add(agent,bread7[;egg2,salt],pickles,bread7[;egg2,salt,pickles]) -succeeded
-         [Press(user,bread8[;],bread7[;egg2,salt,pickles],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]])] -done
-            Propose.Should(agent,Press(user,bread8[;],bread7[;egg2,salt,pickles],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]))
-            Press(user,bread8[;],bread7[;egg2,salt,pickles],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]])
-      [CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]])] -succeeded
-         Propose.Should(agent,CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]))
-         CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]) -succeeded
-      [BagSandwich(user,cut sandwich[bread8[;],bread7[;egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]])] -succeeded <-focus
-         Propose.Should(agent,BagSandwich(user,cut sandwich[bread8[;],bread7[;egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]]))
-         BagSandwich(user,cut sandwich[bread8[;],bread7[;egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;egg2,salt,pickles]]]) -succeeded
+         [Add(user,bread7[;],boiled sliced egg2,bread7[;boiled sliced egg2,salt,pickles])] -succeeded
+            Propose.Should(agent,Add(user,bread7[;],boiled sliced egg2,bread7[;boiled sliced egg2,salt,pickles]))
+            Add(user,bread7[;],boiled sliced egg2,bread7[;boiled sliced egg2,salt,pickles]) -succeeded
+         [Add(user,bread7[;egg2],salt,bread7[;boiled sliced egg2,salt,pickles])] -succeeded
+            Propose.Should(agent,Add(user,bread7[;egg2],salt,bread7[;boiled sliced egg2,salt,pickles]))
+            Add(user,bread7[;egg2],salt,bread7[;boiled sliced egg2,salt,pickles]) -succeeded
+         Add(agent,bread7[;egg2,salt],pickles,bread7[;boiled sliced egg2,salt,pickles]) -succeeded
+         [Press(user,bread8[;],bread7[;boiled sliced egg2,salt,pickles],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]])] -done
+            Propose.Should(agent,Press(user,bread8[;],bread7[;boiled sliced egg2,salt,pickles],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]))
+            Press(user,bread8[;],bread7[;boiled sliced egg2,salt,pickles],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]])
+      [CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]])] -succeeded
+         Propose.Should(agent,CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]))
+         CutSandwich(user,sandwich[bread8[;],bread7[;egg2,salt,pickles]],cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]) -succeeded
+      [BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]])] -succeeded <-focus
+         Propose.Should(agent,BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]))
+         BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]) -succeeded
          Ok(agent)
 
   > quit
