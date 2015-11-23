@@ -10,7 +10,7 @@
   <task id="PreparePicnic">
     <output name="pbj" type="Bag"/>
     <output name="egg" type="Bag"/>
-    <postcondition>
+    <postcondition sufficient="true">
       $this.pbj.contents != null &amp;&amp; $this.pbj.contents.isKind(Kind.ENUM.PBJ)
       $this.egg.contents != null &amp;&amp; $this.egg.contents.isKind(Kind.ENUM.EGG) 
       &amp;&amp; $this.pbj.contents.isCut 
@@ -118,13 +118,19 @@
 
   </task>
 
-  <!-- primitives -->
+  <!-- primitives start here -->
+
+  <!-- notice the sufficient postcondition means that if input slice
+       of bread already has given spreadable on it, the action can be
+       skipped, and similarly elsewhere -->
   
   <task id="Spread">
     <input name="bread" type="Bread" modified ="output"/>
     <input name="spreadable" type="Spreadable"/>
     <output name="output" type="Bread"/>
-    <postcondition> $this.output.contains($this.spreadable) </postcondition>
+    <postcondition sufficient="true">
+      $this.output.contains($this.spreadable)
+    </postcondition>
     <script> $this.bread.spreadables.push($this.spreadable); </script>
   </task>
   
@@ -132,7 +138,9 @@
     <input name="bread" type="Bread" modified="output"/>
     <input name="addable" type="Addable"/>
     <output name="output" type="Bread"/>
-    <postcondition> $this.output.contains($this.addable) </postcondition>
+    <postcondition sufficient="true">
+      $this.output.contains($this.addable)
+    </postcondition>
     <script> $this.bread.addables.push($this.addable); </script>
   </task>
   
@@ -153,7 +161,7 @@
   <task id="CutSandwich">
     <input name="sandwich" type="Sandwich" modified="output"/>
     <output name="output" type="Sandwich"/>
-    <postcondition> $this.output.isCut </postcondition>
+    <postcondition sufficient="true"> $this.output.isCut </postcondition>
     <script> $this.sandwich.isCut = true; </script>
   </task>
   
@@ -161,7 +169,7 @@
     <input name="sandwich" type="Sandwich"/>
     <input name="bag" type="Bag" modified ="output"/>
     <output name="output" type="Bag"/>
-    <postcondition> $this.output.contents == $this.sandwich </postcondition>
+    <postcondition sufficient="true"> $this.output.contents == $this.sandwich </postcondition>
     <script> $this.bag.contents = $this.sandwich; </script>
   </task>
 
@@ -179,7 +187,7 @@
   <task id="SliceEgg">
     <input name="egg" type="Egg" modified="output"/>
     <output name="output" type="Egg"/>
-    <postcondition> $this.output.isSliced </postcondition>
+    <postcondition sufficient="true"> $this.output.isSliced </postcondition>
     <script> $this.egg.isSliced = true; </script>
   </task>
 

@@ -349,19 +349,28 @@ public class Task extends Instance {
       Postcondition condition = getType().getPostcondition();
       if ( condition == null ) return null;
       Boolean achieved;
-      if ( !getType().hasModifiedInputs() || !isOccurred() )
-         achieved = condition.evalCondition(this);
-      else {
-         if ( clonedInputs == null ) // not checking each modified inputs
-            throw new IllegalStateException("Modified inputs have not been cloned: "+this);
-         synchronized (bindings) {
-            Object old = bindings.get("$this");
-            try {
-               bindings.put("$this", clonedInputs);
-               achieved = condition.evalCondition(this);
-            } finally { bindings.put("$this", old); } 
+      if ( getType().hasModifiedInputs() ) {
+         if ( isOccurred() ) {
+            if ( clonedInputs == null ) // not checking each modified inputs
+               throw new IllegalStateException("Modified inputs have not been cloned: "+this);
+            synchronized (bindings) {
+               Object old = bindings.get("$this");
+               try {
+                  bindings.put("$this", clonedInputs);
+                  achieved = condition.evalCondition(this);
+               } finally { bindings.put("$this", old); }
+            }
+         } else try { // not occurred
+            // temporarily set modified outputs for sufficient postconditions
+            setModifiedOutputs();
+            achieved = condition.evalCondition(this);
+         } finally {
+            for (Input input : getType().getDeclaredInputs()) {
+               Output output = input.getModified();
+               if ( output != null ) output.deleteSlotValue(this);
+            }
          }
-      }
+      } else achieved = condition.evalCondition(this);
       return engine.setAchieved(this, achieved);// store cache
    }
 
@@ -765,7 +774,7 @@ public class Task extends Instance {
    public void occurred () {
 	  if ( !isDefinedSlot("external") ) 
 		  throw new IllegalStateException("Occurrence must have external slot value "+this);
-      modifiedOutputs();
+      setModifiedOutputs();
       synchronized (engine.synchronizer) {
          setWhen(System.currentTimeMillis());
          engine.tick();
@@ -773,17 +782,19 @@ public class Task extends Instance {
       }
    }
 
-   private void modifiedOutputs () {
+   private void setModifiedOutputs () {
       TaskClass type = getType();
       for (Input input : type.declaredInputs){
          Output modified = input.getModified();
          if ( modified != null ) {
-            Object value = getSlotValue(input.getName());
-            Object output = getSlotValue(modified.getName());
-            // propagate modified input object to output
-            if ( output == null ) setSlotValue(modified.getName(), value); 
-            else if ( output != value ) 
-               throw new IllegalStateException("Output of modified input not identical "+input.getName());
+            if ( input.isDefinedSlot(this) ) {
+               Object value = input.getSlotValue(this); 
+               if ( modified.isDefinedSlot(this) ) {
+                  if ( modified.getSlotValue(this) != value ) 
+                     throw new IllegalStateException("Output of modified input not identical "+input.getName()); 
+               } else // propagate modified input object to output
+                  modified.setSlotValue(this, value);
+            }
          }
       }
    }

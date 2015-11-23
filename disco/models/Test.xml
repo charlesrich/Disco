@@ -305,7 +305,15 @@
       <binding slot="$b.input" value="$a.output"/>
     </subtasks>
   </task>
-  
+   
+  <task id="ModifiedSufficient">
+    <input name="input" type="Mutable" modified="output"/>
+    <output name="output" type="Mutable"/>
+    <postcondition sufficient="true">
+      $this.output.loc == 0;
+    </postcondition>
+  </task>	
+
   <task id="ModifiedJava">
     <input name="input" type="java.util.Vector" modified="output"/>
     <output name="output" type="java.util.Vector"/>
