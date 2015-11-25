@@ -61,7 +61,6 @@ public abstract class Actor {
     */
    public Plugin.Item generateBest (Interaction interaction) { 
       return agenda.generateBest(interaction);
-         
    }
    
    /**

@@ -1,0 +1,41 @@
+    # Nov 25, 2015 12:21:43 PM - TaskEngine 1.8 / Disco 1.12
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Random.xml
+  > eval Packages.edu.wpi.disco.Agent.RANDOM = new Packages.java.util.Random(12345)
+    # Returned 'java.util.Random@10c7bf15'
+  > eval new Packages.edu.wpi.disco.plugin.DecompositionPlugin($disco.getInteraction().getSystem().getAgenda(), 25, true, true)
+    # Returned 'DecompositionPlugin'
+  > next
+    Agent says "Ok."
+  > task Top
+    User says "Let's achieve Top."
+    Agent says "Good morning."
+  > say
+[1] Good morning.
+  >> 1
+    User says "Good morning."
+    Agent says "Let's talk about the news."
+  > say
+[1] Fine.
+  >> 1
+    User says "Fine."
+    Agent says "Ok."
+  > task Top
+    User says "Let's achieve Top."
+    Agent says "Good morning."
+  > say
+[1] Good morning.
+  >> 1
+    User says "Good morning."
+    Agent says "Let's talk about the news."
+  > clear
+  > task Top
+    User says "Let's achieve Top."
+    Agent says "Good morning."
+  > say
+[1] Good morning.
+  >> 1
+    User says "Good morning."
+    Agent says "Let's talk about the weather."
+  > quit
+    
