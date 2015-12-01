@@ -88,6 +88,10 @@
     </postcondition>
   </task>
   
+  <task id="edu.wpi.disco.lang.Propose$Done">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+  
   <task id="edu.wpi.disco.lang.Propose$Succeeded">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <postcondition sufficient="true">

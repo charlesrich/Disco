@@ -237,6 +237,17 @@ public interface Propose {
          if ( this instanceof Propose.Should.Repeat ) appendSpKey(buffer, "again@word");
          return buffer.toString();
       }
+      
+      protected String formatNested (String key) {
+         String format = getDisco().getFormat(this);
+         if ( format != null) return formatTask(format, null);
+         Task nested = getNested();
+         StringBuilder buffer = new StringBuilder();
+         if ( nested != null ) appendSp(buffer, nested.formatTask());
+         else appendKeySp(buffer, "something@word");
+         appendKey(buffer, key);
+         return buffer.toString();
+      }
    }
 
    /**
@@ -591,6 +602,37 @@ public interface Propose {
       }
    }  
 
+   /**
+    * Propose.Done(Task...) - declare task to be completed (postcondition may be null)
+    */
+   public static class Done extends Nested {
+      
+      public static TaskClass CLASS;
+
+      // for TaskClass.newStep
+      public Done (Disco disco, Decomposition decomp, String step, boolean repeat) { 
+         super(Done.class, disco, decomp, step, repeat);
+      }
+
+      public Done (Disco disco, Boolean external, Task goal) { 
+         super(Done.class, disco, external, goal);
+      }
+
+      @Override
+      protected void respond (Plan contributes, boolean implicit, boolean success) {
+         if ( contributes != null ) {
+            contributes.setComplete(true);
+            if ( contributes.getType() != getType() ) {
+               Task nested = getNested();
+               if ( nested != null ) contributes.match(nested); // copy slot values
+            }
+         }
+      }
+
+      @Override
+      public String formatTask () { return formatNested("done@word"); }
+   }
+   
    public abstract static class Success extends Nested {
 
       // for extensions
@@ -604,26 +646,16 @@ public interface Propose {
          super(cls, disco, external, goal);
       }
       
-      protected void respondSuccess (Plan contributes, boolean implicit, boolean success) {
-         getNested(contributes).setSuccess(success);
-         if ( !success && contributes != null )
-            contributes.getGoal().setShould(false);  // no further negotiation
-      }
-
-      protected String formatSuccess (String success) {
-         String format = getDisco().getFormat(this);
-         if ( format != null) return formatTask(format, null);
-         Task nested = getNested();
-         StringBuilder buffer = new StringBuilder();
-         if ( nested != null ) appendSp(buffer, nested.formatTask());
-         else appendKeySp(buffer, "something@word");
-         appendKey(buffer, success);
-         return buffer.toString();
+      protected void respondSuccess (Plan contributes, boolean success) {
+         if ( contributes != null ) {
+            getNested(contributes).setSuccess(success);
+            if ( !success ) contributes.getGoal().setShould(false);  // no further negotiation
+         }
       }
    }
    
    /**
-    * Propose.Succeeded(Task...) - declare task to have been successful
+    * Propose.Succeeded(Task...) - declare task to have been successful (postcondition true)
     */
    public static class Succeeded extends Success {
 
@@ -640,19 +672,19 @@ public interface Propose {
 
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
-         respondSuccess(contributes, implicit, success);
+         respondSuccess(contributes, success);
          if ( contributes != null && contributes.getType() != getType() ) {
-            Task should = getNested();
-            if ( should != null ) contributes.match(should); // copy slot values
+            Task nested = getNested();
+            if ( nested != null ) contributes.match(nested); // copy slot values
          }
       }
       
       @Override
-      public String formatTask () { return formatSuccess("succeeded@word"); }
+      public String formatTask () { return formatNested("succeeded@word"); }
    }  
 
    /**
-    * Propose.Failed(Task...) - declare task to have failed
+    * Propose.Failed(Task...) - declare task to have failed (postcondition false)
     */
    public static class Failed extends Success {
 
@@ -669,11 +701,11 @@ public interface Propose {
 
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
-         respondSuccess(contributes, implicit, !success);
+         respondSuccess(contributes, !success);
       }
       
       @Override
-      public String formatTask () { return formatSuccess("failed@word"); }
+      public String formatTask () { return formatNested("failed@word"); }
    }  
 
    /**

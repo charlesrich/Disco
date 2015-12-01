@@ -329,16 +329,15 @@ public class Console extends Shell {
    }
 
    /**
-    * Report user execution of primitive task or achievement of non-primitive
+    * Report user execution of primitive task or completion of non-primitive
     * task. Task class and unspecified args default to current focus.
     */
    public Task done (String args) {
       Plan focus = getEngine().getFocus(true);
       Task task = processTaskIf(args, focus, true);
       if ( task != null ) {
-         if ( task.isPrimitive() ) done(task, focus); 
-         else done(new Propose.Succeeded(getEngine(), true, task), 
-                  focus);
+         if ( task.isPrimitive() ) done(task); 
+         else done(new Propose.Done(getEngine(), true, task));
       }
       return task;
    } 
@@ -360,10 +359,10 @@ public class Console extends Shell {
          task.setExternal(true); // must be set before eval
          task.eval(new Plan(task));
       }
-      done(task, focus); 
+      done(task); 
    }
    
-   private Task done (Task occurrence, Plan focus) {
+   private Task done (Task occurrence) {
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             boolean external = !Utils.isFalse(occurrence.getExternal());

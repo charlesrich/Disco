@@ -350,6 +350,14 @@ public class Disco extends TaskEngine {
       }
    }
    
+   /**
+    * Tests whether stack contains given plan
+    */
+   public boolean stackContains (final Plan plan) {
+      return stack.stream().filter(segment -> segment.getPlan() == plan)
+            .findFirst().isPresent();
+   }
+   
    @Override
    public void clear () {
       super.clear();
@@ -464,7 +472,7 @@ public class Disco extends TaskEngine {
             // try ignoring implicit Accept in focus (avoid spurious ambiguity)
             explanations = recognition.recognize(getFocus(true), null);
             if ( !explanations.isEmpty() ) return explanations;
-         }
+         }        
          top = getTop(focus);
          if ( top != focus ) {
             // next look in toplevel plan of current focus (if different)
@@ -474,6 +482,14 @@ public class Disco extends TaskEngine {
             tried.add(top);
          }
       } 
+      // special case for talking about done plans on stack
+      if ( occurrence instanceof Utterance )
+         for (Segment segment : stack) {
+            Plan plan = segment.getPlan();
+            if ( plan != null && occurrence.contributes(plan) ) {
+               return Collections.singletonList(new Explanation(plan, null, null));
+            }
+         }
       // next consider popping toplevel plan(s) on stack
       while (true) {
          if ( focus != null && top != null 
