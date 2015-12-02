@@ -1,4 +1,4 @@
-<taskModel about="urn:disco.wpi.edu:examples:ABC" xmlns="http://ce.org/cea-2018">
+<taskModel about="urn:disco.wpi.edu:ldt:ABC" xmlns="http://ce.org/cea-2018">
   <!-- 
        This is the task model being taught.
 

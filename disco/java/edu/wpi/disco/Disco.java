@@ -354,7 +354,7 @@ public class Disco extends TaskEngine {
     * Tests whether stack contains given plan
     */
    public boolean stackContains (final Plan plan) {
-      return stack.stream().filter(segment -> segment.getPlan() == plan)
+      return stack.stream().map(Segment::getPlan).filter(segment -> segment == plan)
             .findFirst().isPresent();
    }
    
@@ -482,13 +482,14 @@ public class Disco extends TaskEngine {
             tried.add(top);
          }
       } 
-      // special case for talking about done plans on stack
+      // special case for talking about done plans on stack for current top
       if ( occurrence instanceof Utterance )
-         for (Segment segment : stack) {
-            Plan plan = segment.getPlan();
-            if ( plan != null && occurrence.contributes(plan) ) {
+         for (int i = stack.size(); i-- > 1;) {
+            Plan plan = stack.get(i).getPlan();
+            if ( plan != null && !plan.isLive() && occurrence.contributes(plan) ) {
                return Collections.singletonList(new Explanation(plan, null, null));
             }
+            if ( plan == top ) break;
          }
       // next consider popping toplevel plan(s) on stack
       while (true) {

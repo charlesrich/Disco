@@ -1,0 +1,17 @@
+<taskModel about="urn:disco.wpi.edu:ldt:Meta" xmlns="http://ce.org/cea-2018">
+  <!-- 
+       This is the implementation of the proof of concept system in
+       a proposal submitted to the National Science Foundation
+       in November, 2015, titled,
+
+       A Unified Theory of Learning, Doing and Teaching Hierarchical Tasks:
+       The Learn-Do-Teach Challenge for Collaborative Agents
+
+       See Learn-Do-Teach.pdf for technical discussion and test folder
+       for test cases.
+
+       See ABC.xml for the task model being taught.
+  -->
+
+  
+</taskModel>
