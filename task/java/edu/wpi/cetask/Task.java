@@ -5,16 +5,14 @@
  */
 package edu.wpi.cetask;
 
+import java.text.DateFormat;
+import java.util.*;
+import javax.script.Bindings;
 import edu.wpi.cetask.Description.Input;
 import edu.wpi.cetask.Description.Output;
 import edu.wpi.cetask.Description.Slot;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Grounding;
-import edu.wpi.cetask.TaskClass.Postcondition;
-import edu.wpi.cetask.TaskClass.Precondition;
-import java.text.DateFormat;
-import java.util.*;
-import javax.script.Bindings;
+import edu.wpi.cetask.TaskClass.*;
 
 /**
  * Representation for instances of a task class.
@@ -27,8 +25,13 @@ public class Task extends Instance {
          // create JavaScript instance object (no initial slot properties)
          // do not use Instance.eval below because Decomposition.Step includes
          // call to updateBindings, but during constructor, steps are not yet added
-         bindings.put("$this", engine.newObject());
+         Object object = engine.newObject();
+         bindings.put("$this", object);
+         engine.put(object, "$instance", this);
          type.updateBindings(this); // extension
+         // see section 8.3 of ANSI/CEA-2018
+         engine.put(object, "model", type.getNamespace());
+         engine.put(object, "task", type.getId());
       }
    }
    
@@ -1102,6 +1105,23 @@ public class Task extends Instance {
       String format = getProperty("@format"); 
       // allow empty string to undo format
       return format != null && format.length() > 0 ? format : null;
+   }
+   
+   /**
+    * Builtin task class to use for step in which task attribute omitted
+    * Matches any task.
+    */
+   public static class Any extends Decomposition.Step {
+
+      public static TaskClass CLASS;
+      
+      // for TaskClass.newStep
+      public Any (TaskEngine engine, Decomposition decomp, String name, boolean repeat) { 
+         super(engine.getTaskClass(Any.class.getName()), engine, decomp, name);
+      }
+      
+      public Any (TaskEngine engine) { this(engine, null, null, false); }
+
    }
    
 }

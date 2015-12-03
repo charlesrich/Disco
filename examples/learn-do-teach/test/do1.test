@@ -1,7 +1,9 @@
     # This test case corresponds to Figure 3 in models/Learn-Do-Teach.pdf
-
+    # Execute this test case using bin/learn-do-teach 
+    #
     # Dec 1, 2015 4:10:55 PM - TaskEngine 1.8 / Disco 1.12
     Welcome to Disco! (Type 'help' for command list)
+  > load models/Primitives.xml
   > load models/ABC.xml
     # turn off automatic turn-taking for user
   > next false
@@ -25,7 +27,7 @@
     Human says "Do A done."
   > debug
   > history
-
+    #
     # Note Propose.Should and Propose.Done have been renamed to 
     # 'do' and 'done' respectively. 
 
@@ -46,6 +48,8 @@
   > debug false
   > verbose
   > history
+  #
+  # glossed version of history 
 
 [Do A by r1] -accepted -done <-focus
    Human says "Let's do A."

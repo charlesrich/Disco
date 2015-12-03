@@ -181,6 +181,8 @@
     <binding slot="$this.external" value="false" />
   </task>
 
+  <task id="edu.wpi.cetask.Task$Any"/>
+  
   <script init="true"> 
   
     // for convenience in console debugging with eval

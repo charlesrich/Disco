@@ -1,0 +1,102 @@
+<taskModel about="urn:disco.wpi.edu:ldt:Pedagogical"
+	   xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+  
+  <!-- 
+       This is the pedagogical model of the proof of concept system in
+       a proposal submitted to the National Science Foundation
+       in November, 2015, titled,
+
+       A Unified Theory of Learning, Doing and Teaching Hierarchical Tasks:
+       The Learn-Do-Teach Challenge for Collaborative Agents
+
+       See Learn-Do-Teach.pdf (especially Figure 4) for technical discussion
+       and test folder for test cases.
+
+       See ABC.xml for the task model being taught.
+  -->
+
+  <!-- note 'task' is a reserved slot name in ANSI/CEA-2018, so 'action'
+       is used instead below -->
+       
+  <task id="LearnRecipe">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <input name="learner" type="boolean"/>
+
+    <subtasks id="steps">
+      <step name="step" task="LearnStep" maxOccurs="unbounded"/>
+      <binding slot="$step.action" value="$this.action"/>
+      <binding slot="$step.recipe" value="$this.recipe"/>
+      <binding slot="$step.learner" value="$this.learner"/>
+    </subtasks>
+
+  </task>
+
+  <task id="LearnStep">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <input name="learner" type="boolean"/>
+
+    <subtasks id="instruction">
+      <step name="learn" task="addStep"/>
+      <binding slot="$learn.action" value="$this.action"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
+    </subtasks>
+
+    <subtasks id="demonstration">
+      <!-- note unrestricted step task type -->
+      <step name="demonstrate"/>
+      <step name="learn" task="addStep"/>
+      <applicable> $this.action.isPrimitive() </applicable>
+      <binding slot="$learn.action" value="new TaskClass($demonstrate.task)"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
+    </subtasks>
+
+    <subtasks id="topdown">
+      <step name="down" task="LearnRecipe"/>
+      <applicable> !$this.action.isPrimitive() </applicable>      
+      <binding slot="$down.action" value="$this.action"/>
+      <binding slot="$down.recipe" value="$this.recipe"/>
+      <binding slot="$down.learner" value="$this.learner"/>
+    </subtasks>
+
+  </task>
+  
+  <task id="addStep">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <script>
+      $this.recipe.steps.push($this.action);
+    </script>
+  </task>
+
+  <script init="true">
+
+    // using Javascript objects for convenience here, but will eventually
+    // be able to construct actual ANSI/CEA-2018 instances on the fly
+
+    var learned = []; // list of recipes
+    
+    function DecompositionClass (id, goal) {
+       this.id = id;
+       this.steps = [];
+       learned.push(this);
+    }
+
+    DecompositionClass.prototype.toString = function () {
+       return this.id+"["+this.steps+"]";
+    }
+       
+    function TaskClass (id) { this.id = id; }
+    
+    TaskClass.prototype.toString = function () { return this.id;}
+
+    TaskClass.prototype.isPrimitive = function () {
+      var task = $disco.getTaskClass(this.id);
+      return task != null &amp;&amp; task.isPrimitive();
+    }
+
+  </script>
+</taskModel>

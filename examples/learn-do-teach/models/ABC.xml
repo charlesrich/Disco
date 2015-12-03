@@ -1,4 +1,5 @@
-<taskModel about="urn:disco.wpi.edu:ldt:ABC" xmlns="http://ce.org/cea-2018">
+<taskModel about="urn:disco.wpi.edu:ldt:ABC" xmlns="http://ce.org/cea-2018"
+	   xmlns:primitive="urn:disco.wpi.edu:ldt:Primitives">
   <!-- 
        This is the task model being taught.
 
@@ -19,13 +20,13 @@
   <task id="B">
 
     <subtasks id="r2">
-      <step name="step1" task="d"/>
-      <step name="step2" task="e"/>
+      <step name="step1" task="primitive:d"/>
+      <step name="step2" task="primitive:e"/>
     </subtasks>
 
     <subtasks id="r3">
-      <step name="step1" task="f"/>
-      <step name="step2" task="g"/>
+      <step name="step1" task="primitive:f"/>
+      <step name="step2" task="primitive:g"/>
     </subtasks>
 
   </task>
@@ -33,17 +34,10 @@
   <task id="C">
 
     <subtasks id="r4">
-      <step name="step1" task="h"/>
-      <step name="step2" task="i"/>
+      <step name="step1" task="primitive:h"/>
+      <step name="step2" task="primitive:i"/>
     </subtasks>
 
   </task>
-
-  <task id="d"/>
-  <task id="e"/>
-  <task id="f"/>
-  <task id="g"/>
-  <task id="h"/>
-  <task id="i"/>
 
 </taskModel>
