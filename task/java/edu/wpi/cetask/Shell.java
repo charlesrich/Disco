@@ -490,8 +490,8 @@ public class Shell {
    /**
     * @see #processTask(String,Plan,boolean)
     */
-   protected Task processTaskIf (String args, Plan focus, boolean success) {
-      Task occurrence = processTask(args, focus, true);
+   protected Task processTaskIf (String args, Plan focus, boolean optional) {
+      Task occurrence = processTask(args, focus, optional);
       if ( occurrence == null ) 
          warning("Missing task argument (and no focus).");
       else if ( focus != null && focus.getGoal().matches(occurrence) )
@@ -503,8 +503,8 @@ public class Shell {
     * Return the task instance represented by given shell arguments.
     * 
     * JavaScript to compute all <em>declared</em> input
-    * and output slot values is required (in order declared). Success slot value is
-    * followed by external are optional (and last). Skipped slots can be specified
+    * and output slot values (in order declared), followed by external, and followed
+    * by success slot if optional is false. Skipped slots can be specified
     * by '/ /'.<br>
     * <br>
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
@@ -536,10 +536,8 @@ public class Shell {
          if ( !nextArg(tokenizer, task, name) ) return task;
       for (String name : type.declaredOutputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
-      if ( optional ) {
-         if ( nextArg(tokenizer, task, "success") ) 
-            nextArg(tokenizer, task, "external");
-      }
+      if ( !nextArg(tokenizer, task, "external") ) return task;
+      if ( !optional ) nextArg(tokenizer, task, "success");
       if ( tokenizer.hasMoreTokens() ) 
          warning("Ignoring rest of line starting at: \'"+tokenizer.nextToken()+"\'");
       return task;

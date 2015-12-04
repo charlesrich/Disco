@@ -30,6 +30,7 @@ public abstract class Nested extends Utterance {
    public boolean contributes (Plan plan) {
       if ( super.contributes(plan) ) return true;
       Task nested = getNested();
+      if ( nested == this ) throw new IllegalArgumentException("Circular nested utterance: "+this);
       return nested != null && nested.contributes(plan);
    }
 

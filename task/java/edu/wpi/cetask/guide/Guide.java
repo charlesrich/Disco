@@ -266,7 +266,7 @@ public class Guide extends Shell {
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public void done (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), true);
+      Task occurrence = processTaskIf(args, getProposed(), false);
       if ( occurrence != null ) done(occurrence); 
    }
    
@@ -300,7 +300,7 @@ public class Guide extends Shell {
     * @see #done(String)
     */
    public void execute (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), true);
+      Task occurrence = processTaskIf(args, getProposed(), false);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             Grounding script = occurrence.getGrounding();

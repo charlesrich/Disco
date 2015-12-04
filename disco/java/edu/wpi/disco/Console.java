@@ -126,22 +126,22 @@ public class Console extends Shell {
    protected void help () {
       // similar commands to Guide
       out.println("    (Note: $disco bound to current instance of Disco)");
-      out.println("    task <id> [<namespace>] [ / <value> ]*");
+      out.println("    task <id> [<namespace>] [/ <input>]* [/ <output>]* [/ <external>]");
       out.println("                        - propose a task");
       out.println("                          (namespace optional if unambiguous id)");
       out.println("                          (slot values optional)");
-      out.println("    say [<id> [<namespace>]] [ / <value> ]*");
-      out.println("                        - execute an utterance");
-      out.println("                          (defaults to menu of choices)");
-      out.println("    done [<id> [<namespace>]] [ / <value> ]*");
-      out.println("                        - I have performed this task");
+      out.println("    done [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
+      out.println("                        - this task has been performed (default by user)");
       out.println("                          (for primitive tasks only)");
-      out.println("                          (defaults to current focus)");
+      out.println("                          (task defaults to current focus)");
       out.println("                          (all slot values required)");
-      out.println("    execute [<id> [<namespace>]] [ / <value> ]*");
+      out.println("    execute [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'done', except runs script if any");
-      out.println("    instance [<id> [<namespace>]] [ / <value> ]*");
-      out.println("                        - like 'done', except only creates instance and sets $instance");
+      out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
+      out.println("                        - like 'execute' for utterances, except defaults to menu of choices");
+      out.println("    instance [<id> [<namespace>]] [ / <input> ]* [ / <output> ]* [/ <external>]");
+      out.println("                        - sets $new to specified new task instance");
+      out.println("                          (slot values optional)");
       out.println("    next [<boolean>]    - end user console turn");
       out.println("                          (boolean turns automatic turn mode on/off)");
       super.help();
@@ -248,7 +248,7 @@ public class Console extends Shell {
     * @see Propose.Should
     */
    public void task (String args) {
-      Task should = processTaskIf(args, null, false);
+      Task should = processTaskIf(args, null, true);
       if ( should != null ) 
          interaction.occurred(true, 
                Propose.Should.newInstance(getEngine(), true, should), null); 
@@ -267,7 +267,7 @@ public class Console extends Shell {
     */
    public void say (String args) throws Quit {
       if ( args.length() > 0 ) {
-         Task occurrence = done(args);
+         Task occurrence = execute(args);
          if ( !(occurrence instanceof Utterance) )
             warning("Was not utterance!");
       } else {
@@ -334,7 +334,7 @@ public class Console extends Shell {
     */
    public Task done (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, true);
+      Task task = processTaskIf(args, focus, false);
       if ( task != null ) {
          if ( task.isPrimitive() ) done(task); 
          else done(new Propose.Done(getEngine(), true, task));
@@ -348,18 +348,19 @@ public class Console extends Shell {
     * 
     * @see #done(String)
     */
-   public void execute (String args) {
+   public Task execute (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, true);
+      Task task = processTaskIf(args, focus, false);
       if ( !task.isPrimitive() ) {
          err.println("Execute not allowed for non-primitive tasks.");
-         return;
+         return null;
       }
       if ( !(task instanceof Utterance) ) { // see Interaction.done
          task.setExternal(true); // must be set before eval
          task.eval(new Plan(task));
       }
-      done(task); 
+      done(task);
+      return task;
    }
    
    private Task done (Task occurrence) {
@@ -379,8 +380,8 @@ public class Console extends Shell {
     * This command is needed to avoid recursive invocation of eval in test cases.
     */
    public Task instance (String args) {
-      Task task = processTaskIf(args, null, true);
-      getEngine().setGlobal("$instance", task);
+      Task task = processTaskIf(args, null, false);
+      getEngine().setGlobal("$new", task);
       return task;
    }
 

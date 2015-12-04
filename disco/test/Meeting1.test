@@ -15,7 +15,7 @@
   > task _Meeting
     User says "Let's achieve _Meeting."
     Agent says "What is the Meeting start?"
-  > done / / / 1200
+  > say / / / 1200
     User says "The Meeting start is 1200."
     Agent says "How shall we achieve Meeting on 1200?"
   > say
@@ -25,7 +25,7 @@
   >> 1
     User says "Let's achieve Meeting on 1200 by end."
     Agent says "What is the End time?"
-  > done / / / 1300
+  > say / / / 1300
     User says "The End time is 1300."
     Agent execute End on 1300.
     Agent execute Schedule on 1200 and 1300.
@@ -33,7 +33,7 @@
   > task _Meeting
     User says "Let's achieve _Meeting."
     Agent says "What is the Meeting start?"
-  > done / / / 1200
+  > say / / / 1200
     User says "The Meeting start is 1200."
     Agent says "How shall we achieve Meeting on 1200?"
   > say
@@ -43,7 +43,7 @@
   >> 2
     User says "Let's achieve Meeting on 1200 by duration."
     Agent says "What is the Duration duration?"
-  > done / / / 100
+  > say / / / 100
     User says "The Duration duration is 100."
     Agent execute Duration on 1200 and 100 producing 1300.0.
     Agent execute Schedule on 1200 and 1300.0.
@@ -53,10 +53,10 @@
   > task _Meeting
     User says "Let's achieve _Meeting."
     Agent says "What is the Meeting start?"
-  > done / / / 1200
+  > say / / / 1200
     User says "The Meeting start is 1200."
     Agent says "What is the End time?"
-  > done / / / 1300
+  > say / / / 1300
     User says "The End time is 1300."
     Agent execute End on 1300.
     Agent execute Schedule on 1200 and 1300.
@@ -66,10 +66,10 @@
     User says "Let's achieve _Meeting."
   > next
     Agent says "What is the Meeting start?"
-  > done / / / 1200
+  > say / / / 1200
     User says "The Meeting start is 1200."
   > instance End
-  > done edu.wpi.disco.lang.Propose$What / $instance / "time" / 1300
+  > say edu.wpi.disco.lang.Propose$What / $new / "time" / 1300
     User says "The End time is 1300."
   > next
     Agent execute End on 1300.
@@ -79,10 +79,10 @@
     User says "Let's achieve _Meeting."
   > next
     Agent says "What is the Meeting start?"
-  > done / / / 1200
+  > say / / / 1200
     User says "The Meeting start is 1200."
   > instance Duration
-  > done edu.wpi.disco.lang.Propose$What / $instance / "duration" / 100
+  > say edu.wpi.disco.lang.Propose$What / $new / "duration" / 100
     User says "The Duration duration is 100."
   > next
     Agent execute Duration on 1200 and 100 producing 1300.0.
@@ -95,10 +95,10 @@
   > task _Meeting
     User says "Let's achieve _Meeting."
   > instance Meeting
-  > done edu.wpi.disco.lang.Propose$What / $instance / "start" / 1200
+  > say edu.wpi.disco.lang.Propose$What / $new / "start" / 1200
     User says "The Meeting start is 1200."
   > instance End
-  > done edu.wpi.disco.lang.Propose$What / $instance / "time" / 1200
+  > say edu.wpi.disco.lang.Propose$What / $new / "time" / 1200
     User says "The End time is 1200."
   > next
     Agent execute End on 1200.
@@ -110,10 +110,10 @@
   > task _Meeting
     User says "Let's achieve _Meeting."
   > instance Meeting
-  > done edu.wpi.disco.lang.Propose$What / $instance / "start" / 1200
+  > say edu.wpi.disco.lang.Propose$What / $new / "start" / 1200
     User says "The Meeting start is 1200."
   > instance Duration
-  > done edu.wpi.disco.lang.Propose$What / $instance / "duration" / 100
+  > say edu.wpi.disco.lang.Propose$What / $new / "duration" / 100
     User says "The Duration duration is 100."
   > next
     Agent execute Duration on 1200 and 100 producing 1300.0.

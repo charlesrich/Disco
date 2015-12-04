@@ -27,7 +27,6 @@ public class Task extends Instance {
          // call to updateBindings, but during constructor, steps are not yet added
          Object object = engine.newObject();
          bindings.put("$this", object);
-         engine.put(object, "$instance", this);
          type.updateBindings(this); // extension
          // see section 8.3 of ANSI/CEA-2018
          engine.put(object, "model", type.getNamespace());
@@ -975,7 +974,8 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined ) buffer.append(toString(arg));
+         if ( arg != undefined ) 
+            buffer.append(arg == this ? "!circular!" : toString(arg));
       }
       return buffer;
    }

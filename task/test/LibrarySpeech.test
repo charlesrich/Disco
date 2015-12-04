@@ -24,7 +24,7 @@ CE> yes
     Done look Mindscan up in the catalog.
 CE> next
     Please take Mindscan from Shelf 2.
-CE> done / / / false
+CE> done / / / / false
     Failed take Mindscan from Shelf 2.
 CE> status
 

@@ -3,7 +3,7 @@
   > load models/Test.xml
   > eval var FOO
     # Returned 'null'
-  > done edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / / false
+  > say edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / false
     Agent says "Propose.Global on FOO and Flavor and chocolate."
   > eval FOO
     # Returned 'null'
@@ -18,7 +18,7 @@
   > eval FOO=undefined
     # Returned 'null'
   > clear
-  > done edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / / false
+  > say edu.wpi.disco.lang.Propose$Global / "FOO" / "Flavor" / "chocolate" / false
     Agent says "Propose.Global on FOO and Flavor and chocolate."
   > eval FOO
     # Returned 'null'
