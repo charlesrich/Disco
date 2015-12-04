@@ -17,7 +17,7 @@
     Agent says "Do B done."
   > execute h
     Human do h.
-  > task i / / false
+  > task i / false
     Human says "Please do i."
   > next
     Agent do i.
@@ -33,7 +33,7 @@
 
 [A] -accepted -done <-focus
    Propose.Should(human,A)
-   [B] -done
+   [B by r2] -done
       d(agent)
       e(agent)
       Propose.Done(agent,B)

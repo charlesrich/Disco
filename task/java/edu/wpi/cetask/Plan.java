@@ -1156,10 +1156,10 @@ public class Plan {
             : goal);
          DecompositionClass decomp = getDecompositionClass();
          if ( decomp != null &&
-               (TaskEngine.VERBOSE ||
+               (TaskEngine.VERBOSE 
                      // suppress unique known and unformatted decompositions
-                     (goal.getType().getDecompositions().size() > 1 
-                       && decomp.getProperty("@format") != null)) ) {
+                     || goal.getType().getDecompositions().size() > 1 
+                     || decomp.getProperty("@format") != null))  {
             stream.print(' '); 
             if ( format ) stream.print(decomp.format());
             else { stream.print("by "); stream.print(decomp); }
