@@ -25,7 +25,7 @@ class Recognition {
             // oversimplification, since it ignores inputs/outputs
             // and the fact that there could validly be different
             // implementations, but it works well in practice
-            if ( task == e.start.getType() ) return;
+            if ( e.start != null && task == e.start.getType() ) return;
       }
       explanations.add(explanation);
    }
