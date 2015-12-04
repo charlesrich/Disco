@@ -64,7 +64,7 @@ public class DecompositionClass extends TaskModel.Member {
    }
    
    /**
-    * @return applicable condition of this task class (or null if none defined)
+    * @return applicable condition of this decomposition class (or null if none defined)
     */
    public Applicability getApplicable () { return applicable; }
    

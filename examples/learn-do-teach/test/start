@@ -5,6 +5,7 @@ next false
 # define variables for convenience
 eval C = new TaskClass("C"); r4 = new DecompositionClass("r4", C)
 task LearnRecipe / C / r4 / false
-task addStep / new TaskClass("h") / r4 /
+task addStep / new TaskClass("h") / r4 / false
+next
 
 

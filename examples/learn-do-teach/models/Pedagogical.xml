@@ -25,7 +25,6 @@
 
     <subtasks id="steps">
       <step name="step" task="LearnStep" maxOccurs="unbounded"/>
-      <binding slot="$step.action" value="$this.action"/>
       <binding slot="$step.recipe" value="$this.recipe"/>
       <binding slot="$step.learner" value="$this.learner"/>
     </subtasks>

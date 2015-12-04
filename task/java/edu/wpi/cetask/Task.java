@@ -378,7 +378,7 @@ public class Task extends Instance {
 
    @Override
    protected Boolean evalCondition (String condition, Compiled compiled, String where) {
-	   if ( clonedInputs == null ) return super.evalCondition(condition,  compiled, where);
+	   if ( clonedInputs == null ) return super.evalCondition(condition, compiled, where);
        synchronized (bindings) {
           Object old = bindings.get("$this");
           try {

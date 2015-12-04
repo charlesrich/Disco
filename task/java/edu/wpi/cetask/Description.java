@@ -332,7 +332,8 @@ public abstract class Description { //TODO: temporarily public for Anahita
       @Override
       void setEnclosing (Description enclosing) {
          super.setEnclosing(enclosing);
-         if ( enclosing instanceof TaskClass ) {
+         if ( strict && 
+               (enclosing instanceof TaskClass || enclosing instanceof DecompositionClass) ) {
             Matcher matcher = pattern.matcher(script);
             while ( matcher.find() ) {
                String slot = matcher.group().substring(6);
