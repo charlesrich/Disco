@@ -318,6 +318,13 @@ public class Task extends Instance {
       } finally { extra.remove("$$this"); }
    }
    
+   public int countSlotValues () {
+      int n = 0;
+      for (Slot slot : getType().getSlots()) 
+         if ( slot.isDefinedSlot(this) ) n++;
+      return n;
+   }
+   
    /**
     * Make named slot undefined.
     * 

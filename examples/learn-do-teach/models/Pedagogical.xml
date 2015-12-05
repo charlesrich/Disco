@@ -57,7 +57,6 @@
       <step name="down" task="LearnRecipe"/>
       <applicable> !$this.action.isPrimitive() </applicable>      
       <binding slot="$down.action" value="$this.action"/>
-      <binding slot="$down.recipe" value="$this.recipe"/>
       <binding slot="$down.learner" value="$this.learner"/>
     </subtasks>
 
@@ -85,7 +84,8 @@
     }
 
     DecompositionClass.prototype.toString = function () {
-       return this.id+"["+this.steps+"]";
+       return this.id+
+         (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
     }
        
     function TaskClass (id) { this.id = id; }

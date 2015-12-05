@@ -19,17 +19,26 @@ class Recognition {
    private void add (Explanation explanation) {
       if ( explanation.start != null ) {
          TaskClass task = explanation.start.getType();
-         for (Explanation e : explanations)
-            // ignore ambiguity between different explanations for
-            // the same task type --- this is a pretty strong
-            // oversimplification, since it ignores inputs/outputs
-            // and the fact that there could validly be different
-            // implementations, but it works well in practice
+         for (Explanation e : explanations) 
+            /* ignore ambiguity between different explanations for the same task
+             * type --- this is a pretty strong oversimplification, since it
+             * ignores inputs/outputs and the fact that there could validly be
+             * different implementations, but it works well in practice
+             */
             if ( e.start != null && task == e.start.getType() ) return;
+         for (Iterator<Explanation> i = explanations.iterator(); i.hasNext();) {
+            Explanation e = i.next();
+            int old = e.getFocus().getGoal().countSlotValues(),
+                current = explanation.getFocus().getGoal().countSlotValues(); 
+            // prefer more specific explanation with more defined slots
+            if ( old > current ) return;
+            if ( current > old ) i.remove();
+            // otherwise keep ambiguity
+         }
       }
       explanations.add(explanation);
    }
-   
+
    Recognition (Task occurrence) { this.occurrence = occurrence; } 
 
    // Note immediate children of root node are always searched,
