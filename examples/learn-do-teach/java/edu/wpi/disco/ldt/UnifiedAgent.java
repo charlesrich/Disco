@@ -35,4 +35,11 @@ public class UnifiedAgent extends Agent {
       occurred(interaction, item, retry);
       return true;
    }
+   
+   // convert from JavaScript to ANSI/CEA-2018 and load into Disco
+   public static void compile (String id, String goal, String[] steps) {
+      System.out.println(id);
+      System.out.println(goal);
+      System.out.println(steps[0]+steps[1]);///
+   }
 }

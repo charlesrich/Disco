@@ -10,3 +10,4 @@ next
 task addStep / new TaskClass("i") / r4 / false
 next
 done LearnRecipe / C / r4 / false
+eval compile()
