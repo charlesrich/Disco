@@ -1,3 +1,4 @@
+# note *not* loading ABC model
 load models/Pedagogical.xml
 load models/Primitives.xml
 # turn off automatic turn-taking
@@ -11,3 +12,4 @@ task addStep / new TaskClass("i") / r4 / false
 next
 done LearnRecipe / C / r4 / false
 eval compile()
+print r4

@@ -1,5 +1,5 @@
 <taskModel about="urn:disco.wpi.edu:ldt:Pedagogical"
-	   xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
   
   <!-- 
        This is the pedagogical model of the proof of concept system in
@@ -75,20 +75,26 @@
     // using Javascript objects for convenience here, but will eventually
     // be able to construct actual ANSI/CEA-2018 instances on the fly
 
-    var learned = []; // learned recipes (decomposition classesO
-    
-    // compile learned recipes into ANSI/CEA-2018 and load into Disco
-    function compile () {
-       learned.map(function(r) {
-         Packages.edu.wpi.disco.ldt.UnifiedAgent.compile(r.id, r.goal, r.steps);
-       })
+    var tasks = []; // learned task classes
+    var recipes = []; // learned decomposition classes    
+
+    function TaskClass (id) {
+       this.id = id;
+       if ( !$disco.getTaskClass(this.id) ) tasks.push(this);
     }
     
+    TaskClass.prototype.toString = function () {return this.id;}
+
+    TaskClass.prototype.isPrimitive = function () {
+      var task = $disco.getTaskClass(this.id);
+      return task != null &amp;&amp; task.isPrimitive();
+    }
+      
     function DecompositionClass (id, goal) {
        this.id = id;
        this.goal = goal;
        this.steps = [];
-       learned.push(this);
+       if ( !$disco.getDecompositionClass(this.id) ) recipes.push(this);
     }
 
     DecompositionClass.prototype.toString = function () {
@@ -96,13 +102,13 @@
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
     }
 
-    function TaskClass (id) { this.id = id; }
-    
-    TaskClass.prototype.toString = function () { return this.id;}
-
-    TaskClass.prototype.isPrimitive = function () {
-      var task = $disco.getTaskClass(this.id);
-      return task != null &amp;&amp; task.isPrimitive();
+    // compile learned task model into ANSI/CEA-2018 and load into Disco
+    function compile () {
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(tasks);
+       recipes.map(function(r) {
+          Packages.edu.wpi.disco.ldt.UnifiedAgent.compileRecipe(r.id, r.goal,
+            r.steps.map(function(s) { return s.id; })) });
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
     }
 
   </script>
