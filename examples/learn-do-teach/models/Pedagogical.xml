@@ -103,12 +103,13 @@
     }
 
     // compile learned task model into ANSI/CEA-2018 and load into Disco
-    function compile () {
-       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(tasks);
+    function compile (about) {
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(about, tasks);
        recipes.map(function(r) {
           Packages.edu.wpi.disco.ldt.UnifiedAgent.compileRecipe(r.id, r.goal,
             r.steps.map(function(s) { return s.id; })) });
-       Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
+            Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
+       tasks = []; recipes = [];
     }
 
   </script>

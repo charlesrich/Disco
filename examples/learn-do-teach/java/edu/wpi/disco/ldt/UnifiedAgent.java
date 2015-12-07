@@ -55,24 +55,24 @@ public class UnifiedAgent extends Agent {
    
    private static Document document;
    private static Element model;
-   private static final String XMLNS = "http://ce.org/cea-2018";
+   private static final String CEA_2018 = "http://ce.org/cea-2018";
    
-   public static void compileTasks (String[] tasks) {
+   public static void compileTasks (String about, String[] tasks) {
       document = builder.newDocument();
-      model = document.createElementNS(XMLNS, "taskModel");
+      model = document.createElementNS(CEA_2018, "taskModel");
       document.appendChild(model);
       // boiler plate
-      Attr about = document.createAttribute("about");
-      about.setValue("urn:disco.wpi.edu:learn-do-teach");
-      model.setAttributeNode(about);
+      Attr aboutAttr = document.createAttribute("about");
+      aboutAttr.setValue(about);
+      model.setAttributeNode(aboutAttr);
       Attr xmlns = document.createAttribute("xmlns");
-      xmlns.setValue(XMLNS);
+      xmlns.setValue(CEA_2018);
       model.setAttributeNode(xmlns);
       Attr primitive = document.createAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:primitive");
       primitive.setValue("urn:disco.wpi.edu:ldt:Primitives");
       model.setAttributeNode(primitive);
       for (int i = 0; i < tasks.length; i++) {
-         Element task = document.createElementNS(XMLNS, "task");
+         Element task = document.createElementNS(CEA_2018, "task");
          model.appendChild(task);
          Attr id = document.createAttribute("id");
          id.setValue(tasks[i]);
@@ -81,7 +81,7 @@ public class UnifiedAgent extends Agent {
    }
    
    public static void compileRecipe (String id, String goal, String[] steps) {
-      Element subtasks = document.createElementNS(XMLNS, "subtasks");
+      Element subtasks = document.createElementNS(CEA_2018, "subtasks");
       model.appendChild(subtasks);
       Attr idAttr = document.createAttribute("id");
       idAttr.setValue(id);
@@ -90,7 +90,7 @@ public class UnifiedAgent extends Agent {
       goalAttr.setValue(goal);
       subtasks.setAttributeNode(goalAttr);
       for (int i = 0; i < steps.length; i++) {
-         Element step =  document.createElementNS(XMLNS, "step");
+         Element step =  document.createElementNS(CEA_2018, "step");
          subtasks.appendChild(step);
          Attr name = document.createAttribute("name");
          name.setValue("step"+(i+1));
