@@ -181,15 +181,15 @@ public class Console extends Shell {
          } catch (IllegalArgumentException e) {} // is decomposition class
          if ( task != null ) { 
             out.println(); printNamespace(task, namespace);
-            out.print("  "); task.print(out); out.println();
-            printProperties(task);
+            task.print(out); out.println();
+            printProperties(task); 
          } else {
             DecompositionClass decomp = namespace == null ? getEngine().getDecompositionClass(id) :
                            getEngine().getModel(namespace).getDecompositionClass(id);
             if ( decomp != null ) { 
                out.println(); printNamespace(decomp, namespace);
-               out.print("  "); decomp.print(out); out.println();
-               printProperties(decomp);
+               decomp.print(out); out.println();
+               printProperties(decomp); 
             } else err.println("Unknown task or decomposition class.");
          }
       } else err.println("No task or decomposition class provided.");
@@ -197,11 +197,10 @@ public class Console extends Shell {
    }
    
    private void printNamespace (TaskModel.Member member, String namespace) {
-      if ( namespace == null && getEngine().getModels().size() > 1 ) {
-         out.print("  ");out.println(member.getNamespace());
-      }
-      
+      if ( namespace == null && getEngine().getModels().size() > 1 )
+         out.println(member.getNamespace());
    }
+
    private void printProperties (TaskModel.Member member) {
       Set<String> properties = member.getProperties();
       for (String property : properties) {
@@ -221,9 +220,7 @@ public class Console extends Shell {
    private boolean printSlotProperties (TaskClass task, String slot) {
       String key = "."+slot+"@optional";
       Boolean value = task.getProperty(key, (Boolean) null);
-      if ( value != null ) {
-         out.print("  "); out.println(task.getPropertyId()+key+" = "+value);
-      }
+      if ( value != null ) out.println(task.getPropertyId()+key+" = "+value);
       // TODO add other slot properties here
       return value == null;
    }

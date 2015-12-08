@@ -86,14 +86,9 @@ public class Disco extends TaskEngine {
    
    @Override
    protected TaskModel load (String from, InputStream input) {
-      try { 
-         return load(from, builder.parse(input, from), 
-                     loadProperties(from, ".properties"),
-                     loadProperties(from, ".translate.properties"));
-      } // error handler above has already printed info
-      catch (SAXParseException e) { return null; }
-      catch (SAXException e) { return null; }
-      catch (IOException e) { throw new RuntimeException(e); }
+      return load(from, parse(input, from), 
+            loadProperties(from, ".properties"),
+            loadProperties(from, ".translate.properties"));
    }
     
    /**

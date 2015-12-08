@@ -38,6 +38,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
    public void print (PrintStream stream) {
       try {
          Transformer transformer = factory.newTransformer();
+         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
          transformer.setOutputProperty(OutputKeys.INDENT, "yes");
          transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
          transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");

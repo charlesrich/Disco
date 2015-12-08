@@ -408,10 +408,7 @@ public class TaskEngine {
     */
    public Document parse (String from) {
       handler.from = null;  // systemId non-null
-      try { 
-         return builder.parse(Utils.toURL(from).openStream(), from);
-      }
-      catch (SAXException e) { print(e); return null; }
+      try { return parse(Utils.toURL(from).openStream(), from); }
       catch (IOException e) { throw new RuntimeException(e); }
    }
       
@@ -426,22 +423,31 @@ public class TaskEngine {
     * @see #load(String)
     */
    public TaskModel load (String from, String model, String properties) {
-      try {
          return load(from, 
-               builder.parse(new ByteArrayInputStream(model.getBytes()), from),
+               parse(new ByteArrayInputStream(model.getBytes()), from),
                properties == null ? null :
                   Utils.loadProperties(new ByteArrayInputStream(properties.getBytes())));
-      }
-      catch (SAXException e) { print(e); return null; }
-      catch (IOException e) { throw new RuntimeException(e); }
+   }
+
+   protected TaskModel load (String from, InputStream input) {
+        return load(from, parse(input, from), loadProperties(from, ".properties")); 
    }
    
-   protected TaskModel load (String from, InputStream input) {
-      try { 
-         return load(from, builder.parse(input, from), 
-                     loadProperties(from, ".properties")); }
+   protected Document parse (InputStream stream, String from) {
+      Document document;
+      try { document = builder.parse(stream, from); }
       catch (SAXException e) { print(e); return null; }
       catch (IOException e) { throw new RuntimeException(e); }
+      try { // remove whitespace outside tags (for better printing later)
+         NodeList nodeList = (NodeList) xpath.evaluate("//text()[normalize-space()='']",
+               document,
+               XPathConstants.NODESET);
+         for (int i = 0; i < nodeList.getLength(); ++i) {
+            Node node = nodeList.item(i);
+            node.getParentNode().removeChild(node);
+         }
+      } catch (XPathExpressionException e) { throw new RuntimeException(e); }
+      return document;
    }
    
    /** 
