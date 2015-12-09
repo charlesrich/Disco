@@ -111,7 +111,7 @@
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
   </task>
 
-   <task id="edu.wpi.disco.lang.Ask$Should$Repeat">
+  <task id="edu.wpi.disco.lang.Ask$Should$Repeat">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
   </task>
   
@@ -135,6 +135,7 @@
   <task id="edu.wpi.disco.lang.Reject">
     <input name="proposal" type="Packages.edu.wpi.disco.lang.Propose" />
   </task>
+  
   <task id="edu.wpi.disco.lang.Ok"/>
 
   <task id="edu.wpi.disco.lang.Say">   
@@ -177,7 +178,9 @@
     <binding slot="$this.external" value="false" />
   </task>
 
-  <task id="edu.wpi.cetask.Task$Any"/>
+  <task id="edu.wpi.cetask.Task$Any">
+    <input name="type" type="Packages.edu.wpi.cetask.TaskClass"/>
+  </task>
   
   <script init="true"> 
   

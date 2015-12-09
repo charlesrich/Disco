@@ -43,7 +43,7 @@ public class Task extends Instance {
    public boolean equals (Object object) {     
       if ( !(object instanceof Task) ) return false;
       Task task = (Task) object;
-      if ( type != task.type ) return false;
+      if ( getType() != task.getType() ) return false;
       for (Slot slot : getType().getInputs())
          if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
             return false;
@@ -56,7 +56,7 @@ public class Task extends Instance {
    @Override 
    public int hashCode () {
       int factor = 31;
-      int hash = type.hashCode()*factor;
+      int hash = getType().hashCode()*factor;
       for (Slot slot : getType().getInputs()) {
          Object value = slot.getSlotValue(this);
          if ( value != null ) {
@@ -643,6 +643,10 @@ public class Task extends Instance {
     * instances match (symmetric relationship) iff they are both instances of the
     * same type and the values of each corresponding slot are either equal or
     * one is undefined.
+    * <p>
+    * Note to support overriding in {@link Task.Any}, it is important that whenever
+    * this method is called, the goal parameter is the task being explained (which
+    * cannot be an instance of Task.Any).
     * 
     * @see #copySlotValues(Task)
     */
@@ -915,6 +919,53 @@ public class Task extends Instance {
       rejected.add(decomp);
    }
 
+   /**
+    * Builtin task class used for steps in which task attribute omitted
+    * (CEA-2018-ext). This is essentially a way to partially make the task
+    * representation second order. Note it has an input (see Disco.xml) named
+    * 'type' of type TaskClass, which is specially handled below.
+    */
+   public static class Any extends Decomposition.Step {
+      
+      public static TaskClass CLASS;
+      
+      // for TaskClass.newStep
+      public Any (TaskEngine engine, Decomposition decomp, String name, boolean repeat) { 
+         super(engine.getTaskClass(Any.class.getName()), engine, decomp, name);
+      }
+      
+      public Any (TaskEngine engine) { this(engine, null, null, false); }
+
+      // should never be an occurrence or be explained by another task
+      @Override
+      public boolean contributes (Plan plan) { return false; }
+      @Override
+      public boolean contributes (TaskClass task) { return false; }
+      @Override
+      public boolean isPathFrom (TaskClass type) { return false; }
+      
+      // however can explain any other task (see comment on Task.matches())
+      @Override
+      public boolean matches (Task goal) { return true; }
+      
+      /**
+       * Copies the values of defined slots <em>from</em> given task to this task. Note this
+       * side-effects this task, overwriting existing slot values.
+       * 
+       * @param from - task of same type
+       * @return true if any slots of this task overwritten (were defined)
+       * 
+       * @see #matches(Task)
+       */
+      public boolean copySlotValues (Task from) { return false; }
+      
+      // TODO matches any task -- set type input, as well as task and model properties
+      
+      // TODO execute grounding script for type input
+      
+      // TODO How about inputs to type?
+   }
+   
    // *******************************************************************
    //     All code below here is printing-related stuff 
    // *******************************************************************
@@ -1113,22 +1164,5 @@ public class Task extends Instance {
       // allow empty string to undo format
       return format != null && format.length() > 0 ? format : null;
    }
-   
-   /**
-    * Builtin task class to use for step in which task attribute omitted
-    * Matches any task.
-    */
-   public static class Any extends Decomposition.Step {
-
-      public static TaskClass CLASS;
-      
-      // for TaskClass.newStep
-      public Any (TaskEngine engine, Decomposition decomp, String name, boolean repeat) { 
-         super(engine.getTaskClass(Any.class.getName()), engine, decomp, name);
-      }
-      
-      public Any (TaskEngine engine) { this(engine, null, null, false); }
-
-   }
-   
+  
 }

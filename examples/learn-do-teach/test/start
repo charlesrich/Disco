@@ -1,15 +1,65 @@
+# This test case corresponds to Figures 5, 6 and 7 in models/Learn-Do-Teach.pdf,
+# except for Figure 5(c), which requires a separate execution (see Figure5-c.test)
+#
+# Execute this test case using bin/learn-do-teach 
+#
 # note *not* loading ABC model
 load models/Pedagogical.xml
 load models/Primitives.xml
 # turn off automatic turn-taking
 next false
 # define variables for convenience
-eval C = new TaskClass("C"); r4 = new DecompositionClass("r4", C)
+eval C = TaskClass.get("C"); r4 = DecompositionClass.get("r4", C)
+eval h = TaskClass.get("h"); i = TaskClass.get("i")
+#
+# Human teaching agent by instruction how to do C
+#
 task LearnRecipe / C / r4 / false
-task addStep / new TaskClass("h") / r4 / false
+task addStep / h / r4 / false
 next
-task addStep / new TaskClass("i") / r4 / false
+task addStep / i / r4 / false
 next
 done LearnRecipe / C / r4 / false
 eval compile("learn-do-teach")
+debug
+#
+# Following corresponds to Figure 5(a). Note:
+#
+#  * Propose.Should and Propose.Done have been renamed to 'do' and 'done' respectively
+#  * 'false' input to LearnRecipe and LearnStep means agent ('true' means human)
+#  * segments for primitive actions (e.g., addStep) have been omitted in figure
+#
+history 
+# learned recipe
 print r4
+# glossed version of history
+debug false  
+history
+#
+# Agent doing C
+#
+clear
+task C
+next
+next
+next
+debug
+#
+# Following corresponds to Figure 5(b). Note human acceptance of agent's done proposal
+# omitted in figure.
+#
+history
+# glossed version of history
+debug false
+history
+clear
+#
+# Agent teaching another human by mixture of demonstration and instructions how to do C
+#
+task LearnRecipe / C / r4 / true / false
+#
+# agent chooses demonstration by default for first step
+#
+next
+history
+done addStep / h / r4

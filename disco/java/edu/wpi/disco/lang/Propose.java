@@ -166,11 +166,10 @@ public interface Propose {
        * whose slots needs to be set, etc., will be the instance to which
        * proposal contributes.
        */
-      
       protected Task getNested (Plan contributes) {
          Task nested = getNested();
          return ( nested != null && contributes != null 
-                  && nested.matches(contributes.getGoal()) ) ? contributes.getGoal() 
+                  && contributes.getGoal().matches(nested) ) ? contributes.getGoal() 
                   : nested;
       }
 
@@ -783,7 +782,7 @@ public interface Propose {
       private Plan getNestedPlan (Plan contributes) {
          Plan plan = getPlan();
          return ( plan != null && contributes != null
-                  && plan.getGoal().matches(contributes.getGoal()) ) ? contributes : plan;
+                  && contributes.getGoal().matches(plan.getGoal()) ) ? contributes : plan;
       }
       
       @Override

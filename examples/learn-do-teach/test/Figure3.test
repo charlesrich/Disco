@@ -31,13 +31,13 @@
     # Note Propose.Should and Propose.Done have been renamed to 
     # 'do' and 'done' respectively. 
 
-[A] -accepted -done <-focus
+[A by r1] -accepted -done <-focus
    Propose.Should(human,A)
    [B by r2] -done
       d(agent)
       e(agent)
       Propose.Done(agent,B)
-   [C] -done
+   [C by r4] -done
       h(human)
       [i(agent)] -accepted -done
          Propose.Should(human,i(agent))
@@ -45,21 +45,19 @@
       Propose.Done(human,C)
    Propose.Done(human,A)
 
+  # glossed version of history
   > debug false
-  > verbose
   > history
-  #
-  # glossed version of history 
 
 [Do A by r1] -accepted -done <-focus
    Human says "Let's do A."
-   [step1: Do B by r2] -done
+   [Do B by r2] -done
       Agent do d.
       Agent do e.
       Agent says "Do B done."
-   [step2: Do C by r4] -done
+   [Do C by r4] -done
       Human do h.
-      [step2: Agent do i] -accepted -done
+      [Agent do i] -accepted -done
          Human says "Please do i."
          Agent do i.
       Human says "Do C done."

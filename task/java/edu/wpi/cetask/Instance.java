@@ -16,7 +16,7 @@ import javax.script.*;
  */
 abstract class Instance {
    
-   protected final TaskModel.Member type;
+   private final TaskModel.Member type; 
    
    public TaskModel.Member getType () { return type; }
    

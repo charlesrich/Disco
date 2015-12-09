@@ -72,11 +72,13 @@ public class UnifiedAgent extends Agent {
       primitive.setValue("urn:disco.wpi.edu:ldt:Primitives");
       model.setAttributeNode(primitive);
       for (int i = 0; i < tasks.length; i++) {
+         String id = tasks[i];
+         if ( disco.getTaskClass(id) != null ) continue; 
          Element task = document.createElementNS(CEA_2018, "task");
          model.appendChild(task);
-         Attr id = document.createAttribute("id");
-         id.setValue(tasks[i]);
-         task.setAttributeNode(id);
+         Attr idAttr = document.createAttribute("id");
+         idAttr.setValue(id);
+         task.setAttributeNode(idAttr);
       }
    }
    
@@ -90,6 +92,7 @@ public class UnifiedAgent extends Agent {
       goalAttr.setValue(goal);
       subtasks.setAttributeNode(goalAttr);
       for (int i = 0; i < steps.length; i++) {
+         if ( disco.getDecompositionClass(id) != null ) continue; 
          Element step =  document.createElementNS(CEA_2018, "step");
          subtasks.appendChild(step);
          Attr name = document.createAttribute("name");

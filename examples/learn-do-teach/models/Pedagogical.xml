@@ -25,6 +25,8 @@
 
     <subtasks id="steps">
       <step name="step" task="LearnStep" maxOccurs="unbounded"/>
+      <binding slot="$step.action"
+	       value="$this.recipe.steps[$plan.getRepeatStep()]"/>
       <binding slot="$step.recipe" value="$this.recipe"/>
       <binding slot="$step.learner" value="$this.learner"/>
     </subtasks>
@@ -48,7 +50,9 @@
       <step name="demonstrate"/>
       <step name="learn" task="addStep"/>
       <applicable> $this.action.isPrimitive() </applicable>
-      <binding slot="$learn.action" value="new TaskClass($demonstrate.task)"/>
+      <binding slot="$demonstrate.type" value="$disco.getTaskClass($this.action.id)"/>
+      <binding slot="$learn.action"
+	       value="TaskClass.get($demonstrate.type.getId())"/>
       <binding slot="$learn.recipe" value="$this.recipe"/>
       <binding slot="$learn.external" value="$this.learner"/>
     </subtasks>
@@ -75,15 +79,21 @@
     // using Javascript objects for convenience here, but will eventually
     // be able to construct actual ANSI/CEA-2018 instances on the fly
 
-    var tasks = []; // learned task classes
-    var recipes = []; // learned decomposition classes    
+    var tasks = []; // known task classes
+    var recipes = []; // known decomposition classes    
 
     function TaskClass (id) {
        this.id = id;
-       if ( !$disco.getTaskClass(this.id) ) tasks.push(this);
+       tasks.push(this);
+    }
+
+    TaskClass.get = function (id) {  // factory method
+       for (i in tasks)
+          if ( tasks[i].id === id ) return tasks[i];
+       return new TaskClass(id);
     }
     
-    TaskClass.prototype.toString = function () {return this.id;}
+    TaskClass.prototype.toString = function () { return this.id; }
 
     TaskClass.prototype.isPrimitive = function () {
       var task = $disco.getTaskClass(this.id);
@@ -94,22 +104,27 @@
        this.id = id;
        this.goal = goal;
        this.steps = [];
-       if ( !$disco.getDecompositionClass(this.id) ) recipes.push(this);
+       recipes.push(this);
     }
 
+    DecompositionClass.get = function (id, goal) { // factory method
+       for (i in recipes)
+          if ( recipes[i].id === id ) return recipes[i];
+       return new DecompositionClass(id, goal);
+    }
+    
     DecompositionClass.prototype.toString = function () {
        return this.id+
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
     }
 
-    // compile learned task model into ANSI/CEA-2018 and load into Disco
+    // compile newly learned task model elements to ANSI/CEA-2018 and load into Disco
     function compile (about) {
-       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(about,tasks);
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(about, tasks);
        recipes.map(function(r) {
           Packages.edu.wpi.disco.ldt.UnifiedAgent.compileRecipe(r.id, r.goal,
             r.steps.map(function(s) { return s.id; })) });
        Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
-       tasks = []; recipes = [];
     }
 
   </script>
