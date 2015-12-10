@@ -18,6 +18,8 @@ import edu.wpi.disco.lang.Propose;
  */
 public class ProposeDonePlugin extends DefaultPlugin {
    
+   // TODO go through stack starting at bottom and return first appropriate element, if any
+   
    // note this must be a DefaultPlugin because the non-primitive task is no longer live
    
    @Override

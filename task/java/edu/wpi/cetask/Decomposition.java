@@ -73,10 +73,12 @@ public class Decomposition extends Instance {
       if ( repeatableSteps != null ) { 
          for (Repeatable repeatable : repeatableSteps.values()) {
             // must be after updateBindings
-            for (Plan repeat : repeatable.optional)
+            for (Plan repeat : repeatable.optional) {
                // copy fixed binding values (esp. external)
                // (will cause unnecessary calls to updateBindings)
                repeat.getGoal().copySlotValues(repeatable.step);
+               repeat.getGoal().updateBindingsTask();
+            }
          }
       }
    }

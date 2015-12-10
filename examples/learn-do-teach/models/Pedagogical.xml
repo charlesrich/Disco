@@ -36,11 +36,11 @@
     <input name="recipe" type="DecompositionClass"/>
     <input name="learner" type="boolean"/>
     <binding slot="$this.action"
-             value="($plan == null || $this.recipe == undefined) ? undefined :
-                    $this.recipe.steps[$plan.getRepeatStep()]"/>
+             value="($plan != null &amp;&amp; $this.recipe != undefined) ? 
+		    $this.recipe.steps[$plan.getRepeatStep()] : undefined"/>
     <precondition>
-      ($plan == null || $this.recipe == undefined) ? undefined :
-       ($this.recipe.isKnown() ? $this.recipe.steps[$plan.getRepeatStep()] != undefined : undefined)
+      ($plan != null &amp;&amp; $this.recipe != undefined &amp;&amp; $this.recipe.isCompiled() ) ? 
+       ($this.recipe.steps[$plan.getRepeatStep()] != undefined) : undefined
     </precondition>
 
     <subtasks id="instruction">
@@ -119,7 +119,7 @@
        return new DecompositionClass(id, goal);
     }
     
-    DecompositionClass.prototype.isKnown = function () {
+    DecompositionClass.prototype.isCompiled = function () {
       return $disco.getDecompositionClass(this.id) != null;
     }
 
@@ -136,6 +136,9 @@
             r.steps.map(function(s) { return s.id; })) });
        Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
     }
+
+    // helper function for conditions and values
+    function isStep () { return $plan != null &amp;&amp; $plan.getParent() != null; }
 
   </script>
 </taskModel>
