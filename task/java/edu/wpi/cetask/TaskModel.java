@@ -193,6 +193,8 @@ public class TaskModel extends Description {
          simpleName = Utils.getSimpleName(id);
          ids.add(id);  
       }
+      
+      public abstract Slot getSlot (String name);
     
       public TaskModel getModel () { return TaskModel.this; }   
       

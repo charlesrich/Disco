@@ -22,8 +22,9 @@ public class ProposeDonePlugin extends DefaultPlugin {
    
    @Override
    protected List<Plugin.Item> apply () {
-      Plan focus = getDisco().getFocus();
-      return ( !focus.isPrimitive() && focus.isComplete() ) ?
+      Plan focus = getDisco().getFocus(true);
+      return ( focus != null && !focus.isPrimitive() && focus.isComplete() 
+               && getGenerateProperty(Propose.Done.class, focus.getGoal()) ) ?
          Collections.singletonList(
                new Plugin.Item(new Propose.Done(getDisco(), self(), focus.getGoal()), focus))
          : null;

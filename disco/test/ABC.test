@@ -18,8 +18,8 @@
    User says "Let's achieve A."
    [User says propose the A input1] -live -stopped
    User execute B on x producing 1 and y. -succeeded
-   [User says propose the A input1] -live <-focus
-      [User accept what is the A input1?] -live
+   [User says propose the A input1] -live
+      [User accept what is the A input1?] -live <-focus
          Agent says "What is the A input1?"
    [c: Execute C on a number and 1] -live
 

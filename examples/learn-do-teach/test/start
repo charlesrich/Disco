@@ -58,8 +58,21 @@ clear
 #
 task LearnRecipe / C / r4 / true / false
 #
-# agent chooses demonstration by default for first step
+# Agent chooses demonstration meta-recipe by default for first step
 #
 next
-history
 done addStep / h / r4
+#
+# Make agent choose instruction meta-recipe for teaching next step
+#
+eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
+next
+done
+next
+debug
+#
+# Following corresponds to Figure 5(c). As above, segment for primitive addStep omitted
+# in figure.
+#
+history 
+# TODO closing done

@@ -49,9 +49,8 @@ public interface Propose {
             propose.accept(contributes, false);
             // accept can change liveness and achieved
             disco.clearLiveAchieved();
-         } else disco.push(new Plan(
-               new Accept(disco, !utterance.getExternal(), propose), 
-               contributes));
+         } else disco.push(new Plan(new Accept(disco, !utterance.getExternal(), propose), 
+                                    contributes));
       } 
    
       private Interpret () {}

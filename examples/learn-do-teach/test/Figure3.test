@@ -5,7 +5,7 @@
     Welcome to Disco! (Type 'help' for command list)
   > load models/Primitives.xml
   > load models/ABC.xml
-    # turn off automatic turn-taking for user
+    # Turn off automatic turn-taking for user
   > next false
   > task A
     Human says "Let's do A."
@@ -45,7 +45,7 @@
       Propose.Done(human,C)
    Propose.Done(human,A)
 
-  # glossed version of history
+  # Glossed version of history
   > debug false
   > history
 

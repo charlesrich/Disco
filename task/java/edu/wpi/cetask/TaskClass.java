@@ -375,6 +375,7 @@ public class TaskClass extends TaskModel.Member {
    
    private final Map<String,Slot> slots;
    
+   @Override
    public Slot getSlot (String name) { return slots.get(name); }
    
    public Collection<Slot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
@@ -804,7 +805,7 @@ public class TaskClass extends TaskModel.Member {
       }
    }
    
-   // for use with extensions to CEA-2018
+   // for use with CEA-2018-ext
    // a greatly simplified version of DecompositionClass.Binding
    
    // TODO does not handle dependencies between bindings

@@ -833,7 +833,8 @@ public class Disco extends TaskEngine {
             if ( segment.isShift() ) stream.print(" -shift");
             if ( plan.isLive() && segment.isStopped() ) stream.print(" -stopped");
             // note ignoring temporary Accept's to avoid novice confusion
-            if ( segment.getPlan() == getFocus(true) && stack.contains(segment) )
+            if ( segment.getPlan() == getFocus(!TaskEngine.VERBOSE) 
+                  && stack.contains(segment) )
                stream.print(' '+Plan.FOCUS_NOTE);
             stream.println();
             // unless history recurse on open segments only 

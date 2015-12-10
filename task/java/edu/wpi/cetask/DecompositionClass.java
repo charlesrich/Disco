@@ -37,9 +37,6 @@ public class DecompositionClass extends TaskModel.Member {
       return result;
    }
    
-   private final static Pattern pattern = // to match $var.slot
-      Pattern.compile("\\$\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
-
    private final TaskClass goal;
    
    public TaskClass getGoal () { return goal; } 
@@ -180,6 +177,7 @@ public class DecompositionClass extends TaskModel.Member {
     
    private final Map<String,GoalSlot> slots;
    
+   @Override
    public GoalSlot getSlot (String name) { return slots.get(name); }
    
    /**
@@ -580,7 +578,9 @@ public class DecompositionClass extends TaskModel.Member {
     */
    public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, INPUT_OUTPUT, 
                                     NON_IDENTITY }
-
+   private final static Pattern pattern = // to match $var.slot
+         Pattern.compile("\\$\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+         
    public class Binding {
       
       // since these are final, ok to make public

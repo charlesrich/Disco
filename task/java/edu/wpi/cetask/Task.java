@@ -27,6 +27,7 @@ public class Task extends Instance {
          // call to updateBindings, but during constructor, steps are not yet added
          Object object = engine.newObject();
          bindings.put("$this", object);
+         bindings.put("$plan", null);
          type.updateBindings(this); // extension
          // see section 8.3 of ANSI/CEA-2018
          engine.put(object, "model", type.getNamespace());
@@ -448,6 +449,13 @@ public class Task extends Instance {
     */
    public boolean isInternal () { return getType().isInternal(); }
    
+   
+   /**
+    * Test whether this task is temporary.  For extension to
+    * Disco with Accept utterance.  See {@link Plan#isExhausted()}
+    */
+   public boolean isTemporary () { return false; }
+   
    // predefined slots
    
    /**
@@ -762,10 +770,8 @@ public class Task extends Instance {
       Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
-            try { 
-               bindings.put("$plan", plan);
-               script.eval(this);      
-            } finally { bindings.remove("$plan"); }
+            bindings.put("$plan", plan);
+            script.eval(this);      
          }
       // set outputs to modified inputs
       if ( type.getPostcondition() != null )

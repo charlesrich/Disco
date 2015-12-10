@@ -25,8 +25,6 @@
 
     <subtasks id="steps">
       <step name="step" task="LearnStep" maxOccurs="unbounded"/>
-      <binding slot="$step.action"
-	       value="$this.recipe.steps[$plan.getRepeatStep()]"/>
       <binding slot="$step.recipe" value="$this.recipe"/>
       <binding slot="$step.learner" value="$this.learner"/>
     </subtasks>
@@ -37,6 +35,13 @@
     <input name="action" type="TaskClass"/>
     <input name="recipe" type="DecompositionClass"/>
     <input name="learner" type="boolean"/>
+    <binding slot="$this.action"
+             value="($plan == null || $this.recipe == undefined) ? undefined :
+                    $this.recipe.steps[$plan.getRepeatStep()]"/>
+    <precondition>
+      ($plan == null || $this.recipe == undefined) ? undefined :
+       ($this.recipe.isKnown() ? $this.recipe.steps[$plan.getRepeatStep()] != undefined : undefined)
+    </precondition>
 
     <subtasks id="instruction">
       <step name="learn" task="addStep"/>
@@ -50,9 +55,10 @@
       <step name="demonstrate"/>
       <step name="learn" task="addStep"/>
       <applicable> $this.action.isPrimitive() </applicable>
-      <binding slot="$demonstrate.type" value="$disco.getTaskClass($this.action.id)"/>
+      <binding slot="$demonstrate.type"
+               value="$disco.getTaskClass($this.action.id)"/>
       <binding slot="$learn.action"
-	       value="TaskClass.get($demonstrate.type.getId())"/>
+               value="TaskClass.get($demonstrate.type.getId())"/>
       <binding slot="$learn.recipe" value="$this.recipe"/>
       <binding slot="$learn.external" value="$this.learner"/>
     </subtasks>
@@ -88,7 +94,7 @@
     }
 
     TaskClass.get = function (id) {  // factory method
-       for (i in tasks)
+       for (var i in tasks)
           if ( tasks[i].id === id ) return tasks[i];
        return new TaskClass(id);
     }
@@ -99,7 +105,7 @@
       var task = $disco.getTaskClass(this.id);
       return task != null &amp;&amp; task.isPrimitive();
     }
-      
+
     function DecompositionClass (id, goal) {
        this.id = id;
        this.goal = goal;
@@ -108,11 +114,15 @@
     }
 
     DecompositionClass.get = function (id, goal) { // factory method
-       for (i in recipes)
+       for (var i in recipes)
           if ( recipes[i].id === id ) return recipes[i];
        return new DecompositionClass(id, goal);
     }
     
+    DecompositionClass.prototype.isKnown = function () {
+      return $disco.getDecompositionClass(this.id) != null;
+    }
+
     DecompositionClass.prototype.toString = function () {
        return this.id+
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");

@@ -17,6 +17,7 @@ public class UnifiedAgent extends Agent {
       Interaction interaction = new Interaction(new UnifiedAgent("agent"),
             new User("human"), args.length > 0 && args[0].length() > 0 ? args[0]
                : null);
+      interaction.setOk(false);
       disco = interaction.getDisco();
       // tweak glossing
       disco.setProperty("execute@word", "do");
