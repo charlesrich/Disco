@@ -45,8 +45,8 @@ next
 next
 debug
 #
-# Following corresponds to Figure 5(b). Note human acceptance of agent's done proposal
-# omitted in figure.
+# Following corresponds to Figure 5(b).
+# Note human acceptance of agent's done proposal omitted in figure.
 #
 history
 # glossed version of history
@@ -71,8 +71,14 @@ done
 next
 debug
 #
-# Following corresponds to Figure 5(c). As above, segment for primitive addStep omitted
-# in figure.
+# Following corresponds to Figure 5(c).
+# As above, segment for primitive addStep and human acceptance of agent's done proposal
+# omitted in figure.
 #
-history 
-# TODO closing done
+history
+# glossed version of history
+debug false
+history
+
+
+

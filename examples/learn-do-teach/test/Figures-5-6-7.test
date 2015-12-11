@@ -1,0 +1,180 @@
+    # Dec 10, 2015 7:05:14 PM - TaskEngine 1.8 / Disco 1.12
+    Welcome to Disco! (Type 'help' for command list)
+    # This test case corresponds to Figures 5, 6 and 7 in models/Learn-Do-Teach.pdf,
+    # except for Figure 5(c), which requires a separate execution (see Figure5-c.test)
+    #
+    # Execute this test case using bin/learn-do-teach 
+    #
+    # note *not* loading ABC model
+  > load models/Pedagogical.xml
+  > load models/Primitives.xml
+    # turn off automatic turn-taking
+  > next false
+    # define variables for convenience
+  > eval C = TaskClass.get("C"); r4 = DecompositionClass.get("r4", C)
+    # Returned 'r4'
+  > eval h = TaskClass.get("h"); i = TaskClass.get("i")
+    # Returned 'i'
+    #
+    # Human teaching agent by instruction how to do C
+    #
+  > task LearnRecipe / C / r4 / false
+    Human says "Let's do LearnRecipe on C and r4 and false."
+  > task addStep / h / r4 / false
+    Human says "Please do addStep on h and r4."
+  > next
+    Agent do addStep on h and r4.
+  > task addStep / i / r4 / false
+    Human says "Please do addStep on i and r4."
+  > next
+    Agent do addStep on i and r4.
+  > done LearnRecipe / C / r4 / false
+    Human says "Do LearnRecipe on C and r4 and false done."
+  > eval compile("learn-do-teach")
+    # Returned 'null'
+  > debug
+    #
+    # Following corresponds to Figure 5(a). Note:
+    #
+    #  * Propose.Should and Propose.Done have been renamed to 'do' and 'done' respectively
+    #  * 'false' input to LearnRecipe and LearnStep means agent ('true' means human)
+    #  * segments for primitive actions (e.g., addStep) have been omitted in figure
+    #
+  > history 
+
+[LearnRecipe(C,r4,false) by steps] -accepted -done <-focus
+   Propose.Should(human,LearnRecipe(C,r4,false))
+   [LearnStep(h,r4,false) by instruction] -done
+      [addStep(agent,h,r4)] -accepted -done
+         Propose.Should(human,addStep(agent,h,r4))
+         addStep(agent,h,r4)
+   [LearnStep(i,r4,false) by instruction] -optionalStep -done
+      [addStep(agent,i,r4)] -accepted -done
+         Propose.Should(human,addStep(agent,i,r4))
+         addStep(agent,i,r4)
+   Propose.Done(human,LearnRecipe(C,r4,false))
+
+    # learned recipe
+  > print r4
+
+learn-do-teach
+<subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:h"/>
+  <step name="step2" task="primitive:i"/>
+</subtasks>
+
+    # glossed version of history
+  > debug false  
+  > history
+
+[Do LearnRecipe on C and r4 and false by steps] -accepted -done <-focus
+   Human says "Let's do LearnRecipe on C and r4 and false."
+   [Do LearnStep on h and r4 and false by instruction] -done
+      [Agent do addStep on h and r4] -accepted -done
+         Human says "Please do addStep on h and r4."
+         Agent do addStep on h and r4.
+   [Do LearnStep on i and r4 and false by instruction] -optional -done
+      [Agent do addStep on i and r4] -accepted -done
+         Human says "Please do addStep on i and r4."
+         Agent do addStep on i and r4.
+   Human says "Do LearnRecipe on C and r4 and false done."
+
+    #
+    # Agent doing C
+    #
+  > clear
+  > task C
+    Human says "Let's do C."
+  > next
+    Agent do h.
+  > next
+    Agent do i.
+  > next
+    Agent says "Do C done."
+  > debug
+    #
+    # Following corresponds to Figure 5(b).
+    # Note human acceptance of agent's done proposal omitted in figure.
+    #
+  > history
+
+[C] -accepted -done <-focus
+   Propose.Should(human,C)
+   h(agent)
+   i(agent)
+   Propose.Done(agent,C)
+   [Accept(human,Propose.Done(agent,C))] -live
+
+    # glossed version of history
+  > debug false
+  > history
+
+[Do C] -accepted -done <-focus
+   Human says "Let's do C."
+   Agent do h.
+   Agent do i.
+   Agent says "Do C done."
+   [Human accept] -live
+
+  > clear
+    #
+    # Agent teaching another human by mixture of demonstration and instructions how to do C
+    #
+  > task LearnRecipe / C / r4 / true / false
+    Human says "Let's do LearnRecipe on C and r4 and true."
+    #
+    # Agent chooses demonstration meta-recipe by default for first step
+    #
+  > next
+    Agent do Task.Any on h.
+  > done addStep / h / r4
+    Human do addStep on h and r4.
+    #
+    # Make agent choose instruction meta-recipe for teaching next step
+    #
+  > eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
+    # Returned 'null'
+  > next
+    Agent says "Please do addStep on i and r4."
+  > done
+    Human do addStep on i and r4.
+  > next
+    Agent says "Do LearnRecipe on C and r4 and true done."
+  > debug
+    #
+    # Following corresponds to Figure 5(c).
+    # As above, segment for primitive addStep and human acceptance of agent's done proposal
+    # omitted in figure.
+    #
+  > history
+
+[LearnRecipe(C,r4,true) by steps] -accepted -done <-focus
+   Propose.Should(human,LearnRecipe(C,r4,true))
+   [LearnStep(h,r4,true) by demonstration] -done
+      edu.wpi.cetask.Task.Any(agent,h)
+      addStep(human,h,r4)
+   [LearnStep(i,r4,true) by instruction] -optionalStep -done
+      [addStep(human,i,r4)] -done
+         Propose.Should(agent,addStep(human,i,r4))
+         addStep(human,i,r4)
+   Propose.Done(agent,LearnRecipe(C,r4,true))
+   [Accept(human,Propose.Done(agent,LearnRecipe(C,r4,true)))] -live
+
+    # glossed version of history
+  > debug false
+  > history
+
+[Do LearnRecipe on C and r4 and true by steps] -accepted -done <-focus
+   Human says "Let's do LearnRecipe on C and r4 and true."
+   [Do LearnStep on h and r4 and true by demonstration] -done
+      Agent do Task.Any on h.
+      Human do addStep on h and r4.
+   [Do LearnStep on i and r4 and true by instruction] -optional -done
+      [Human do addStep on i and r4] -done
+         Agent says "Please do addStep on i and r4."
+         Human do addStep on i and r4.
+   Agent says "Do LearnRecipe on C and r4 and true done."
+   [Human accept] -live
+
+  > quit
+    

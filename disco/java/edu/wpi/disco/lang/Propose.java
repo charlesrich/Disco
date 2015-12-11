@@ -5,7 +5,6 @@
  */
 package edu.wpi.disco.lang;
 
-import java.util.ArrayList;
 import edu.wpi.cetask.*;
 import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Disco;
@@ -625,9 +624,6 @@ public interface Propose {
                Task nested = getNested();
                if ( nested != null ) contributes.match(nested); // copy slot values
             }
-            // TODO this will not be needed when handling of optional steps corrected
-            for (Plan child : new ArrayList<Plan>(contributes.getChildren())) 
-               if ( child.isOptional() && !child.isDone() ) contributes.remove(child); 
          }
       }
 

@@ -12,24 +12,26 @@ import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.Propose;
 
 /**
- * Plugin to propose that currently focused non-primitive task is complete
- * (postcondition may be null). Not currently used by default agent (see
+ * Plugin to propose that done and exhausted highest-level focused non-primitive task is 
+ * done (postcondition may be null). Not currently used by default agent (see
  * examples/learn-do-teach/UnifiedAgent)
  */
 public class ProposeDonePlugin extends DefaultPlugin {
-   
-   // TODO go through stack starting at bottom and return first appropriate element, if any
    
    // note this must be a DefaultPlugin because the non-primitive task is no longer live
    
    @Override
    protected List<Plugin.Item> apply () {
-      Plan focus = getDisco().getFocus(true);
-      return ( focus != null && !focus.isPrimitive() && focus.isComplete() 
-               && getGenerateProperty(Propose.Done.class, focus.getGoal()) ) ?
-         Collections.singletonList(
-               new Plugin.Item(new Propose.Done(getDisco(), self(), focus.getGoal()), focus))
-         : null;
+      for (Segment segment : getDisco().getStack()) {
+         Plan plan = segment.getPlan();
+         if ( plan == null ) continue;
+         Task goal = plan.getGoal();
+         if ( getGenerateProperty(Propose.Done.class, goal)
+               && !plan.isPrimitive() && plan.isDone() && plan.isExhausted() ) 
+            return Collections.singletonList(
+               new Plugin.Item(new Propose.Done(getDisco(), self(), goal), plan));
+      }
+      return null;
    }
    
    public ProposeDonePlugin (Agenda agenda, int priority) { 

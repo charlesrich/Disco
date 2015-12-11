@@ -24,7 +24,8 @@
     <input name="learner" type="boolean"/>
 
     <subtasks id="steps">
-      <step name="step" task="LearnStep" maxOccurs="unbounded"/>
+      <!-- maxOccurs should be 'unbounded', but not implemented yet -->
+      <step name="step" task="LearnStep" maxOccurs="10"/>
       <binding slot="$step.recipe" value="$this.recipe"/>
       <binding slot="$step.learner" value="$this.learner"/>
     </subtasks>
@@ -136,9 +137,6 @@
             r.steps.map(function(s) { return s.id; })) });
        Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
     }
-
-    // helper function for conditions and values
-    function isStep () { return $plan != null &amp;&amp; $plan.getParent() != null; }
 
   </script>
 </taskModel>
