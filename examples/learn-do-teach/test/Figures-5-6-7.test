@@ -138,14 +138,16 @@ learn-do-teach
   > debug
     #
     # Following corresponds to Figure 5(d).
-    # See notes above for differences with figure.
+    # Note Task.Any is general Disco implementation for ?task variable
+    # that is bound to h
+    # See notes above for other differences with figure.
     #
   > history
 
 [LearnRecipe(C,r4,true) by steps] -accepted -done <-focus
    Propose.Should(human,LearnRecipe(C,r4,true))
    [LearnStep(h,r4,true) by demonstration] -done
-      edu.wpi.cetask.Task.Any(agent,h)
+      Task.Any(agent,h)
       addStep(human,h,r4)
    [LearnStep(i,r4,true) by instruction] -optionalStep -done
       [addStep(human,i,r4)] -done

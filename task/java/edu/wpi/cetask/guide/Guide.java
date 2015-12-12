@@ -273,7 +273,7 @@ public class Guide extends Shell {
    protected void done (Task occurrence) {
       if ( getProposed() != null ) {
          Task task = getProposed().getGoal();
-         if ( task.matches(occurrence) )
+         if ( task.isMatch(occurrence) )
             occurrence.copySlotValues(task);
       }
       if ( occurrence.isDefinedInputs() ) { 

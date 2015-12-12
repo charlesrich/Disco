@@ -647,28 +647,24 @@ public class Task extends Instance {
    }
    
    /**
-    * Test whether given task instance matches this task instance. Two task
+    * Test whether given task instance unifies with this task instance. Two task
     * instances match (symmetric relationship) iff they are both instances of the
     * same type and the values of each corresponding slot are either equal or
     * one is undefined.
-    * <p>
-    * Note to support overriding in {@link Task.Any}, it is important that whenever
-    * this method is called, the goal parameter is the task being explained (which
-    * cannot be an instance of Task.Any).
     * 
     * @see #copySlotValues(Task)
     */
-   public boolean matches (Task goal) {
-      if ( goal == this ) return true;
+   public boolean isMatch (Task goal) {
+      if ( goal == this || goal instanceof Any ) return true;
       if ( !getType().equals(goal.getType()) ) return false;
       for (String name : getType().inputNames)
-         if ( !matchesSlot(goal, name) ) return false;
+         if ( !isMatchSlot(goal, name) ) return false;
       for (String name : getType().outputNames)
-         if ( !matchesSlot(goal, name) ) return false;
+         if ( !isMatchSlot(goal, name) ) return false;
       return true;
    }
    
-   private boolean matchesSlot (Task goal, String name) {
+   private boolean isMatchSlot (Task goal, String name) {
       return !isDefinedSlot(name) || !goal.isDefinedSlot(name) 
         || Utils.equals(getSlotValue(name), goal.getSlotValue(name));
    }
@@ -679,10 +675,10 @@ public class Task extends Instance {
     * given plan explains this task.  
     * <p>
     * This method is for use in extensions.  In CETask, it is equivalent 
-    * to {@link #matches(Task)}.   
+    * to {@link #isMatch(Task)}.   
     */
    public boolean contributes (Plan plan) {
-      return matches(plan.getGoal());
+      return isMatch(plan.getGoal());
    }
    
    /**
@@ -690,7 +686,7 @@ public class Task extends Instance {
     * (For extension to plan recognition.)
     */
    public boolean contributes (TaskClass type) {
-      return getType() == type;
+      return type == Any.CLASS || getType() == type;
    }
    
    /**
@@ -709,7 +705,7 @@ public class Task extends Instance {
     * @param from - task of same type
     * @return true if any slots of this task overwritten (were defined)
     * 
-    * @see #matches(Task)
+    * @see #isMatch(Task)
     */
    public boolean copySlotValues (Task from) {
       if ( !getType().equals(from.getType()) ) 
@@ -764,8 +760,9 @@ public class Task extends Instance {
    protected  void evalIf (Plan plan) { if ( isSystem() ) eval(plan); }
    
    // public for Console.execute()
-   public void eval (Plan plan) {
-      TaskClass type = getType();
+   public void eval (Plan plan) { eval(plan, getType()); }
+   
+   protected void eval (Plan plan, TaskClass type) {  // for Task.Any
       cloneInputs(); //  cache modified inputs before grounding script executed
       Grounding script = getGrounding();
       if ( script != null ) 
@@ -927,8 +924,8 @@ public class Task extends Instance {
 
    /**
     * Builtin task class used for steps in which task attribute omitted
-    * (CEA-2018-ext). This is essentially a way to partially make the task
-    * representation second order. Note it has an input (see Disco.xml) named
+    * (CEA-2018-ext). This is essentially a way to make the task
+    * representation partially second order. Note it has an input (see Disco.xml) named
     * 'type' of type TaskClass, which is specially handled below.
     */
    public static class Any extends Decomposition.Step {
@@ -942,34 +939,34 @@ public class Task extends Instance {
       
       public Any (TaskEngine engine) { this(engine, null, null, false); }
 
-      // should never be an occurrence or be explained by another task
       @Override
-      public boolean contributes (Plan plan) { return false; }
+      public boolean isMatch (Task goal) { return true; }
+      
+      // TODO This implementation does not handle inputs/outputs 
+      //      Add lists of inputs and outputs are additional inputs?
+
       @Override
-      public boolean contributes (TaskClass task) { return false; }
+      public boolean copySlotValues (Task from) {
+         TaskClass type = from.getType();
+         if ( type == CLASS ) return super.copySlotValues(from);
+         if ( !(type.getDeclaredInputs().isEmpty() && type.getDeclaredOutputs().isEmpty()) )
+            throw new IllegalArgumentException("Task.Any does not support inputs/outputs: "+from);
+         setSlotValue("external", from.getExternal());
+         setSlotValue("success", from.getSuccess());
+         setSlotValue("type", type);
+         Object slots = bindings.get("$this");
+         engine.put(slots, "model", type.getNamespace());
+         engine.put(slots, "task", type.getId());
+         return true; 
+      }
+      
       @Override
-      public boolean isPathFrom (TaskClass type) { return false; }
-      
-      // however can explain any other task (see comment on Task.matches())
-      @Override
-      public boolean matches (Task goal) { return true; }
-      
-      /**
-       * Copies the values of defined slots <em>from</em> given task to this task. Note this
-       * side-effects this task, overwriting existing slot values.
-       * 
-       * @param from - task of same type
-       * @return true if any slots of this task overwritten (were defined)
-       * 
-       * @see #matches(Task)
-       */
-      public boolean copySlotValues (Task from) { return false; }
-      
-      // TODO matches any task -- set type input, as well as task and model properties
-      
-      // TODO execute grounding script for type input
-      
-      // TODO How about inputs to type?
+      public void eval (Plan plan) { 
+         TaskClass type = (TaskClass) getSlotValue("type");
+         if ( type == null ) 
+            throw new IllegalArgumentException("Cannot execute grounding script for: "+plan);
+         eval(plan, type);
+      }
    }
    
    // *******************************************************************

@@ -2,9 +2,9 @@
            xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
   
   <!-- 
-       This is the pedagogical model of the proof of concept system in
+       This is the pedagogical model for the proof of concept system in
        a proposal submitted to the National Science Foundation
-       in November, 2015, titled,
+       in November, 2015, titled:
 
        A Unified Theory of Learning, Doing and Teaching Hierarchical Tasks:
        The Learn-Do-Teach Challenge for Collaborative Agents
@@ -12,7 +12,7 @@
        See Learn-Do-Teach.pdf (especially Figure 4) for technical discussion
        and test folder for test cases.
 
-       See ABC.xml for the task model being taught.
+       See ABC.xml for the task model being learned.
   -->
 
   <!-- note 'task' is a reserved slot name in ANSI/CEA-2018, so 'action'

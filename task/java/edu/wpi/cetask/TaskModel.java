@@ -148,9 +148,11 @@ public class TaskModel extends Description {
    private final List<String> ids = new ArrayList<String>();
    
    protected static String getPropertyId (String id) {
-         return (id.startsWith("edu.wpi.disco.lang.") ?
-            // spare users typing this prefix in properties files
-            id.substring(19) : id).replace('$', '.');
+      // spare users typing these prefixes in properties files
+      // or appearing in debug printouts
+      return ( id.startsWith("edu.wpi.disco.lang.") ? id.substring(19) : 
+               id.startsWith("edu.wpi.cetask.") ? id.substring(15) : id )
+            .replace('$', '.');
    }
       
    protected static String parseId (Node node, XPath xpath) {

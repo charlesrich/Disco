@@ -1081,7 +1081,7 @@ public class Plan {
    public List<Plan> explain (Task task, boolean onlyLive, Plan exclude) {
       List<Plan> plans = new ArrayList<Plan>();
       // unroll recursion one level
-      if ( (!onlyLive || isLive()) && goal.matches(task) ) plans.add(this);
+      if ( (!onlyLive || isLive()) && goal.isMatch(task) ) plans.add(this);
       for (Plan child : children)
          child.explain(task, plans, onlyLive, exclude);
       return plans;
