@@ -79,6 +79,15 @@ history
 # glossed version of history
 debug false
 history
-
+clear
+# define variables for convenience
+eval A = TaskClass.get("A"); B = TaskClass.get("B");
+eval r1 = DecompositionClass.get("r1"); r2 = DecompositionClass.get("r2");
+#
+# Human teaching agent how to do A
+#
+task LearnRecipe / A / r1 / false
+task LearnRecipe / B / r2 / false
+done d
 
 

@@ -24,8 +24,8 @@
     <input name="learner" type="boolean"/>
 
     <subtasks id="steps">
-      <!-- maxOccurs should be 'unbounded', but not implemented yet -->
-      <step name="step" task="LearnStep" maxOccurs="10"/>
+      <!-- maxOccurs should be 'unbounded', but not fully supported yet -->
+      <step name="step" task="LearnStep" maxOccurs="5"/>
       <binding slot="$step.recipe" value="$this.recipe"/>
       <binding slot="$step.learner" value="$this.learner"/>
     </subtasks>

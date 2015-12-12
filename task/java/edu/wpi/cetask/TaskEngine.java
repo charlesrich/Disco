@@ -104,6 +104,10 @@ public class TaskEngine {
       return scriptEngine.isDefined(object, field); 
    }
    
+   protected boolean isUndefined (Object value) { // do not make public 
+       return scriptEngine.isUndefined(value);
+   }
+   
    /**
     * Remove the field of given Javascript object.
     */

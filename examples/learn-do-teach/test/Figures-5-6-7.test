@@ -1,7 +1,8 @@
     # Dec 10, 2015 7:05:14 PM - TaskEngine 1.8 / Disco 1.12
     Welcome to Disco! (Type 'help' for command list)
+    #
     # This test case corresponds to Figures 5, 6 and 7 in models/Learn-Do-Teach.pdf,
-    # except for Figure 5(c), which requires a separate execution (see Figure5-c.test)
+    # except for Figure 5(c), which requires a separate execution (see Figure-5c.test)
     #
     # Execute this test case using bin/learn-do-teach 
     #
@@ -19,17 +20,17 @@
     # Human teaching agent by instruction how to do C
     #
   > task LearnRecipe / C / r4 / false
-    Human says "Let's do LearnRecipe on C and r4 and false."
+    Human says "Let's learn how to do C."
   > task addStep / h / r4 / false
-    Human says "Please do addStep on h and r4."
+    Human says "First step is h."
   > next
-    Agent do addStep on h and r4.
+    Agent adds step h.
   > task addStep / i / r4 / false
-    Human says "Please do addStep on i and r4."
+    Human says "Next step is i."
   > next
-    Agent do addStep on i and r4.
+    Agent adds step i.
   > done LearnRecipe / C / r4 / false
-    Human says "Do LearnRecipe on C and r4 and false done."
+    Human says "We're done learning how to do C."
   > eval compile("learn-do-teach")
     # Returned 'null'
   > debug
@@ -67,30 +68,27 @@ learn-do-teach
   > debug false  
   > history
 
-[Do LearnRecipe on C and r4 and false by steps] -accepted -done <-focus
-   Human says "Let's do LearnRecipe on C and r4 and false."
-   [Do LearnStep on h and r4 and false by instruction] -done
-      [Agent do addStep on h and r4] -accepted -done
-         Human says "Please do addStep on h and r4."
-         Agent do addStep on h and r4.
-   [Do LearnStep on i and r4 and false by instruction] -optional -done
-      [Agent do addStep on i and r4] -accepted -done
-         Human says "Please do addStep on i and r4."
-         Agent do addStep on i and r4.
-   Human says "Do LearnRecipe on C and r4 and false done."
+[Learn how to do C by steps] -accepted -done <-focus
+   Human says "Let's learn how to do C."
+   [Learn step h by instruction] -done
+      [Agent adds step h] -accepted -done
+         Human says "First step is h."
+         Agent adds step h.
+   [Learn step i by instruction] -optional -done
+      [Agent adds step i] -accepted -done
+         Human says "Next step is i."
+         Agent adds step i.
+   Human says "We're done learning how to do C."
 
-    #
-    # Agent doing C
-    #
   > clear
   > task C
     Human says "Let's do C."
   > next
-    Agent do h.
+    Agent execute h.
   > next
-    Agent do i.
+    Agent execute i.
   > next
-    Agent says "Do C done."
+    Agent says "We're done doing C."
   > debug
     #
     # Following corresponds to Figure 5(b).
@@ -111,9 +109,9 @@ learn-do-teach
 
 [Do C] -accepted -done <-focus
    Human says "Let's do C."
-   Agent do h.
-   Agent do i.
-   Agent says "Do C done."
+   Agent execute h.
+   Agent execute i.
+   Agent says "We're done doing C."
    [Human accept] -live
 
   > clear
@@ -121,30 +119,26 @@ learn-do-teach
     # Agent teaching another human by mixture of demonstration and instructions how to do C
     #
   > task LearnRecipe / C / r4 / true / false
-    Human says "Let's do LearnRecipe on C and r4 and true."
-    #
-    # Agent chooses demonstration meta-recipe by default for first step
-    #
+    Human says "Let's learn how to do C."
   > next
-    Agent do Task.Any on h.
+    Agent execute h.
   > done addStep / h / r4
-    Human do addStep on h and r4.
+    Human adds step h.
     #
     # Make agent choose instruction meta-recipe for teaching next step
     #
   > eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
     # Returned 'null'
   > next
-    Agent says "Please do addStep on i and r4."
+    Agent says "Next step is i."
   > done
-    Human do addStep on i and r4.
+    Human adds step i.
   > next
-    Agent says "Do LearnRecipe on C and r4 and true done."
+    Agent says "We're done learning how to do C."
   > debug
     #
-    # Following corresponds to Figure 5(c).
-    # As above, segment for primitive addStep and human acceptance of agent's done proposal
-    # omitted in figure.
+    # Following corresponds to Figure 5(d).
+    # See notes above for differences with figure.
     #
   > history
 
@@ -164,16 +158,16 @@ learn-do-teach
   > debug false
   > history
 
-[Do LearnRecipe on C and r4 and true by steps] -accepted -done <-focus
-   Human says "Let's do LearnRecipe on C and r4 and true."
-   [Do LearnStep on h and r4 and true by demonstration] -done
-      Agent do Task.Any on h.
-      Human do addStep on h and r4.
-   [Do LearnStep on i and r4 and true by instruction] -optional -done
-      [Human do addStep on i and r4] -done
-         Agent says "Please do addStep on i and r4."
-         Human do addStep on i and r4.
-   Agent says "Do LearnRecipe on C and r4 and true done."
+[Learn how to do C by steps] -accepted -done <-focus
+   Human says "Let's learn how to do C."
+   [Learn step h by demonstration] -done
+      Agent execute h.
+      Human adds step h.
+   [Learn step i by instruction] -optional -done
+      [Human adds step i] -done
+         Agent says "Next step is i."
+         Human adds step i.
+   Agent says "We're done learning how to do C."
    [Human accept] -live
 
   > quit

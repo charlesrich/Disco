@@ -1127,6 +1127,35 @@ public class Disco extends TaskEngine {
    }
    
    /**
+    * For use in format strings, e.g., {$disco.gerundize($this.arg,"a foo")}
+    */
+   public String gerundize (Object object, String undefined) {
+      if ( isUndefined(object) ) return undefined;
+      String string = object instanceof Task ? ((Task) object).formatTask() : toString(object);
+      if ( string.length() < 2 ) return string;
+      int space = string.indexOf(' ');
+      StringBuffer buffer = new StringBuffer(string);
+      int end          = space > 0 ? space : buffer.length();
+      char ultimate    = buffer.charAt(end-1);
+      char penultimate = buffer.charAt(end-2);
+      if (end > 2 && ultimate == 'e' && (penultimate == 'u' || !isVowel(penultimate)) ) {
+         buffer.setCharAt(end-1, 'i');
+         buffer.insert(end, "ng");
+      } else {
+         if (end > 2 && (!isVowel(ultimate) && (ultimate != 'y') && (ultimate != 'w'))
+               && isVowel(penultimate) && !isVowel(buffer.charAt(end-3))
+               && (!((ultimate=='n' || ultimate=='r') && penultimate=='e')))
+            buffer.insert(end++, ultimate);   // double last consonant
+         buffer.insert(end, "ing");
+      }
+      return buffer.toString();
+   }
+
+   private static boolean isVowel (char c) {
+      return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+   }
+
+   /**
     * Return string identifying external slot of given task
     */
    public String getWho (Task task) {

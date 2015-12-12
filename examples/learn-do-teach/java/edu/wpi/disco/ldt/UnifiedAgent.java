@@ -19,9 +19,6 @@ public class UnifiedAgent extends Agent {
                : null);
       interaction.setOk(false);
       disco = interaction.getDisco();
-      // tweak glossing
-      disco.setProperty("execute@word", "do");
-      disco.setProperty("achieve@word", "do");
       interaction.start(true);
    }
 

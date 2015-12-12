@@ -14,7 +14,7 @@
   > next
     Agent do e.
   > next
-    Agent says "Do B done."
+    Agent says "We're done doing B."
   > execute h
     Human do h.
   > task i / false
@@ -22,9 +22,9 @@
   > next
     Agent do i.
   > done C
-    Human says "Do C done."
+    Human says "We're done doing C."
   > done A
-    Human says "Do A done."
+    Human says "We're done doing A."
   > debug
   > history
     #
@@ -54,14 +54,14 @@
    [Do B by r2] -done
       Agent do d.
       Agent do e.
-      Agent says "Do B done."
+      Agent says "We're done doing B."
    [Do C by r4] -done
       Human do h.
       [Agent do i] -accepted -done
          Human says "Please do i."
          Agent do i.
-      Human says "Do C done."
-   Human says "Do A done."
+      Human says "We're done doing C."
+   Human says "We're done doing A."
 
   > quit
     
