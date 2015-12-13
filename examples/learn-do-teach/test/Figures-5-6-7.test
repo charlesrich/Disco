@@ -80,6 +80,7 @@ learn-do-teach
          Agent adds step i.
    Human says "We're done learning how to do C."
 
+    # clear discourse state, but not task model
   > clear
   > task C
     Human says "Let's do C."

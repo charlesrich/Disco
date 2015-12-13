@@ -90,7 +90,7 @@
   > history
 
 [PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]])] -accepted -succeeded
-   Propose.Should(user,PreparePicnic(bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]))
+   Propose.Should(user,PreparePicnic)
    [PrepareSandwich(peanut butter and jelly,false,bag2[cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]])] -done
       [MakeSandwich(peanut butter and jelly,cut sandwich[bread5[peanut butter;],bread6[strawberry jam;]]) by pbj] -done
          [Spread(user,bread5[;],peanut butter,bread5[peanut butter;])] -succeeded

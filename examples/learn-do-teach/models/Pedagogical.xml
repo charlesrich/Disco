@@ -58,10 +58,15 @@
       <applicable> $this.action.isPrimitive() </applicable>
       <binding slot="$demonstrate.type"
                value="$disco.getTaskClass($this.action.id)"/>
+      <!-- inverse binding, see design note in DecompositionClass.Binding -->
+      <binding slot="$this.action"
+               value="$this.action == undefined &amp;&amp; $demonstrate.type != undefined ?
+                           TaskClass.get($demonstrate.type.getId()) : undefined"/>
       <binding slot="$learn.action"
                value="TaskClass.get($demonstrate.type.getId())"/>
       <binding slot="$learn.recipe" value="$this.recipe"/>
       <binding slot="$learn.external" value="$this.learner"/>
+
     </subtasks>
 
     <subtasks id="topdown">
@@ -104,7 +109,10 @@
 
     TaskClass.prototype.isPrimitive = function () {
       var task = $disco.getTaskClass(this.id);
-      return task != null &amp;&amp; task.isPrimitive();
+      if ( task != null ) return task.isPrimitive();
+      for (var i in recipes)
+         if ( recipes[i].goal == this ) return false;
+      return true;
     }
 
     function DecompositionClass (id, goal) {

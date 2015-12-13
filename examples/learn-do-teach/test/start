@@ -82,12 +82,19 @@ history
 clear
 # define variables for convenience
 eval A = TaskClass.get("A"); B = TaskClass.get("B");
-eval r1 = DecompositionClass.get("r1"); r2 = DecompositionClass.get("r2");
+eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B);
 #
 # Human teaching agent how to do A
 #
 task LearnRecipe / A / r1 / false
 task LearnRecipe / B / r2 / false
 done d
+next
+done e
+next
+done LearnRecipe / B / r2 / false
+task addStep / C / r1 / false
+next
+done LearnRecipe / A / r1 / false
 
 

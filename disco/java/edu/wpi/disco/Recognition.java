@@ -19,22 +19,31 @@ class Recognition {
    private void add (Explanation explanation) {
       if ( explanation.start != null ) {
          TaskClass task = explanation.start.getType();
-         for (Explanation e : explanations) 
-            /* ignore ambiguity between different explanations for the same task
-             * type --- this is a pretty strong oversimplification, since it
-             * ignores inputs/outputs and the fact that there could validly be
-             * different implementations, but it works well in practice
-             */
-            if ( e.start != null && task == e.start.getType() ) return;
          for (Iterator<Explanation> i = explanations.iterator(); i.hasNext();) {
             Explanation e = i.next();
-            int old = e.getFocus().getGoal().countSlotValues(),
-                current = explanation.getFocus().getGoal().countSlotValues(); 
+            Task current = explanation.getFocus().getGoal();
+            Task old = e.getFocus().getGoal();
+            // prefer specific explanation over Task.Any
+            if ( current.getType() == Task.Any.CLASS ) {
+               if ( old.getType() != Task.Any.CLASS ) return; // ignore current
+               continue; // keep ambiguity
+            } else if ( old.getType() == Task.Any.CLASS ) {
+               i.remove(); // remove old
+               continue; // keep current
+            }
+            int oldCount = old.countSlotValues(),
+                currentCount = current.countSlotValues(); 
             // prefer more specific explanation with more defined slots
-            if ( old > current ) return;
-            if ( current > old ) i.remove();
-            // otherwise keep ambiguity
-         }
+            if ( oldCount > currentCount ) return; // ignore current
+            if ( currentCount > oldCount ) i.remove(); // remove old
+            // otherwise keep current or ambiguity
+         } 
+         for (Explanation e : explanations) // do after above 
+            // ignore ambiguity between different explanations for the same task
+            // type --- this is a pretty strong oversimplification, since it
+            // ignores inputs/outputs and the fact that there could validly be
+            // different implementations, but it works well in practice
+            if ( e.start != null && task == e.start.getType() ) return;
       }
       explanations.add(explanation);
    }
@@ -101,7 +110,9 @@ class Recognition {
                         extended = true; path.add(decompStep);
                         Plan focus = instantiate(start, path);
                         // make sure instantiation didn't fail
-                        if ( focus != null && occurrence.contributes(focus) )
+                        if ( focus != null && occurrence.contributes(focus) 
+                              // and check applicability condition with new bindings
+                              && !Utils.isFalse(decomp.isApplicable(start.getGoal()) )                            )
                            add(new Explanation(focus, start, path));
                      } finally { start.setDecomposition(null); }
                   } 

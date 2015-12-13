@@ -776,7 +776,8 @@ public class TaskClass extends TaskModel.Member {
     * Returns false if given task class is same as this task class.
     */
    public boolean isPathFrom (TaskClass task) { 
-      return task == Task.Any.CLASS || task.explains.contains(this);   
+      return this == Task.Any.CLASS || Task.Any.CLASS.isPathFrom(task) 
+            || task.explains.contains(this);   
    }
 
    void contributes (TaskClass task) {

@@ -924,9 +924,9 @@ public class Task extends Instance {
 
    /**
     * Builtin task class used for steps in which task attribute omitted
-    * (CEA-2018-ext). This is essentially a way to make the task
-    * representation partially second order. Note it has an input (see Disco.xml) named
-    * 'type' of type TaskClass, which is specially handled below.
+    * (CEA-2018-ext). This is essentially a way to make the task representation
+    * partially second order. Note it has an input (see Disco.xml) named 'type'
+    * of type TaskClass, which is specially handled below.
     */
    public static class Any extends Decomposition.Step {
       
@@ -943,7 +943,8 @@ public class Task extends Instance {
       public boolean isMatch (Task goal) { return true; }
       
       // TODO This implementation does not handle inputs/outputs 
-      //      Add lists of inputs and outputs are additional inputs?
+      //      Add lists of inputs and outputs?
+      //      Consider actually changing type and all associated info
 
       @Override
       public boolean copySlotValues (Task from) {
@@ -953,15 +954,14 @@ public class Task extends Instance {
             throw new IllegalArgumentException("Task.Any does not support inputs/outputs: "+from);
          setSlotValue("external", from.getExternal());
          setSlotValue("success", from.getSuccess());
+         setSlotValue("when", from.getWhen());
          setSlotValue("type", type);
-         Object slots = bindings.get("$this");
-         engine.put(slots, "model", type.getNamespace());
-         engine.put(slots, "task", type.getId());
          return true; 
       }
       
       @Override
       public void eval (Plan plan) { 
+         // TODO grounding script may reference slots
          TaskClass type = (TaskClass) getSlotValue("type");
          if ( type == null ) 
             throw new IllegalArgumentException("Cannot execute grounding script for: "+plan);

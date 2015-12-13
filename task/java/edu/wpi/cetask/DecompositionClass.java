@@ -704,7 +704,8 @@ public class DecompositionClass extends TaskModel.Member {
          (2) Inverse bindings, e.g.,
          
              <binding slot="$step1.slot1" value="f($this.input)"/>
-             <binding slot="$this.input" value="g($step1.slot1)"/>
+             <binding slot="$this.input" 
+                      value="$this.input == undefined ? g($step1.slot1) : undefined"/>
              
          The second binding above uses the inverse function g to propagate
          a value "up" from plan recognition.  This is taking one step closer 
