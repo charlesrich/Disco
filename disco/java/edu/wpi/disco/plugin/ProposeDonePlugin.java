@@ -19,7 +19,7 @@ import edu.wpi.disco.lang.Propose;
 public class ProposeDonePlugin extends DefaultPlugin {
    
    // note this must be a DefaultPlugin because the non-primitive task is no longer live
-   
+    
    @Override
    protected List<Plugin.Item> apply () {
       for (Segment segment : getDisco().getStack()) {
@@ -27,6 +27,7 @@ public class ProposeDonePlugin extends DefaultPlugin {
          if ( plan == null ) continue;
          Task goal = plan.getGoal();
          if ( getGenerateProperty(Propose.Done.class, goal)
+               && !Propose.Done.ACCEPTED.contains(goal)
                && !plan.isPrimitive() && plan.isDone() && plan.isExhausted() ) 
             return Collections.singletonList(
                new Plugin.Item(new Propose.Done(getDisco(), self(), goal), plan));

@@ -944,7 +944,9 @@ public class Task extends Instance {
       
       // TODO This implementation does not handle inputs/outputs 
       //      Add lists of inputs and outputs?
-      //      Consider actually changing type and all associated info
+      
+      // Note: do not be tempted to actually change the type and associated
+      // properties, since still need input slot for changing bindings
 
       @Override
       public boolean copySlotValues (Task from) {

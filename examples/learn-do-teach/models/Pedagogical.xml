@@ -71,9 +71,13 @@
 
     <subtasks id="topdown">
       <step name="down" task="LearnRecipe"/>
-      <applicable> !$this.action.isPrimitive() </applicable>      
+      <step name="learn" task="addStep"/>
+      <applicable> !$this.action.isPrimitive() </applicable>
       <binding slot="$down.action" value="$this.action"/>
       <binding slot="$down.learner" value="$this.learner"/>
+      <binding slot="$learn.action" value="$down.action"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
     </subtasks>
 
   </task>

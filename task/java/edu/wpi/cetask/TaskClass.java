@@ -776,7 +776,7 @@ public class TaskClass extends TaskModel.Member {
     * Returns false if given task class is same as this task class.
     */
    public boolean isPathFrom (TaskClass task) { 
-      return this == Task.Any.CLASS || Task.Any.CLASS.isPathFrom(task) 
+      return this == Task.Any.CLASS || task.explains.contains(Task.Any.CLASS)
             || task.explains.contains(this);   
    }
 
@@ -818,6 +818,11 @@ public class TaskClass extends TaskModel.Member {
    }
    
    private class Binding {
+      
+      //TODO improve this by refactoring and reusing code from
+      //     DecompostionClass.Binding (make separate class)
+      //     to take advantage of strictness and dependency-based
+      //     updating
 
       private final String slot, value, expression, where;
       private final Compiled compiled;

@@ -110,9 +110,7 @@ class Recognition {
                         extended = true; path.add(decompStep);
                         Plan focus = instantiate(start, path);
                         // make sure instantiation didn't fail
-                        if ( focus != null && occurrence.contributes(focus) 
-                              // and check applicability condition with new bindings
-                              && !Utils.isFalse(decomp.isApplicable(start.getGoal()) )                            )
+                        if ( focus != null && occurrence.contributes(focus) )
                            add(new Explanation(focus, start, path));
                      } finally { start.setDecomposition(null); }
                   } 
@@ -190,8 +188,9 @@ class Recognition {
 
       public Plan instantiate (Plan current) {
          if ( current.isDecomposed() 
-               || Utils.isFalse(decomp.isApplicable(current.getGoal())) 
-               || current.apply(decomp)  == null ) 
+               || current.apply(decomp)  == null 
+               // re-check applicability condition after bindings done (if not started)
+               || (!current.getGoal().isStarter(current) && Utils.isFalse(decomp.isApplicable(current.getGoal()))) ) 
             return null;
          for (Plan child : current.getChildren()) {
             Task task = child.getGoal();

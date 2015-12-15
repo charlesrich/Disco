@@ -93,8 +93,18 @@ next
 done e
 next
 done LearnRecipe / B / r2 / false
+next
 task addStep / C / r1 / false
 next
 done LearnRecipe / A / r1 / false
-
-
+debug
+#
+# Following corresponds to Figure 6.
+#
+history
+debug false
+# glossed version of history
+history
+eval compile("learn-do-teach")
+print r1
+print r2

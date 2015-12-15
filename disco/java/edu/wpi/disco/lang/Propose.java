@@ -5,7 +5,7 @@
  */
 package edu.wpi.disco.lang;
 
-import java.util.ArrayList;
+import java.util.*;
 import edu.wpi.cetask.*;
 import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Disco;
@@ -618,14 +618,18 @@ public interface Propose {
          super(Done.class, disco, external, goal);
       }
 
+      
+      // keep track of already accepted tasks for ProposeDonePlugin
+      public final static List<Task> ACCEPTED = new ArrayList<Task>();
+      
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
+         Task nested = getNested();
+         if ( nested != null ) ACCEPTED.add(nested);
          if ( contributes != null ) {
             contributes.setComplete(true);
-            if ( contributes.getType() != getType() ) {
-               Task nested = getNested();
-               if ( nested != null ) contributes.match(nested); // copy slot values
-            }
+            if ( nested != null && contributes.getType() != getType() ) 
+               contributes.match(nested); // copy slot values
             // TODO this will not be needed when handling of optional steps corrected
             for (Plan child : new ArrayList<Plan>(contributes.getChildren())) 
                if ( child.isOptional() && !child.isDone() ) contributes.remove(child); 

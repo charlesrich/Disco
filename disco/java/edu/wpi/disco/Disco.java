@@ -435,10 +435,8 @@ public class Disco extends TaskEngine {
          if ( explanation == null ) return null;
          explanation.attach();
          Plan start = explanation.getStart();
-         Plan focus = explanation.getFocus();
          if ( start != null && start.getParent() == null ) addTop(start);
-         else if ( focus != null && focus.getParent() == null ) addTop(focus);
-         return focus;
+         return explanation.getFocus();
       }
    }
    

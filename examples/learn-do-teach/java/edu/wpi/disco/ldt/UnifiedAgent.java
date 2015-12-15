@@ -26,7 +26,7 @@ public class UnifiedAgent extends Agent {
       super(name);
       // prevent asking about recipes (see interaction@guess below)
       getAgenda().remove(AskHowPlugin.class);
-      // announce when done current non-primitive (highest priority)
+      // announce when done current non-primitive (high priority)
       new ProposeDonePlugin(agenda, 300);
    }
     
@@ -71,7 +71,8 @@ public class UnifiedAgent extends Agent {
       model.setAttributeNode(primitive);
       for (int i = 0; i < tasks.length; i++) {
          String id = tasks[i];
-         if ( disco.getTaskClass(id) != null ) continue; 
+         TaskClass type = disco.getTaskClass(id);
+         if ( type != null && type.isPrimitive() ) continue; 
          Element task = document.createElementNS(CEA_2018, "task");
          model.appendChild(task);
          Attr idAttr = document.createAttribute("id");
@@ -90,7 +91,6 @@ public class UnifiedAgent extends Agent {
       goalAttr.setValue(goal);
       subtasks.setAttributeNode(goalAttr);
       for (int i = 0; i < steps.length; i++) {
-         if ( disco.getDecompositionClass(id) != null ) continue; 
          Element step =  document.createElementNS(CEA_2018, "step");
          subtasks.appendChild(step);
          Attr name = document.createAttribute("name");
