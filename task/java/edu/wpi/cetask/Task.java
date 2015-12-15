@@ -925,7 +925,7 @@ public class Task extends Instance {
    /**
     * Builtin task class used for steps in which task attribute omitted
     * (CEA-2018-ext). This is essentially a way to make the task representation
-    * partially second order. Note it has an input (see Disco.xml) named 'type'
+    * partly second order. Note it has an input (see Disco.xml) named 'type'
     * of type TaskClass, which is specially handled below.
     */
    public static class Any extends Decomposition.Step {
@@ -934,7 +934,7 @@ public class Task extends Instance {
       
       // for TaskClass.newStep
       public Any (TaskEngine engine, Decomposition decomp, String name, boolean repeat) { 
-         super(engine.getTaskClass(Any.class.getName()), engine, decomp, name);
+         super(CLASS, engine, decomp, name);
       }
       
       public Any (TaskEngine engine) { this(engine, null, null, false); }
@@ -953,7 +953,7 @@ public class Task extends Instance {
          TaskClass type = from.getType();
          if ( type == CLASS ) return super.copySlotValues(from);
          if ( !(type.getDeclaredInputs().isEmpty() && type.getDeclaredOutputs().isEmpty()) )
-            throw new IllegalArgumentException("Task.Any does not support inputs/outputs: "+from);
+            throw new IllegalArgumentException("Task.Any does not yet support inputs/outputs: "+from);
          setSlotValue("external", from.getExternal());
          setSlotValue("success", from.getSuccess());
          setSlotValue("when", from.getWhen());

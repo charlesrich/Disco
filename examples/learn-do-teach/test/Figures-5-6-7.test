@@ -139,7 +139,7 @@ learn-do-teach
   > debug
     #
     # Following corresponds to Figure 5(d).
-    # Note Task.Any is general Disco implementation for ?task variable
+    # Note Task.Any is a technical artifact of Disco implementation for ?task variable
     # that is bound to h
     # See notes above for other differences with figure.
     #
@@ -172,6 +172,108 @@ learn-do-teach
          Human adds step i.
    Agent says "We're done learning how to do C."
    [Human accept] -live
+
+  > clear
+    # define variables for convenience
+  > eval A = TaskClass.get("A"); B = TaskClass.get("B");
+    # Returned 'B'
+  > eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B);
+    # Returned 'r2'
+    #
+    # Human teaching agent how to do A
+    #
+  > task LearnRecipe / A / r1 / false
+    Human says "Let's learn how to do A."
+  > task LearnRecipe / B / r2 / false
+    Human says "Let's learn how to do B."
+  > done d
+    Human execute d.
+  > next
+    Agent adds step d.
+  > done e
+    Human execute e.
+  > next
+    Agent adds step e.
+  > done LearnRecipe / B / r2 / false
+    Human says "We're done learning how to do B."
+  > next
+    Agent adds step B.
+  > task addStep / C / r1 / false
+    Human says "Next step is C."
+  > next
+    Agent adds step C.
+  > done LearnRecipe / A / r1 / false
+    Human says "We're done learning how to do A."
+  > debug
+    #
+    # Following corresponds to Figure 6.
+    #
+  > history
+
+[LearnRecipe(A,r1,false) by steps] -accepted -done <-focus
+   Propose.Should(human,LearnRecipe(A,r1,false))
+   [LearnStep(B,r1,false) by topdown] -done
+      [LearnRecipe(B,r2,false) by steps] -accepted -done
+         Propose.Should(human,LearnRecipe(B,r2,false))
+         [LearnStep(d,r2,false) by demonstration] -done
+            [Task.Any(human,d)] -done
+               d(human)
+            addStep(agent,d,r2)
+         [LearnStep(e,r2,false) by demonstration] -optionalStep -done
+            [Task.Any(human,e)] -done
+               e(human)
+            addStep(agent,e,r2)
+         Propose.Done(human,LearnRecipe(B,r2,false))
+      addStep(agent,B,r1)
+   [LearnStep(C,r1,false) by instruction] -optionalStep -done
+      [addStep(agent,C,r1)] -accepted -done
+         Propose.Should(human,addStep(agent,C,r1))
+         addStep(agent,C,r1)
+   Propose.Done(human,LearnRecipe(A,r1,false))
+
+  > debug false
+    # glossed version of history
+  > history
+
+[Learn how to do A by steps] -accepted -done <-focus
+   Human says "Let's learn how to do A."
+   [Learn step B by topdown] -done
+      [Learn how to do B by steps] -accepted -done
+         Human says "Let's learn how to do B."
+         [Learn step d by demonstration] -done
+            [Human execute d] -done
+               Human execute d.
+            Agent adds step d.
+         [Learn step e by demonstration] -optional -done
+            [Human execute e] -done
+               Human execute e.
+            Agent adds step e.
+         Human says "We're done learning how to do B."
+      Agent adds step B.
+   [Learn step C by instruction] -optional -done
+      [Agent adds step C] -accepted -done
+         Human says "Next step is C."
+         Agent adds step C.
+   Human says "We're done learning how to do A."
+
+  > eval compile("learn-do-teach")
+WARNING: redefining task model learn-do-teach
+    # Returned 'null'
+  > print r1
+
+learn-do-teach
+<subtasks goal="A" id="r1" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="B"/>
+  <step name="step2" task="C"/>
+</subtasks>
+
+  > print r2
+
+learn-do-teach
+<subtasks goal="B" id="r2" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:d"/>
+  <step name="step2" task="primitive:e"/>
+</subtasks>
 
   > quit
     

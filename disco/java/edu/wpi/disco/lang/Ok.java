@@ -15,8 +15,8 @@ public class Ok extends Utterance {
 
    public static TaskClass CLASS;
    
-   // for TaskClass.newInstance
-   public Ok ( Disco disco, Decomposition decomp, String name, boolean repeat) { 
+   // for TaskClass.newStep
+   public Ok (Disco disco, Decomposition decomp, String name, boolean repeat) { 
       super(Ok.class, disco, decomp, name, repeat);
    }
    

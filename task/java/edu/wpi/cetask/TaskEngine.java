@@ -861,7 +861,7 @@ public class TaskEngine {
       return occurred(true, occurrence, null);
    }
  
-   // factorization of done below is to support extension in Disco
+   // factorization of occurred below is to support extension in Disco
    
    public Plan occurred (boolean external, Task occurrence, Plan contributes) { 
       occurrence.setExternal(external);
