@@ -141,9 +141,12 @@
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
     }
 
-    function hasRecipe (goal) {
+    // used in gloss for LearnRecipe (see Pedagogical.properties)
+    function hasRecipe (goal, except) { 
        for (var i in recipes)
-          if ( recipes[i].goal === goal ) return true;
+          if ( recipes[i].goal == goal &amp;&amp; recipes[i].id != except
+               &amp;&amp; $disco.getDecompositionClass(recipes[i].id) != null )
+                  return true;
        return false;
     }
 

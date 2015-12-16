@@ -31,8 +31,6 @@
     Agent adds step i.
   > done LearnRecipe / C / r4 / false
     Human says "We're done learning how to do C."
-  > eval compile("learn-do-teach1")
-    # Returned 'null'
   > debug
     #
     # Following corresponds to Figure 5(a). Note:
@@ -55,15 +53,6 @@
          addStep(agent,i,r4)
    Propose.Done(human,LearnRecipe(C,r4,false))
 
-    # learned recipe
-  > print r4
-
-learn-do-teach1
-<subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
-  <step name="step1" task="primitive:h"/>
-  <step name="step2" task="primitive:i"/>
-</subtasks>
-
     # glossed version of history
   > debug false  
   > history
@@ -79,6 +68,17 @@ learn-do-teach1
          Human says "Next step is i."
          Agent adds step i.
    Human says "We're done learning how to do C."
+
+  > eval compile("learn-do-teach1") 
+    # Returned 'null' 
+    # learned recipe 
+  > print r4
+
+learn-do-teach1
+<subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:h"/>
+  <step name="step2" task="primitive:i"/>
+</subtasks>
 
     # clear discourse state, but not task model
   > clear
@@ -286,7 +286,7 @@ learn-do-teach2
     # Human teaching agent another way to do B
     #
   > task LearnRecipe / B / r3 / false
-    Human says "Let's learn how to do B."
+    Human says "Let's learn another way to do B."
   > execute f
     Human do f.
   > next
@@ -298,7 +298,7 @@ learn-do-teach2
   > next
     Agent adds step g.
   > done LearnRecipe / B / r3 / false
-    Human says "We're done learning how to do B."
+    Human says "We're done learning another way to do B."
   > debug
     #
     # Following corresponds to Figure 7
@@ -323,8 +323,8 @@ learn-do-teach2
     # glossed version of history
   > history
 
-[Learn how to do B by steps] -accepted -done <-focus
-   Human says "Let's learn how to do B."
+[Learn another way to do B by steps] -accepted -done <-focus
+   Human says "Let's learn another way to do B."
    [Learn step f by demonstration] -done
       [Human do f] -done
          Human do f.
@@ -334,7 +334,7 @@ learn-do-teach2
          Human says "Please do g."
          Agent do g.
       Agent adds step g.
-   Human says "We're done learning how to do B."
+   Human says "We're done learning another way to do B."
 
   > eval compile("learn-do-teach3")
     # Returned 'null'
