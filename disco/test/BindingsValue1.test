@@ -1,4 +1,4 @@
-    # Jan 27, 2014 4:40:02 PM - TaskEngine 1.5.4 / Disco 1.7.5
+    # Dec 16, 2015 4:30:37 PM - TaskEngine 1.8 / Disco 1.12
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
   > task BindingsValueTest

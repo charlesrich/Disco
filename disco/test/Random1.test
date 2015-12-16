@@ -1,8 +1,8 @@
     # Nov 25, 2015 12:21:43 PM - TaskEngine 1.8 / Disco 1.12
     Welcome to Disco! (Type 'help' for command list)
   > load models/Random.xml
-  > eval Packages.edu.wpi.disco.Agent.RANDOM = new Packages.java.util.Random(12345)
-    # Returned 'java.util.Random@10c7bf15'
+  > eval Packages.edu.wpi.disco.Agent.RANDOM = new Packages.java.util.Random(12345); null
+    # Returned 'null'
   > eval new Packages.edu.wpi.disco.plugin.DecompositionPlugin($disco.getInteraction().getSystem().getAgenda(), 25, true, true)
     # Returned 'DecompositionPlugin'
   > next
