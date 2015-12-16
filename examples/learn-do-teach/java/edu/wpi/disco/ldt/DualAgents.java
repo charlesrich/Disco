@@ -6,7 +6,7 @@ public class DualAgents extends Console {
    
    /**
     * Use this main instead of Interaction.main() for console debugging
-    * for interaction with two agents in Figure 3c.
+    * for interaction with two agents in Figure 5(c).
     * Also see bin/learn-do-teach-dual bash script.
     * 
     * @see UnifiedAgent#main(String[])

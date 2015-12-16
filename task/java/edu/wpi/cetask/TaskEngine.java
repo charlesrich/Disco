@@ -237,11 +237,23 @@ public class TaskEngine {
       catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
+   /**
+    * Sets given variable to given value in global scope of this engine.
+    * <p>
+    * WARNING: If this variable already has a value or has been initialized (by
+    * 'var') using {@link #eval(String,String)} or related methods, then this
+    * method will create a <em>new</em> copy of the variable whose value will be
+    * independent of the original variable.
+    */
    public void setGlobal (String variable, Object value) {
       Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
       synchronized (bindings) { bindings.put(variable, value); }
    }
    
+   /**
+    * Get the value of given variable in global scope of this engine.
+    * See {@link #setGlobal(String,Object)} for WARNING!
+    */
    public Object getGlobal (String variable) {
       Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
       synchronized (bindings) { return bindings.get(variable); }

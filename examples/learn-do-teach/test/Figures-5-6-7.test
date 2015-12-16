@@ -70,7 +70,7 @@
    Human says "We're done learning how to do C."
 
   > eval compile("learn-do-teach1") 
-    # Returned 'null' 
+    # Returned 'null'
     # learned recipe 
   > print r4
 
@@ -119,8 +119,12 @@ learn-do-teach1
     #
     # Agent teaching another human by mixture of demonstration and instructions how to do C
     #
-  > task LearnRecipe / C / r4 / true / false
-    Human says "Let's learn how to do C."
+    # give system agent starting intention of teaching C to external agent
+  > instance LearnRecipe / C / r4 / true
+  > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
+    # Returned 'null'
+  > next
+    Agent says "Let's learn how to do C."
   > next
     Agent do h.
   > done addStep / h / r4
@@ -145,8 +149,8 @@ learn-do-teach1
   > history
 
 [LearnRecipe(C,r4,true) by steps] -accepted -done <-focus
-   Propose.Should(human,LearnRecipe(C,r4,true))
-   [LearnStep(h,r4,true) by demonstration] -done
+   Propose.Should(agent,LearnRecipe(C,r4,true))
+   [LearnStep(h,r4,true) by demonstration] -done -shift
       Task.Any(agent,h)
       addStep(human,h,r4)
    [LearnStep(i,r4,true) by instruction] -optionalStep -done
@@ -161,8 +165,8 @@ learn-do-teach1
   > history
 
 [Learn how to do C by steps] -accepted -done <-focus
-   Human says "Let's learn how to do C."
-   [Learn step h by demonstration] -done
+   Agent says "Let's learn how to do C."
+   [Learn step h by demonstration] -done -shift
       Agent do h.
       Human adds step h.
    [Learn step i by instruction] -optional -done

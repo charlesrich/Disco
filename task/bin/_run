@@ -60,6 +60,8 @@ if [ "$filename" ]; then
   if [ -f "$good" ]; then 
     # ignore comments and blank lines (Unix and Windows)
     diff -qB --strip-trailing-cr <($dir/bin/ack -v "^\s*#(?! Returned )" "$arg.test") <($dir/bin/ack -v "^\s*#(?! Returned )" "$good") &> /dev/null
+    # version to see diffs
+#    diff -B --strip-trailing-cr <($dir/bin/ack -v "^\s*#(?! Returned )" "$arg.test") <($dir/bin/ack -v "^\s*#(?! Returned )" "$good")
     diff=$?
     if [ $diff = 0 ]
        then echo "Succeed" $base "("`expr $end - $start` "sec)"
