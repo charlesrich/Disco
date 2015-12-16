@@ -96,7 +96,7 @@ public interface Propose {
          if ( isDefinedSlot("variable") && isDefinedSlot("value") ) {
             String variable = getVariable();
             if ( getDisco().isDefinedGlobal(variable) &&
-                  !getDisco().getGlobal(variable).equals(getValue()) )
+                  getDisco().getGlobal(variable).equals(getValue()) )
                getDisco().deleteGlobal(variable);
          }
       }
