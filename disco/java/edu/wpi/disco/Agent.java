@@ -135,7 +135,7 @@ public class Agent extends Actor {
       if ( Disco.TRACE || RANDOM != null ) {
          List<Plugin.Item> items = generate(interaction);
          if ( items.isEmpty() ) return null;
-         if ( Disco.TRACE && items.size() > 1 ) Utils.print(items, interaction.getDisco().getOut());
+         if ( Disco.TRACE ) Utils.print(items, interaction.getDisco().getOut());
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 

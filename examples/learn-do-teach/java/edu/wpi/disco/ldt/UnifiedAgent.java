@@ -9,22 +9,30 @@ import edu.wpi.disco.plugin.*;
 
 public class UnifiedAgent extends Agent {
    
-   private static Disco disco;
+   static Disco DISCO;
    
-   // use this main instead of Interaction.main() for console debugging
-   // also see bin/learn-do-teach bash script
+   /**
+    * Use this main instead of Interaction.main() for console debugging.
+    * Also see bin/learn-do-teach bash script.
+    * 
+    * @see DualAgents#main(String[])
+    */
    public static void main (String[] args) {
-      Interaction interaction = new Interaction(new UnifiedAgent("agent"),
-            new User("human"), args.length > 0 && args[0].length() > 0 ? args[0]
-               : null);
-      interaction.setOk(false);
-      disco = interaction.getDisco();
-      // make glosses agree with figures
-      disco.setProperty("achieve@word", "do");
-      disco.setProperty("execute@word", "do");
-      interaction.start(true);
+      main(args, new UnifiedAgent("agent"), new User("human")).start(true);
    }
 
+   static Interaction main (String[] args, Actor system, Actor external) {
+      Interaction interaction = new Interaction(system, external,
+            args != null && args.length > 0 && args[0].length() > 0 ? args[0] : null,
+            args != null, null, "edu.wpi.disco.Interaction");
+      interaction.setOk(false);
+      DISCO = interaction.getDisco();
+      // make glosses agree with figures
+      DISCO.setProperty("achieve@word", "do");
+      DISCO.setProperty("execute@word", "do");
+      return interaction;
+   }
+   
    public UnifiedAgent (String name) { 
       super(name);
       // prevent asking about recipes
@@ -59,7 +67,7 @@ public class UnifiedAgent extends Agent {
    private static final String CEA_2018 = "http://ce.org/cea-2018";
    private static final String primitives = "urn:disco.wpi.edu:ldt:Primitives";
    
-   public static void load () { disco.load(document, null); }
+   public static void load () { DISCO.load(document, null); }
    
    public static void compileTasks (String about, String[] tasks) {
       document = builder.newDocument();
@@ -108,7 +116,7 @@ public class UnifiedAgent extends Agent {
    }  
    
    private static boolean isPrimitive (String id) {
-      return disco.resolveTaskClass(new QName(primitives, id)) != null;
+      return DISCO.resolveTaskClass(new QName(primitives, id)) != null;
    }
 
 }

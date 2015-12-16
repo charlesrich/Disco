@@ -393,7 +393,7 @@ public class Interaction extends Thread {
     * @param disco associated instance of Disco (or extension)
     * @param title for interaction thread 
     */
-   protected Interaction (Actor system, Actor external, String from, boolean console, Disco disco, String title) {
+   public Interaction (Actor system, Actor external, String from, boolean console, Disco disco, String title) {
       super(title);
       this.system = system;
       this.external = external;
