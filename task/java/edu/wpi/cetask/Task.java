@@ -954,10 +954,10 @@ public class Task extends Instance {
          if ( type == CLASS ) return super.copySlotValues(from);
          if ( !(type.getDeclaredInputs().isEmpty() && type.getDeclaredOutputs().isEmpty()) )
             throw new IllegalArgumentException("Task.Any does not yet support inputs/outputs: "+from);
-         setSlotValue("external", from.getExternal());
-         setSlotValue("success", from.getSuccess());
-         setSlotValue("when", from.getWhen());
          setSlotValue("type", type);
+         if ( from.getExternal() != null ) setExternal(from.getExternal());
+         if ( from.getSuccess() != null ) setSuccess(from.getSuccess());
+         if ( from.getWhen() != 0 ) setWhen(from.getWhen());
          return true; 
       }
       

@@ -31,7 +31,7 @@
     Agent adds step i.
   > done LearnRecipe / C / r4 / false
     Human says "We're done learning how to do C."
-  > eval compile("learn-do-teach")
+  > eval compile("learn-do-teach1")
     # Returned 'null'
   > debug
     #
@@ -58,7 +58,7 @@
     # learned recipe
   > print r4
 
-learn-do-teach
+learn-do-teach1
 <subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="primitive:h"/>
   <step name="step2" task="primitive:i"/>
@@ -85,9 +85,9 @@ learn-do-teach
   > task C
     Human says "Let's do C."
   > next
-    Agent execute h.
+    Agent do h.
   > next
-    Agent execute i.
+    Agent do i.
   > next
     Agent says "We're done doing C."
   > debug
@@ -110,8 +110,8 @@ learn-do-teach
 
 [Do C] -accepted -done <-focus
    Human says "Let's do C."
-   Agent execute h.
-   Agent execute i.
+   Agent do h.
+   Agent do i.
    Agent says "We're done doing C."
    [Human accept] -live
 
@@ -122,7 +122,7 @@ learn-do-teach
   > task LearnRecipe / C / r4 / true / false
     Human says "Let's learn how to do C."
   > next
-    Agent execute h.
+    Agent do h.
   > done addStep / h / r4
     Human adds step h.
     #
@@ -140,7 +140,6 @@ learn-do-teach
     #
     # Following corresponds to Figure 5(d).
     # Note Task.Any is a technical artifact of Disco implementation for ?task variable
-    # that is bound to h
     # See notes above for other differences with figure.
     #
   > history
@@ -164,7 +163,7 @@ learn-do-teach
 [Learn how to do C by steps] -accepted -done <-focus
    Human says "Let's learn how to do C."
    [Learn step h by demonstration] -done
-      Agent execute h.
+      Agent do h.
       Human adds step h.
    [Learn step i by instruction] -optional -done
       [Human adds step i] -done
@@ -186,12 +185,12 @@ learn-do-teach
     Human says "Let's learn how to do A."
   > task LearnRecipe / B / r2 / false
     Human says "Let's learn how to do B."
-  > done d
-    Human execute d.
+  > execute d
+    Human do d.
   > next
     Agent adds step d.
-  > done e
-    Human execute e.
+  > execute e
+    Human do e.
   > next
     Agent adds step e.
   > done LearnRecipe / B / r2 / false
@@ -207,6 +206,7 @@ learn-do-teach
   > debug
     #
     # Following corresponds to Figure 6.
+    # See notes above for differences with figure.
     #
   > history
 
@@ -241,12 +241,12 @@ learn-do-teach
       [Learn how to do B by steps] -accepted -done
          Human says "Let's learn how to do B."
          [Learn step d by demonstration] -done
-            [Human execute d] -done
-               Human execute d.
+            [Human do d] -done
+               Human do d.
             Agent adds step d.
          [Learn step e by demonstration] -optional -done
-            [Human execute e] -done
-               Human execute e.
+            [Human do e] -done
+               Human do e.
             Agent adds step e.
          Human says "We're done learning how to do B."
       Agent adds step B.
@@ -256,23 +256,95 @@ learn-do-teach
          Agent adds step C.
    Human says "We're done learning how to do A."
 
-  > eval compile("learn-do-teach")
-WARNING: redefining task model learn-do-teach
+  > eval compile("learn-do-teach2")
     # Returned 'null'
+    # learned recipe
   > print r1
 
-learn-do-teach
+learn-do-teach2
 <subtasks goal="A" id="r1" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="B"/>
   <step name="step2" task="C"/>
 </subtasks>
 
+    # learned recipe
   > print r2
 
-learn-do-teach
+learn-do-teach2
 <subtasks goal="B" id="r2" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="primitive:d"/>
   <step name="step2" task="primitive:e"/>
+</subtasks>
+
+  > clear
+    # define variables for convenience
+  > eval r3 = DecompositionClass.get("r3", B);
+    # Returned 'r3'
+  > eval f = TaskClass.get("f"); g = TaskClass.get("g") 
+    # Returned 'g'
+    #
+    # Human teaching agent another way to do B
+    #
+  > task LearnRecipe / B / r3 / false
+    Human says "Let's learn how to do B."
+  > execute f
+    Human do f.
+  > next
+    Agent adds step f.
+  > task g / false
+    Human says "Please do g."
+  > next
+    Agent do g.
+  > next
+    Agent adds step g.
+  > done LearnRecipe / B / r3 / false
+    Human says "We're done learning how to do B."
+  > debug
+    #
+    # Following corresponds to Figure 7
+    # See notes above for differences with figure.
+    #
+  > history 
+
+[LearnRecipe(B,r3,false) by steps] -accepted -done <-focus
+   Propose.Should(human,LearnRecipe(B,r3,false))
+   [LearnStep(f,r3,false) by demonstration] -done
+      [Task.Any(human,f)] -done
+         f(human)
+      addStep(agent,f,r3)
+   [LearnStep(g,r3,false) by demonstration] -optionalStep -done
+      [Task.Any(agent,g)] -accepted -done
+         Propose.Should(human,g(agent))
+         Task.Any(agent,g)
+      addStep(agent,g,r3)
+   Propose.Done(human,LearnRecipe(B,r3,false))
+
+  > debug false
+    # glossed version of history
+  > history
+
+[Learn how to do B by steps] -accepted -done <-focus
+   Human says "Let's learn how to do B."
+   [Learn step f by demonstration] -done
+      [Human do f] -done
+         Human do f.
+      Agent adds step f.
+   [Learn step g by demonstration] -optional -done
+      [Agent do g] -accepted -done
+         Human says "Please do g."
+         Agent do g.
+      Agent adds step g.
+   Human says "We're done learning how to do B."
+
+  > eval compile("learn-do-teach3")
+    # Returned 'null'
+    # learned recipe
+  > print r3
+
+learn-do-teach3
+<subtasks goal="B" id="r3" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:f"/>
+  <step name="step2" task="primitive:g"/>
 </subtasks>
 
   > quit

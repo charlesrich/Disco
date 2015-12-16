@@ -45,8 +45,8 @@
       Propose.Done(human,C)
    Propose.Done(human,A)
 
-  # Glossed version of history
   > debug false
+  # glossed version of history 
   > history
 
 [Do A by r1] -accepted -done <-focus

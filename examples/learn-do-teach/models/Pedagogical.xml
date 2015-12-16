@@ -38,7 +38,7 @@
     <input name="learner" type="boolean"/>
     <binding slot="$this.action"
              value="($plan != null &amp;&amp; $this.recipe != undefined) ? 
-		    $this.recipe.steps[$plan.getRepeatStep()] : undefined"/>
+                    $this.recipe.steps[$plan.getRepeatStep()] : undefined"/>
     <precondition>
       ($plan != null &amp;&amp; $this.recipe != undefined &amp;&amp; $this.recipe.isCompiled() ) ? 
        ($this.recipe.steps[$plan.getRepeatStep()] != undefined) : undefined
@@ -139,6 +139,12 @@
     DecompositionClass.prototype.toString = function () {
        return this.id+
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
+    }
+
+    function hasRecipe (goal) {
+       for (var i in recipes)
+          if ( recipes[i].goal === goal ) return true;
+       return false;
     }
 
     // compile newly learned task model elements to ANSI/CEA-2018 and load into Disco

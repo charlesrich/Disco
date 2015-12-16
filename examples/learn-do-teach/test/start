@@ -20,7 +20,7 @@ next
 task addStep / i / r4 / false
 next
 done LearnRecipe / C / r4 / false
-eval compile("learn-do-teach")
+eval compile("learn-do-teach1")
 debug
 #
 # Following corresponds to Figure 5(a). Note:
@@ -82,7 +82,7 @@ history
 clear
 # define variables for convenience
 eval A = TaskClass.get("A"); B = TaskClass.get("B");
-eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B);
+eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B); 
 #
 # Human teaching agent how to do A
 #
@@ -105,6 +105,29 @@ history
 debug false
 # glossed version of history
 history
-eval compile("learn-do-teach")
+eval compile("learn-do-teach2")
 print r1
 print r2
+clear
+# define variables for convenience
+eval r3 = DecompositionClass.get("r3", B);
+eval f = TaskClass.get("f"); g = TaskClass.get("g") 
+#
+# Human teaching agent another way to do B
+#
+task LearnRecipe / B / r3 / false
+execute f
+next
+task g / false
+next
+done LearnRecipe / B / r3 / false
+debug
+#
+# Following corresponds to Figure 7
+#
+history 
+debug false
+# glossed version of history
+history
+eval compile("learn-do-teach3")
+print r3

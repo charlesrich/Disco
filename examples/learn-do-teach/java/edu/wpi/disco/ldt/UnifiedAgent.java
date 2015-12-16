@@ -1,8 +1,8 @@
 package edu.wpi.disco.ldt;
 
 import org.w3c.dom.*;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.*;
-import edu.wpi.cetask.TaskClass;
 import edu.wpi.disco.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.plugin.*;
@@ -19,21 +19,24 @@ public class UnifiedAgent extends Agent {
                : null);
       interaction.setOk(false);
       disco = interaction.getDisco();
+      // make glosses agree with figures
+      disco.setProperty("achieve@word", "do");
+      disco.setProperty("execute@word", "do");
       interaction.start(true);
    }
 
    public UnifiedAgent (String name) { 
       super(name);
-      // prevent asking about recipes (see interaction@guess below)
+      // prevent asking about recipes
       getAgenda().remove(AskHowPlugin.class);
-      // announce when done current non-primitive (high priority)
+      // announce when done current highest-level non-primitive (high priority)
       new ProposeDonePlugin(agenda, 300);
    }
     
    @Override
    protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
       // override default turn-taking to simply do one action if possible
-      Plugin.Item item = respondIf(interaction, true, retry);
+      Plugin.Item item = respondIf(interaction, true, retry); // guess true
       if ( item == null ) return false;
       occurred(interaction, item, retry);
       return true;
@@ -54,6 +57,9 @@ public class UnifiedAgent extends Agent {
    private static Document document;
    private static Element model;
    private static final String CEA_2018 = "http://ce.org/cea-2018";
+   private static final String primitives = "urn:disco.wpi.edu:ldt:Primitives";
+   
+   public static void load () { disco.load(document, null); }
    
    public static void compileTasks (String about, String[] tasks) {
       document = builder.newDocument();
@@ -67,12 +73,11 @@ public class UnifiedAgent extends Agent {
       xmlns.setValue(CEA_2018);
       model.setAttributeNode(xmlns);
       Attr primitive = document.createAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:primitive");
-      primitive.setValue("urn:disco.wpi.edu:ldt:Primitives");
+      primitive.setValue(primitives);
       model.setAttributeNode(primitive);
       for (int i = 0; i < tasks.length; i++) {
          String id = tasks[i];
-         TaskClass type = disco.getTaskClass(id);
-         if ( type != null && type.isPrimitive() ) continue; 
+         if ( isPrimitive(id) ) continue;
          Element task = document.createElementNS(CEA_2018, "task");
          model.appendChild(task);
          Attr idAttr = document.createAttribute("id");
@@ -97,11 +102,13 @@ public class UnifiedAgent extends Agent {
          name.setValue("step"+(i+1));
          step.setAttributeNode(name);
          Attr taskAttr = document.createAttribute("task");
-         TaskClass task = disco.getTaskClass(steps[i]);
-         taskAttr.setValue(((task != null && task.isPrimitive()) ? "primitive:" : "")+steps[i]);
+         taskAttr.setValue((isPrimitive(steps[i]) ? "primitive:" : "")+steps[i]);
          step.setAttributeNode(taskAttr);
       }
    }  
    
-   public static void load () { disco.load(document, null); }
+   private static boolean isPrimitive (String id) {
+      return disco.resolveTaskClass(new QName(primitives, id)) != null;
+   }
+
 }
