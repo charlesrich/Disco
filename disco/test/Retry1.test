@@ -31,29 +31,29 @@
     Agent says "Sure."
   > history
 
-[Achieve RetryA] -failed
+[Achieve RetryA by retryA1] -failed
    User says "Let's achieve RetryA."
    [Agent execute PostA] -failed
       Agent execute PostA. -failed
-[Achieve RetryA] -failed
+[Achieve RetryA by retryA2] -failed
    [Agent execute PostA] -failed
       Agent execute PostA. -failed
-[Achieve RetryA] -accepted -failed
+[Achieve RetryA by retryA3] -accepted -failed
    [Agent execute PostA] -optional -accepted -failed
       [User says please execute PostA]
          Agent says "Should I execute PostA?"
          User says "Yes."
       Agent execute PostA. -failed
       Agent says "Ok."
-[Achieve RetryA] -accepted -done
+[Achieve RetryA by retryA1] -accepted -done
    User says "Let's achieve RetryA."
    Agent execute PostA.
    Agent says "Yup."
-[Achieve RetryA] -failed
+[Achieve RetryA by retryA1] -failed
    User says "Let's achieve RetryA."
    [Agent execute PostA] -failed
       Agent execute PostA. -failed
-[Achieve RetryA] -accepted -done <-focus
+[Achieve RetryA by retryA2] -accepted -done <-focus
    Agent execute PostA.
    Agent says "Sure."
 

@@ -1,0 +1,12 @@
+<taskModel about="urn:disco.wpi.edu:ldt:Primitives" xmlns="http://ce.org/cea-2018">
+
+  <!-- These are the primitives for learning the task model in ABC.xml -->
+
+  <task id="d"/>
+  <task id="e"/>
+  <task id="f"/>
+  <task id="g"/>
+  <task id="h"/>
+  <task id="i"/>
+
+</taskModel>

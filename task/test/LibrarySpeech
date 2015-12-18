@@ -8,7 +8,7 @@ CE> status
 CE> next
 CE> yes
 CE> next
-CE> done / / / false
+CE> done / / / / false
 CE> status
 CE> next
 CE> debug

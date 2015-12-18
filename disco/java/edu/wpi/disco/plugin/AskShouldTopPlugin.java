@@ -13,7 +13,7 @@ import edu.wpi.disco.lang.*;
 import java.util.*;
 
 /**
- * Plugin for agent to ask about first live toplevel plan iff
+ * Plugin for agent to ask about (or propose) first live toplevel plan iff
  * Ask.Should property for task is true (default) and stack is empty.
  */
 public class AskShouldTopPlugin extends DefaultPlugin {
@@ -26,7 +26,11 @@ public class AskShouldTopPlugin extends DefaultPlugin {
          Task goal = top.getGoal();
          if ( getGenerateProperty(Ask.Should.class, goal) && top.isLive() )
             return Collections.singletonList(
-                  new Plugin.Item(new Ask.Should(disco, self(), goal), top));
+                  new Plugin.Item(
+                        Utils.isTrue(goal.getShould()) ?
+                           Propose.Should.newInstance(disco, self(), goal)
+                           : new Ask.Should(disco, self(), goal), 
+                        top));
       }
       return null;
    }

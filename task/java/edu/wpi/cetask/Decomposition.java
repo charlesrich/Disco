@@ -19,11 +19,12 @@ public class Decomposition extends Instance {
       super(type, type.engine);
       List<String> stepNames = type.getStepNames();
       Map<String,Repeatable> repeatableSteps = null;
+      bindings.put("$plan", plan);
       List<Plan> optionalSteps = null; // for copying bindings
       for (String name : stepNames) {
          TaskClass task = type.getStepType(name);
          boolean optional = type.isOptionalStep(name);
-         Plan step = addStep(task, name, optional, false);
+         Plan step = addStep(task, name, optional, 0);
          for (String required : type.getRequiredStepNames(name)) {
             Plan requiredStep = getStep(required);
             if ( requiredStep == null ) 
@@ -62,8 +63,7 @@ public class Decomposition extends Instance {
                boolean optionalRepeat = ( i >= min );
                // note $ not allowed in XML names, so cannot accidentally
                // collide with user-defined step names
-               step = addStep(task, name+'$'+i, optionalRepeat, true);
-               step.setRepeatStep(i);
+               step = addStep(task, name+'$'+i, optionalRepeat, i);
                step.requires(requires); 
                if ( optionalRepeat ) optionalSteps.add(step);
             }       
@@ -73,10 +73,12 @@ public class Decomposition extends Instance {
       if ( repeatableSteps != null ) { 
          for (Repeatable repeatable : repeatableSteps.values()) {
             // must be after updateBindings
-            for (Plan repeat : repeatable.optional)
+            for (Plan repeat : repeatable.optional) {
                // copy fixed binding values (esp. external)
                // (will cause unnecessary calls to updateBindings)
                repeat.getGoal().copySlotValues(repeatable.step);
+               repeat.getGoal().updateBindingsTask();
+            }
          }
       }
    }
@@ -91,13 +93,14 @@ public class Decomposition extends Instance {
    }
    
    private Plan addStep (TaskClass type, String name,
-                         boolean optional, boolean repeat) {
+                         boolean optional, int repeat) {
       Decomposition.Step step;
       try { step = type.isBuiltin() ?
-               type.newStep(Decomposition.this, name, repeat) :
+               type.newStep(Decomposition.this, name, repeat > 0) :
                new Step(type, engine, this, name);
       } catch (NoSuchMethodException e) { throw new RuntimeException(e); }
       Plan plan = new Plan(step);
+      plan.setRepeatStep(repeat);
       step.setPlan(plan);
       plan.setOptionalStep(optional);
       putStep(name, plan);
@@ -136,7 +139,7 @@ public class Decomposition extends Instance {
       goal = null;
       synchronized (bindings) { 
          bindings.remove("$this"); 
-         bindings.remove("$plan"); 
+         bindings.put("$plan", null); 
       }
    }
    
@@ -191,7 +194,12 @@ public class Decomposition extends Instance {
       private final Decomposition decomp;
       
       private /* final */ Plan plan; // can be null (for builtin tasks)
-      void setPlan (Plan plan) { this.plan = plan; }
+      
+      void setPlan (Plan plan) { 
+         this.plan = plan;
+         plan.getGoal().bindings.put("$plan", plan);
+         updateBindingsTask();
+      }
       
       public String getName () { return name; }
       

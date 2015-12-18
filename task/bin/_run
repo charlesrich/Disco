@@ -59,9 +59,14 @@ if [ "$filename" ]; then
   if [[ $uname == CYGWIN* ]]; then dos2unix -q "$arg.test"; fi
   if [ -f "$good" ]; then 
     # ignore comments and blank lines (Unix and Windows)
-    diff -qBI "^.$\|\#" --strip-trailing-cr "$arg.test" "$good"
+    diff -qB --strip-trailing-cr <($dir/bin/ack -v "^\s*#(?! Returned )" "$arg.test") <($dir/bin/ack -v "^\s*#(?! Returned )" "$good") &> /dev/null
+    # version to see diffs
+#    diff -B --strip-trailing-cr <($dir/bin/ack -v "^\s*#(?! Returned )" "$arg.test") <($dir/bin/ack -v "^\s*#(?! Returned )" "$good")
     diff=$?
-    if [ $diff = 0 ]; then echo "Succeed" $base "("`expr $end - $start` "sec)" ; fi
+    if [ $diff = 0 ]
+       then echo "Succeed" $base "("`expr $end - $start` "sec)"
+       else echo "Files $arg.test and $good differ"
+    fi
     exit $diff
   fi
 fi

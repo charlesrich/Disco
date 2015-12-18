@@ -375,6 +375,7 @@ public class TaskClass extends TaskModel.Member {
    
    private final Map<String,Slot> slots;
    
+   @Override
    public Slot getSlot (String name) { return slots.get(name); }
    
    public Collection<Slot> getSlots () { return Collections.unmodifiableCollection(slots.values()); }
@@ -775,7 +776,8 @@ public class TaskClass extends TaskModel.Member {
     * Returns false if given task class is same as this task class.
     */
    public boolean isPathFrom (TaskClass task) { 
-      return task.explains.contains(this);   
+      return this == Task.Any.CLASS || task.explains.contains(Task.Any.CLASS)
+            || task.explains.contains(this);   
    }
 
    void contributes (TaskClass task) {
@@ -804,7 +806,7 @@ public class TaskClass extends TaskModel.Member {
       }
    }
    
-   // for use with extensions to CEA-2018
+   // for use with CEA-2018-ext
    // a greatly simplified version of DecompositionClass.Binding
    
    // TODO does not handle dependencies between bindings
@@ -816,6 +818,11 @@ public class TaskClass extends TaskModel.Member {
    }
    
    private class Binding {
+      
+      //TODO improve this by refactoring and reusing code from
+      //     DecompostionClass.Binding (make separate class)
+      //     to take advantage of strictness and dependency-based
+      //     updating
 
       private final String slot, value, expression, where;
       private final Compiled compiled;

@@ -86,14 +86,9 @@ public class Disco extends TaskEngine {
    
    @Override
    protected TaskModel load (String from, InputStream input) {
-      try { 
-         return load(from, builder.parse(input, from), 
-                     loadProperties(from, ".properties"),
-                     loadProperties(from, ".translate.properties"));
-      } // error handler above has already printed info
-      catch (SAXParseException e) { return null; }
-      catch (SAXException e) { return null; }
-      catch (IOException e) { throw new RuntimeException(e); }
+      return load(from, parse(input, from), 
+            loadProperties(from, ".properties"),
+            loadProperties(from, ".translate.properties"));
    }
     
    /**
@@ -350,6 +345,14 @@ public class Disco extends TaskEngine {
       }
    }
    
+   /**
+    * Tests whether stack contains given plan
+    */
+   public boolean stackContains (final Plan plan) {
+      return stack.stream().map(Segment::getPlan).filter(segment -> segment == plan)
+            .findFirst().isPresent();
+   }
+   
    @Override
    public void clear () {
       super.clear();
@@ -464,7 +467,7 @@ public class Disco extends TaskEngine {
             // try ignoring implicit Accept in focus (avoid spurious ambiguity)
             explanations = recognition.recognize(getFocus(true), null);
             if ( !explanations.isEmpty() ) return explanations;
-         }
+         }        
          top = getTop(focus);
          if ( top != focus ) {
             // next look in toplevel plan of current focus (if different)
@@ -474,6 +477,15 @@ public class Disco extends TaskEngine {
             tried.add(top);
          }
       } 
+      // special case for talking about done plans on stack for current top
+      if ( occurrence instanceof Utterance )
+         for (int i = stack.size(); i-- > 1;) {
+            Plan plan = stack.get(i).getPlan();
+            if ( plan != null && !plan.isLive() && occurrence.contributes(plan) ) {
+               return Collections.singletonList(new Explanation(plan, null, null));
+            }
+            if ( plan == top ) break;
+         }
       // next consider popping toplevel plan(s) on stack
       while (true) {
          if ( focus != null && top != null 
@@ -821,7 +833,8 @@ public class Disco extends TaskEngine {
             if ( segment.isShift() ) stream.print(" -shift");
             if ( plan.isLive() && segment.isStopped() ) stream.print(" -stopped");
             // note ignoring temporary Accept's to avoid novice confusion
-            if ( segment.getPlan() == getFocus(true) && stack.contains(segment) )
+            if ( segment.getPlan() == getFocus(!TaskEngine.VERBOSE) 
+                  && stack.contains(segment) )
                stream.print(' '+Plan.FOCUS_NOTE);
             stream.println();
             // unless history recurse on open segments only 
@@ -1113,6 +1126,35 @@ public class Disco extends TaskEngine {
       }
    }
    
+   /**
+    * For use in format strings, e.g., {$disco.gerundize($this.arg,"a foo")}
+    */
+   public String gerundize (Object object, String undefined) {
+      if ( isUndefined(object) ) return undefined;
+      String string = object instanceof Task ? ((Task) object).formatTask() : toString(object);
+      if ( string.length() < 2 ) return string;
+      int space = string.indexOf(' ');
+      StringBuffer buffer = new StringBuffer(string);
+      int end          = space > 0 ? space : buffer.length();
+      char ultimate    = buffer.charAt(end-1);
+      char penultimate = buffer.charAt(end-2);
+      if (end > 2 && ultimate == 'e' && (penultimate == 'u' || !isVowel(penultimate)) ) {
+         buffer.setCharAt(end-1, 'i');
+         buffer.insert(end, "ng");
+      } else {
+         if (end > 2 && (!isVowel(ultimate) && (ultimate != 'y') && (ultimate != 'w'))
+               && isVowel(penultimate) && !isVowel(buffer.charAt(end-3))
+               && (!((ultimate=='n' || ultimate=='r') && penultimate=='e')))
+            buffer.insert(end++, ultimate);   // double last consonant
+         buffer.insert(end, "ing");
+      }
+      return buffer.toString();
+   }
+
+   private static boolean isVowel (char c) {
+      return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+   }
+
    /**
     * Return string identifying external slot of given task
     */

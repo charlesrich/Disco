@@ -19,17 +19,35 @@ class Recognition {
    private void add (Explanation explanation) {
       if ( explanation.start != null ) {
          TaskClass task = explanation.start.getType();
-         for (Explanation e : explanations)
-            // ignore ambiguity between different explanations for
-            // the same task type --- this is a pretty strong
-            // oversimplification, since it ignores inputs/outputs
-            // and the fact that there could validly be different
-            // implementations, but it works well in practice
-            if ( task == e.start.getType() ) return;
+         for (Iterator<Explanation> i = explanations.iterator(); i.hasNext();) {
+            Explanation e = i.next();
+            Task current = explanation.getFocus().getGoal();
+            Task old = e.getFocus().getGoal();
+            // prefer specific explanation over Task.Any
+            if ( current.getType() == Task.Any.CLASS ) {
+               if ( old.getType() != Task.Any.CLASS ) return; // ignore current
+               continue; // keep ambiguity
+            } else if ( old.getType() == Task.Any.CLASS ) {
+               i.remove(); // remove old
+               continue; // keep current
+            }
+            int oldCount = old.countSlotValues(),
+                currentCount = current.countSlotValues(); 
+            // prefer more specific explanation with more defined slots
+            if ( oldCount > currentCount ) return; // ignore current
+            if ( currentCount > oldCount ) i.remove(); // remove old
+            // otherwise keep current or ambiguity
+         } 
+         for (Explanation e : explanations) // do after above 
+            // ignore ambiguity between different explanations for the same task
+            // type --- this is a pretty strong oversimplification, since it
+            // ignores inputs/outputs and the fact that there could validly be
+            // different implementations, but it works well in practice
+            if ( e.start != null && task == e.start.getType() ) return;
       }
       explanations.add(explanation);
    }
-   
+
    Recognition (Task occurrence) { this.occurrence = occurrence; } 
 
    // Note immediate children of root node are always searched,
@@ -170,8 +188,9 @@ class Recognition {
 
       public Plan instantiate (Plan current) {
          if ( current.isDecomposed() 
-               || Utils.isFalse(decomp.isApplicable(current.getGoal())) 
-               || current.apply(decomp)  == null ) 
+               || current.apply(decomp)  == null 
+               // re-check applicability condition after bindings done (if not started)
+               || (!current.getGoal().isStarter(current) && Utils.isFalse(decomp.isApplicable(current.getGoal()))) ) 
             return null;
          for (Plan child : current.getChildren()) {
             Task task = child.getGoal();

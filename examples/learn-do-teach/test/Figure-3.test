@@ -1,0 +1,67 @@
+    # This test case corresponds to Figure 3 in models/Learn-Do-Teach.pdf
+    # Execute this test case using bin/learn-do-teach 
+    #
+    # Dec 1, 2015 4:10:55 PM - TaskEngine 1.8 / Disco 1.12
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Primitives.xml
+  > load models/ABC.xml
+    # Turn off automatic turn-taking for user
+  > next false
+  > task A
+    Human says "Let's do A."
+  > next
+    Agent do d.
+  > next
+    Agent do e.
+  > next
+    Agent says "We're done doing B."
+  > execute h
+    Human do h.
+  > task i / false
+    Human says "Please do i."
+  > next
+    Agent do i.
+  > done C
+    Human says "We're done doing C."
+  > done A
+    Human says "We're done doing A."
+  > debug
+  > history
+    #
+    # Note Propose.Should and Propose.Done have been renamed to 
+    # 'do' and 'done' respectively. 
+
+[A by r1] -accepted -done <-focus
+   Propose.Should(human,A)
+   [B by r2] -done
+      d(agent)
+      e(agent)
+      Propose.Done(agent,B)
+   [C by r4] -done
+      h(human)
+      [i(agent)] -accepted -done
+         Propose.Should(human,i(agent))
+         i(agent)
+      Propose.Done(human,C)
+   Propose.Done(human,A)
+
+  > debug false
+  # glossed version of history 
+  > history
+
+[Do A by r1] -accepted -done <-focus
+   Human says "Let's do A."
+   [Do B by r2] -done
+      Agent do d.
+      Agent do e.
+      Agent says "We're done doing B."
+   [Do C by r4] -done
+      Human do h.
+      [Agent do i] -accepted -done
+         Human says "Please do i."
+         Agent do i.
+      Human says "We're done doing C."
+   Human says "We're done doing A."
+
+  > quit
+    

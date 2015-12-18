@@ -50,9 +50,9 @@ public class Agent extends Actor {
    private Plugin.Item generateBest (Interaction interaction, Boolean guess) {
       Disco disco = interaction.getDisco();
       Plan focus = disco.getFocusExhausted(true);
-      // decompose *all* live plan plans in current focus 
-      // with either exactly one *applicable* decomposition (that has not been
-      // de-authorized) or first applicable authorized one
+      // decompose *all* live plan in current focus with either chosen decomposition,
+      // or exactly one *applicable* decomposition (that has not been
+      // de-authorized), or first applicable authorized one
       List<Plan> live = null;
       if ( focus != null ) {
          live = focus.getLiveDescendants();
@@ -66,7 +66,7 @@ public class Agent extends Actor {
          if ( !plan.isPrimitive() && !plan.isDecomposed() ) {
             Task goal = plan.getGoal();
             List<DecompositionClass> decomps = plan.getDecompositions();
-            if ( decomps.isEmpty() ) continue;
+            if ( decomps.isEmpty() ) continue; // possible loop exit without return
             DecompositionClass choice = null;
             if ( decomps.size() == 1 ) {
                DecompositionClass decomp = decomps.get(0);
@@ -83,7 +83,7 @@ public class Agent extends Actor {
             if ( choice != null ) { 
                plan.apply(choice);
                plan.decomposeAll();
-               // new live plans may have been create above
+               // new live plans may have been created above
                return generateBest(interaction, guess);
             } else if ( guess == null || guess ) {
                Plugin.Item item = generateBest(interaction); // no guessing
@@ -99,7 +99,7 @@ public class Agent extends Actor {
                      return item != null ? item : 
                         // recursion ends when no more live non-decomposed plans
                         generateBest(interaction, guess); // continue guessing
-                  }
+                  } // possible loop exit without return
             }
          }
       }
@@ -135,7 +135,7 @@ public class Agent extends Actor {
       if ( Disco.TRACE || RANDOM != null ) {
          List<Plugin.Item> items = generate(interaction);
          if ( items.isEmpty() ) return null;
-         if ( Disco.TRACE && items.size() > 1 ) Utils.print(items, interaction.getDisco().getOut());
+         if ( Disco.TRACE ) Utils.print(items, interaction.getDisco().getOut());
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 
@@ -155,6 +155,7 @@ public class Agent extends Actor {
     * @param ok force turn to end with 'Ok' if necessary
     * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
     * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @return true if some response was made
     */
    @Override
    protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {

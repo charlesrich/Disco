@@ -1,0 +1,133 @@
+# This test case corresponds to Figures 5, 6 and 7 in models/Learn-Do-Teach.pdf,
+# except for Figure 5(c), which requires a separate execution (see Figure5-c.test)
+#
+# Execute this test case using bin/learn-do-teach 
+#
+# note *not* loading ABC model
+load models/Pedagogical.xml
+load models/Primitives.xml
+# turn off automatic turn-taking
+next false
+# define variables for convenience
+eval C = TaskClass.get("C"); r4 = DecompositionClass.get("r4", C)
+eval h = TaskClass.get("h"); i = TaskClass.get("i")
+#
+# Human teaching agent by instruction how to do C
+#
+task LearnRecipe / C / r4 / false
+task addStep / h / r4 / false
+next
+task addStep / i / r4 / false
+next
+done LearnRecipe / C / r4 / false
+eval compile("learn-do-teach1")
+debug
+#
+# Following corresponds to Figure 5(a). Note:
+#
+#  * Propose.Should and Propose.Done have been renamed to 'do' and 'done' respectively
+#  * 'false' input to LearnRecipe and LearnStep means agent ('true' means human)
+#  * segments for primitive actions (e.g., addStep) have been omitted in figure
+#
+history 
+# learned recipe
+print r4
+# glossed version of history
+debug false  
+history
+#
+# Agent doing C
+#
+clear
+task C
+next
+next
+next
+debug
+#
+# Following corresponds to Figure 5(b).
+# Note human acceptance of agent's done proposal omitted in figure.
+#
+history
+# glossed version of history
+debug false
+history
+clear
+#
+# Agent teaching another human by mixture of demonstration and instructions how to do C
+#
+task LearnRecipe / C / r4 / true / false
+#
+# Agent chooses demonstration meta-recipe by default for first step
+#
+next
+done addStep / h / r4
+#
+# Make agent choose instruction meta-recipe for teaching next step
+#
+eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
+next
+done
+next
+debug
+#
+# Following corresponds to Figure 5(c).
+# As above, segment for primitive addStep and human acceptance of agent's done proposal
+# omitted in figure.
+#
+history
+# glossed version of history
+debug false
+history
+clear
+# define variables for convenience
+eval A = TaskClass.get("A"); B = TaskClass.get("B");
+eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B); 
+#
+# Human teaching agent how to do A
+#
+task LearnRecipe / A / r1 / false
+task LearnRecipe / B / r2 / false
+done d
+next
+done e
+next
+done LearnRecipe / B / r2 / false
+next
+task addStep / C / r1 / false
+next
+done LearnRecipe / A / r1 / false
+debug
+#
+# Following corresponds to Figure 6.
+#
+history
+debug false
+# glossed version of history
+history
+eval compile("learn-do-teach2")
+print r1
+print r2
+clear
+# define variables for convenience
+eval r3 = DecompositionClass.get("r3", B);
+eval f = TaskClass.get("f"); g = TaskClass.get("g") 
+#
+# Human teaching agent another way to do B
+#
+task LearnRecipe / B / r3 / false
+execute f
+next
+task g / false
+next
+done LearnRecipe / B / r3 / false
+debug
+#
+# Following corresponds to Figure 7
+#
+history 
+debug false
+# glossed version of history
+history
+eval compile("learn-do-teach3")
+print r3

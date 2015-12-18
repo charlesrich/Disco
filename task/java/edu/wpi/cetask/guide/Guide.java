@@ -266,14 +266,14 @@ public class Guide extends Shell {
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public void done (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), true);
+      Task occurrence = processTaskIf(args, getProposed(), false);
       if ( occurrence != null ) done(occurrence); 
    }
    
    protected void done (Task occurrence) {
       if ( getProposed() != null ) {
          Task task = getProposed().getGoal();
-         if ( task.matches(occurrence) )
+         if ( task.isMatch(occurrence) )
             occurrence.copySlotValues(task);
       }
       if ( occurrence.isDefinedInputs() ) { 
@@ -300,7 +300,7 @@ public class Guide extends Shell {
     * @see #done(String)
     */
    public void execute (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), true);
+      Task occurrence = processTaskIf(args, getProposed(), false);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             Grounding script = occurrence.getGrounding();

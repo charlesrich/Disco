@@ -9,7 +9,7 @@
 [ ]
 
   > eval Character.LILY.health = -10
-    # Returned '-10.0'
+    # Returned '-10'
   > status
 
 [ ] -live
@@ -31,7 +31,7 @@
    [Character execute AddLowHealth on Lily]
 
   > eval Character.LILY.health = 10
-    # Returned '10.0'
+    # Returned '10'
   > status
 
 [ ] -live
@@ -55,7 +55,7 @@
   > eval HEALER = null
     # Returned 'null'
   > eval Character.LILY.health = -10
-    # Returned '-10.0'
+    # Returned '-10'
   > status
 
 [ ] -done <-focus

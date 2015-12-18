@@ -16,7 +16,7 @@ import javax.script.*;
  */
 abstract class Instance {
    
-   protected final TaskModel.Member type;
+   private final TaskModel.Member type; 
    
    public TaskModel.Member getType () { return type; }
    
@@ -28,9 +28,9 @@ abstract class Instance {
       this.type = type;
       this.engine = engine;
       bindings = engine.getScriptEngine().createBindings();
-      // $id and $model are future extensions to standard
       bindings.put("$id", type.getId());
       bindings.put("$model", type.getNamespace());
+      bindings.put("$instance", this);
    }
    
    // store slot values in JavaScript form

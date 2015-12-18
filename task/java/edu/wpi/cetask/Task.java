@@ -5,16 +5,15 @@
  */
 package edu.wpi.cetask;
 
+import java.text.DateFormat;
+import java.util.*;
+import javax.script.*;
 import edu.wpi.cetask.Description.Input;
 import edu.wpi.cetask.Description.Output;
 import edu.wpi.cetask.Description.Slot;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
-import edu.wpi.cetask.TaskClass.Grounding;
-import edu.wpi.cetask.TaskClass.Postcondition;
-import edu.wpi.cetask.TaskClass.Precondition;
-import java.text.DateFormat;
-import java.util.*;
-import javax.script.Bindings;
+import edu.wpi.cetask.TaskClass.*;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 /**
  * Representation for instances of a task class.
@@ -27,8 +26,13 @@ public class Task extends Instance {
          // create JavaScript instance object (no initial slot properties)
          // do not use Instance.eval below because Decomposition.Step includes
          // call to updateBindings, but during constructor, steps are not yet added
-         bindings.put("$this", engine.newObject());
+         Object object = engine.newObject();
+         bindings.put("$this", object);
+         bindings.put("$plan", null);
          type.updateBindings(this); // extension
+         // see section 8.3 of ANSI/CEA-2018
+         engine.put(object, "model", type.getNamespace());
+         engine.put(object, "task", type.getId());
       }
    }
    
@@ -41,7 +45,7 @@ public class Task extends Instance {
    public boolean equals (Object object) {     
       if ( !(object instanceof Task) ) return false;
       Task task = (Task) object;
-      if ( type != task.type ) return false;
+      if ( getType() != task.getType() ) return false;
       for (Slot slot : getType().getInputs())
          if ( !Utils.equals(slot.getSlotValue(this), slot.getSlotValue(task)) ) 
             return false;
@@ -54,7 +58,7 @@ public class Task extends Instance {
    @Override 
    public int hashCode () {
       int factor = 31;
-      int hash = type.hashCode()*factor;
+      int hash = getType().hashCode()*factor;
       for (Slot slot : getType().getInputs()) {
          Object value = slot.getSlotValue(this);
          if ( value != null ) {
@@ -316,6 +320,13 @@ public class Task extends Instance {
       } finally { extra.remove("$$this"); }
    }
    
+   public int countSlotValues () {
+      int n = 0;
+      for (Slot slot : getType().getSlots()) 
+         if ( slot.isDefinedSlot(this) ) n++;
+      return n;
+   }
+   
    /**
     * Make named slot undefined.
     * 
@@ -376,7 +387,7 @@ public class Task extends Instance {
 
    @Override
    protected Boolean evalCondition (String condition, Compiled compiled, String where) {
-	   if ( clonedInputs == null ) return super.evalCondition(condition,  compiled, where);
+	   if ( clonedInputs == null ) return super.evalCondition(condition, compiled, where);
        synchronized (bindings) {
           Object old = bindings.get("$this");
           try {
@@ -438,6 +449,13 @@ public class Task extends Instance {
     * Test whether this task is instance of an internal type.
     */
    public boolean isInternal () { return getType().isInternal(); }
+   
+   
+   /**
+    * Test whether this task is temporary.  For extension to
+    * Disco with Accept utterance.  See {@link Plan#isExhausted()}
+    */
+   public boolean isTemporary () { return false; }
    
    // predefined slots
    
@@ -630,26 +648,35 @@ public class Task extends Instance {
    }
    
    /**
-    * Test whether given task instance matches this task instance. Two task
+    * Test whether given task instance unifies with this task instance. Two task
     * instances match (symmetric relationship) iff they are both instances of the
     * same type and the values of each corresponding slot are either equal or
     * one is undefined.
     * 
     * @see #copySlotValues(Task)
     */
-   public boolean matches (Task goal) {
-      if ( goal == this ) return true;
+   public boolean isMatch (Task goal) {
+      if ( goal == this || goal instanceof Any ) return true;
       if ( !getType().equals(goal.getType()) ) return false;
       for (String name : getType().inputNames)
-         if ( !matchesSlot(goal, name) ) return false;
+         if ( !isMatchSlot(goal, name) ) return false;
       for (String name : getType().outputNames)
-         if ( !matchesSlot(goal, name) ) return false;
+         if ( !isMatchSlot(goal, name) ) return false;
       return true;
    }
    
-   private boolean matchesSlot (Task goal, String name) {
-      return !isDefinedSlot(name) || !goal.isDefinedSlot(name) 
-        || Utils.equals(getSlotValue(name), goal.getSlotValue(name));
+   private boolean isMatchSlot (Task goal, String name) {
+      if ( !isDefinedSlot(name) || !goal.isDefinedSlot(name) ) return true;
+      Object value = getSlotValue(name);
+      Object goalValue = goal.getSlotValue(name);
+      if ( Utils.equals(value, goalValue) ) return true;
+      // otherwise use JavaScript equals if possible
+      ScriptEngine script = engine.getScriptEngine();
+      if ( script instanceof Invocable && value instanceof ScriptObjectMirror )
+         try {
+            return (boolean) ((Invocable) script).invokeMethod(value, "equals", goalValue);
+         } catch (ScriptException | NoSuchMethodException e) { return false; }
+      else return false;
    }
 
    /**
@@ -658,10 +685,10 @@ public class Task extends Instance {
     * given plan explains this task.  
     * <p>
     * This method is for use in extensions.  In CETask, it is equivalent 
-    * to {@link #matches(Task)}.   
+    * to {@link #isMatch(Task)}.   
     */
    public boolean contributes (Plan plan) {
-      return matches(plan.getGoal());
+      return isMatch(plan.getGoal());
    }
    
    /**
@@ -669,7 +696,7 @@ public class Task extends Instance {
     * (For extension to plan recognition.)
     */
    public boolean contributes (TaskClass type) {
-      return getType() == type;
+      return type == Any.CLASS || getType() == type;
    }
    
    /**
@@ -688,7 +715,7 @@ public class Task extends Instance {
     * @param from - task of same type
     * @return true if any slots of this task overwritten (were defined)
     * 
-    * @see #matches(Task)
+    * @see #isMatch(Task)
     */
    public boolean copySlotValues (Task from) {
       if ( !getType().equals(from.getType()) ) 
@@ -743,16 +770,15 @@ public class Task extends Instance {
    protected  void evalIf (Plan plan) { if ( isSystem() ) eval(plan); }
    
    // public for Console.execute()
-   public void eval (Plan plan) {
-      TaskClass type = getType();
+   public void eval (Plan plan) { eval(plan, getType()); }
+   
+   protected void eval (Plan plan, TaskClass type) {  // for Task.Any
       cloneInputs(); //  cache modified inputs before grounding script executed
       Grounding script = getGrounding();
       if ( script != null ) 
          synchronized (bindings) {
-            try { 
-               bindings.put("$plan", plan);
-               script.eval(this);      
-            } finally { bindings.remove("$plan"); }
+            bindings.put("$plan", plan);
+            script.eval(this);      
          }
       // set outputs to modified inputs
       if ( type.getPostcondition() != null )
@@ -906,6 +932,55 @@ public class Task extends Instance {
       rejected.add(decomp);
    }
 
+   /**
+    * Builtin task class used for steps in which task attribute omitted
+    * (CEA-2018-ext). This is essentially a way to make the task representation
+    * partly second order. Note it has an input (see Disco.xml) named 'type'
+    * of type TaskClass, which is specially handled below.
+    */
+   public static class Any extends Decomposition.Step {
+      
+      public static TaskClass CLASS;
+      
+      // for TaskClass.newStep
+      public Any (TaskEngine engine, Decomposition decomp, String name, boolean repeat) { 
+         super(CLASS, engine, decomp, name);
+      }
+      
+      public Any (TaskEngine engine) { this(engine, null, null, false); }
+
+      @Override
+      public boolean isMatch (Task goal) { return true; }
+      
+      // TODO This implementation does not handle inputs/outputs 
+      //      Add lists of inputs and outputs?
+      
+      // Note: do not be tempted to actually change the type and associated
+      // properties, since still need input slot for changing bindings
+
+      @Override
+      public boolean copySlotValues (Task from) {
+         TaskClass type = from.getType();
+         if ( type == CLASS ) return super.copySlotValues(from);
+         if ( !(type.getDeclaredInputs().isEmpty() && type.getDeclaredOutputs().isEmpty()) )
+            throw new IllegalArgumentException("Task.Any does not yet support inputs/outputs: "+from);
+         setSlotValue("type", type);
+         if ( from.getExternal() != null ) setExternal(from.getExternal());
+         if ( from.getSuccess() != null ) setSuccess(from.getSuccess());
+         if ( from.getWhen() != 0 ) setWhen(from.getWhen());
+         return true; 
+      }
+      
+      @Override
+      public void eval (Plan plan) { 
+         // TODO grounding script may reference slots
+         TaskClass type = (TaskClass) getSlotValue("type");
+         if ( type == null ) 
+            throw new IllegalArgumentException("Cannot execute grounding script for: "+plan);
+         eval(plan, type);
+      }
+   }
+   
    // *******************************************************************
    //     All code below here is printing-related stuff 
    // *******************************************************************
@@ -972,7 +1047,8 @@ public class Task extends Instance {
       for (Object arg : args) {
          if ( first ) first = false;
          else buffer.append(",");
-         if ( arg != undefined ) buffer.append(toString(arg));
+         if ( arg != undefined ) 
+            buffer.append(arg == this ? "!circular!" : toString(arg));
       }
       return buffer;
    }
@@ -1103,5 +1179,5 @@ public class Task extends Instance {
       // allow empty string to undo format
       return format != null && format.length() > 0 ? format : null;
    }
-   
+  
 }

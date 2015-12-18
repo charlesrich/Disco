@@ -3,7 +3,7 @@ edu.wpi.cetask = Packages.edu.wpi.cetask;
 
 // following must be at toplevel for invokeFunction (see TaskEngine.toString)
 
-function edu_wpi_cetask_toString (obj) { return obj.toString(); }
+function edu_wpi_cetask_toString (obj) { return obj+""; } // works for null or undefined
 
 // default shallow cloning (as in Java)
 function edu_wpi_cetask_clone (x) {

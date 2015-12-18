@@ -63,8 +63,8 @@
          User says "Yes."
       Agent execute B.
    [repeat$2: Execute B] -optional -live
-      [User says one of us should execute B again] -live <-focus
-         [User accept do you want to do B again?] -live
+      [User says one of us should execute B again] -live
+         [User accept do you want to do B again?] -live <-focus
             Agent says "Do you want to do B again?"
    [next: Execute C] -live
    [repeat$3: Execute B] -optional

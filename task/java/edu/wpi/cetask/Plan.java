@@ -320,11 +320,9 @@ public class Plan {
     */
    public void execute () {
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            goal.execute(this);
-            checkAchieved();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         goal.execute(this);
+         checkAchieved();
       }
    }
    
@@ -365,19 +363,15 @@ public class Plan {
 
    public Boolean isApplicable () {
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            return goal.isApplicable();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         return goal.isApplicable();
       }
    }
    
    public Boolean isAchieved () {
       synchronized (goal.bindings) {
-         try {
-            goal.bindings.put("$plan", this);
-            return goal.isAchieved();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         return goal.isAchieved();
       }
    }
 
@@ -635,7 +629,7 @@ public class Plan {
             // precondition only required before starting               
             || ( !isStarted() && Utils.isFalse(isApplicable()) ))
          return true;
-      if ( isPrimitive() ) return !isLive();
+      if ( isPrimitive() ) return goal.isTemporary() || !isLive();
       else if ( isDecomposed() ) {
          if ( decomp == null && decompClass != null ) return false; // not expanded yet
          for (Plan child : children) // procedural decomposition
@@ -817,10 +811,8 @@ public class Plan {
       if ( decompClass != null ) return Collections.singletonList(decompClass);
       List<DecompositionClass> decomps;
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            decomps = goal.getDecompositions();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         decomps = goal.getDecompositions();
       }
       for (Iterator<DecompositionClass> i = decomps.iterator();
            i.hasNext();) {
@@ -943,17 +935,15 @@ public class Plan {
  
    boolean applyDecompositionScript () {
       String script = getType().getDecompositionScript();
-      if ( script != null ) 
-         try {
-            goal.bindings.put("$plan", this);
-            Object result = goal.eval(script, "Decomposition script for "+getType());
-            if ( result instanceof Boolean ) {
-               if (((Boolean) result)) setPlanned(true);
-               return (Boolean) result;
-            } else throw new RuntimeException("Decomposition script for "+getType()
-                  +" returned non-boolean: "+result);
-         } finally { goal.bindings.remove("$plan"); }
-      else return false;
+      if ( script != null ) { 
+         goal.bindings.put("$plan", this);
+         Object result = goal.eval(script, "Decomposition script for "+getType());
+         if ( result instanceof Boolean ) {
+            if (((Boolean) result)) setPlanned(true);
+            return (Boolean) result;
+         } else throw new RuntimeException("Decomposition script for "+getType()
+         +" returned non-boolean: "+result);
+      } else return false;
    }
    
    /**
@@ -1046,20 +1036,18 @@ public class Plan {
                DecompositionClass only = decomps.get(0);
                if ( only.getProperty("@authorized", true) ) {
                   synchronized (goal.bindings) {
-                     try { 
-                        goal.bindings.put("$plan", this);
-                        if ( !Utils.isFalse(only.isApplicable(goal)) ) {
-                           Plan focus = goal.engine.getFocus();
-                           // inhibit infinite recursion, but allow incremental expansion
-                           // if live (and recursive parent started) or if focus or child 
-                           // of focus 
-                           if ( !stack.contains(only) 
-                                 || (focus != null && 
-                                 (focus == this || focus.children.contains(this))) 
-                                 || (isLive() && recursiveParent(only).isStarted()) ) 
-                           { apply(only); applied = true; }
-                        }
-                     } finally { goal.bindings.remove("$plan"); }
+                     goal.bindings.put("$plan", this);
+                     if ( !Utils.isFalse(only.isApplicable(goal)) ) {
+                        Plan focus = goal.engine.getFocus();
+                        // inhibit infinite recursion, but allow incremental expansion
+                        // if live (and recursive parent started) or if focus or child 
+                        // of focus 
+                        if ( !stack.contains(only) 
+                              || (focus != null && 
+                              (focus == this || focus.children.contains(this))) 
+                              || (isLive() && recursiveParent(only).isStarted()) ) 
+                        { apply(only); applied = true; }
+                     }
                   }
                }
             }
@@ -1093,7 +1081,7 @@ public class Plan {
    public List<Plan> explain (Task task, boolean onlyLive, Plan exclude) {
       List<Plan> plans = new ArrayList<Plan>();
       // unroll recursion one level
-      if ( (!onlyLive || isLive()) && goal.matches(task) ) plans.add(this);
+      if ( (!onlyLive || isLive()) && goal.isMatch(task) ) plans.add(this);
       for (Plan child : children)
          child.explain(task, plans, onlyLive, exclude);
       return plans;
@@ -1156,10 +1144,10 @@ public class Plan {
             : goal);
          DecompositionClass decomp = getDecompositionClass();
          if ( decomp != null &&
-               (TaskEngine.VERBOSE ||
+               (TaskEngine.VERBOSE 
                      // suppress unique known and unformatted decompositions
-                     (goal.getType().getDecompositions().size() > 1 
-                       && decomp.getProperty("@format") != null)) ) {
+                     || goal.getType().getDecompositions().size() > 1 
+                     || decomp.getProperty("@format") != null))  {
             stream.print(' '); 
             if ( format ) stream.print(decomp.format());
             else { stream.print("by "); stream.print(decomp); }
