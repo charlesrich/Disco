@@ -30,7 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.8";
+   public static String VERSION = "1.9";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    

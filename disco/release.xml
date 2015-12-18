@@ -43,7 +43,7 @@
             doctitle="DISCO - Collaborative Discourse Manager" 
             nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" 
             packagenames="edu.wpi.disco,edu.wpi.disco.game.actions,edu.wpi.cetask.guide,edu.wpi.cetask,edu.wpi.disco.plugin,edu.wpi.disco.game,edu.wpi.disco.lang" 
-            source="1.7" 
+            source="1.8" 
             sourcefiles="../task/java/GuiExample.java"
             sourcepath="java:../task/java" splitindex="false" use="false" version="true"/>
         <zip destfile="../release/lib/disco-api.zip">
