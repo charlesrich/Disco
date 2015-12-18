@@ -12,9 +12,9 @@
     # turn off automatic turn-taking
   > next false
     # define variables for convenience
-  > eval C = new Task("C"); r4 = new Recipe("r4", C)
+  > eval C = new TaskClass("C"); r4 = new DecompositionClass("r4", C)
     # Returned 'r4'
-  > eval h = new Task("h"); i = new Task("i")
+  > eval h = new TaskClass("h"); i = new TaskClass("i")
     # Returned 'i'
     #
     # Human teaching agent by instruction how to do C
@@ -187,9 +187,9 @@
 
   > clear
     # define variables for convenience
-  > eval A = new Task("A"); B = new Task("B");
+  > eval A = new TaskClass("A"); B = new TaskClass("B");
     # Returned 'B'
-  > eval r1 = new Recipe("r1", A); r2 = new Recipe("r2", B);
+  > eval r1 = new DecompositionClass("r1", A); r2 = new DecompositionClass("r2", B);
     # Returned 'r2'
     #
     # Human teaching agent how to do A
@@ -289,9 +289,9 @@
 
   > clear
     # define variables for convenience
-  > eval r3 = new Recipe("r3", B);
+  > eval r3 = new DecompositionClass("r3", B);
     # Returned 'r3'
-  > eval f = new Task("f"); g = new Task("g") 
+  > eval f = new TaskClass("f"); g = new TaskClass("g") 
     # Returned 'g'
     #
     # Human teaching agent another way to do B

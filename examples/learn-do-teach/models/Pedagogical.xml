@@ -19,8 +19,8 @@
        is used instead below -->
 
   <task id="LearnRecipe">
-    <input name="action" type="Task"/>
-    <input name="recipe" type="Recipe"/>
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
     <input name="learner" type="boolean"/>
 
     <subtasks id="steps">
@@ -33,8 +33,8 @@
   </task>
 
   <task id="LearnStep">
-    <input name="action" type="Task"/>
-    <input name="recipe" type="Recipe"/>
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
     <input name="learner" type="boolean"/>
     <binding slot="$this.action"
              value="($plan != null &amp;&amp; $this.recipe != undefined &amp;&amp;
@@ -62,12 +62,12 @@
       <applicable> $this.action.isPrimitive() </applicable>
       <binding slot="$demonstrate.type"
                value="$disco.getTaskClass($this.action.id)"/>
-      <!-- inverse binding, see design note in Recipe.Binding -->
+      <!-- inverse binding, see design note in DecompositionClass.Binding -->
       <binding slot="$this.action"
                value="$this.action == undefined &amp;&amp; $demonstrate.type != undefined ?
-                        new Task($demonstrate.type.getId()) : undefined"/>
+                        new TaskClass($demonstrate.type.getId()) : undefined"/>
       <binding slot="$learn.action"
-               value="new Task($demonstrate.type.getId())"/>
+               value="new TaskClass($demonstrate.type.getId())"/>
       <binding slot="$learn.recipe" value="$this.recipe"/>
       <binding slot="$learn.external" value="$this.learner"/>
 
@@ -87,8 +87,8 @@
   </task>
   
   <task id="addStep">
-    <input name="action" type="Task"/>
-    <input name="recipe" type="Recipe"/>
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
     <script>
       models[$this.external].getRecipe($this.recipe).steps.push(
               models[$this.external].getTask($this.action.id));
@@ -97,7 +97,7 @@
 
   <script init="true">
 
-    // using Javascript objects for convenience here, but will eventually
+    // using "mirror" Javascript objects for convenience here, but will eventually
     // be able to construct ANSI/CEA-2018 instances on the fly (see compile
     // function below)
 
@@ -106,33 +106,33 @@
     // in which there are two copies of the agent
 
     var models = {
-       true: new Model(), // for external actor
-       false: new Model() // for system actor
+       true: new TaskModel(), // for external actor
+       false: new TaskModel() // for system actor
     }
 
-    function Model () {
+    function TaskModel () {
        this.tasks = [];   // known task classes
        this.recipes = []; // known decomposition classes
     }
 
-    Model.prototype.getRecipe = function (recipe) { // factory method
+    TaskModel.prototype.getRecipe = function (recipe) { // factory method
        for (var i in this.recipes)
           if ( this.recipes[i].id == recipe.id ) return this.recipes[i];
-       var recipe = new Recipe(recipe.id, this.getTask(recipe.goal.id));
+       var recipe = new DecompositionClass(recipe.id, this.getTask(recipe.goal.id));
        this.recipes.push(recipe);
        return recipe;
     }
 
-    Model.prototype.getTask = function (id) {  // factory method
+    TaskModel.prototype.getTask = function (id) {  // factory method
        for (var i in this.tasks)
           if ( this.tasks[i].id == id ) return this.tasks[i];
-       var task = new Task(id);
+       var task = new TaskClass(id);
        this.tasks.push(task);
        return task;
     }
 
     // compile newly learned task model elements to ANSI/CEA-2018 and load into Disco
-    Model.prototype.compile = function (about) {
+    TaskModel.prototype.compile = function (about) {
        Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(about,
           this.tasks.map(function(t) { return t.id; }));
        this.recipes.map(function(r) {
@@ -142,7 +142,7 @@
     }
 
     // used in gloss for LearnRecipe (see Pedagogical.properties)
-    Model.prototype.hasRecipe = function (goal, except) { 
+    TaskModel.prototype.hasRecipe = function (goal, except) { 
        for (var i in this.recipes) {
           var recipe = this.recipes[i];
           if ( recipe.goal.id == goal.id &amp;&amp; recipe.id != except.id
@@ -152,19 +152,19 @@
        return false;
     }
        
-    Model.prototype.toString = function () {
+    TaskModel.prototype.toString = function () {
        return "["+this.tasks+";"+this.recipes+"]";
     }
        
-    function Task (id) { this.id = id; }
+    function TaskClass (id) { this.id = id; }
     
-    Task.prototype.toString = function () { return this.id; }
+    TaskClass.prototype.toString = function () { return this.id; }
 
-    Task.prototype.equals = function (object) { // for slot comparison
-       return object instanceof Task &amp;&amp; this.id == object.id;
+    TaskClass.prototype.equals = function (object) { // for slot comparison
+       return object instanceof TaskClass &amp;&amp; this.id == object.id;
     }
 
-    Task.prototype.isPrimitive = function (who) {
+    TaskClass.prototype.isPrimitive = function (who) {
       var task = $disco.getTaskClass(this.id);
       if ( task != null ) return task.isPrimitive();
       for (var i in models[who].recipes)
@@ -172,21 +172,21 @@
       return true;
     }
 
-    function Recipe (id, goal) {
+    function DecompositionClass (id, goal) {
        this.id = id;
        this.goal = goal;
        this.steps = [];
     }
 
-    Recipe.prototype.equals = function (object) { // for slot comparison
-       return object instanceof Recipe &amp;&amp; this.id == object.id;
+    DecompositionClass.prototype.equals = function (object) { // for slot comparison
+       return object instanceof DecompositionClass &amp;&amp; this.id == object.id;
     }
 
-    Recipe.prototype.isCompiled = function () {
+    DecompositionClass.prototype.isCompiled = function () {
        return Packages.edu.wpi.disco.ldt.UnifiedAgent.isCompiled(this.id);
     }
 
-    Recipe.prototype.toString = function () {
+    DecompositionClass.prototype.toString = function () {
        return this.id+
          (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
     }
