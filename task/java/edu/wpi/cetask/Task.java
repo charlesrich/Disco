@@ -7,12 +7,13 @@ package edu.wpi.cetask;
 
 import java.text.DateFormat;
 import java.util.*;
-import javax.script.Bindings;
+import javax.script.*;
 import edu.wpi.cetask.Description.Input;
 import edu.wpi.cetask.Description.Output;
 import edu.wpi.cetask.Description.Slot;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 import edu.wpi.cetask.TaskClass.*;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 /**
  * Representation for instances of a task class.
@@ -665,8 +666,17 @@ public class Task extends Instance {
    }
    
    private boolean isMatchSlot (Task goal, String name) {
-      return !isDefinedSlot(name) || !goal.isDefinedSlot(name) 
-        || Utils.equals(getSlotValue(name), goal.getSlotValue(name));
+      if ( !isDefinedSlot(name) || !goal.isDefinedSlot(name) ) return true;
+      Object value = getSlotValue(name);
+      Object goalValue = goal.getSlotValue(name);
+      if ( Utils.equals(value, goalValue) ) return true;
+      // otherwise use JavaScript equals if possible
+      ScriptEngine script = engine.getScriptEngine();
+      if ( script instanceof Invocable && value instanceof ScriptObjectMirror )
+         try {
+            return (boolean) ((Invocable) script).invokeMethod(value, "equals", goalValue);
+         } catch (ScriptException | NoSuchMethodException e) { return false; }
+      else return false;
    }
 
    /**

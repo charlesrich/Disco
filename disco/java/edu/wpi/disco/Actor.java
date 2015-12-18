@@ -184,6 +184,17 @@ public abstract class Actor {
       return interaction.getSystem() == this ? task.canUser() : task.canSystem();
    }
 
+   private boolean eval;
+   
+   /**
+    * It true, then eval grounding scripts for this actor regardless of whether
+    * it is system or external.  Used for running simulations with two agents
+    * as in examples/DualAgents.
+    */
+   public boolean isEval () { return eval; }
+   
+   public void setEval (boolean eval) { this.eval = eval; }
+   
    @Override
    public String toString () { return name; }
 }

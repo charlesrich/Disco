@@ -870,21 +870,25 @@ public class TaskEngine {
     */
    public Plan occurred (Task occurrence) {
       // leave "success" undefined (see doc for Task.isDefinedOutputs)
-      return occurred(true, occurrence, null);
+      return occurred(true, occurrence, null, false);
    }
  
    // factorization of occurred below is to support extension in Disco
    
-   public Plan occurred (boolean external, Task occurrence, Plan contributes) { 
+   public Plan occurred (boolean external, Task occurrence, Plan contributes, 
+                         boolean eval) { 
       occurrence.setExternal(external);
       // do explanation before evaluating scripts, since expectations are in
       // terms of state of world before execution
       if ( contributes == null ) contributes = explainBest(occurrence, true);
       // check for continuation before setWhen
       boolean continuation = contributes != null && contributes.isStarted();
-      // sic evalIf, since overridden in Utterance
-      if ( external ) { occurrence.occurred(); occurrence.evalIf(contributes); } 
-      else occurrence.execute(contributes);
+            if ( external ) { 
+         occurrence.occurred(); 
+         // sic evalIf, since overridden in Utterance
+         if ( eval ) occurrence.eval(contributes); 
+         else occurrence.evalIf(contributes); 
+      } else occurrence.execute(contributes);
       occurred(occurrence, contributes, continuation);     
       return contributes;
    }

@@ -285,7 +285,8 @@ public class Interaction extends Thread {
     */
    public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes) {
       responded = true;
-      return disco.occurred(external, occurrence, contributes);
+      return disco.occurred(external, occurrence, contributes, 
+            (external ? getExternal() : getSystem()).isEval());
    }
    
    /**

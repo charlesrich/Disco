@@ -12,9 +12,9 @@
     # turn off automatic turn-taking
   > next false
     # define variables for convenience
-  > eval C = TaskClass.get("C"); r4 = DecompositionClass.get("r4", C)
+  > eval C = new Task("C"); r4 = new Recipe("r4", C)
     # Returned 'r4'
-  > eval h = TaskClass.get("h"); i = TaskClass.get("i")
+  > eval h = new Task("h"); i = new Task("i")
     # Returned 'i'
     #
     # Human teaching agent by instruction how to do C
@@ -69,12 +69,11 @@
          Agent adds step i.
    Human says "We're done learning how to do C."
 
-  > eval compile("learn-do-teach1") 
+  > eval models[false].compile("learn-do-teach1") 
     # Returned 'null'
     # learned recipe 
-  > print r4
+  > print r4 learn-do-teach1
 
-learn-do-teach1
 <subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="primitive:h"/>
   <step name="step2" task="primitive:i"/>
@@ -176,11 +175,21 @@ learn-do-teach1
    Agent says "We're done learning how to do C."
    [Human accept] -live
 
+  > eval models[true].compile("learn-do-teach2") 
+    # Returned 'null'
+    # learned recipe 
+  > print r4 learn-do-teach2
+
+<subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:h"/>
+  <step name="step2" task="primitive:i"/>
+</subtasks>
+
   > clear
     # define variables for convenience
-  > eval A = TaskClass.get("A"); B = TaskClass.get("B");
+  > eval A = new Task("A"); B = new Task("B");
     # Returned 'B'
-  > eval r1 = DecompositionClass.get("r1", A); r2 = DecompositionClass.get("r2", B);
+  > eval r1 = new Recipe("r1", A); r2 = new Recipe("r2", B);
     # Returned 'r2'
     #
     # Human teaching agent how to do A
@@ -260,21 +269,19 @@ learn-do-teach1
          Agent adds step C.
    Human says "We're done learning how to do A."
 
-  > eval compile("learn-do-teach2")
+  > eval models[false].compile("learn-do-teach3")
     # Returned 'null'
     # learned recipe
-  > print r1
+  > print r1 learn-do-teach3
 
-learn-do-teach2
 <subtasks goal="A" id="r1" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="B"/>
   <step name="step2" task="C"/>
 </subtasks>
 
     # learned recipe
-  > print r2
+  > print r2 learn-do-teach3
 
-learn-do-teach2
 <subtasks goal="B" id="r2" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="primitive:d"/>
   <step name="step2" task="primitive:e"/>
@@ -282,9 +289,9 @@ learn-do-teach2
 
   > clear
     # define variables for convenience
-  > eval r3 = DecompositionClass.get("r3", B);
+  > eval r3 = new Recipe("r3", B);
     # Returned 'r3'
-  > eval f = TaskClass.get("f"); g = TaskClass.get("g") 
+  > eval f = new Task("f"); g = new Task("g") 
     # Returned 'g'
     #
     # Human teaching agent another way to do B
@@ -340,12 +347,11 @@ learn-do-teach2
       Agent adds step g.
    Human says "We're done learning another way to do B."
 
-  > eval compile("learn-do-teach3")
+  > eval models[false].compile("learn-do-teach4")
     # Returned 'null'
     # learned recipe
-  > print r3
+  > print r3 learn-do-teach4
 
-learn-do-teach3
 <subtasks goal="B" id="r3" xmlns="http://ce.org/cea-2018">
   <step name="step1" task="primitive:f"/>
   <step name="step2" task="primitive:g"/>

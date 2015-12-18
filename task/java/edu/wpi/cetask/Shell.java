@@ -131,12 +131,13 @@ public class Shell {
                println("# Done single stepping.");
             } else {
                char in = (char) System.in.read(); // wait for keyboard
-               System.in.skip(1); // flush enter
+               try { System.in.skip(1); } // flush enter
+               catch (IOException e) {} // ignore "illegal seek"
                if ( in == 'q' ) {
                   stepping = false;
                   println("# Stopped single stepping.");
                } else if ( in == 'p' ) {
-                  stepping = false;
+                  stepping = false; onlyPrompts = false;
                   try { pushSource(null); } catch (IOException e) {}
                   println("# Pause single stepping. Use 'step' command to resume.");
                }
@@ -355,17 +356,17 @@ public class Shell {
    private boolean stepping;
 
    /**
-    * Like 'source', but with single-stepping
+    * Like 'test', but with single-stepping
     */
    public void step (String from) {
       if ( from.length() == 0 ) {
          if ( source == null && !sources.isEmpty() ) {
             println("# Resume single stepping:  <enter> = next, p<enter> = pause, q<enter> = quit");
-            popSource();
-            stepping = true;
+            popSource(); // sets onlyPrompts to false
+            stepping = true; onlyPrompts = true;
          } else println("# No source to resume single stepping.");
       } else {
-         stepping = true;
+         stepping = true; onlyPrompts = true;
          println("# Start single stepping: <enter> = next, p<enter> = pause, q<enter> = quit");
          source(from);
       }

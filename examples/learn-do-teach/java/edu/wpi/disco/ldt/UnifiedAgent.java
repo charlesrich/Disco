@@ -3,6 +3,7 @@ package edu.wpi.disco.ldt;
 import org.w3c.dom.*;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.*;
+import edu.wpi.cetask.TaskEngine.AmbiguousIdException;
 import edu.wpi.disco.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.plugin.*;
@@ -26,6 +27,7 @@ public class UnifiedAgent extends Agent {
             args != null && args.length > 0 && args[0].length() > 0 ? args[0] : null,
             args != null, null, "edu.wpi.disco.Interaction");
       interaction.setOk(false);
+      interaction.getExternal().setEval(true);
       DISCO = interaction.getDisco();
       // make glosses agree with figures
       DISCO.setProperty("achieve@word", "do");
@@ -117,6 +119,13 @@ public class UnifiedAgent extends Agent {
    
    private static boolean isPrimitive (String id) {
       return DISCO.resolveTaskClass(new QName(primitives, id)) != null;
+   }
+   
+   // convenience function for calling from JavaScript
+   
+   public static boolean isCompiled (String id) {
+      try { return DISCO.getDecompositionClass(id) != null; }
+      catch (AmbiguousIdException e) { return true; }
    }
 
 }
