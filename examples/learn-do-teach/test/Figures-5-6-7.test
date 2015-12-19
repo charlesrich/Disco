@@ -71,7 +71,7 @@
 
   > eval models[false].compile("learn-do-teach1") 
     # Returned 'null'
-    # learned recipe 
+    # recipe learned by agent
   > print r4 learn-do-teach1
 
 <subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
@@ -81,6 +81,9 @@
 
     # clear discourse state, but not task model
   > clear
+    #
+    # Agent doing C
+    #
   > task C
     Human says "Let's do C."
   > next
@@ -122,21 +125,20 @@
   > instance LearnRecipe / C / r4 / true
   > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
     # Returned 'null'
+  > eval $disco.getInteraction().getExternal().setName("human'")
+    # Returned 'null'
   > next
     Agent says "Let's learn how to do C."
   > next
     Agent do h.
   > done addStep / h / r4
-    Human adds step h.
-    #
-    # Make agent choose instruction meta-recipe for teaching next step
-    #
+    Human' adds step h.
   > eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
     # Returned 'null'
   > next
     Agent says "Next step is i."
   > done
-    Human adds step i.
+    Human' adds step i.
   > next
     Agent says "We're done learning how to do C."
   > debug
@@ -151,13 +153,13 @@
    Propose.Should(agent,LearnRecipe(C,r4,true))
    [LearnStep(h,r4,true) by demonstration] -done -shift
       Task.Any(agent,h)
-      addStep(human,h,r4)
+      addStep(human',h,r4)
    [LearnStep(i,r4,true) by instruction] -optionalStep -done
-      [addStep(human,i,r4)] -done
-         Propose.Should(agent,addStep(human,i,r4))
-         addStep(human,i,r4)
+      [addStep(human',i,r4)] -done
+         Propose.Should(agent,addStep(human',i,r4))
+         addStep(human',i,r4)
    Propose.Done(agent,LearnRecipe(C,r4,true))
-   [Accept(human,Propose.Done(agent,LearnRecipe(C,r4,true)))] -live
+   [Accept(human',Propose.Done(agent,LearnRecipe(C,r4,true)))] -live
 
     # glossed version of history
   > debug false
@@ -167,17 +169,17 @@
    Agent says "Let's learn how to do C."
    [Learn step h by demonstration] -done -shift
       Agent do h.
-      Human adds step h.
+      Human' adds step h.
    [Learn step i by instruction] -optional -done
-      [Human adds step i] -done
+      [Human' adds step i] -done
          Agent says "Next step is i."
-         Human adds step i.
+         Human' adds step i.
    Agent says "We're done learning how to do C."
-   [Human accept] -live
+   [Human' accept] -live
 
   > eval models[true].compile("learn-do-teach2") 
     # Returned 'null'
-    # learned recipe 
+    # recipe learned by human 
   > print r4 learn-do-teach2
 
 <subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
@@ -191,6 +193,8 @@
     # Returned 'B'
   > eval r1 = new DecompositionClass("r1", A); r2 = new DecompositionClass("r2", B);
     # Returned 'r2'
+  > eval $disco.getInteraction().getExternal().setName("human")
+    # Returned 'null'
     #
     # Human teaching agent how to do A
     #
@@ -271,7 +275,7 @@
 
   > eval models[false].compile("learn-do-teach3")
     # Returned 'null'
-    # learned recipe
+    # recipe learned by agent
   > print r1 learn-do-teach3
 
 <subtasks goal="A" id="r1" xmlns="http://ce.org/cea-2018">
@@ -279,7 +283,7 @@
   <step name="step2" task="C"/>
 </subtasks>
 
-    # learned recipe
+    # recipe learned by agent
   > print r2 learn-do-teach3
 
 <subtasks goal="B" id="r2" xmlns="http://ce.org/cea-2018">
@@ -349,7 +353,7 @@
 
   > eval models[false].compile("learn-do-teach4")
     # Returned 'null'
-    # learned recipe
+    # second recipe learned by agent
   > print r3 learn-do-teach4
 
 <subtasks goal="B" id="r3" xmlns="http://ce.org/cea-2018">
