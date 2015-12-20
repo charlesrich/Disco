@@ -631,7 +631,8 @@ public class Disco extends TaskEngine {
                } // TODO extend for other types of proposals
             }
             pop();
-            shift = !focus.isPoppable(); // can stop being a shift
+            // can stop being a shift
+            shift = !focus.isPoppable() && !(focus.getGoal() instanceof Accept); 
             // recursion must end since focus and contributes have same top
             reconcileStack(occurrence, getFocus(), contributes, continuation, shift);
          } else {

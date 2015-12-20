@@ -151,7 +151,7 @@
 
 [LearnRecipe(C,r4,true) by steps] -accepted -done <-focus
    Propose.Should(agent,LearnRecipe(C,r4,true))
-   [LearnStep(h,r4,true) by demonstration] -done -shift
+   [LearnStep(h,r4,true) by demonstration] -done
       Task.Any(agent,h)
       addStep(human',h,r4)
    [LearnStep(i,r4,true) by instruction] -optionalStep -done
@@ -167,7 +167,7 @@
 
 [Learn how to do C by steps] -accepted -done <-focus
    Agent says "Let's learn how to do C."
-   [Learn step h by demonstration] -done -shift
+   [Learn step h by demonstration] -done
       Agent do h.
       Human' adds step h.
    [Learn step i by instruction] -optional -done
