@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Choosing">
+   <task id="Top">
+      <subtasks id="_Top_subtasks">
+         <step name="_Top_step" task="disco:Say"/>
+         <step name="_Top_ref" task="_Top_tree"/>
+         <binding slot="$_Top_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_Top_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Top_tree">
+      <subtasks id="_d4e4_subtasks">
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_d4e4_ref" task="_d4e4_tree"/>
+         <binding slot="$_d4e4_step.text" value="&#34;Good morning&#34;"/>
+         <binding slot="$_d4e4_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e4_tree">
+      <subtasks id="_d4e5_subtasks">
+         <step name="_d4e5_step" task="disco:Say"/>
+         <step name="_d4e6_step" task="disco:Say"/>
+         <binding slot="$_d4e5_step.text" value="&#34;Let's talk about the weather&#34;"/>
+         <binding slot="$_d4e5_step.external" value="false"/>
+         <binding slot="$_d4e6_step.text" value="&#34;Sure&#34;"/>
+         <binding slot="$_d4e6_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e7_subtasks">
+         <step name="_d4e7_step" task="disco:Say"/>
+         <step name="_d4e8_step" task="disco:Say"/>
+         <binding slot="$_d4e7_step.text" value="&#34;Let's talk about the news&#34;"/>
+         <binding slot="$_d4e7_step.external" value="false"/>
+         <binding slot="$_d4e8_step.text" value="&#34;Fine&#34;"/>
+         <binding slot="$_d4e8_step.external" value="true"/>
+      </subtasks>
+   </task>
+</taskModel>

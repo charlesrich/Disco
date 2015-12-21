@@ -94,6 +94,21 @@
       <optional>
         <attribute name="applicable"/>
       </optional>
+      <zeroOrMore>
+        <!-- other attributes interpeted as bindings for inputs -->
+        <attribute>
+          <anyName>
+            <except>
+              <name ns="">id</name>
+              <name ns="">actor</name>
+              <name ns="">task</name>
+              <name ns="">minOccurs</name>
+              <name ns="">maxOccurs</name>
+              <name ns="">applicable</name>
+            </except>
+          </anyName>
+        </attribute>
+      </zeroOrMore>
       <ref name="Choices"/>
     </element>
   </define>

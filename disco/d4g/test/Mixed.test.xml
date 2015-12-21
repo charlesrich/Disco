@@ -47,7 +47,7 @@
    </task>
    <task id="PrintDone">
       <binding slot="$this.external" value="false"/>
-      <script> println("Done") </script>
+      <script> java.lang.System.out.println("Done") </script>
    </task>
    <script init="true"> 
      // for testing, return constant instead of 'new Date().getHours()' 

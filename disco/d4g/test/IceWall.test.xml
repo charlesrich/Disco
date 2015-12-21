@@ -73,7 +73,7 @@
    </task>
    <task id="Escape">
       <postcondition sufficient="true">
-      world.get("door").isOpen() &amp;&amp; (player() &gt;= walkToLocation.x)
+      world.get("door").isOpen() &amp;&amp; (user() &gt;= walkToLocation.x)
     </postcondition>
       <subtasks id="over">
          <step name="boost" task="Boost"/>
@@ -124,7 +124,6 @@
    </task>
    <task id="Walk">
       <postcondition>
-      actor($this.external) != undefined &amp;&amp;
       actor($this.external).getLocation().x &gt;= walkToLocation.x
     </postcondition>
       <script>
@@ -134,7 +133,7 @@
    </task>
    <task id="SillyConversation">
       <precondition>
-      (player() &gt;= walkToLocation.x) &amp;&amp; (sidekick() &lt; walkToLocation.x)
+      (user() &gt;= walkToLocation.x) &amp;&amp; (sidekick() &lt; walkToLocation.x)
     </precondition>
       <subtasks id="silly_subtasks">
          <step name="say" task="disco:Say$Agent"/>
@@ -143,7 +142,7 @@
       </subtasks>
    </task>
    <script init="true">
-    function player () { return getX("player"); }
+    function user () { return getX("player"); }
     function sidekick () { return getX("sidekick"); }
     function getX (actor) { return world.get(actor).getLocation().x; }
     walkToLocation = new Packages.java.awt.Point(16, 10);    

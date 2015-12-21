@@ -4,7 +4,7 @@
 # 
 # Transforms file  <basename>.d4g.xml in D4g format to <basename>.xml in ANSI/CEA-2018 format.
 # Also validates syntax of source file.
-# Optional argument is name of actor that will be 'external' (defaults to player).
+# Optional argument is name of actor that will be 'external' (defaults to 'user').
 # 
 dir="`dirname $0`/.."
 

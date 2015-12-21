@@ -1,0 +1,23 @@
+    # Dec 21, 2015 1:00:50 PM - TaskEngine 1.9 / Disco 1.13
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Do.xml
+  > task _talk
+    User says "Let's achieve _talk."
+    Agent says "Hello."
+  > say
+[1] Hi.
+[2] Goodbye.
+  >> 2
+    User says "Goodbye."
+    Agent says "Bye."
+  > history
+
+[ ] -accepted -done
+   User says "Let's achieve _talk."
+   Agent says "Hello."
+   [ ] -done <-focus
+      User says "Goodbye."
+      Agent says "Bye."
+
+  > quit
+    

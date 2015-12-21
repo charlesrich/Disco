@@ -14,7 +14,7 @@
 #
 
 this=`dirname $0`
-models=$this/../../secrets/java/edu/wpi/secrets/resources/models
+models=$this/../../examples/secrets/java/edu/wpi/secrets/resources/models
 all_start=`date +%s`
 result=0
 
