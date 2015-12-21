@@ -14,9 +14,9 @@ SET folder="%~d1%~p0.."
 SET wd=%CD%
 
 CD %folder%
-
+PWD
 ECHO Validating %1.d4g.xml...
-java -cp "%folder%\lib\disco.jar" "edu.wpi.disco.Disco$Validate" "%wd%\%1.d4g.xml" "http://www.cs.wpi.edu/~rich/d4g" || GOTO :end
+java -cp "%folder%\class;%folder%\..\task\class;%folder%\..\task\lib\msv-rng.jar" "edu.wpi.disco.Disco$Validate" "%wd%\%1.d4g.xml" "http://www.cs.wpi.edu/~rich/d4g" || GOTO :end
 
 IF NOT {%2}=={} SET param="external=%2"
 
@@ -24,6 +24,6 @@ ECHO Transforming %1.d4g.xml to %1.xml...
 java -jar "%folder%\d4g\saxon9he.jar" -o:"%wd%\%1.xml" "%wd%\%1.d4g.xml" "%folder%\d4g\d4g.xslt" %param%
 
 ECHO Validating %1.xml...
-java -cp "%folder%\lib\disco.jar" "edu.wpi.disco.Disco$Validate" "%wd%\%1.xml" "http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+java -cp "%folder%\class;%folder%\..\task\class;%folder%\..\task\lib\msv-rng.jar" "edu.wpi.disco.Disco$Validate" "%wd%\%1.xml" "http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
 
 :end

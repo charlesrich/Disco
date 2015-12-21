@@ -6,6 +6,7 @@
           August 3, 2009 to make slot type optional and to support <binding>'s for tasks.
           Oct 23, 2009 to allow dots in DataType and to allow dot and dollar in task id and step type.
           Dec 28, 2011 to prohibit tasks with both scripts and nested subtasks
+          Dec 2, 2015 to make step task optional
   
   	Document URL: http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext/rnc
   
@@ -34,7 +35,7 @@
   	CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OF 
   	THIS DOCUMENT.
 -->
-<grammar xmlns:dc="http://purl.org/dc/elements/1.1" ns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dcterms="http://purl.org/dc/terms" xmlns:dc="http://purl.org/dc/elements/1.1" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <element name="taskModel">
       <!-- about shall be non-empty and not contain fragment identifier          -->
@@ -379,11 +380,14 @@
     <attribute name="name">
       <ref name="StepName"/>
     </attribute>
-    <attribute name="task">
-      <data type="token">
-        <param name="pattern">(\i[\c-[:\-]]*:)?\i([\c-[:\-]]|$)*</param>
-      </data>
-    </attribute>
+    <optional>
+      <!-- NOTE: modified by CR to make task optional -->
+      <attribute name="task">
+        <data type="token">
+          <param name="pattern">(\i[\c-[:\-]]*:)?\i([\c-[:\-]]|$)*</param>
+        </data>
+      </attribute>
+    </optional>
     <optional>
       <attribute name="minOccurs" a:defaultValue="1">
         <data type="nonNegativeInteger"/>

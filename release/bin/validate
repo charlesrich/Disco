@@ -9,9 +9,9 @@ file="$1"
 if [[ $file != /* ]]; then file="$dir/$1"; fi
 case `uname -s` in
 CYGWIN* ) 
-    java -cp "$(cygpath -w lib/disco.jar)" 'edu.wpi.disco.Disco$Validate' "$(cygpath -w "$file")" "$2"
+    java -cp "class;$(cygpath -w ../task/class);$(cygpath -w ../task/lib/msv-rng.jar)" 'edu.wpi.disco.Disco$Validate' "$(cygpath -w "$file")" "$2"
     ;;
   *)
-    java -cp "lib/disco.jar" 'edu.wpi.disco.Disco$Validate' "$file" "$2"
+    java -cp "class:../task/class:../task/lib/msv-rng.jar" 'edu.wpi.disco.Disco$Validate' "$file" "$2"
     ;;
 esac

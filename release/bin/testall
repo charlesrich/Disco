@@ -25,7 +25,9 @@ result=0
 for f in `find $testdir -maxdepth 1 -name '*.test' -type f -print`
   do
     $command ${f%.test}
-    result=`expr $result + $?`
+    if [ $? != 0 ]; then
+       result=`expr $result + 1`
+    fi
   done
 all_end=`date +%s`
 if [ $result = 0 ]; then

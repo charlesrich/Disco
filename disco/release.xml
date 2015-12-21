@@ -1,57 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="release" name="Release Disco">
-    <property environment="env"/>
-    <target name="release">
-        <copy todir="../release/bin">
-           <fileset file="d4g2018"/>
-           <fileset file="d4g2018.bat"/>
-           <fileset file="testall"/>
-           <fileset file="validate"/>
-        </copy>
-        <copy todir="../release/d4g">
-           <fileset file="cea-2018-ext.rng"/>
-           <fileset file="d4g-fp.xslt"/>
-           <fileset file="d4g.rnc"/>
-           <fileset file="d4g.rng"/>
-           <fileset file="d4g.xsd"/>
-           <fileset file="d4g.xslt"/>
-           <fileset file="README.txt"/>
-           <fileset file="saxon9he.jar"/>
-        </copy>
-        <copy todir="../release/lib">
-           <fileset file="cea-2018-ext.rnc"/>
-           <fileset file="cea-2018-ext.xsd"/>
-           <fileset file="cea-2018.rnc"/>
-           <fileset file="cea-2018.xsd"/>
-        </copy>
-        <copy todir="../release/models">
-           <fileset file="README.txt"/>
-        </copy>
-        <jar destfile="../release/lib/disco.jar" filesetmanifest="mergewithoutmain">
-            <manifest> 
-                <attribute name="Main-Class" value="edu.wpi.disco.Disco"/>
-            </manifest>
-            <fileset dir="class"/>
-            <fileset dir="../task/class"/>
-            <zipfileset  excludes="META-INF/*.SF" src="../task/lib/msv-rng.jar"/>
-        </jar>
-        <delete dir="${env.TMPDIR}/disco-api"/>
-        <javadoc destdir="${env.TMPDIR}/disco-api"
-            access="protected" additionalparam="-J-Xmx256m -Xdoclint:all,-missing" 
-            author="true" 
-            classpath="../task/speech/en_us.jar:../task/speech/cmulex.jar:../task/speech/freetts.jar:../task/lib/js.jar:../task/class:../task/speech/cmu_us_kal.jar:../task/speech/jsapi.jar:../task/lib/msv-rng.jar:../task/speech/tags.jar:../task/speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar:../task/speech/sphinx4.jar:../task/lib/mono/Jint.jar" 
-            doctitle="DISCO - Collaborative Discourse Manager" 
-            nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" 
-            packagenames="edu.wpi.disco,edu.wpi.disco.game.actions,edu.wpi.cetask.guide,edu.wpi.cetask,edu.wpi.disco.plugin,edu.wpi.disco.game,edu.wpi.disco.lang" 
-            source="1.8" 
-            sourcefiles="../task/java/GuiExample.java"
-            sourcepath="java:../task/java" splitindex="false" use="false" version="true"/>
-        <zip destfile="../release/lib/disco-api.zip">
-           <fileset dir="${env.TMPDIR}/disco-api"/>
-        </zip>
-        <zip destfile="../release/lib/disco-src.zip">
-           <fileset dir="java"/>
-           <fileset dir="../task/java"/>
-        </zip>
-    </target>
+  <property environment="env"/>
+  <target name="release">
+    <copy todir="../release/bin">
+      <fileset dir="bin">
+        <include name="d4g2018"/>
+        <include name="d4g2018.bat"/>
+        <include name="testall"/>
+        <include name="validate"/>
+      </fileset>
+    </copy>
+    <copy todir="../release/d4g">
+      <fileset dir="d4g">
+        <include name="cea-2018-ext.rng"/>
+        <include name="d4g-fp.xslt"/>
+        <include name="d4g.rnc"/>
+        <include name="d4g.rng"/>
+        <include name="d4g.xsd"/>
+        <include name="d4g.xslt"/>
+        <include name="README.txt"/>
+        <include name="saxon9he.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="../release/lib">
+      <fileset dir="lib">
+        <include name="cea-2018-ext.rnc"/>
+        <include name="cea-2018-ext.xsd"/>
+        <include name="cea-2018.rnc"/>
+        <include name="cea-2018.xsd"/>
+      </fileset>
+    </copy>
+    <copy todir="../release/models">
+      <fileset dir="models">
+        <include name="README.txt"/>
+      </fileset>
+    </copy>
+    <jar destfile="../release/lib/disco.jar" filesetmanifest="mergewithoutmain">
+      <manifest> 
+        <attribute name="Main-Class" value="edu.wpi.disco.Disco"/>
+      </manifest>
+      <fileset dir="class"/>
+      <fileset dir="../task/class"/>
+      <zipfileset  excludes="META-INF/*.SF" src="../task/lib/msv-rng.jar"/>
+    </jar>
+    <delete dir="${env.TMPDIR}/disco-api"/>
+    <javadoc destdir="${env.TMPDIR}/disco-api"
+             access="protected" additionalparam="-J-Xmx256m -Xdoclint:all,-missing" 
+             author="true" 
+             classpath="../task/speech/en_us.jar:../task/speech/cmulex.jar:../task/speech/freetts.jar:../task/lib/js.jar:../task/class:../task/speech/cmu_us_kal.jar:../task/speech/jsapi.jar:../task/lib/msv-rng.jar:../task/speech/tags.jar:../task/speech/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar:../task/speech/sphinx4.jar:../task/lib/mono/Jint.jar" 
+             doctitle="DISCO - Collaborative Discourse Manager" 
+             nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" 
+             packagenames="edu.wpi.disco,edu.wpi.disco.game.actions,edu.wpi.cetask.guide,edu.wpi.cetask,edu.wpi.disco.plugin,edu.wpi.disco.game,edu.wpi.disco.lang" 
+             source="1.8" 
+             sourcefiles="../task/java/GuiExample.java"
+             sourcepath="java:../task/java" splitindex="false" use="false" version="true"/>
+    <zip destfile="../release/lib/disco-api.zip">
+      <fileset dir="${env.TMPDIR}/disco-api"/>
+    </zip>
+    <zip destfile="../release/lib/disco-src.zip">
+      <fileset dir="java"/>
+      <fileset dir="../task/java"/>
+    </zip>
+  </target>
 </project>
