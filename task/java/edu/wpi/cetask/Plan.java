@@ -1008,8 +1008,8 @@ public class Plan {
 
    /**
     * Tests whether decomposition chosen for this plan.  Returns true iff either
-    * {@link #isDecomposed()} or {@link #getDecompositionClass()} returns non-null.
-    * Returns false for primitive tasks.
+    * {@link #isDecomposed()} returns true or {@link #getDecompositionClass()} 
+    * returns non-null. Returns false for primitive tasks.
     */
    public boolean isHow () { return isDecomposed() || decompClass != null; }
    

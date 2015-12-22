@@ -35,7 +35,7 @@ public class ImplicitAcceptPlugin extends Agenda.Plugin {
          propose.accept(contributes, true);
          getDisco().clearLiveAchieved();
          // note recursive call to agenda generation starting at top, excluding this 
-         getAgenda().visit(getDisco().getTop(plan), items, plan);
+         getAgenda().visitNotOnlyBest(getDisco().getTop(plan), items, plan);
       } finally { 
          propose.reject(contributes, true);
          getDisco().clearLiveAchieved();

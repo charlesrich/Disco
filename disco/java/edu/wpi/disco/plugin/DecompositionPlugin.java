@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Plugin to explore applicable decompositions to extend set of possible
  * next tasks. Only apply to focus, because it does its own recursion, and
- * not elsewhere, because  it is expensive and potentially distracting. 
+ * not elsewhere, because it is expensive and potentially distracting. 
  * Typically used to generate things-to-say list. 
  */
 public class DecompositionPlugin extends Agenda.Plugin {
@@ -53,7 +53,7 @@ public class DecompositionPlugin extends Agenda.Plugin {
                   else plan.apply(decomp);
                   for (Plan child : plan.getChildren()) 
                      // note recursive call to agenda generation 
-                     getAgenda().visit(child, items, null);
+                     getAgenda().visitNotOnlyBest(child, items, null);
                } finally { if ( decomp != null ) plan.setDecomposition(null); }
          } finally { path.pop(); } // relies on discourse process single threaded
       }
@@ -70,6 +70,6 @@ public class DecompositionPlugin extends Agenda.Plugin {
    public DecompositionPlugin (Agenda agenda, int priority, boolean suppressFormatted, boolean focusOnly) { 
       agenda.super(priority);
       this.suppressFormatted = suppressFormatted;
-	this.focusOnly = focusOnly;
+      this.focusOnly = focusOnly;
    }
 }
