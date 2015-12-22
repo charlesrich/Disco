@@ -5,9 +5,7 @@
     <copy todir="../release/bin">
       <fileset dir="bin">
         <include name="d4g2018"/>
-        <include name="d4g2018.bat"/>
         <include name="testall"/>
-        <include name="validate"/>
       </fileset>
     </copy>
     <copy todir="../release/d4g">
