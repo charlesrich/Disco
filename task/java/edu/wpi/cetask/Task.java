@@ -269,7 +269,7 @@ public class Task extends Instance {
          String value, boolean onlyDefined) {
       StringBuilder buffer = new StringBuilder();
       buffer.append("(function(value){");
-      if ( onlyDefined ) buffer.append("if (value == undefined) return true; ");
+      if ( onlyDefined ) buffer.append("if (value === undefined) return true; ");
       buffer.append("if ( ").append(checkExpression(type, name)).append(" ) {")
       // note using [ ] to protect keywords
       .append(self).append("['").append(name).append("']")
@@ -289,7 +289,7 @@ public class Task extends Instance {
       String type = task.getSlotType(name);
       return type == null ? "true" :
           // ignore undefined and allow any slot to be set to null (for "optional" inputs)
-          ("value == undefined || value === null || "+ 
+          ("value === undefined || value === null || "+ 
              ("boolean".equals(type) ? "typeof value == \"boolean\"" :
                "string".equals(type) ? "typeof value == \"string\"" :
                   "number".equals(type) ? "typeof value == \"number\"" :
