@@ -111,8 +111,8 @@ public class Task extends Instance {
       if ( isScriptable(name) ) {
          Object object = bindings.get("$this");
          return engine.isDefined(object, name) ? engine.get(object, name) : null;
-         // super.eval below to avoid returning cached value in clonedInputs
-      } else return super.eval("$this."+name, "getSlotValue"); 
+         // evalFinal below to avoid returning cached value in clonedInputs
+      } else return evalFinal("$this."+name, "getSlotValue"); 
    }
 
    private void checkIsSlot (String name) {
@@ -125,8 +125,8 @@ public class Task extends Instance {
       if ( isScriptable(name) ) {
          Object object = bindings.get("$this");
          return engine.isDefined(object, name) ? (Boolean) engine.get(object, name) : null;
-         // super.evalCondition below to avoid returning cached value in clonedInputs
-      } else return super.evalCondition("$this."+name, "getSlotValueBoolean"); 
+         // evalConditionFinal below to avoid returning cached value in clonedInputs
+      } else return evalConditionFinal("$this."+name, "getSlotValueBoolean"); 
    }
    
    private boolean isScriptable (String name) {
@@ -154,6 +154,7 @@ public class Task extends Instance {
     */
    public boolean isDefinedSlot (String name) {
       checkIsSlot(name);
+      updateBindingsTask(false);
       return engine.isDefined(bindings.get("$this"), name); 
    }     
    
@@ -178,8 +179,7 @@ public class Task extends Instance {
     * @see #setSlotValueScript(String,String,String)
     */
    public Object setSlotValue (String name, Object value) {
-      setSlotValue(name, value, true);
-      return value;
+      return setSlotValue(name, value, true);
    }   
    
    /**
@@ -187,7 +187,7 @@ public class Task extends Instance {
     *
     * @see #setSlotValue(String,Object)
     */
-   public void setSlotValue (String name, Object value, boolean check) { 
+   public Object setSlotValue (String name, Object value, boolean check) { 
       checkIsSlot(name);
       checkCircular(name, value);
       String type = getType().getSlotType(name);
@@ -200,12 +200,13 @@ public class Task extends Instance {
                try {
                   bindings.put("$$value", value); 
                   modified = true;
-                  super.eval("$this."+name+" = $$value;", "setSlotValue"); // sic super
+                  evalFinal("$this."+name+" = $$value;", "setSlotValue");
                } finally { bindings.remove("$$value"); }
             }
          }
          if ( clonedInputs != null ) engine.put(clonedInputs, name, value);
       } else failCheck(name, value == null ? "null" : value.toString(), "setSlotValue");
+      return value;
    }  
       
    protected void checkCircular (String name, Object value) {
@@ -253,16 +254,32 @@ public class Task extends Instance {
     * @see #setSlotValue(String,Object)
     */
    public void setSlotValueScript (String name, String expression, String where) {
+      setSlotValueScript(name, expression, null, where);
+   }
+
+   protected void setSlotValueScript (String name, String expression, Compiled compiled, String where) {
       // only evaluate expression once (in case of side effects)
-      if ( !evalCondition(makeExpression("$this", getType(), name, expression, false), where) )
+      if ( !evalConditionFinal(compiled != null ? null :
+                  makeExpression("$this", getType(), name, expression, false),
+               compiled, bindings, where) )
          failCheck(name, expression, where);
       else modified = true;
    }
-
-   void setSlotValueScript (String name, Compiled compiled, String where) {
-      if ( !evalCondition(compiled, bindings, where) )
-         failCheck(name, "compiled script", where);
-      else modified = true;
+   
+   /**
+    * Similar to {@link #setSlotValueScript(String,String,String)} but with extra 
+    * bindings to use for evaluation of expression (instead of task bindings)
+    */
+   protected void setSlotValueScript (String name, String expression, Compiled compiled, 
+         Bindings extra, String where) {
+      try {
+         extra.put("$$this", bindings.get("$this"));
+         if ( !evalConditionFinal(compiled != null ? null :
+                    makeExpression("$$this", getType(), name, expression, true), 
+                  compiled, extra, where) )
+            failCheck(name, expression, where);
+         else modified = true;
+      } finally { extra.remove("$$this"); }
    }
    
    static String makeExpression (String self, TaskClass type, String name, 
@@ -296,30 +313,6 @@ public class Task extends Instance {
                         "value instanceof "+type));
    }
    
-   /**
-    * Similar to {@link #setSlotValueScript(String,String,String)} but with extra 
-    * bindings to use for evaluation of expression (instead of task bindings)
-    */
-   void setSlotValueScript (String name, String expression, String where,
-                            Bindings extra) {
-      try {
-         extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(makeExpression("$$this", getType(), name, expression, true), extra, where) )
-            failCheck(name, expression, where);
-         else modified = true;
-      } finally { extra.remove("$$this"); }
-   }
-  
-   void setSlotValueScript (String name, Compiled compiled, String where,
-                            Bindings extra) {
-      try {
-         extra.put("$$this", bindings.get("$this"));
-         if ( !evalCondition(compiled, extra, where) )
-            failCheck(name, "compiled script", where);
-         else modified = true;
-      } finally { extra.remove("$$this"); }
-   }
-   
    public int countSlotValues () {
       int n = 0;
       for (Slot slot : getType().getSlots()) 
@@ -333,13 +326,17 @@ public class Task extends Instance {
     * @see #isDefinedSlot(String)
     */
    public void removeSlotValue (String name) {
+      removeSlotValueFinal(name);
+      updateBindingsTask(true); 
+   }
+  
+   protected final void removeSlotValueFinal (String name) {
       checkIsSlot(name);
       engine.remove(bindings.get("$this"), name);
       if ( clonedInputs != null ) engine.remove(clonedInputs, name); 
-      getType().updateBindings(this);
       modified = true;
    }
-  
+   
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
       return condition == null ? null : condition.evalCondition(this);
@@ -383,32 +380,34 @@ public class Task extends Instance {
          }
       } else achieved = condition.evalCondition(this);
       return engine.setAchieved(this, achieved);// store cache
-   }
-
-   @Override
-   protected Boolean evalCondition (String condition, Compiled compiled, String where) {
-	   if ( clonedInputs == null ) return super.evalCondition(condition, compiled, where);
-       synchronized (bindings) {
-          Object old = bindings.get("$this");
-          try {
-             bindings.put("$this", clonedInputs);
-             return super.evalCondition(condition, compiled, where);
-           } finally { bindings.put("$this", old); }
-       }
-   }			
+   }	
  
    @Override
-   public Object eval (String expression, String where) {
-	   if  ( clonedInputs == null ) return super.eval(expression, where);
-	   synchronized (bindings) {
-	      Object old = bindings.get("$this");
+   protected Object eval (String expression, Compiled compiled, Bindings extra, String where) {
+      updateBindingsTask(false);
+	   if  ( clonedInputs == null ) return evalFinal(expression, compiled, extra, where);
+	   synchronized (extra) {
+	      Object old = extra.get("$this");
 		   try {
-			   bindings.put("$this", clonedInputs);	
-			   return super.eval(expression, where);	
-		   } finally { bindings.put("$this", old); } 
+			   extra.put("$this", clonedInputs);	
+			   return evalFinal(expression, compiled, extra, where);	
+		   } finally { extra.put("$this", old); } 
 	   }
    }	
-
+    
+   @Override
+   protected Boolean evalCondition (String expression, Compiled compiled, Bindings extra, String where) {
+	   updateBindingsTask(false);
+	   if ( clonedInputs == null ) return evalConditionFinal(expression, compiled, extra, where);
+       synchronized (extra) {
+          Object old = extra.get("$this");
+          try {
+             extra.put("$this", clonedInputs);
+             return evalConditionFinal(expression, compiled, extra, where);
+           } finally { extra.put("$this", old); }
+       }
+   }		
+   
    /**
     * Test whether all declared input slots (i.e., not including
     * "external") have defined values.
@@ -482,7 +481,10 @@ public class Task extends Instance {
    /**
     * Test whether this task instance occurred.
     */
-   public boolean isOccurred () { return isDefinedSlot("when"); }
+   public boolean isOccurred () { 
+      // do not call isDefinedSlot to avoid circularity
+      return engine.isDefined(bindings.get("$this"), "when");
+   }
       
    /**
     * Get the value of the predefined 'success' slot 
@@ -626,9 +628,10 @@ public class Task extends Instance {
       return decomps; 
    }
 
-   void updateBindingsTask () {
-      // 2018-ext bindings on task
-      getType().updateBindings(this);
+   // update 2018-ext self slot bindings on task
+   protected void updateBindingsTask (boolean modified) {
+      // never update slots on occurrence
+      if ( !isOccurred() ) getType().updateBindings(this);       
    }
    
    /**
@@ -745,6 +748,7 @@ public class Task extends Instance {
    
    boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
          boolean onlyDefined, boolean check) {
+      from.updateBindingsTask(false);
       Object fromObject = from.bindings.get("$this");
       if ( onlyDefined && !engine.isDefined(fromObject, fromSlot) ) return false;
       Object value = engine.get(fromObject, fromSlot);
@@ -850,13 +854,13 @@ public class Task extends Instance {
       if ( slot == null || !(slot instanceof Input) || ((Input) slot).getModified() == null )
          throw new IllegalArgumentException("Not a modified input: "+name);
       if ( clonedInputs == null ) 
-         clonedInputs = eval(cloneThis, compiledCloneThis, "cloneInput");
+         clonedInputs = eval(cloneThis, compiledCloneThis, bindings, "cloneInput");
       synchronized (bindings) {
          Object old = bindings.get("$this");
          try {
             bindings.put("$this", clonedInputs);
             bindings.put("$$value", name);
-            eval(cloneSlot, compiledCloneSlot, "cloneInput");
+            eval(cloneSlot, compiledCloneSlot, bindings, "cloneInput");
          } finally { 
             bindings.put("$this", old); 
             bindings.remove("$$value"); 

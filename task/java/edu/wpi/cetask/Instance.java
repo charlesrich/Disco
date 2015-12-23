@@ -35,61 +35,55 @@ abstract class Instance {
    
    // store slot values in JavaScript form
    protected final Bindings bindings;
-   
+          
    public Object eval (String expression, String where) {
-      return eval(expression, bindings, where);
+      return eval(expression, null, bindings, where);
    }
    
-   public Object eval (String expression, Compiled compiled, String where) {
-      try {
-         return compiled == null ? eval(expression, where) : compiled.eval(bindings);
-      } catch (ScriptException e) { throw new RuntimeException(e); }
+   protected Object eval (String expression, Compiled compiled, Bindings extra,
+         String where) {
+      return evalFinal(expression, compiled, extra, where);
    }
-  
-   protected Object eval (String script, Bindings extra, String where) {
-      return engine.eval(script, extra, where); 
+      
+   final Object evalFinal (String expression, String where) {
+      return evalFinal(expression, null, bindings, where);
    }
    
-   public void eval (String expression, Object value, String where) {
+   final Object evalFinal (String expression, Compiled compiled, Bindings extra, String where) {
+      try { return compiled == null ? engine.eval(expression, extra, where) 
+                                    : compiled.eval(extra);
+      } catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+   }
+   
+   public Object eval (String expression, Object value, String where) {
       synchronized (bindings) {
          try {
             bindings.put("$$value", value); 
-            eval(expression, bindings, where);
+            return eval(expression, null, bindings, where);
          } finally { bindings.remove("$$value"); }
       }
    }
-
+   
    protected Boolean evalCondition (String expression, String where) {
-      return evalConditionFinal(expression, where);
+      return evalCondition(expression, null, bindings, where);
    }
-   
-   final protected Boolean evalConditionFinal (String expression, String where) { 
-      return engine.evalBoolean(expression, bindings, where);
-   }
-   
-   protected Boolean evalCondition (String expression, Bindings extra, String where) { 
-      return engine.evalBoolean(expression, extra, where);
-   }
-   
-   protected Boolean evalCondition (String condition, Compiled compiled, String where) {
-      return compiled != null ? evalCondition(compiled, bindings, where) :
-         evalCondition(condition, bindings, where);
-   }
-   
-   protected Boolean evalCondition (Compiled compiled, Bindings extra,
+
+   protected Boolean evalCondition (String expression, Compiled compiled, Bindings extra,
                                     String where) {
-      return evalConditionFinal(compiled, extra, where);
+      return evalConditionFinal(expression, compiled, extra, where);
    }
 
-   // not overridden with updateBindings by Decomposition.Step
-   final protected Boolean evalConditionFinal (Compiled compiled, Bindings extra, 
-         String where) {
-      if ( compiled == null ) return null;
-      try { return compiled.evalBoolean(extra); }
-      catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
-      catch (ClassCastException e) { throw TaskEngine.newRuntimeException(e, where); }
+   final Boolean evalConditionFinal (String expression, String where) {
+      return evalConditionFinal(expression, null, bindings, where);
    }
-
+   
+   final Boolean evalConditionFinal (String expression, Compiled compiled, Bindings extra,
+                                    String where) {
+      try { return compiled == null ? engine.evalBoolean(expression, extra, where)
+                                    : compiled.evalBoolean(extra);
+      } catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+   }
+   
    @Override
    public String toString () { 
       //TODO add error check for infinite looping due to circular slot value

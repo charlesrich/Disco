@@ -830,7 +830,7 @@ public class TaskEngine {
       cacheLive.put(plan, live);
       // to make sure bindings that do not depend on other bindings
       // are updated before plugins run or task executed
-      if ( live ) plan.getGoal().updateBindingsTask();
+      if ( live ) plan.getGoal().updateBindingsTask(false);
       return live;
    }
    

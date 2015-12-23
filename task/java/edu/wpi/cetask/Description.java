@@ -348,7 +348,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
             for (String slot : slots)
                if ( !task.isDefinedSlot(slot) ) return null;
          } 
-         return task.evalCondition(script, compiled, where);
+         return task.evalCondition(script, compiled, task.bindings, where);
       }
    }
 

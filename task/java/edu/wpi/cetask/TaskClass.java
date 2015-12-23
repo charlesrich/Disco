@@ -5,10 +5,10 @@
  */
 package edu.wpi.cetask;
 
+import org.w3c.dom.*;
 import java.beans.Expression;
 import java.util.*;
 import javax.xml.xpath.*;
-import org.w3c.dom.*;
 import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 public class TaskClass extends TaskModel.Member {
@@ -820,7 +820,7 @@ public class TaskClass extends TaskModel.Member {
    private class Binding {
       
       //TODO improve this by refactoring and reusing code from
-      //     DecompostionClass.Binding (make separate class)
+      //     DecompositionClass.Binding (make separate class)
       //     to take advantage of strictness and dependency-based
       //     updating
 
@@ -839,17 +839,11 @@ public class TaskClass extends TaskModel.Member {
       }
       
       private void update (Task task) {
-         // using ..Final methods to avoid calling Decomposition.Step.updateBindings 
+         // calling evalConditionFinal to avoid calling Decomposition.Step.updateBindings 
          // (see Task constructor)
-         if ( compiled != null ) {
-            if ( !task.evalConditionFinal(compiled, task.bindings, where) )
-               task.failCheck(slot, "compiled script", where);
-            else task.setModified(true);
-         } else {
-            if ( !task.evalConditionFinal(expression, where) )
-               task.failCheck(slot, value, where);
-            else task.setModified(true);
-         }
+         if ( task.evalConditionFinal(expression, compiled, task.bindings, where) )
+            task.setModified(true);
+         else task.failCheck(slot, value, where);
       }
       
       @Override

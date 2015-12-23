@@ -771,9 +771,7 @@ public class DecompositionClass extends TaskModel.Member {
             if ( identity) 
                target.copySlotValue(getTask(decomp, identityStep), identitySlot, slot,
                      true, false); // onlyDefined true, i.e., do not propagate undefined
-            else if ( compiled != null )
-               target.setSlotValueScript(slot, compiled, where, decomp.bindings);
-            else target.setSlotValueScript(slot, expression, where, decomp.bindings);
+            else target.setSlotValueScript(slot, expression, compiled, decomp.bindings, where);
             updateBindings(decomp, target, null, null);
          }
       }

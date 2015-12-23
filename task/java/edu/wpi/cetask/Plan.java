@@ -957,7 +957,7 @@ public class Plan {
     * be triggered by the liveness checking that the agent does on every tick.
     */
    public Object setSlotValue (String name, Object value) {
-      goal.setSlotValue(name, value, true);
+      goal.setSlotValue(name, value);
       if ( decomp != null ) decomp.updateBindings(true, null, null, null);
       return value;
    }   
