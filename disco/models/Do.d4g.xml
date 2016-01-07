@@ -24,5 +24,26 @@
     </do>
 
   </do>
+  
+  <!-- 
+      This example illustrates that although all of the inputs
+      of an agent utterance must be defined, it is possible for
+      some inputs of user utterance to be undefined and plan
+      recognition will still select the correct recipe (due to
+      unification
+   -->
+   
+   <agent id="_another_talk" text="Hello">
+      
+      <do actor="user" task="disco:Say" text="'Hi'">
+         <agent text="Ho"/>
+      </do>
+      
+      <!-- user says anything other than 'Hi' -->
+      <do actor="user" task="disco:Say">
+         <agent text="What?"/>
+      </do>
+      
+   </agent> 
 
 </model>

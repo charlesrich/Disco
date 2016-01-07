@@ -1,0 +1,34 @@
+    # Jan 7, 2016 4:28:17 PM - TaskEngine 1.9 / Disco 1.13
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Do.xml
+  > task _another_talk
+    User says "Let's achieve _another_talk."
+    Agent says "Hello."
+  > say
+[1] Hi.
+  >> 1
+    User says "Hi."
+    Agent says "Ho."
+  > task _another_talk
+    User says "Let's achieve _another_talk."
+    Agent says "Hello."
+  > execute edu.wpi.disco.lang.Say / "Boo"
+    User says "Boo."
+    Agent says "What?"
+  > history
+
+[ ] -accepted -done
+   User says "Let's achieve _another_talk."
+   Agent says "Hello."
+   [ ] -done
+      User says "Hi."
+      Agent says "Ho."
+[ ] -accepted -done
+   User says "Let's achieve _another_talk."
+   Agent says "Hello."
+   [ ] -done <-focus
+      User says "Boo."
+      Agent says "What?"
+
+  > quit
+    

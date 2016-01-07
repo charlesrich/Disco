@@ -10,6 +10,14 @@
          <binding slot="$__talk_step.text" value="'Hello'"/>
       </subtasks>
    </task>
+   <task id="_another_talk">
+      <subtasks id="__another_talk_subtasks">
+         <step name="__another_talk_step" task="disco:Say"/>
+         <step name="__another_talk_ref" task="__another_talk_tree"/>
+         <binding slot="$__another_talk_step.text" value="&#34;Hello&#34;"/>
+         <binding slot="$__another_talk_step.external" value="false"/>
+      </subtasks>
+   </task>
    <task id="__talk_tree">
       <subtasks id="_d4e4_subtasks">
          <step name="_d4e4_step" task="disco:Say"/>
@@ -26,6 +34,23 @@
          <binding slot="$_d4e6_step.text" value="'Goodbye'"/>
          <binding slot="$_d4e7_step.external" value="false"/>
          <binding slot="$_d4e7_step.text" value="'Bye'"/>
+      </subtasks>
+   </task>
+   <task id="__another_talk_tree">
+      <subtasks id="_d4e10_subtasks">
+         <step name="_d4e10_step" task="disco:Say"/>
+         <step name="_d4e11_step" task="disco:Say"/>
+         <binding slot="$_d4e10_step.external" value="true"/>
+         <binding slot="$_d4e10_step.text" value="'Hi'"/>
+         <binding slot="$_d4e11_step.text" value="&#34;Ho&#34;"/>
+         <binding slot="$_d4e11_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e13_subtasks">
+         <step name="_d4e13_step" task="disco:Say"/>
+         <step name="_d4e14_step" task="disco:Say"/>
+         <binding slot="$_d4e13_step.external" value="true"/>
+         <binding slot="$_d4e14_step.text" value="&#34;What?&#34;"/>
+         <binding slot="$_d4e14_step.external" value="false"/>
       </subtasks>
    </task>
 </taskModel>
