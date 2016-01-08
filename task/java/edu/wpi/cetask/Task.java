@@ -310,6 +310,7 @@ public class Task extends Instance {
              ("boolean".equals(type) ? "typeof value == \"boolean\"" :
                "string".equals(type) ? "typeof value == \"string\"" :
                   "number".equals(type) ? "typeof value == \"number\"" :
+                     "function".equals(type) ? "typeof value == \"function\"" :
                         "value instanceof "+type));
    }
    
