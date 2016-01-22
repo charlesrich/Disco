@@ -1,0 +1,43 @@
+<taskModel about="urn:disco.wpi.edu:ldt:ABC" xmlns="http://ce.org/cea-2018"
+	   xmlns:primitive="urn:disco.wpi.edu:ldt:Primitives">
+  <!-- 
+       This is the task model being taught.
+
+       See test/do1.test for collaborative execution test case.
+
+       See Learn-Do-Teach.xml for pedagogical model.
+  -->
+
+  <task id="A">
+
+    <subtasks id="r1">
+      <step name="step1" task="B"/>
+      <step name="step2" task="C"/>
+    </subtasks>
+
+  </task>
+
+  <task id="B">
+
+    <subtasks id="r2">
+      <step name="step1" task="primitive:d"/>
+      <step name="step2" task="primitive:e"/>
+    </subtasks>
+
+    <subtasks id="r3">
+      <step name="step1" task="primitive:f"/>
+      <step name="step2" task="primitive:g"/>
+    </subtasks>
+
+  </task>
+
+  <task id="C">
+
+    <subtasks id="r4">
+      <step name="step1" task="primitive:h"/>
+      <step name="step2" task="primitive:i"/>
+    </subtasks>
+
+  </task>
+
+</taskModel>

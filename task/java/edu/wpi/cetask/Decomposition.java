@@ -5,9 +5,9 @@
  */
 package edu.wpi.cetask;
 
-import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 import java.util.*;
 import javax.script.Bindings;
+import edu.wpi.cetask.ScriptEngineWrapper.Compiled;
 
 /**
  * Representation for instances of a decomposition class.
@@ -19,11 +19,12 @@ public class Decomposition extends Instance {
       super(type, type.engine);
       List<String> stepNames = type.getStepNames();
       Map<String,Repeatable> repeatableSteps = null;
+      bindings.put("$plan", plan);
       List<Plan> optionalSteps = null; // for copying bindings
       for (String name : stepNames) {
          TaskClass task = type.getStepType(name);
          boolean optional = type.isOptionalStep(name);
-         Plan step = addStep(task, name, optional, false);
+         Plan step = addStep(task, name, optional, 0);
          for (String required : type.getRequiredStepNames(name)) {
             Plan requiredStep = getStep(required);
             if ( requiredStep == null ) 
@@ -62,8 +63,7 @@ public class Decomposition extends Instance {
                boolean optionalRepeat = ( i >= min );
                // note $ not allowed in XML names, so cannot accidentally
                // collide with user-defined step names
-               step = addStep(task, name+'$'+i, optionalRepeat, true);
-               step.setRepeatStep(i);
+               step = addStep(task, name+'$'+i, optionalRepeat, i);
                step.requires(requires); 
                if ( optionalRepeat ) optionalSteps.add(step);
             }       
@@ -73,10 +73,11 @@ public class Decomposition extends Instance {
       if ( repeatableSteps != null ) { 
          for (Repeatable repeatable : repeatableSteps.values()) {
             // must be after updateBindings
-            for (Plan repeat : repeatable.optional)
+            for (Plan repeat : repeatable.optional) {
                // copy fixed binding values (esp. external)
                // (will cause unnecessary calls to updateBindings)
                repeat.getGoal().copySlotValues(repeatable.step);
+            }
          }
       }
    }
@@ -91,13 +92,14 @@ public class Decomposition extends Instance {
    }
    
    private Plan addStep (TaskClass type, String name,
-                         boolean optional, boolean repeat) {
+                         boolean optional, int repeat) {
       Decomposition.Step step;
       try { step = type.isBuiltin() ?
-               type.newStep(Decomposition.this, name, repeat) :
+               type.newStep(Decomposition.this, name, repeat > 0) :
                new Step(type, engine, this, name);
       } catch (NoSuchMethodException e) { throw new RuntimeException(e); }
       Plan plan = new Plan(step);
+      plan.setRepeatStep(repeat);
       step.setPlan(plan);
       plan.setOptionalStep(optional);
       putStep(name, plan);
@@ -136,7 +138,7 @@ public class Decomposition extends Instance {
       goal = null;
       synchronized (bindings) { 
          bindings.remove("$this"); 
-         bindings.remove("$plan"); 
+         bindings.put("$plan", null); 
       }
    }
    
@@ -191,7 +193,12 @@ public class Decomposition extends Instance {
       private final Decomposition decomp;
       
       private /* final */ Plan plan; // can be null (for builtin tasks)
-      void setPlan (Plan plan) { this.plan = plan; }
+      
+      void setPlan (Plan plan) { 
+         this.plan = plan;
+         plan.getGoal().bindings.put("$plan", plan);
+         updateBindingsTask(false);
+      }
       
       public String getName () { return name; }
       
@@ -207,117 +214,74 @@ public class Decomposition extends Instance {
       public boolean isOptionalStep () {
          return decomp != null && decomp.getType().isOptionalStep(name);
       }
-      
-      private void updateBindings () {
-         if ( decomp != null ) decomp.updateBindings(false, null, null, null);
-      }
-      
+    
       @Override
-      void updateBindingsTask () {
-         super.updateBindingsTask(); // do 2018-ext self bindings first
-         // for binding expressions on this step that do not depend on other slots
-         if ( decomp != null ) decomp.updateBindings(true, name, null, null);
-      }
-   
-      @Override
-      public Object eval (String expression, String where) {
-         updateBindings();
-         return super.eval(expression, where);
-      }
-      
-      @Override
-      protected Object eval (String script, Bindings extra, String where) {
-         updateBindings();
-         return super.eval(script, extra, where);
-      }
-  
-      @Override
-      protected Boolean evalCondition (Compiled compiled, Bindings extra, 
-                                       String where) {
-         updateBindings();
-         return super.evalCondition(compiled, extra, where);
+      protected void updateBindingsTask (boolean modified) {
+         super.updateBindingsTask(modified); // do 2018-ext self bindings first
+         if ( !isOccurred() ) // don't change slots on occurrences
+            updateBindings(modified, null, null);
       }
       
       // need these also since SCRIPTABLE optimization does not call eval 
     
       @Override
       public Object getSlotValue (String name) {
-         updateBindings();
+         updateBindingsTask(false);
          return super.getSlotValue(name);
       }
       
       @Override
       protected Boolean getSlotValueBoolean (String name) {
-         updateBindings();
+         updateBindingsTask(false);
          return super.getSlotValueBoolean(name);
       }
-      
-      @Override
-      public String getSlotValueToString (String name) {
-         updateBindings();
-         return super.getSlotValueToString(name);
-      }
-      
-      @Override
-      public boolean isDefinedSlot (String name) {
-         updateBindings();
-         return super.isDefinedSlot(name);
-      }
-      
+  
       // only setting/removing slot values sets modified bit 
       // evaluation of conditions, etc., is specified not to have side effects
 
       @Override
-      public Object setSlotValue (String name, Object value) {
-         super.setSlotValue(name, value);
-         updateBindings(null, null);
+      public Object setSlotValue (String name, Object value, boolean check) {
+         super.setSlotValue(name, value, check);
+         updateBindings(true, null, null);
          return value;
       }
       
       @Override
       public void removeSlotValue (String name) {
-         super.removeSlotValue(name);
-         updateBindings(this.name, name);
+         removeSlotValueFinal(name);
+         updateBindings(true, this.name, name);
       }
       
       @Override
       boolean copySlotValue (Task from, String fromSlot, String thisSlot, 
                              boolean onlyDefined, boolean check) {
-         if ( from instanceof Step ) ((Step) from).updateBindings();
          boolean overwrite = super.copySlotValue(from, fromSlot, thisSlot, onlyDefined, check);
-         updateBindings(null, null);
+         updateBindings(true, null, null);
          return overwrite;
       }
 
       @Override
-      public void setSlotValueScript (String name, String expression, String where) { 
-         super.setSlotValueScript(name, expression, where);
-         updateBindings(null, null);
+      public void setSlotValueScript (String name, String expression, Compiled compiled, String where) { 
+         super.setSlotValueScript(name, expression, compiled, where);
+         updateBindings(true, null, null);
       }
       
       @Override
-      void setSlotValueScript (String name, String expression, String where,
-            Bindings extra) {
-         super.setSlotValueScript(name, expression, where, extra);
-         updateBindings(null, null);
+      protected void setSlotValueScript (String name, String expression, Compiled compiled,
+            Bindings extra, String where) {
+         super.setSlotValueScript(name, expression, compiled, extra, where);
+         updateBindings(true, null, null);
       }
-      
-      @Override
-      void setSlotValueScript (String name, Compiled compiled, String where,
-            Bindings extra) {
-         super.setSlotValueScript(name, compiled, where, extra);
-         updateBindings(null, null);
-      }
-     
-      private void updateBindings (String retractedStep, String retractedSlot) {
+         
+      private void updateBindings (boolean modified, String retractedStep, String retractedSlot) {
           // propagate changed value within current decomp (including goal)
-         if ( this.decomp != null ) this.decomp.updateBindings(true, null, retractedStep, retractedSlot);
+         if ( decomp != null ) decomp.updateBindings(modified, null, retractedStep, retractedSlot);
          // propagate changed value down to decomposition of this step, if any
          // see also set/deleteSlotValue methods on Plan
-         if ( plan != null ) {
+         if ( modified && plan != null ) {
             Decomposition decomp = plan.getDecomposition();
             // note step name is always "this" here!
-            if ( decomp != null ) decomp.updateBindings(true, null, "this", retractedSlot);
+            if ( decomp != null ) decomp.updateBindings(modified, null, "this", retractedSlot);
          }
       }
    }

@@ -38,6 +38,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
    public void print (PrintStream stream) {
       try {
          Transformer transformer = factory.newTransformer();
+         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
          transformer.setOutputProperty(OutputKeys.INDENT, "yes");
          transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
          transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -332,7 +333,8 @@ public abstract class Description { //TODO: temporarily public for Anahita
       @Override
       void setEnclosing (Description enclosing) {
          super.setEnclosing(enclosing);
-         if ( enclosing instanceof TaskClass ) {
+         if ( strict && 
+               (enclosing instanceof TaskClass || enclosing instanceof DecompositionClass) ) {
             Matcher matcher = pattern.matcher(script);
             while ( matcher.find() ) {
                String slot = matcher.group().substring(6);
@@ -346,7 +348,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
             for (String slot : slots)
                if ( !task.isDefinedSlot(slot) ) return null;
          } 
-         return task.evalCondition(script, compiled, where);
+         return task.evalCondition(script, compiled, task.bindings, where);
       }
    }
 

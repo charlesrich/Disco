@@ -2,10 +2,10 @@
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
   > instance A
-  > eval $disco.addTop($instance)
+  > eval $disco.addTop($new)
     # Returned '[A]'
   > instance IntA
-  > eval $disco.addTop($instance)
+  > eval $disco.addTop($new)
     # Returned '[IntA]'
   > next
     Agent says "Should we achieve A?"

@@ -1,0 +1,90 @@
+    # Dec 18, 2015 9:13:30 AM - TaskEngine 1.8 / Disco 1.12
+    Welcome to Disco! (Type 'help' for command list)
+    # This test case corresponds to Figure 5(c) in models/Learn-Do-Teach.pdf,
+    # in which there are _two_ agents.  See DualAgents class.
+    #
+    # Execute this test case using bin/learn-do-teach-dual
+    #
+  > load models/Pedagogical.xml
+  > load models/Primitives.xml
+    #
+    # Reconstruct system agent's mental state as of end of Figure 5(b)
+  > eval C = new TaskClass("C");  h = new TaskClass("h"); i = new TaskClass("i");
+    # Returned 'i'
+  > eval r4 = models[false].getRecipe(new DecompositionClass("r4", C));
+    # Returned 'r4'
+  > eval r4.steps.push(h); r4.steps.push(i);
+    # Returned '2'
+  > eval models[false].compile("learn-do-teach1") 
+    # Returned 'null'
+    #
+    # turn off automatic turn-taking
+  > next false
+    #
+    # Agent teaching another copy of itself by demonstration how to do C
+    #
+    # give system agent starting intention of teaching C to external agent
+  > instance LearnRecipe / C / r4 / true
+  > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
+    # Returned 'null'
+  > system
+    Agent says "Let's learn how to do C."
+  > system
+    Agent do h.
+  > external
+    Agent' adds step h.
+  > system
+    Agent do i.
+  > external
+    Agent' adds step i.
+  > system
+    Agent says "We're done learning how to do C."
+  > debug
+    #
+    # Following corresponds to Figure 5(c). Note:
+    #
+    #  * Propose.Should and Propose.Done have been renamed to 'do' and 'done' respectively
+    #  * 'false' input to LearnRecipe and LearnStep means system agent ('true' means external agent)
+    #  * Task.Any is a technical artifact of Disco implementation for ?task variable
+    #  * External agent's acceptance of system agent's done proposal omitted in figure.
+    #
+  > history
+
+[LearnRecipe(C,r4,true) by steps] -accepted -done <-focus
+   Propose.Should(agent,LearnRecipe(C,r4,true))
+   [LearnStep(h,r4,true) by demonstration] -done
+      Task.Any(agent,h)
+      addStep(agent',h,r4)
+   [LearnStep(i,r4,true) by demonstration] -optionalStep -done
+      Task.Any(agent,i)
+      addStep(agent',i,r4)
+   Propose.Done(agent,LearnRecipe(C,r4,true))
+   [Accept(agent',Propose.Done(agent,LearnRecipe(C,r4,true)))] -live
+
+  > debug false
+    # glossed version of history
+  > history
+
+[Learn how to do C by steps] -accepted -done <-focus
+   Agent says "Let's learn how to do C."
+   [Learn step h by demonstration] -done
+      Agent do h.
+      Agent' adds step h.
+   [Learn step i by demonstration] -optional -done
+      Agent do i.
+      Agent' adds step i.
+   Agent says "We're done learning how to do C."
+   [Agent' accept] -live
+
+  > eval models[true].compile("learn-do-teach2")
+    # Returned 'null'
+    # recipe learned by external agent
+  > print r4 learn-do-teach2
+
+<subtasks goal="C" id="r4" xmlns="http://ce.org/cea-2018">
+  <step name="step1" task="primitive:h"/>
+  <step name="step2" task="primitive:i"/>
+</subtasks>
+
+  > quit
+    

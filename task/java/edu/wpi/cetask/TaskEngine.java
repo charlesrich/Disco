@@ -30,7 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.8";
+   public static String VERSION = "1.9";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
@@ -102,6 +102,10 @@ public class TaskEngine {
 
    public boolean isDefined (Object object, String field) { 
       return scriptEngine.isDefined(object, field); 
+   }
+   
+   protected boolean isUndefined (Object value) { // do not make public 
+       return scriptEngine.isUndefined(value);
    }
    
    /**
@@ -233,11 +237,23 @@ public class TaskEngine {
       catch (ClassCastException e) { throw newRuntimeException(e, where); } 
    }
    
+   /**
+    * Sets given variable to given value in global scope of this engine.
+    * <p>
+    * WARNING: If this variable already has a value or has been initialized (by
+    * 'var') using {@link #eval(String,String)} or related methods, then this
+    * method will create a <em>new</em> copy of the variable whose value will be
+    * independent of the original variable.
+    */
    public void setGlobal (String variable, Object value) {
       Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
       synchronized (bindings) { bindings.put(variable, value); }
    }
    
+   /**
+    * Get the value of given variable in global scope of this engine.
+    * See {@link #setGlobal(String,Object)} for WARNING!
+    */
    public Object getGlobal (String variable) {
       Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
       synchronized (bindings) { return bindings.get(variable); }
@@ -408,10 +424,7 @@ public class TaskEngine {
     */
    public Document parse (String from) {
       handler.from = null;  // systemId non-null
-      try { 
-         return builder.parse(Utils.toURL(from).openStream(), from);
-      }
-      catch (SAXException e) { print(e); return null; }
+      try { return parse(Utils.toURL(from).openStream(), from); }
       catch (IOException e) { throw new RuntimeException(e); }
    }
       
@@ -426,22 +439,31 @@ public class TaskEngine {
     * @see #load(String)
     */
    public TaskModel load (String from, String model, String properties) {
-      try {
          return load(from, 
-               builder.parse(new ByteArrayInputStream(model.getBytes()), from),
+               parse(new ByteArrayInputStream(model.getBytes()), from),
                properties == null ? null :
                   Utils.loadProperties(new ByteArrayInputStream(properties.getBytes())));
-      }
-      catch (SAXException e) { print(e); return null; }
-      catch (IOException e) { throw new RuntimeException(e); }
+   }
+
+   protected TaskModel load (String from, InputStream input) {
+        return load(from, parse(input, from), loadProperties(from, ".properties")); 
    }
    
-   protected TaskModel load (String from, InputStream input) {
-      try { 
-         return load(from, builder.parse(input, from), 
-                     loadProperties(from, ".properties")); }
+   protected Document parse (InputStream stream, String from) {
+      Document document;
+      try { document = builder.parse(stream, from); }
       catch (SAXException e) { print(e); return null; }
       catch (IOException e) { throw new RuntimeException(e); }
+      try { // remove whitespace outside tags (for better printing later)
+         NodeList nodeList = (NodeList) xpath.evaluate("//text()[normalize-space()='']",
+               document,
+               XPathConstants.NODESET);
+         for (int i = 0; i < nodeList.getLength(); ++i) {
+            Node node = nodeList.item(i);
+            node.getParentNode().removeChild(node);
+         }
+      } catch (XPathExpressionException e) { throw new RuntimeException(e); }
+      return document;
    }
    
    /** 
@@ -808,7 +830,7 @@ public class TaskEngine {
       cacheLive.put(plan, live);
       // to make sure bindings that do not depend on other bindings
       // are updated before plugins run or task executed
-      if ( live ) plan.getGoal().updateBindingsTask();
+      if ( live ) plan.getGoal().updateBindingsTask(false);
       return live;
    }
    
@@ -848,21 +870,25 @@ public class TaskEngine {
     */
    public Plan occurred (Task occurrence) {
       // leave "success" undefined (see doc for Task.isDefinedOutputs)
-      return occurred(true, occurrence, null);
+      return occurred(true, occurrence, null, false);
    }
  
-   // factorization of done below is to support extension in Disco
+   // factorization of occurred below is to support extension in Disco
    
-   public Plan occurred (boolean external, Task occurrence, Plan contributes) { 
+   public Plan occurred (boolean external, Task occurrence, Plan contributes, 
+                         boolean eval) { 
       occurrence.setExternal(external);
       // do explanation before evaluating scripts, since expectations are in
       // terms of state of world before execution
       if ( contributes == null ) contributes = explainBest(occurrence, true);
       // check for continuation before setWhen
       boolean continuation = contributes != null && contributes.isStarted();
-      // sic evalIf, since overridden in Utterance
-      if ( external ) { occurrence.occurred(); occurrence.evalIf(contributes); } 
-      else occurrence.execute(contributes);
+            if ( external ) { 
+         occurrence.occurred(); 
+         // sic evalIf, since overridden in Utterance
+         if ( eval ) occurrence.eval(contributes); 
+         else occurrence.evalIf(contributes); 
+      } else occurrence.execute(contributes);
       occurred(occurrence, contributes, continuation);     
       return contributes;
    }
@@ -950,8 +976,8 @@ public class TaskEngine {
    /**
     * Shift focus to the given plan or null.
     * 
-    * @return true iff this is an "unexpected focus shift" in the sense of Lesh,
-    *         Rich and Sidner's UM'01 paper, i.e., we are leaving the current
+    * @return true iff this is an "unnecessary focus shift" in the sense of 
+    *         docs/LeshRichSidner2001_UM.pdf, i.e., we are leaving the current
     *         focus when it is started but not done.
     *         
     * @see #getFocus()        

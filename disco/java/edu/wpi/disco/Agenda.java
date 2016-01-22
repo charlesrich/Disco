@@ -280,8 +280,16 @@ public class Agenda {
       if ( plan.isLive() ) visitPlugins(plan, items);
    }
    
-   // public for use in DecompositionPlugin
-   public void visit (Plan plan, Map<Task,Plugin.Item> items, Plan exclude) {
+   // public for recursive call to agenda generation in
+   // DecompositionPlugin and ImplicitAcceptPlugin
+   public void visitNotOnlyBest (Plan plan, Map<Task,Plugin.Item> items, Plan exclude) {
+      boolean old = onlyBest;
+      onlyBest = false;
+      try { visit(plan, items, exclude); }
+      finally { onlyBest = old; }
+   }
+
+   private void visit (Plan plan, Map<Task,Plugin.Item> items, Plan exclude) {
       // see note in Plan re trailing optional steps for why hasLiveDescendants needed
       if ( plan != exclude && (plan.isLive() || plan.hasLiveDescendants()) ) {
          boolean optional = plan.isOptional();

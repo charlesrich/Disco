@@ -37,9 +37,6 @@ public class DecompositionClass extends TaskModel.Member {
       return result;
    }
    
-   private final static Pattern pattern = // to match $var.slot
-      Pattern.compile("\\$\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
-
    private final TaskClass goal;
    
    public TaskClass getGoal () { return goal; } 
@@ -64,7 +61,7 @@ public class DecompositionClass extends TaskModel.Member {
    }
    
    /**
-    * @return applicable condition of this task class (or null if none defined)
+    * @return applicable condition of this decomposition class (or null if none defined)
     */
    public Applicability getApplicable () { return applicable; }
    
@@ -180,6 +177,7 @@ public class DecompositionClass extends TaskModel.Member {
     
    private final Map<String,GoalSlot> slots;
    
+   @Override
    public GoalSlot getSlot (String name) { return slots.get(name); }
    
    /**
@@ -414,17 +412,16 @@ public class DecompositionClass extends TaskModel.Member {
          int max = maxOccurs.length() == 0 ? ( min == 0 ? 1 : min ) : 
                               maxOccurs.equals("unbounded") ? -1 :
                               Integer.parseInt(maxOccurs);
-         if ( max < min ) {
+         if ( max >= 0 && max < min ) {
             engine.getErr().println("WARNING: Ignoring maxOccurs in "+id+" step "+name);
             max = min;
          }
-         TaskClass task = resolveTaskClass(node, 
-               parseAbout(node, xpath),
-               xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@task"), 
-               engine);
-         if ( task == null )
-            throw new RuntimeException("Step "+name+" in "+id+" has unknown task type");
-         steps.add(new Step(name, task, min, max, required));
+         String task = xpath(node, xpath, "./n:step[@name=\""+name+"\"]/@task");
+         TaskClass taskClass = task.isEmpty()? Task.Any.CLASS :
+            resolveTaskClass(node, parseAbout(node, xpath), task, engine);
+         if ( taskClass == null )
+            throw new RuntimeException("Step "+name+" in "+id+" has unknown task type: "+task);
+         steps.add(new Step(name, taskClass, min, max, required));
       }
       return steps;
    }
@@ -581,7 +578,9 @@ public class DecompositionClass extends TaskModel.Member {
     */
    public static enum BindingType { INPUT_INPUT, OUTPUT_INPUT, OUTPUT_OUTPUT, INPUT_OUTPUT, 
                                     NON_IDENTITY }
-
+   private final static Pattern pattern = // to match $var.slot
+         Pattern.compile("\\$\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+         
    public class Binding {
       
       // since these are final, ok to make public
@@ -630,24 +629,30 @@ public class DecompositionClass extends TaskModel.Member {
             identity = inputInput = outputInput = false; 
          } else {
             value = xpath.evaluate("./@value", node); // keep value for dependency analysis
-            identity = pattern.matcher(value).matches();
-            if ( identity ) {               
+            boolean matches = pattern.matcher(value).matches();
+            if ( matches ) {               
+               expression = null; compiled = null;
                tokenizer = new StringTokenizer(value.substring(1), ".");
                identityStep = tokenizer.nextToken();
-               identitySlot = tokenizer.nextToken();
-               expression = null; compiled = null;
-               inputInput = value.startsWith("$this.") &&
-                     !step.equals("this") &&
-                     getGoal().inputNames.contains(value.substring(6)) &&
-                     getStepType(step).inputNames.contains(slot);
-               outputInput = !(step.equals("this") || identityStep.equals("this")); 
-               if ( outputInput ) { 
-                  // make sure compatible with ordering constraints
-                  if ( !isRequired(step, identityStep, 0) ) 
-                     getErr().println("WARNING: "+getId()+" contains binding that needs step "+step+" to require step "+identityStep);
+               if ( !identityStep.equals("this") && getStepType(identityStep) == Task.Any.CLASS ) { 
+                  identity = inputInput = outputInput = false;  // non-identity
+                  identitySlot = null;
+               } else {
+                  identity = matches;
+                  identitySlot = tokenizer.nextToken();
+                  inputInput = value.startsWith("$this.") &&
+                        !step.equals("this") &&
+                        getGoal().inputNames.contains(value.substring(6)) &&
+                        getStepType(step).inputNames.contains(slot);
+                  outputInput = !(step.equals("this") || identityStep.equals("this")); 
+                  if ( outputInput ) { 
+                     // make sure compatible with ordering constraints
+                     if ( !isRequired(step, identityStep, 0) ) 
+                        getErr().println("WARNING: "+getId()+" contains binding that needs step "+step+" to require step "+identityStep);
+                  }
                }
             } else { 
-               inputInput = outputInput = false;
+               identity = inputInput = outputInput = false;
                identityStep = identitySlot = null;
                if ( !TaskEngine.DEBUG ) { 
                   compiled = engine.compile(
@@ -694,12 +699,13 @@ public class DecompositionClass extends TaskModel.Member {
          
          (1) Default values, e.g.,
          
-             <binding slot="$this.slot1" value="$this.slot1 == undefined ? 5 : undefined"/>
+             <binding slot="$this.slot1" value="$this.slot1 === undefined ? 5 : undefined"/>
              
          (2) Inverse bindings, e.g.,
          
              <binding slot="$step1.slot1" value="f($this.input)"/>
-             <binding slot="$this.input" value="g($step1.slot1)"/>
+             <binding slot="$this.input" 
+                      value="$this.input === undefined ? g($step1.slot1) : undefined"/>
              
          The second binding above uses the inverse function g to propagate
          a value "up" from plan recognition.  This is taking one step closer 
@@ -765,9 +771,7 @@ public class DecompositionClass extends TaskModel.Member {
             if ( identity) 
                target.copySlotValue(getTask(decomp, identityStep), identitySlot, slot,
                      true, false); // onlyDefined true, i.e., do not propagate undefined
-            else if ( compiled != null )
-               target.setSlotValueScript(slot, compiled, where, decomp.bindings);
-            else target.setSlotValueScript(slot, expression, where, decomp.bindings);
+            else target.setSlotValueScript(slot, expression, compiled, decomp.bindings, where);
             updateBindings(decomp, target, null, null);
          }
       }

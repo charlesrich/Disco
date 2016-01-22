@@ -5,6 +5,7 @@
  */
 package edu.wpi.disco.lang;
 
+import java.util.*;
 import edu.wpi.cetask.*;
 import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Disco;
@@ -48,9 +49,8 @@ public interface Propose {
             propose.accept(contributes, false);
             // accept can change liveness and achieved
             disco.clearLiveAchieved();
-         } else disco.push(new Plan(
-               new Accept(disco, !utterance.getExternal(), propose), 
-               contributes));
+         } else disco.push(new Plan(new Accept(disco, !utterance.getExternal(), propose), 
+                                    contributes));
       } 
    
       private Interpret () {}
@@ -96,7 +96,7 @@ public interface Propose {
          if ( isDefinedSlot("variable") && isDefinedSlot("value") ) {
             String variable = getVariable();
             if ( getDisco().isDefinedGlobal(variable) &&
-                  !getDisco().getGlobal(variable).equals(getValue()) )
+                  getDisco().getGlobal(variable).equals(getValue()) )
                getDisco().deleteGlobal(variable);
          }
       }
@@ -165,11 +165,10 @@ public interface Propose {
        * whose slots needs to be set, etc., will be the instance to which
        * proposal contributes.
        */
-      
       protected Task getNested (Plan contributes) {
          Task nested = getNested();
          return ( nested != null && contributes != null 
-                  && nested.matches(contributes.getGoal()) ) ? contributes.getGoal() 
+                  && contributes.getGoal().isMatch(nested) ) ? contributes.getGoal() 
                   : nested;
       }
 
@@ -235,6 +234,17 @@ public interface Propose {
             appendKey(buffer, "something@word");
          } else buffer.append(should.formatTask());
          if ( this instanceof Propose.Should.Repeat ) appendSpKey(buffer, "again@word");
+         return buffer.toString();
+      }
+      
+      protected String formatNested (String key) {
+         String format = getDisco().getFormat(this);
+         if ( format != null) return formatTask(format, null);
+         Task nested = getNested();
+         StringBuilder buffer = new StringBuilder();
+         if ( nested != null ) appendSp(buffer, nested.formatTask());
+         else appendKeySp(buffer, "something@word");
+         appendKey(buffer, key);
          return buffer.toString();
       }
    }
@@ -306,7 +316,8 @@ public interface Propose {
          Task should = getNested();
          if ( contributes != null ) {
             reconcileStack(contributes, continuation);
-            if ( contributes.getType() == should.getType() )
+            TaskClass type = contributes.getType();
+            if ( type == Task.Any.CLASS || type == should.getType() )
                // TODO this match should really be moved to accept method below, but that
                //      would require modeling of agent's private beliefs
                contributes.match(should);
@@ -591,6 +602,44 @@ public interface Propose {
       }
    }  
 
+   /**
+    * Propose.Done(Task...) - declare task to be completed (postcondition may be null)
+    */
+   public static class Done extends Nested {
+      
+      public static TaskClass CLASS;
+
+      // for TaskClass.newStep
+      public Done (Disco disco, Decomposition decomp, String step, boolean repeat) { 
+         super(Done.class, disco, decomp, step, repeat);
+      }
+
+      public Done (Disco disco, Boolean external, Task goal) { 
+         super(Done.class, disco, external, goal);
+      }
+
+      
+      // keep track of already accepted tasks for ProposeDonePlugin
+      public final static List<Task> ACCEPTED = new ArrayList<Task>();
+      
+      @Override
+      protected void respond (Plan contributes, boolean implicit, boolean success) {
+         Task nested = getNested();
+         if ( nested != null ) ACCEPTED.add(nested);
+         if ( contributes != null ) {
+            contributes.setComplete(true);
+            if ( nested != null && contributes.getType() != getType() ) 
+               contributes.match(nested); // copy slot values
+            // TODO this will not be needed when handling of optional steps corrected
+            for (Plan child : new ArrayList<Plan>(contributes.getChildren())) 
+               if ( child.isOptional() && !child.isDone() ) contributes.remove(child); 
+         }
+      }
+
+      @Override
+      public String formatTask () { return formatNested("done@word"); }
+   }
+   
    public abstract static class Success extends Nested {
 
       // for extensions
@@ -604,26 +653,16 @@ public interface Propose {
          super(cls, disco, external, goal);
       }
       
-      protected void respondSuccess (Plan contributes, boolean implicit, boolean success) {
-         getNested(contributes).setSuccess(success);
-         if ( !success && contributes != null )
-            contributes.getGoal().setShould(false);  // no further negotiation
-      }
-
-      protected String formatSuccess (String success) {
-         String format = getDisco().getFormat(this);
-         if ( format != null) return formatTask(format, null);
-         Task nested = getNested();
-         StringBuilder buffer = new StringBuilder();
-         if ( nested != null ) appendSp(buffer, nested.formatTask());
-         else appendKeySp(buffer, "something@word");
-         appendKey(buffer, success);
-         return buffer.toString();
+      protected void respondSuccess (Plan contributes, boolean success) {
+         if ( contributes != null ) {
+            getNested(contributes).setSuccess(success);
+            if ( !success ) contributes.getGoal().setShould(false);  // no further negotiation
+         }
       }
    }
    
    /**
-    * Propose.Succeeded(Task...) - declare task to have been successful
+    * Propose.Succeeded(Task...) - declare task to have been successful (postcondition true)
     */
    public static class Succeeded extends Success {
 
@@ -640,19 +679,19 @@ public interface Propose {
 
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
-         respondSuccess(contributes, implicit, success);
+         respondSuccess(contributes, success);
          if ( contributes != null && contributes.getType() != getType() ) {
-            Task should = getNested();
-            if ( should != null ) contributes.match(should); // copy slot values
+            Task nested = getNested();
+            if ( nested != null ) contributes.match(nested); // copy slot values
          }
       }
       
       @Override
-      public String formatTask () { return formatSuccess("succeeded@word"); }
+      public String formatTask () { return formatNested("succeeded@word"); }
    }  
 
    /**
-    * Propose.Failed(Task...) - declare task to have failed
+    * Propose.Failed(Task...) - declare task to have failed (postcondition false)
     */
    public static class Failed extends Success {
 
@@ -669,11 +708,11 @@ public interface Propose {
 
       @Override
       protected void respond (Plan contributes, boolean implicit, boolean success) {
-         respondSuccess(contributes, implicit, !success);
+         respondSuccess(contributes, !success);
       }
       
       @Override
-      public String formatTask () { return formatSuccess("failed@word"); }
+      public String formatTask () { return formatNested("failed@word"); }
    }  
 
    /**
@@ -747,7 +786,7 @@ public interface Propose {
       private Plan getNestedPlan (Plan contributes) {
          Plan plan = getPlan();
          return ( plan != null && contributes != null
-                  && plan.getGoal().matches(contributes.getGoal()) ) ? contributes : plan;
+                  && contributes.getGoal().isMatch(plan.getGoal()) ) ? contributes : plan;
       }
       
       @Override

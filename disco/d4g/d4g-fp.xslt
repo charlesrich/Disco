@@ -16,7 +16,7 @@
   <xsl:output method="xml" indent="yes"/>
   <xsl:strip-space elements="*"/>
 
-  <xsl:param name="external" select="'player'"/>
+  <xsl:param name="external" select="'user'"/>
 
   <!-- pre-pass to transform <user>/<agent> into <say> -->
   <xsl:template match="g:model">
@@ -355,6 +355,24 @@
         </xsl:element>
       </xsl:if>
 
+      <!-- interpret remaining attributes as input bindings -->
+      <xsl:for-each select="@*">
+        <xsl:if test="not(name()='id' or name()='actor' or name()='task' or name()='minOccurs'
+                      or name()='maxOccurs' or name()='applicable')">
+          <xsl:element name="binding">
+            <xsl:attribute name="slot">
+              <xsl:text>$</xsl:text>
+              <xsl:value-of select="$id"/>
+              <xsl:text>_step.</xsl:text>
+              <xsl:value-of select="name()"/>
+            </xsl:attribute>
+            <xsl:attribute name="value">
+              <xsl:value-of select="."/>
+            </xsl:attribute>
+          </xsl:element>
+        </xsl:if>
+      </xsl:for-each>
+      
     </xsl:element>
   </xsl:template>
 

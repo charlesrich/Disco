@@ -17,7 +17,7 @@
     Agent says "Please execute IntF."
   > status
 
-[Achieve IntA] -accepted -live
+[Achieve IntA by IntBC] -accepted -live
    User says "Let's achieve IntA."
    [User says let's achieve IntA somehow] -succeeded
    [Achieve IntB with great care and precision] -live
@@ -36,7 +36,7 @@
     Agent says "Please execute IntE."
   > status
 
-[Achieve IntA] -accepted -live
+[Achieve IntA by IntBC] -accepted -live
    User says "Let's achieve IntA."
    [User says let's achieve IntA somehow] -succeeded
    [Achieve IntB the quickest and cheapest way possible] -live
@@ -55,7 +55,7 @@
     Agent says "How shall we achieve IntB?"
   > status
 
-[Achieve IntA] -accepted -live
+[Achieve IntA by IntBD] -accepted -live
    User says "Let's achieve IntA."
    [User says let's achieve IntA somehow] -succeeded
    User execute IntD.

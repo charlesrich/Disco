@@ -26,7 +26,7 @@ Prim5(user,7)
   > history 
 
 [Root1] -live
-   [Abs1(7)] -live <-focus
+   [Abs1(7) by abs1b] -live <-focus
       Prim5(user,7)
       [Prim2(user)] -live
    [Prim4(user)]
@@ -39,7 +39,7 @@ Prim5(user,7)
   > history
 
 [Root1] -live
-   [Abs1(7)] -live
+   [Abs1(7) by abs1b] -live
       [Prim5(user,7)] -succeeded <-focus
          Propose.Succeeded(user,Prim5(user,7))
       [Prim2(user)] -live
@@ -107,7 +107,7 @@ Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
   > history
 
 [Root1] -live
-   [Abs1(7)] -live <-focus
+   [Abs1(7) by abs1b] -live <-focus
       Prim5(user,7)
       [Prim2(user)] -live
    [Prim4(user)]
@@ -128,7 +128,7 @@ Explanation[start=[Abs1],path=[<abs1a,step1>, <abs2,step2>],focus=[Prim2(user)]]
   > history
 
 [Root1] -done <-focus
-   [Abs1] -done
+   [Abs1 by abs1a] -done
       [Abs2] -done
          Prim1(user)
          Prim2(user)
@@ -159,7 +159,7 @@ Unexplained occurrence: execute Prim4
    Prim1(user)
    Prim2(user)
 [Root1] -live
-   [Abs1] -live <-focus
+   [Abs1 by abs1a] -live <-focus
       Prim3(user)
       Prim4(user)
       [Abs2] -live

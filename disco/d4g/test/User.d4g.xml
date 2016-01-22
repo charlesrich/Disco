@@ -54,7 +54,7 @@
     </agent>
   </user>
 
-  <say text="play" actor="player"/>
+  <say text="play" actor="user"/>
   <user text="play"/>
   <say text="side" actor="sidekick"/>
   <agent text="side"/>

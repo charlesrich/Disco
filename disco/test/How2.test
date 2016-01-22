@@ -77,7 +77,7 @@
 [Achieve HowPlus] -accepted -live
    User says "Let's achieve HowPlus."
    [ ] -optional -live -stopped
-   [Achieve A] -live
+   [Achieve A] -live -shift
       [Execute B] -optional -live
          [User says one of us should execute B] -live <-focus
             [User accept] -live
@@ -100,7 +100,7 @@
 [Achieve HowPlus] -accepted -done
    User says "Let's achieve HowPlus."
    [ ] -optional
-   [Achieve A] -done
+   [Achieve A] -done -shift
       [Agent execute B] -optional -accepted -done
       Agent execute C.
       [Execute D] -optional -live

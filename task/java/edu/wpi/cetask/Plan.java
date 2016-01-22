@@ -52,6 +52,36 @@ public class Plan {
       
    public final static String FOCUS_NOTE = "<-focus";
    
+   /**
+    * The following mutually exclusive breakdown of possible states of a plan
+    * may be convenient for applications using Disco:
+    * <ul>
+    * <li>DONE - Equivalent to {@link #isDone()}.
+    * 
+    * <li>FAILED - Equivalent to {@link #isFailed()}.
+    * 
+    * <li>PENDING - This plan is live (see {@link #isLive()}) and if it is non-primitive, 
+    *               has not been started (see {@link #isStarted()}).
+    * 
+    * <li>IN_PROGRESS - (For non-primitive tasks only) This plan has been started but is
+    *                   not yet completed (see {@link #isComplete()}).
+    * 
+    * <li>INAPPLICABLE - This plan is not live only because the precondition of the
+    *                    goal evaluated to false (i.e., all of its predecessors are done).
+    *
+    * <li>BLOCKED - Equivalent to {@link #isBlocked()}.
+    * </ul>
+    */
+   public enum Status { DONE, FAILED, PENDING, IN_PROGRESS, INAPPLICABLE, BLOCKED }
+
+   public Status getStatus () {
+	   return isDone() ? Status.DONE :
+		   isFailed() ? Status.FAILED :
+			   // plan has not been (completely) executed
+			   isLive() ? ( isStarted() ? Status.IN_PROGRESS : Status.PENDING ) :
+				   isBlocked() ? Status.BLOCKED : Status.INAPPLICABLE;
+   }
+   
    private boolean optionalStep;
    
    /**
@@ -278,7 +308,8 @@ public class Plan {
    
    /**
     * Return unmodifiable list of immediate predecessors of this plan, i.e., 
-    * the plans it requires.
+    * the plans it requires.  This plan may not become live until all of these
+    * are done (see {@link #isDone()}) and its precondition is not false.
     */
    public List<Plan> getPredecessors() { 
       return Collections.unmodifiableList(required);
@@ -289,53 +320,66 @@ public class Plan {
     */
    public void execute () {
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            goal.execute(this);
-            checkAchieved();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         goal.execute(this);
+         checkAchieved();
       }
    }
    
    public boolean isOccurred () { return goal.isOccurred(); }
    
    /**
-    * Tests whether plans which require this plan should become live.
+    * Tests whether the postcondition of the goal evaluated to true or
+    * unknown at the appropriate time (@see {@link #isSucceeded()}).
+    * This test is used to determine liveness (see {@link #getPredecessors()}).
     * Note that this plan may have "trailing" optional steps that have
     * not yet been completed.
     * 
     * @see #isExhausted()
+    * @see #isFailed()
     */
    public boolean isDone () {
       return ( isOccurred() || isSucceeded() || isComplete() ) && !isFailed();
    }
-   
+
+   /**
+    * Tests whether the postcondition of the goal evaluated to false
+    * immediately after execution of this plan was completed.
+    */
    public boolean isFailed () {
-      return Utils.isFalse(goal.getSuccess());
+	   return Utils.isFalse(goal.getSuccess());
    }
-   
-   public boolean isSucceeded () { 
-      return Utils.isTrue(goal.getSuccess());
+
+   /**
+    * Tests whether the postcondition of the goal evaluated to true immediately
+    * after execution of this plan was completed, or for sufficient
+    * postconditions, while this plan was live.  Note that for non-sufficient
+    * postconditions, the fact that the postcondition evaluated to true
+    * does not guarantee that the task "really" succeeded.
+    */
+   public boolean isSucceeded () {
+	   return Utils.isTrue(goal.getSuccess());
    }
 
    public Boolean isApplicable () {
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            return goal.isApplicable();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         return goal.isApplicable();
       }
    }
    
    public Boolean isAchieved () {
       synchronized (goal.bindings) {
-         try {
-            goal.bindings.put("$plan", this);
-            return goal.isAchieved();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         return goal.isAchieved();
       }
    }
 
+   /**
+    * Tests whether this plan is ready for execution based on its predecessors being done
+    * and the precondition of the goal not being false.  Note that this does <em>not</em>
+    * imply that all of its inputs are defined.
+    */
    public boolean isLive () {
       Boolean live = goal.engine.isLive(this); // check cached value
       if ( live != null ) return live;
@@ -354,7 +398,7 @@ public class Plan {
    // isLivePlan except for achieved
    private boolean isLiveAchieved () {
       return !isOccurred() && !Utils.isFalse(goal.getShould()) 
-         && !isPassed() && !isBlocked()
+         && !isPassed() && isRequiredDone()
          && (isStarted() || !Utils.isFalse(isApplicable()))
          && !isFailed();
    }
@@ -366,7 +410,7 @@ public class Plan {
 
    /**
     * Tests whether popping plan from the stack would constitute an
-    * unnecessary focus shift.
+    * unnecessary focus shift (see docs/LeshRichSidner2001.pdf)
     * 
     * @return true iff popping would <em>not</em> be an unnecessary focus
     *         shift.
@@ -424,23 +468,31 @@ public class Plan {
       return false;
    }
    
+   /**
+    * Test whether any required plans in this plan or recursively through parent
+    * are not done and therefore block this plan from becoming live.
+    */
    public boolean isBlocked () {
-      for (Plan plan : required)
-         if ( !isRepeatStep() && plan.isOptionalStep() && plan.isOptional() ) { 
-            if ( plan.isBlocked() ) return true; 
-         } else if ( !plan.isDone() ) return true;
-      return false;
+	  return !isRequiredDone() || ( parent != null && parent.isBlocked() );
    }
    
-    /**
+   private boolean isRequiredDone () {
+      for (Plan plan : required)
+         if ( !isRepeatStep() && plan.isOptionalStep() && plan.isOptional() ) { 
+            if ( !plan.isRequiredDone() ) return false; 
+         } else if ( !plan.isDone() ) return false;
+      return true;
+   }
+   
+   /**
     * Test if this plan has live children.
     * 
     * @see #hasLiveDescendants()
     */
    public boolean hasLive () {
-      for (Plan child : children)
-         if ( child.isLive() ) return true;
-      return false;
+	   for (Plan child : children)
+		   if ( child.isLive() ) return true;
+	   return false;
    }
 
    /**
@@ -544,7 +596,7 @@ public class Plan {
    
    /**
     * Test whether this plan or any of its descendants which is a
-    * starter {@link Task#isStarter(Plan)} for this plan.
+    * starter {@link Task#isStarter(Plan)} have been executed.
     */
    public boolean isStarted () {
       if ( started || isOccurred() ) return true;
@@ -573,11 +625,11 @@ public class Plan {
    public boolean isExhausted () {
       // may be done but have live optional trailing steps
       if ( goal.getSuccess() != null || isMoot() 
-            || isBlocked() || Utils.isFalse(goal.getShould())
+            || !isRequiredDone() || Utils.isFalse(goal.getShould())
             // precondition only required before starting               
             || ( !isStarted() && Utils.isFalse(isApplicable()) ))
          return true;
-      if ( isPrimitive() ) return !isLive();
+      if ( isPrimitive() ) return goal.isTemporary() || !isLive();
       else if ( isDecomposed() ) {
          if ( decomp == null && decompClass != null ) return false; // not expanded yet
          for (Plan child : children) // procedural decomposition
@@ -759,10 +811,8 @@ public class Plan {
       if ( decompClass != null ) return Collections.singletonList(decompClass);
       List<DecompositionClass> decomps;
       synchronized (goal.bindings) {
-         try { 
-            goal.bindings.put("$plan", this);
-            decomps = goal.getDecompositions();
-         } finally { goal.bindings.remove("$plan"); }
+         goal.bindings.put("$plan", this);
+         decomps = goal.getDecompositions();
       }
       for (Iterator<DecompositionClass> i = decomps.iterator();
            i.hasNext();) {
@@ -885,17 +935,15 @@ public class Plan {
  
    boolean applyDecompositionScript () {
       String script = getType().getDecompositionScript();
-      if ( script != null ) 
-         try {
-            goal.bindings.put("$plan", this);
-            Object result = goal.eval(script, "Decomposition script for "+getType());
-            if ( result instanceof Boolean ) {
-               if (((Boolean) result)) setPlanned(true);
-               return (Boolean) result;
-            } else throw new RuntimeException("Decomposition script for "+getType()
-                  +" returned non-boolean: "+result);
-         } finally { goal.bindings.remove("$plan"); }
-      else return false;
+      if ( script != null ) { 
+         goal.bindings.put("$plan", this);
+         Object result = goal.eval(script, "Decomposition script for "+getType());
+         if ( result instanceof Boolean ) {
+            if (((Boolean) result)) setPlanned(true);
+            return (Boolean) result;
+         } else throw new RuntimeException("Decomposition script for "+getType()
+         +" returned non-boolean: "+result);
+      } else return false;
    }
    
    /**
@@ -909,7 +957,7 @@ public class Plan {
     * be triggered by the liveness checking that the agent does on every tick.
     */
    public Object setSlotValue (String name, Object value) {
-      goal.setSlotValue(name, value, true);
+      goal.setSlotValue(name, value);
       if ( decomp != null ) decomp.updateBindings(true, null, null, null);
       return value;
    }   
@@ -960,8 +1008,8 @@ public class Plan {
 
    /**
     * Tests whether decomposition chosen for this plan.  Returns true iff either
-    * {@link #isDecomposed()} or {@link #getDecompositionClass()} returns non-null.
-    * Returns false for primitive tasks.
+    * {@link #isDecomposed()} returns true or {@link #getDecompositionClass()} 
+    * returns non-null. Returns false for primitive tasks.
     */
    public boolean isHow () { return isDecomposed() || decompClass != null; }
    
@@ -988,20 +1036,18 @@ public class Plan {
                DecompositionClass only = decomps.get(0);
                if ( only.getProperty("@authorized", true) ) {
                   synchronized (goal.bindings) {
-                     try { 
-                        goal.bindings.put("$plan", this);
-                        if ( !Utils.isFalse(only.isApplicable(goal)) ) {
-                           Plan focus = goal.engine.getFocus();
-                           // inhibit infinite recursion, but allow incremental expansion
-                           // if live (and recursive parent started) or if focus or child 
-                           // of focus 
-                           if ( !stack.contains(only) 
-                                 || (focus != null && 
-                                 (focus == this || focus.children.contains(this))) 
-                                 || (isLive() && recursiveParent(only).isStarted()) ) 
-                           { apply(only); applied = true; }
-                        }
-                     } finally { goal.bindings.remove("$plan"); }
+                     goal.bindings.put("$plan", this);
+                     if ( !Utils.isFalse(only.isApplicable(goal)) ) {
+                        Plan focus = goal.engine.getFocus();
+                        // inhibit infinite recursion, but allow incremental expansion
+                        // if live (and recursive parent started) or if focus or child 
+                        // of focus 
+                        if ( !stack.contains(only) 
+                              || (focus != null && 
+                              (focus == this || focus.children.contains(this))) 
+                              || (isLive() && recursiveParent(only).isStarted()) ) 
+                        { apply(only); applied = true; }
+                     }
                   }
                }
             }
@@ -1035,7 +1081,7 @@ public class Plan {
    public List<Plan> explain (Task task, boolean onlyLive, Plan exclude) {
       List<Plan> plans = new ArrayList<Plan>();
       // unroll recursion one level
-      if ( (!onlyLive || isLive()) && goal.matches(task) ) plans.add(this);
+      if ( (!onlyLive || isLive()) && goal.isMatch(task) ) plans.add(this);
       for (Plan child : children)
          child.explain(task, plans, onlyLive, exclude);
       return plans;
@@ -1098,10 +1144,10 @@ public class Plan {
             : goal);
          DecompositionClass decomp = getDecompositionClass();
          if ( decomp != null &&
-               (TaskEngine.VERBOSE ||
+               (TaskEngine.VERBOSE 
                      // suppress unique known and unformatted decompositions
-                     (goal.getType().getDecompositions().size() > 1 
-                       && decomp.getProperty("@format") != null)) ) {
+                     || goal.getType().getDecompositions().size() > 1 
+                     || decomp.getProperty("@format") != null))  {
             stream.print(' '); 
             if ( format ) stream.print(decomp.format());
             else { stream.print("by "); stream.print(decomp); }

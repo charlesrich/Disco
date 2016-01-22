@@ -305,7 +305,15 @@
       <binding slot="$b.input" value="$a.output"/>
     </subtasks>
   </task>
-  
+   
+  <task id="ModifiedSufficient">
+    <input name="input" type="Mutable" modified="output"/>
+    <output name="output" type="Mutable"/>
+    <postcondition sufficient="true">
+      $this.output.loc == 0;
+    </postcondition>
+  </task>	
+
   <task id="ModifiedJava">
     <input name="input" type="java.util.Vector" modified="output"/>
     <output name="output" type="java.util.Vector"/>
@@ -463,6 +471,42 @@
   <task id="InversePrim">
     <input name="input" type="number"/>
   </task>
+  
+  <!-- test unnecessary focus shift -->
+
+  <task id="ShiftA">
+    <subtasks id="shiftA" ordered="false">
+      <step name="b" task="ShiftB"/>
+      <step name="i" task="ShiftI"/>
+    </subtasks>
+  </task>
+
+  <task id="ShiftB">
+    <subtasks id="shiftB" ordered="false">
+      <step name="c" task="ShiftC"/>
+      <step name="d" task="ShiftD"/>
+    </subtasks>
+  </task>
+
+  <task id="ShiftC">
+    <subtasks id="shiftC" ordered="false">
+      <step name="e" task="ShiftE"/>
+      <step name="f" task="ShiftF"/>
+    </subtasks>
+  </task>
+
+  <task id="ShiftD">
+    <subtasks id="shiftD" ordered="false">
+      <step name="g" task="ShiftG"/>
+      <step name="h" task="ShiftH"/>
+    </subtasks>
+  </task>
+
+  <task id="ShiftE"/>
+  <task id="ShiftF"/>
+  <task id="ShiftG"/>
+  <task id="ShiftH"/>
+  <task id="ShiftI"/>
   
   <script init="true">
   

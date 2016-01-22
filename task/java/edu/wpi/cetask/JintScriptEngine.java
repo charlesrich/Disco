@@ -5,11 +5,11 @@
  */
 package edu.wpi.cetask;
 
+import java.util.Map.Entry;
+import javax.script.*;
 import cli.Jint.*;
 import cli.Jint.Expressions.Program;
 import cli.Jint.Native.*;
-import java.util.Map.Entry;
-import javax.script.*;
 
 // wrapper for Jint to support running CETask/Disco under Mono (for Unity)
 // not a complete implementation of ScriptEngine
@@ -45,10 +45,14 @@ class JintScriptEngine extends ScriptEngineWrapper
    boolean isScriptable (Object value) { return value instanceof JsObject; }
    
    @Override
-   boolean isDefined (Object object, String field) {
-      Object value = get(object, field);
+   boolean isUndefined (Object value) {
       // note null below means "not initialized", not JsNull.Instance
-      return !( value == null || value == JsUndefined.Instance );
+      return value == null || value == JsUndefined.Instance;
+   }
+   
+   @Override
+   boolean isDefined (Object object, String field) {
+      return !isUndefined(get(object, field));
    }
    
    @Override

@@ -49,6 +49,7 @@ public abstract class ScriptEngineWrapper extends AbstractScriptEngine {
    }
  
    abstract boolean isScriptable (Object value);
+   abstract boolean isUndefined (Object value);
    abstract boolean isDefined (Object object, String field); 
    abstract Object get (Object object, String field); 
    abstract void put (Object object, String field, Object value); 

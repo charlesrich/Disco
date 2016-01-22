@@ -45,6 +45,8 @@ Do =
     attribute minOccurs { xsd:nonNegativeInteger }?,
     attribute maxOccurs { xsd:positiveInteger | "unbounded" }?,
     attribute applicable { text }?,
+    # other attributes interpeted as bindings for inputs
+    attribute * - (id | actor | task | minOccurs | maxOccurs | applicable) { text }*,
     Choices
   }
 

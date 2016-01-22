@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Test"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:disco="urn:disco.wpi.edu:Disco"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+  <!--
+      This is a silly example that illustrates the extension of <do>
+      to support binding of input slots via additional attributes.  It is silly
+      in part because the same effect in this example could be achieved using
+      the <say> or <user>/<agent> elements.
+  -->
+  <do id="_talk" actor="agent" task="disco:Say" text="'Hello'">
+
+    <do actor="user" task="disco:Say" text="'Hi'">
+
+      <do actor="agent" task="disco:Say" text="'Ho'"/>
+
+    </do>
+
+    <do actor="user" task="disco:Say" text="'Goodbye'"> 
+
+      <do actor="agent" task="disco:Say" text="'Bye'"/>
+
+    </do>
+
+  </do>
+  
+  <!-- 
+      This example illustrates that although all of the inputs
+      of an agent utterance must be defined, it is possible for
+      some inputs of user utterance to be undefined and plan
+      recognition will still select the correct recipe (due to
+      unification
+   -->
+   
+   <agent id="_another_talk" text="Hello">
+      
+      <do actor="user" task="disco:Say" text="'Hi'">
+         <agent text="Ho"/>
+      </do>
+      
+      <!-- user says anything other than 'Hi' -->
+      <do actor="user" task="disco:Say">
+         <agent text="What?"/>
+      </do>
+      
+   </agent> 
+
+</model>

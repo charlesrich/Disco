@@ -195,7 +195,7 @@
    <task id="PickUpShard">
       <input name="shard" type="Packages.edu.wpi.secrets.objects.IceShard"/>
       <precondition>
-      ($this.external == undefined) || (!actor($this.external).isCarrying())
+      !actor($this.external).isCarrying()
     </precondition>
       <script>
       if ( !$this.external ) { moveNPC("sidekick", $this.shard.getLocation()); }
@@ -207,8 +207,7 @@
       <input name="placement" type="string"/>
       <input name="shard" type="Packages.edu.wpi.secrets.objects.IceShard"/>
       <precondition>
-      ($this.external != undefined) &amp;&amp;
-      (actor($this.external).getCarriedObject() == $this.shard)
+      actor($this.external).getCarriedObject() == $this.shard
     </precondition>
       <script>
       shack = world.get("shack");

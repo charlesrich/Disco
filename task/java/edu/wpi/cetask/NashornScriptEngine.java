@@ -24,13 +24,17 @@ class NashornScriptEngine extends ScriptEngineWrapper.JSR_223
    public NashornScriptEngine (ScriptEngine nashorn) {
       super(nashorn);
    }
-  
+   
+   @Override
+   boolean isUndefined (Object value) {
+      return ScriptObjectMirror.isUndefined(value);
+   }
+   
    @Override
    boolean isDefined (Object object, String field) {
-      return !ScriptObjectMirror.isUndefined(
-            ((ScriptObjectMirror) object).getMember(field));
+      return !ScriptObjectMirror.isUndefined(((ScriptObjectMirror) object).getMember(field));
    }
-
+   
    @Override
    Object get (Object object, String field) {
       return ((ScriptObjectMirror) object).get(field);

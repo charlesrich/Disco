@@ -32,5 +32,8 @@ public class Accept extends Respond {
    }
    
    @Override
+   public boolean isTemporary () { return true; }
+   
+   @Override
    protected String getKey () { return "accept@word"; }
 }

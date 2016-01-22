@@ -13,8 +13,8 @@ CE> done
     Failed execute I.
 CE> status
 
-[Achieve G] -live <-focus
-   [Achieve H] -failed
+[Achieve G by decomp1] -live <-focus
+   [Achieve H by decomp3] -failed
       [User execute I] -failed
    [Achieve H] -live
 
@@ -24,10 +24,10 @@ CE> done
     Failed execute J.
 CE> status
 
-[Achieve G] -failed
-   [Achieve H] -failed
+[Achieve G by decomp1] -failed
+   [Achieve H by decomp3] -failed
       [User execute I] -failed
-   [Achieve H] -failed
+   [Achieve H by decomp4] -failed
       [User execute J] -failed
 [Achieve G] -live
 
@@ -39,12 +39,12 @@ CE> done
     Failed execute J.
 CE> status
 
-[Achieve G] -failed
-   [Achieve H] -failed
+[Achieve G by decomp1] -failed
+   [Achieve H by decomp3] -failed
       [User execute I] -failed
-   [Achieve H] -failed
+   [Achieve H by decomp4] -failed
       [User execute J] -failed
-[Achieve G] -failed
+[Achieve G by decomp2] -failed
    [User execute J] -failed
 
 CE> next

@@ -1,0 +1,195 @@
+<taskModel about="urn:disco.wpi.edu:ldt:Pedagogical"
+           xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+  
+  <!-- 
+       This is the pedagogical model for the proof of concept system in
+       a proposal submitted to the National Science Foundation
+       in November, 2015, titled:
+
+       A Unified Theory of Learning, Doing and Teaching Hierarchical Tasks:
+       The Learn-Do-Teach Challenge for Collaborative Agents
+
+       See Learn-Do-Teach.pdf (especially Figure 4) for technical discussion
+       and test folder for test cases.
+
+       See ABC.xml for the task model being learned.
+  -->
+
+  <!-- note 'task' is a reserved slot name in ANSI/CEA-2018, so 'action'
+       is used instead below -->
+
+  <task id="LearnRecipe">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <input name="learner" type="boolean"/>
+
+    <subtasks id="steps">
+      <!-- maxOccurs should be 'unbounded', but not fully supported yet -->
+      <step name="step" task="LearnStep" maxOccurs="5"/>
+      <binding slot="$step.recipe" value="$this.recipe"/>
+      <binding slot="$step.learner" value="$this.learner"/>
+    </subtasks>
+
+  </task>
+
+  <task id="LearnStep">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <input name="learner" type="boolean"/>
+    <binding slot="$this.action"
+             value="($plan != null &amp;&amp; $this.recipe != undefined &amp;&amp;
+                    $this.learner!= undefined &amp;&amp; $this.recipe.isCompiled() ) ? 
+                    models[!$this.learner].getRecipe($this.recipe).steps[$plan.getRepeatStep()]
+		    : undefined"/>
+    <precondition>
+      ($plan != null &amp;&amp; $this.recipe != undefined &amp;&amp;
+       $this.learner != undefined &amp;&amp; $this.recipe.isCompiled() ) ? 
+       (models[!$this.learner].getRecipe($this.recipe).steps[$plan.getRepeatStep()] != undefined)
+       : undefined
+    </precondition>
+
+    <subtasks id="instruction">
+      <step name="learn" task="addStep"/>
+      <binding slot="$learn.action" value="$this.action"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
+    </subtasks>
+
+    <subtasks id="demonstration">
+      <!-- note unrestricted step task type -->
+      <step name="demonstrate"/>
+      <step name="learn" task="addStep"/>
+      <applicable> $this.action.isPrimitive() </applicable>
+      <binding slot="$demonstrate.type"
+               value="$disco.getTaskClass($this.action.id)"/>
+      <!-- inverse binding, see design note in DecompositionClass.Binding -->
+      <binding slot="$this.action"
+               value="$this.action == undefined &amp;&amp; $demonstrate.type != undefined ?
+                        new TaskClass($demonstrate.type.getId()) : undefined"/>
+      <binding slot="$learn.action"
+               value="new TaskClass($demonstrate.type.getId())"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
+
+    </subtasks>
+
+    <subtasks id="topdown" ordered="false">
+      <step name="down" task="LearnRecipe"/>
+      <step name="learn" task="addStep"/>
+      <applicable> !$this.action.isPrimitive(!$this.learner) </applicable>
+      <binding slot="$down.action" value="$this.action"/>
+      <binding slot="$down.learner" value="$this.learner"/>
+      <binding slot="$learn.action" value="$this.action"/>
+      <binding slot="$learn.recipe" value="$this.recipe"/>
+      <binding slot="$learn.external" value="$this.learner"/>
+    </subtasks>
+
+  </task>
+  
+  <task id="addStep">
+    <input name="action" type="TaskClass"/>
+    <input name="recipe" type="DecompositionClass"/>
+    <script>
+      models[$this.external].getRecipe($this.recipe).steps.push(
+              models[$this.external].getTask($this.action.id));
+    </script>
+  </task>
+
+  <script init="true">
+
+    // using "mirror" Javascript objects for convenience here, but will eventually
+    // be able to construct ANSI/CEA-2018 instances on the fly (see compile
+    // function below)
+
+    // following are separate mental models of tasks for the two actors
+    // in the collaboration, which is needed for the case in Figure 5(c)
+    // in which there are two copies of the agent
+
+    var models = {
+       true: new TaskModel(), // for external actor
+       false: new TaskModel() // for system actor
+    }
+
+    function TaskModel () {
+       this.tasks = [];   // known task classes
+       this.recipes = []; // known decomposition classes
+    }
+
+    TaskModel.prototype.getRecipe = function (recipe) { // factory method
+       for (var i in this.recipes)
+          if ( this.recipes[i].id == recipe.id ) return this.recipes[i];
+       var recipe = new DecompositionClass(recipe.id, this.getTask(recipe.goal.id));
+       this.recipes.push(recipe);
+       return recipe;
+    }
+
+    TaskModel.prototype.getTask = function (id) {  // factory method
+       for (var i in this.tasks)
+          if ( this.tasks[i].id == id ) return this.tasks[i];
+       var task = new TaskClass(id);
+       this.tasks.push(task);
+       return task;
+    }
+
+    // compile newly learned task model elements to ANSI/CEA-2018 and load into Disco
+    TaskModel.prototype.compile = function (about) {
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.compileTasks(about,
+          this.tasks.map(function(t) { return t.id; }));
+       this.recipes.map(function(r) {
+          Packages.edu.wpi.disco.ldt.UnifiedAgent.compileRecipe(r.id, r.goal.id,
+             r.steps.map(function(s) { return s.id; })) });
+       Packages.edu.wpi.disco.ldt.UnifiedAgent.load();
+    }
+
+    // used in gloss for LearnRecipe (see Pedagogical.properties)
+    TaskModel.prototype.hasRecipe = function (goal, except) { 
+       for (var i in this.recipes) {
+          var recipe = this.recipes[i];
+          if ( recipe.goal.id == goal.id &amp;&amp; recipe.id != except.id
+               &amp;&amp; recipe.isCompiled() )
+             return true;
+       }
+       return false;
+    }
+       
+    TaskModel.prototype.toString = function () {
+       return "["+this.tasks+";"+this.recipes+"]";
+    }
+       
+    function TaskClass (id) { this.id = id; }
+    
+    TaskClass.prototype.toString = function () { return this.id; }
+
+    TaskClass.prototype.equals = function (object) { // for slot comparison
+       return object instanceof TaskClass &amp;&amp; this.id == object.id;
+    }
+
+    TaskClass.prototype.isPrimitive = function (who) {
+      var task = $disco.getTaskClass(this.id);
+      if ( task != null ) return task.isPrimitive();
+      for (var i in models[who].recipes)
+         if ( models[who].recipes[i].goal.id == this.id ) return false;
+      return true;
+    }
+
+    function DecompositionClass (id, goal) {
+       this.id = id;
+       this.goal = goal;
+       this.steps = [];
+    }
+
+    DecompositionClass.prototype.equals = function (object) { // for slot comparison
+       return object instanceof DecompositionClass &amp;&amp; this.id == object.id;
+    }
+
+    DecompositionClass.prototype.isCompiled = function () {
+       return Packages.edu.wpi.disco.ldt.UnifiedAgent.isCompiled(this.id);
+    }
+
+    DecompositionClass.prototype.toString = function () {
+       return this.id+
+         (Packages.edu.wpi.cetask.TaskEngine.TRACE ? ("["+this.steps+"]") : "");
+    }
+
+  </script>
+</taskModel>

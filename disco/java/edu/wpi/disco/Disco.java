@@ -40,7 +40,7 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.12";
+   public static String VERSION = "1.14";
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
@@ -86,14 +86,9 @@ public class Disco extends TaskEngine {
    
    @Override
    protected TaskModel load (String from, InputStream input) {
-      try { 
-         return load(from, builder.parse(input, from), 
-                     loadProperties(from, ".properties"),
-                     loadProperties(from, ".translate.properties"));
-      } // error handler above has already printed info
-      catch (SAXParseException e) { return null; }
-      catch (SAXException e) { return null; }
-      catch (IOException e) { throw new RuntimeException(e); }
+      return load(from, parse(input, from), 
+            loadProperties(from, ".properties"),
+            loadProperties(from, ".translate.properties"));
    }
     
    /**
@@ -208,6 +203,24 @@ public class Disco extends TaskEngine {
    private Stack<Segment> stack;
    public Stack<Segment> getStack () { return stack; }
    
+   private Segment lastShift; // last shifted segment or null
+
+   private Segment getLastShift () {
+	   for (int i = stack.size(); i-- > 1;)
+		   if (stack.get(i).isShift())
+			   return stack.get(i);
+	   return null;
+   }
+	
+   /*
+    * Test whether interpretation of last occurrence resulted in an unnecessary
+    * focus shift (see docs/LeshRichSidner2001_UM.pdf)
+    */
+   public boolean isLastShift () {
+	   Segment shift = getLastShift();
+	   return shift != null && shift != lastShift;
+   }
+
    /**
     * Test whether discourse stack is empty
     */
@@ -306,16 +319,16 @@ public class Disco extends TaskEngine {
    }
 
    @Override
-   public void pop () {
-      if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
-      Segment segment = stack.pop();
-      if ( TRACE ) getOut().println("Pop: "+segment);
-      Plan plan = segment.getPlan();
-      if ( !(plan.isDone() || plan.isFailed()) ) {
-         // see reconcileStack for implicit acceptance
-         if ( plan.getGoal() instanceof Accept ) segment.remove();
-         else segment.stop();
-      }
+   public void pop() {
+	   if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
+	   Segment segment = stack.pop();
+	   Plan plan = segment.getPlan();
+	   if ( TRACE ) getOut().println("Pop: " + segment);
+	   if ( !(plan.isDone() || plan.isFailed()) ) {
+		   // see reconcileStack for implicit acceptance
+		   if ( plan.getGoal() instanceof Accept ) segment.remove();
+		   else segment.stop();
+	   }
    }
    
    /**
@@ -330,6 +343,14 @@ public class Disco extends TaskEngine {
          Segment segment = stack.pop();
          if ( TRACE ) getOut().println("Pop: "+segment);
       }
+   }
+   
+   /**
+    * Tests whether stack contains given plan
+    */
+   public boolean stackContains (final Plan plan) {
+      return stack.stream().map(Segment::getPlan).filter(segment -> segment == plan)
+            .findFirst().isPresent();
    }
    
    @Override
@@ -446,7 +467,7 @@ public class Disco extends TaskEngine {
             // try ignoring implicit Accept in focus (avoid spurious ambiguity)
             explanations = recognition.recognize(getFocus(true), null);
             if ( !explanations.isEmpty() ) return explanations;
-         }
+         }        
          top = getTop(focus);
          if ( top != focus ) {
             // next look in toplevel plan of current focus (if different)
@@ -456,6 +477,15 @@ public class Disco extends TaskEngine {
             tried.add(top);
          }
       } 
+      // special case for talking about done plans on stack for current top
+      if ( occurrence instanceof Utterance )
+         for (int i = stack.size(); i-- > 1;) {
+            Plan plan = stack.get(i).getPlan();
+            if ( plan != null && !plan.isLive() && occurrence.contributes(plan) ) {
+               return Collections.singletonList(new Explanation(plan, null, null));
+            }
+            if ( plan == top ) break;
+         }
       // next consider popping toplevel plan(s) on stack
       while (true) {
          if ( focus != null && top != null 
@@ -535,6 +565,7 @@ public class Disco extends TaskEngine {
   
    @Override
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
+      lastShift = getLastShift(); // cache before stack changed
       boolean explained = super.interpret(occurrence, contributes, continuation);
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 
@@ -571,17 +602,20 @@ public class Disco extends TaskEngine {
             top = getTop(focus);
          }
          if ( top == target ) { 
-            while (pop-- > 0) pop(); // do the popping for real
+            while (pop-- > 0) {
+            	pop(); // do the popping for real
+            	getSegment().setShift(false); // not a shift any more
+            }
          } else {
             // start new toplevel goal or interruption 
             push(target, continuation);
          }
       } else push(target, continuation);
-      reconcileStack(occurrence, getFocus(), contributes, continuation);
+      reconcileStack(occurrence, getFocus(), contributes, continuation, false);
     }
    
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
-         boolean continuation) {
+         boolean continuation, boolean shift) {
       if ( focus != contributes ) {
          Stack<Plan> path = focus.pathToDescendant(contributes);
          if ( path == null ) {
@@ -597,16 +631,26 @@ public class Disco extends TaskEngine {
                } // TODO extend for other types of proposals
             }
             pop();
+            // can stop being a shift
+            shift = !focus.isPoppable() && !(focus.getGoal() instanceof Accept); 
             // recursion must end since focus and contributes have same top
-            reconcileStack(occurrence, getFocus(), contributes, continuation);
+            reconcileStack(occurrence, getFocus(), contributes, continuation, shift);
          } else {
             // push to contributes
             // if contributes is continuation, then so are all parents
-            while ( !path.isEmpty() ) push(path.pop(), continuation);
+            while ( !path.isEmpty() ) {
+            	push(path.pop(), continuation);
+            	if ( shift ) {
+            		getSegment().setShift(true);
+            		shift = false;
+            	}
+            }
             // suppress singleton segments
             if ( contributes.getType() != occurrence.getType()
-                  || !contributes.getChildren().isEmpty() || !contributes.isDone() )
-               push(contributes, continuation);
+                  || !contributes.getChildren().isEmpty() || !contributes.isDone() ) {
+            	push(contributes, continuation);
+            	if ( shift ) getSegment().setShift(true);
+            }
          }
       }
    }
@@ -787,9 +831,11 @@ public class Disco extends TaskEngine {
             printedTops.add(getTop(plan));
             if ( segment.isContinuation() ) stream.print(" -continuation");
             if ( segment.isInterruption() ) stream.print(" -interruption");
+            if ( segment.isShift() ) stream.print(" -shift");
             if ( plan.isLive() && segment.isStopped() ) stream.print(" -stopped");
             // note ignoring temporary Accept's to avoid novice confusion
-            if ( segment.getPlan() == getFocus(true) && stack.contains(segment) )
+            if ( segment.getPlan() == getFocus(!TaskEngine.VERBOSE) 
+                  && stack.contains(segment) )
                stream.print(' '+Plan.FOCUS_NOTE);
             stream.println();
             // unless history recurse on open segments only 
@@ -1081,6 +1127,35 @@ public class Disco extends TaskEngine {
       }
    }
    
+   /**
+    * For use in format strings, e.g., {$disco.gerundize($this.arg,"a foo")}
+    */
+   public String gerundize (Object object, String undefined) {
+      if ( isUndefined(object) ) return undefined;
+      String string = object instanceof Task ? ((Task) object).formatTask() : toString(object);
+      if ( string.length() < 2 ) return string;
+      int space = string.indexOf(' ');
+      StringBuffer buffer = new StringBuffer(string);
+      int end          = space > 0 ? space : buffer.length();
+      char ultimate    = buffer.charAt(end-1);
+      char penultimate = buffer.charAt(end-2);
+      if (end > 2 && ultimate == 'e' && (penultimate == 'u' || !isVowel(penultimate)) ) {
+         buffer.setCharAt(end-1, 'i');
+         buffer.insert(end, "ng");
+      } else {
+         if (end > 2 && (!isVowel(ultimate) && (ultimate != 'y') && (ultimate != 'w'))
+               && isVowel(penultimate) && !isVowel(buffer.charAt(end-3))
+               && (!((ultimate=='n' || ultimate=='r') && penultimate=='e')))
+            buffer.insert(end++, ultimate);   // double last consonant
+         buffer.insert(end, "ing");
+      }
+      return buffer.toString();
+   }
+
+   private static boolean isVowel (char c) {
+      return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+   }
+
    /**
     * Return string identifying external slot of given task
     */

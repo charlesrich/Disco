@@ -14,21 +14,21 @@
          as if it was not spurious (used for second level <say>/<do>)
     --> 
   <say id="ID1" actor="sidekick" text="text 1">
-    <say id="ID2" actor="player" text="text 2">
+    <say id="ID2" actor="user" text="text 2">
       <say id="ID3" actor="sidekick" text="text 3">
-	<say id="ID4" actor="player" text="text 4">
+	<say id="ID4" actor="user" text="text 4">
 	  <say id="ID5" actor="sidekick" text="text 5">
-	    <say id="ID6s1" actor="player" text="text 6s1">
+	    <say id="ID6s1" actor="user" text="text 6s1">
 	      <say id="REF" actor="sidekick" text="text 7s1">
-		<say id="ID8s1" actor="player" text="text 8s1">
+		<say id="ID8s1" actor="user" text="text 8s1">
 		  <do id="ID9s1" task="_TASK_tree"/>
 		</say>
 	      </say>
 	    </say>
-	    <say id="ID6s2" actor="player" text="text 6s2">
+	    <say id="ID6s2" actor="user" text="text 6s2">
 	      <say id="ID7s2" ref="REF"/>
 	    </say>
-	    <say id="ID6s3" actor="player" text="text 6s3">
+	    <say id="ID6s3" actor="user" text="text 6s3">
 	      <do id="TASK" task="SomeRandomTask">
 		<say id="ID8s3" actor="sidekick" text="text 8s3"/>
 	      </do>
@@ -47,7 +47,7 @@
     
   <say actor="sidekick" text="1">
     <t:applicable>app1</t:applicable>
-    <say actor="player" text="2">
+    <say actor="user" text="2">
       <do task ="testTask2">
 	<say actor="sidekick" text="3"/>
       </do>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Choosing"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!-- example of providing multiple agent choices to be randomly
+       chosen for variability.  See test/Random1.test
+  -->
+  
+ 
+  <agent id="Top" text="Good morning">
+    <user text="Good morning">
+      <agent text="Let's talk about the weather">
+        <user text="Sure"/>
+      </agent>
+      <agent text="Let's talk about the news">
+        <user text="Fine"/>
+      </agent>
+    </user>
+  </agent>
+
+</model>

@@ -14,7 +14,7 @@
 # System.setProperty("java.awt.headless", "false").
 #
 start=`date +%s`
-dir="`dirname $0`/.."
+dir=$(cd `dirname $0` && cd ../ && pwd)
 main="$1"
 filename="$2"
 shift 2

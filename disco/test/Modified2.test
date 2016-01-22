@@ -98,5 +98,14 @@ ModifiedJava(,[1, 3])
   > eval java.lang.System.out.println(j.getSlotValue("input"))
 [1, 3]
     # Returned 'null'
+  > task ModifiedSufficient / new Mutable(0)
+    User says "One of us should execute ModifiedSufficient on [0]."
+    Agent says "Ok."
+  > history
+
+[Execute ModifiedSufficient on [0]] -accepted -succeeded <-focus
+   User says "One of us should execute ModifiedSufficient on [0]."
+   Agent says "Ok."
+
   > quit
     

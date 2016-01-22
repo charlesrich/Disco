@@ -74,6 +74,7 @@
             </xsd:simpleType>
           </xsd:attribute>
           <xsd:attribute name="applicable"/>
+          <xsd:anyAttribute processContents="skip"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
