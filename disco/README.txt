@@ -18,6 +18,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ________________________________________________________________
 
+See docs/README.txt directory in parent directory for related research 
+papers.
+
 README file for the toplevel directory of Disco.
 
    java         Java source files directory
@@ -30,11 +33,7 @@ README file for the toplevel directory of Disco.
 
    bin          Unix shell scripts directory [see README.txt]
                 (To use these scripts on Windows, install www.cygwin.com)
-
-   docs         Documentation [see also task/docs]
-     api                    Javadoc for Disco
-     *.pdf                  Relevant papers [see README.txt] 
-        
+         
    models       Task models directory [see README.txt]
 
    test         Test script directory [see README.txt]

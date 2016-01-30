@@ -39,9 +39,8 @@ not being about interface appearance, this is not a proposal for a
 real user interface, but rather a way to demonstrate and debug the
 capabilities of the underlying task engine.
 
-For more information, see the enclosed file file Rich2009.pdf, which contains an article
-titled "Building Task-Based User Interfaces with ANSI/CEA-2018", which appeared in IEEE
-Computer in August 2009 (Vol. 42, No. 8).
+See docs/README.txt directory in parent directory for related research 
+papers.
 
 The system release archive (zip) file contains the following folder structure:
 
@@ -55,11 +54,6 @@ The system release archive (zip) file contains the following folder structure:
 
    bin          Unix shell scripts directory [see README.txt]
 
-   docs         documentation
-     /api       				Javadoc documentation director
-     CEA-2018.pdf				Specification for standard
-     Rich2009.pdf	 			IEEE Computer paper on CETask
-	
    lib          library directory
                 [note contains pre-compiled system guide.jar] 
                 [note XML schema CEA-2018.xsd]
