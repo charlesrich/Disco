@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Recursive">
+   <task id="_top">
+      <subtasks id="__top_subtasks">
+         <step name="__top_step" task="disco:Say"/>
+         <step name="__top_ref" task="__top_tree"/>
+         <binding slot="$__top_step.text" value="&#34;Start&#34;"/>
+         <binding slot="$__top_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="__top_tree">
+      <subtasks id="_d4e3_subtasks">
+         <step name="_d4e3_step" task="disco:Say"/>
+         <step name="_d4e3_ref" task="_d4e3_tree"/>
+         <binding slot="$_d4e3_step.text" value="&#34;User1&#34;"/>
+         <binding slot="$_d4e3_step.external" value="true"/>
+      </subtasks>
+      <subtasks id="_d4e8_subtasks">
+         <step name="_d4e8_step" task="disco:Say"/>
+         <step name="_d4e8_ref" task="_d4e8_tree"/>
+         <binding slot="$_d4e8_step.text" value="&#34;User2&#34;"/>
+         <binding slot="$_d4e8_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e3_tree">
+      <subtasks id="_d4e4_subtasks">
+         <step name="_d4e4_step" task="disco:Say"/>
+         <step name="_d4e5_step" task="__top_tree"/>
+         <applicable>U1A1</applicable>
+         <binding slot="$_d4e4_step.text" value="&#34;User1-Agent1&#34;"/>
+         <binding slot="$_d4e4_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e6_subtasks">
+         <step name="_d4e6_step" task="disco:Say"/>
+         <step name="_d4e7_step" task="__top_tree"/>
+         <applicable>U1A2</applicable>
+         <binding slot="$_d4e6_step.text" value="&#34;User1-Agent2&#34;"/>
+         <binding slot="$_d4e6_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e8_tree">
+      <subtasks id="_d4e9_subtasks">
+         <step name="_d4e9_step" task="disco:Say"/>
+         <step name="_d4e10_step" task="__top_tree"/>
+         <applicable>U2A1</applicable>
+         <binding slot="$_d4e9_step.text" value="&#34;User2-Agent1&#34;"/>
+         <binding slot="$_d4e9_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e11_subtasks">
+         <step name="_d4e11_step" task="disco:Say"/>
+         <step name="_d4e12_step" task="__top_tree"/>
+         <applicable>U2A2</applicable>
+         <binding slot="$_d4e11_step.text" value="&#34;User2-Agent2&#34;"/>
+         <binding slot="$_d4e11_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <script init="true">
+
+    var U1A1 = true;
+    var U1A2 = false;
+    var U2A1 = true;
+    var U2A2 = false;
+    
+  </script>
+</taskModel>

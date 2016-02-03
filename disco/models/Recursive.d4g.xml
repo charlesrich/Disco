@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model about="urn:disco.wpi.edu:models:Recursive"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+    
+  <agent id="_top" text="Start">
+
+    <user text="User1">
+
+      <agent text="User1-Agent1" applicable="U1A1">
+        <user ref="_top"/>
+      </agent>
+
+      <agent text="User1-Agent2" applicable="U1A2">
+        <user ref="_top"/>
+      </agent>
+      
+    </user>
+
+    <user text="User2">
+
+      <agent text="User2-Agent1" applicable="U2A1">
+        <user ref="_top"/>
+      </agent>
+
+      <agent text="User2-Agent2" applicable="U2A2">
+        <user ref="_top"/>
+      </agent>
+
+    </user>
+
+  </agent>
+
+  <t:script init="true">
+
+    var U1A1 = true;
+    var U1A2 = false;
+    var U2A1 = true;
+    var U2A2 = false;
+    
+  </t:script>
+  
+</model>
