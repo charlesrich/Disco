@@ -352,6 +352,7 @@ public class Task extends Instance {
    }
    
    // not public because has caching side effect
+   // use getSuccess()
    Boolean isAchieved () {
       if ( achieved != null ) return achieved; // overrides condition
       if ( engine.containsAchieved(this) )  // check cached value

@@ -369,6 +369,7 @@ public class Plan {
    }
    
    // not public because has caching side effect
+   // use isSucceeded()
    Boolean isAchieved () {
       synchronized (goal.bindings) {
          goal.bindings.put("$plan", this);
