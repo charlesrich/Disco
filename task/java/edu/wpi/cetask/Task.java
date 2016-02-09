@@ -351,7 +351,8 @@ public class Task extends Instance {
       engine.clearLiveAchieved();
    }
    
-   public Boolean isAchieved () {
+   // not public because has caching side effect
+   Boolean isAchieved () {
       if ( achieved != null ) return achieved; // overrides condition
       if ( engine.containsAchieved(this) )  // check cached value
          return engine.isAchieved(this);
