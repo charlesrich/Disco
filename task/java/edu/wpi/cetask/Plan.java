@@ -975,6 +975,10 @@ public class Plan {
      
    private List<Decomposition> failed = Collections.emptyList();
    
+   public List<Decomposition> getFailed () { 
+      return Collections.unmodifiableList(failed); 
+   }
+   
    private boolean planned; // for procedural decomposition
    
    /**
