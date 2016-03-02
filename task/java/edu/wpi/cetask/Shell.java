@@ -325,8 +325,8 @@ public class Shell {
       out.println("    clear               - delete all current tasks");
       out.println("    eval <javascript>   - evaluate inline JavaScript");
       out.println("    source <filename>   - read command input from file");
-      out.println("    test <filename>     - like source but only prompt lines");
-      out.println("    step (<filename>)   - single-step command input from file");
+      out.println("    test <filename>     - like 'source', except for .test files");
+      out.println("    step [<filename>]   - like 'test', except single-stepping");
       out.println("    cd <path>           - change working directory");
       out.println("    quit                - quit program");
       out.println("    verbose [<boolean>] - turn verbose output on/off (default true)");
