@@ -876,14 +876,14 @@ public class TaskEngine {
    // factorization of occurred below is to support extension in Disco
    
    public Plan occurred (boolean external, Task occurrence, Plan contributes, 
-                         boolean eval) { 
+         boolean eval) { 
       occurrence.setExternal(external);
       // do explanation before evaluating scripts, since expectations are in
       // terms of state of world before execution
       if ( contributes == null ) contributes = explainBest(occurrence, true);
       // check for continuation before setWhen
       boolean continuation = contributes != null && contributes.isStarted();
-            if ( external ) { 
+      if ( external ) { 
          occurrence.occurred(); 
          // sic evalIf, since overridden in Utterance
          if ( eval ) occurrence.eval(contributes); 

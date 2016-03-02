@@ -252,7 +252,10 @@ public class Interaction extends Thread {
  
    /**
     * Thread-safe method to notify interaction that given <em>primitive</em>
-    * task has occurred. Typically used in dialogue loop.
+    * task has occurred. Typically used in dialogue loop.  For system
+    * actions, the grounding script is evaluated; for external actions, the
+    * grounding script is evaluated iff <code>getExternal().isEval()</code> returns
+    * true.
     * 
     * @param external true if performed by user, false if by system
     * @param occurrence task that has occurred
