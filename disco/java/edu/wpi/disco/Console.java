@@ -139,7 +139,7 @@ public class Console extends Shell {
       out.println("                        - like 'done', except runs script if any");
       out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'execute' for utterances, except defaults to menu of choices");
-      out.println("    instance [<id> [<namespace>]] [ / <input> ]* [ / <output> ]* [/ <external>]");
+      out.println("    instance [<id> [<namespace>]] [/ <input> ]* [/ <output> ]* [/ <external>]");
       out.println("                        - sets $new to specified new task instance");
       out.println("                          (slot values optional)");
       out.println("    next [<boolean>]    - end user console turn");
