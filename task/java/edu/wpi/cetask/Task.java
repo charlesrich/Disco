@@ -529,7 +529,8 @@ public class Task extends Instance {
    }
 
    /**
-    * Get the value of the predefined 'external' input slot.
+    * Get the value of the predefined 'external' input slot.  Always returns null
+    * for non-primitive task.
     *  
     * @return TRUE, FALSE or null
     */
