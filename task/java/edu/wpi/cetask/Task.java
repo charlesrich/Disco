@@ -340,7 +340,19 @@ public class Task extends Instance {
    
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
-      return condition == null ? null : condition.evalCondition(this);
+      if ( condition == null ) return null;
+      if ( isOccurred() && getType().hasModifiedInputs() ) {
+         // special case for checking applicability *after* execution
+         if ( clonedInputs == null ) // not checking each modified inputs
+            throw new IllegalStateException("Modified inputs have not been cloned: "+this);
+         synchronized (bindings) {
+            Object old = bindings.get("$this");
+            try {
+               bindings.put("$this", clonedInputs);
+               return condition.evalCondition(this);
+            } finally { bindings.put("$this", old); }
+         }
+      } else return condition.evalCondition(this);
    }
    
    private Boolean achieved;
