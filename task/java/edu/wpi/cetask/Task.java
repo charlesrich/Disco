@@ -8,6 +8,7 @@ package edu.wpi.cetask;
 import java.text.DateFormat;
 import java.util.*;
 import javax.script.*;
+import edu.wpi.cetask.Description.Condition;
 import edu.wpi.cetask.Description.Input;
 import edu.wpi.cetask.Description.Output;
 import edu.wpi.cetask.Description.Slot;
@@ -341,18 +342,9 @@ public class Task extends Instance {
    public Boolean isApplicable () {
       Precondition condition = getType().getPrecondition();
       if ( condition == null ) return null;
-      if ( isOccurred() && getType().hasModifiedInputs() ) {
+      return isOccurred() && getType().hasModifiedInputs() ?
          // special case for checking applicability *after* execution
-         if ( clonedInputs == null ) // not checking each modified inputs
-            throw new IllegalStateException("Modified inputs have not been cloned: "+this);
-         synchronized (bindings) {
-            Object old = bindings.get("$this");
-            try {
-               bindings.put("$this", clonedInputs);
-               return condition.evalCondition(this);
-            } finally { bindings.put("$this", old); }
-         }
-      } else return condition.evalCondition(this);
+         evalClonedInputs(condition) : condition.evalCondition(this);
    }
    
    private Boolean achieved;
@@ -373,17 +365,8 @@ public class Task extends Instance {
       if ( condition == null ) return null;
       Boolean achieved;
       if ( getType().hasModifiedInputs() ) {
-         if ( isOccurred() ) {
-            if ( clonedInputs == null ) // not checking each modified inputs
-               throw new IllegalStateException("Modified inputs have not been cloned: "+this);
-            synchronized (bindings) {
-               Object old = bindings.get("$this");
-               try {
-                  bindings.put("$this", clonedInputs);
-                  achieved = condition.evalCondition(this);
-               } finally { bindings.put("$this", old); }
-            }
-         } else try { // not occurred
+         if ( isOccurred() ) achieved = evalClonedInputs(condition);
+         else try { // not occurred
             // temporarily set modified outputs for sufficient postconditions
             setModifiedOutputs();
             achieved = condition.evalCondition(this);
@@ -396,7 +379,19 @@ public class Task extends Instance {
       } else achieved = condition.evalCondition(this);
       return engine.setAchieved(this, achieved);// store cache
    }	
- 
+   
+   private Boolean evalClonedInputs (Condition condition) {
+      if ( clonedInputs == null ) // not checking each modified inputs
+         throw new IllegalStateException("Modified inputs have not been cloned: "+this);
+      synchronized (bindings) {
+         Object old = bindings.get("$this");
+         try {
+            bindings.put("$this", clonedInputs);
+            return condition.evalCondition(this);
+         } finally { bindings.put("$this", old); }
+      }
+   }
+   
    @Override
    protected Object eval (String expression, Compiled compiled, Bindings extra, String where) {
       updateBindingsTask(false);
