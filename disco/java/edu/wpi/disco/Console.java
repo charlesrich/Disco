@@ -353,7 +353,8 @@ public class Console extends Shell {
          return null;
       }
       if ( !(task instanceof Utterance) ) { // see Interaction.done
-         task.setExternal(true); // must be set before eval
+         if ( task.getExternal() == null )
+            task.setExternal(true); // must be set before eval
          task.eval(new Plan(task));
       }
       done(task);
