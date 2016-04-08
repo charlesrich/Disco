@@ -1102,7 +1102,9 @@ public class Disco extends TaskEngine {
    private String translateKey (String key, Utterance utterance) {
       // note evaluation happens before alternatives, so don't
       // have to quote |'s in Javascript
-      return evalFormat(utterance, (String) translate.get(key), key);
+      String value = (String) translate.get(key);
+      if ( value != null && value.isEmpty() ) value = null;
+      return evalFormat(utterance, value, key);
    }
    
    String getTranslateKey (String utterance) { 
