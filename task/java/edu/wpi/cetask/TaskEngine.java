@@ -191,14 +191,14 @@ public class TaskEngine {
     */
    public Object eval (String script, String where) {
       try { return scriptEngine.eval(script); }
-      catch (ScriptException e) {
+      catch (Exception e) {
          if ( DEBUG ) getErr().println(script);
          throw newRuntimeException(e, where); } 
    }
 
    public Object eval (String script, Bindings bindings, String where) {
       try { return scriptEngine.eval(script, bindings); }
-      catch (ScriptException e) {
+      catch (Exception e) {
          if ( DEBUG ) getErr().println(script);
          throw newRuntimeException(e, where); } 
    }
@@ -214,27 +214,23 @@ public class TaskEngine {
    Boolean evalBoolean (String script, String where) {
       if ( script == null || script.length() == 0 ) return null;
       try { return (Boolean) scriptEngine.eval(script); }
-      catch (ScriptException e) { throw newRuntimeException(e, where); } 
-      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
+      catch (Exception e) { throw newRuntimeException(e, where); } 
    }
    
    Boolean evalBoolean (String script, Bindings bindings, String where) {
       if ( script == null || script.length() == 0 ) return null;
       try { return scriptEngine.evalBoolean(script, bindings); }
-      catch (ScriptException e) { throw newRuntimeException(e, where); } 
-      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
+      catch (Exception e) { throw newRuntimeException(e, where); } 
    }
   
    Double evalDouble (String script, Bindings bindings, String where) {
       try { return scriptEngine.evalDouble(script, bindings); } 
-      catch (ScriptException e) { throw newRuntimeException(e, where); } 
-      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
+      catch (Exception e) { throw newRuntimeException(e, where); } 
    }
    
    Long evalLong (String script, Bindings bindings, String where) {
       try { return scriptEngine.evalLong(script, bindings); } 
-      catch (ScriptException e) { throw newRuntimeException(e, where); } 
-      catch (ClassCastException e) { throw newRuntimeException(e, where); } 
+      catch (Exception e) { throw newRuntimeException(e, where); } 
    }
    
    /**

@@ -8,7 +8,6 @@ package edu.wpi.cetask;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.regex.*;
-import javax.script.ScriptException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -295,7 +294,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
          if ( compiled != null)  
             // assuming that $platform and $deviceType already in task.bindings
             try { compiled.eval(occurrence.bindings); }
-            catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+            catch (Exception e) { throw TaskEngine.newRuntimeException(e, where); }
          else engine.eval(script, occurrence.bindings, where); 
       }
       

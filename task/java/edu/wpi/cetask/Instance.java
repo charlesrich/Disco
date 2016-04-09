@@ -52,7 +52,7 @@ abstract class Instance {
    final Object evalFinal (String expression, Compiled compiled, Bindings extra, String where) {
       try { return compiled == null ? engine.eval(expression, extra, where) 
                                     : compiled.eval(extra);
-      } catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+      } catch (Exception e) { throw TaskEngine.newRuntimeException(e, where); }
    }
    
    public Object eval (String expression, Object value, String where) {
@@ -81,7 +81,7 @@ abstract class Instance {
                                     String where) {
       try { return compiled == null ? engine.evalBoolean(expression, extra, where)
                                     : compiled.evalBoolean(extra);
-      } catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+      } catch (Exception e) { throw TaskEngine.newRuntimeException(e, where); }
    }
    
    @Override
