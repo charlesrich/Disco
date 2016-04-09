@@ -133,8 +133,7 @@ public class Console extends Shell {
       out.println("    done [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - this task has been performed (default by user)");
       out.println("                          (for primitive tasks only)");
-      out.println("                          (task defaults to current focus)");
-      out.println("                          (all slot values required)");
+      out.println("                          (task and slot values default to current focus)");
       out.println("    execute [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'done', except runs script if any");
       out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
