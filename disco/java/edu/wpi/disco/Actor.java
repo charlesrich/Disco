@@ -5,10 +5,10 @@
  */
 package edu.wpi.disco;
 
+import java.util.List;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.Utterance;
-import java.util.List;
 
 /**
  * Base class for entities that execute actions and utterances.  An actor
@@ -27,14 +27,9 @@ public abstract class Actor {
    protected final Agenda agenda;
    public Agenda getAgenda () { return agenda; }
    
-   // to allow creation of Agenda in constructor below 
-   protected class Agenda extends edu.wpi.disco.Agenda { 
-      Agenda () { super(Actor.this); }
-   }
-   
    public Actor (String name) {
       this.name = name;
-      this.agenda = new Agenda(); 
+      this.agenda = new Agenda(this); 
    }
    
    /**
@@ -55,20 +50,6 @@ public abstract class Actor {
     * related to given interaction.
     */
    public void clear (Interaction interaction) {}
-   
-   /**
-    * Thread-safe method to generate highest priority task for this actor.
-    */
-   public Plugin.Item generateBest (Interaction interaction) { 
-      return agenda.generateBest(interaction);
-   }
-   
-   /**
-    * Thread-safe method to generate tasks for this actor.
-    */
-   public List<Plugin.Item> generate (Interaction interaction) {
-      return agenda.generate(interaction);
-   }
    
    /**
     * Thread-safe method to take a turn in given interaction. <em>Note:</em>
@@ -93,6 +74,27 @@ public abstract class Actor {
    
    private boolean authorized = true;
    
+   /**
+    * Thread-safe method to generate list of tasks for this actor, 
+    * sorted according to plugin priorities.
+    * 
+    * @see #generateBest(Interaction)
+    * @see Agent#generate(Interaction,boolean)
+    */
+   public List<Plugin.Item> generate (Interaction interaction) {
+     return agenda.generate(interaction);
+   }
+
+   /**
+    * Thread-safe method to return highest priority task for this actor.
+    * 
+    * @see #generate(Interaction)
+    * @see Agent#generateBest(Interaction,boolean)
+    */
+   public Plugin.Item generateBest (Interaction interaction) {
+      return agenda.generateBest(interaction);
+   }
+
    /**
     * Test whether this actor is pre-authorized to perform <em>all</em>
     * primitive tasks (unless specifically rejected) without asking for permission. 

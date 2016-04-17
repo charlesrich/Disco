@@ -42,12 +42,31 @@ public class Agent extends Actor {
     */
    public void setMax (int max) { this.max = max; }
    
-   @Override
-   public Plugin.Item generateBest (Interaction interaction) {
-     return generateBest(interaction, false);
+   /**
+    * Thread-safe method to generate list of tasks for agent, 
+    * sorted according to plugin priorities.
+    * 
+    * @param guess guess among applicable decompositions
+    * 
+    * @see #generateBest(Interaction,boolean)
+    */
+   public List<Plugin.Item> generate (Interaction interaction, boolean guess) {
+     return generate(interaction, guess, false);
    }
 
-   private Plugin.Item generateBest (Interaction interaction, Boolean guess) {
+   /**
+    * Thread-safe method to return highest priority task for agent.
+    * 
+    * @param guess guess among applicable decompositions
+    * 
+    * @see #generate(Interaction,boolean)
+    */
+   public Plugin.Item generateBest (Interaction interaction, boolean guess) {
+      List<Plugin.Item> items = generate(interaction, guess, true);
+      return items == null ? null : items.get(0);
+   }
+
+   private List<Plugin.Item> generate (Interaction interaction, Boolean guess, boolean onlyBest) {
       Disco disco = interaction.getDisco();
       Plan focus = disco.getFocusExhausted(true);
       // decompose *all* live plan in current focus with either chosen decomposition,
@@ -84,10 +103,10 @@ public class Agent extends Actor {
                plan.apply(choice);
                plan.decomposeAll();
                // new live plans may have been created above
-               return generateBest(interaction, guess);
+               return generate(interaction, guess, onlyBest);
             } else if ( guess == null || guess ) {
-               Plugin.Item item = generateBest(interaction); // no guessing
-               if ( item != null ) return item;
+               List<Plugin.Item> items = generate(interaction, false, onlyBest); // no guessing
+               if ( items != null  && !items.isEmpty() ) return items;
                for (DecompositionClass decomp : decomps)
                   if ( !decomp.isInternal() // don't guess dialog tree choices
                         && decomp.getProperty("@authorized", true) // only if authorized
@@ -95,15 +114,19 @@ public class Agent extends Actor {
                      plan.apply(decomp); // one guess
                      plan.decomposeAll();
                      // new live plans may have been create above
-                     item = generateBest(interaction); // no guessing
-                     return item != null ? item : 
+                     items = generate(interaction, false, onlyBest); // no guessing
+                     return items != null && !items.isEmpty() ? items : 
                         // recursion ends when no more live non-decomposed plans
-                        generateBest(interaction, guess); // continue guessing
+                        generate(interaction, guess, onlyBest); // continue guessing
                   } // possible loop exit without return
             }
          }
       }
-      return chooseBest(interaction);
+      if ( onlyBest ) {
+         Plugin.Item item = chooseBest(interaction);
+         return item == null ? null : Collections.singletonList(item);
+      } // else 
+      return generate(interaction);
    }
    
    /**
@@ -133,13 +156,13 @@ public class Agent extends Actor {
     */
    protected Plugin.Item chooseBest (Interaction interaction) {
       if ( Disco.TRACE || RANDOM != null ) {
-         List<Plugin.Item> items = generate(interaction);
+         List<Plugin.Item> items = generate(interaction); // Actor method
          if ( items.isEmpty() ) return null;
          if ( Disco.TRACE ) Utils.print(items, interaction.getDisco().getOut());
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 
-      return super.generateBest(interaction);
+      return generateBest(interaction); // Actor method
    }
    
    /**
@@ -153,7 +176,7 @@ public class Agent extends Actor {
     * initiative or discourse structure.
     * 
     * @param ok force turn to end with 'Ok' if necessary
-    * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
+    * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
     * @param retry try other decompositions if failure (see {@link #retry(Disco)})
     * @return true if some response was made
     */
@@ -179,19 +202,20 @@ public class Agent extends Actor {
    /**
     * Return best response or null if there is no response.
     * 
-    * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
+    * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
     * @param retry try other decompositions if failure (see {@link #retry(Disco)})
     */
    public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
       if ( retry) retry(disco); // see also in done
       disco.decomposeAll();
-      Plugin.Item item = generateBest(interaction);
-      if ( guess ) {
+      Plugin.Item item = generateBest(interaction, false);
+      if ( item == null && guess ) {
          // guess first true applicable decomposition
-         if ( item == null ) item = generateBest(interaction, true);
+         List<Plugin.Item> items = generate(interaction, true, true);
          // guess first unknown applicable decomposition
-         if ( item == null ) item = generateBest(interaction, null);
+         if ( items == null ) items = generate(interaction, null, true);
+         return items == null ? null : items.get(0);
       }
       return item;
    }

@@ -34,7 +34,7 @@ public class User extends Actor {
    }
    
    /**
-    * Generate list of items for user utterance menu (TTSay).
+    * Thread-safe method to generate list of items for user utterance menu (TTSay).
     * 
     * Note interaction@ok property (default true) controls whether instance of Ok added
     * when menu is either empty or consists exclusively of Propose.ShouldNot
@@ -46,12 +46,12 @@ public class User extends Actor {
     */
    @Override
    public List<Plugin.Item> generate (Interaction interaction) {
-      List<Plugin.Item> items = super.generate(interaction);
+      List<Plugin.Item> items = agenda.generate(interaction);
       for (Plugin.Item item : items)
          if ( !(item.task instanceof Propose.ShouldNot) ) return items;
       Disco disco = interaction.getDisco();
       if ( disco.getProperty("interaction@ok", interaction.isOk()) ||
-            interaction.getSystem().generateBest(interaction) != null )
+            interaction.getSystem().agenda.generateBest(interaction) != null )
          items.add(0, Agenda.newItem(new Ok(disco, true), null));
       return items;
    }
