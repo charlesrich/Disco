@@ -44,6 +44,29 @@ public class Agent extends Actor {
    
    /**
     * Thread-safe method to generate list of tasks for agent, 
+    * sorted according to plugin priorities (with guessing)
+    * 
+    * @see #generate(Interaction,boolean)
+    * @see #generateBest(Interaction)
+    */
+   @Override
+   public List<Plugin.Item> generate (Interaction interaction) {
+     return generate(interaction, true);
+   }
+   
+   /**
+    * Thread-safe method to return highest priority task for agent (with guessing)
+    * 
+    * @see #generateBest(Interaction,boolean)
+    * @see #generate(Interaction)
+    */
+   @Override
+   public Plugin.Item generateBest (Interaction interaction) {
+      return generateBest(interaction, true);
+   }
+   
+   /**
+    * Thread-safe method to generate list of tasks for agent, 
     * sorted according to plugin priorities.
     * 
     * @param guess guess among applicable decompositions
@@ -51,7 +74,14 @@ public class Agent extends Actor {
     * @see #generateBest(Interaction,boolean)
     */
    public List<Plugin.Item> generate (Interaction interaction, boolean guess) {
-     return generate(interaction, guess, false);
+      List<Plugin.Item> items = generate(interaction, false, false); // no guessing
+      if ( guess ) {
+         // guess first true applicable decomposition
+         if ( items == null || items.isEmpty() ) items = generate(interaction, true, false);
+         // guess first unknown applicable decomposition
+         if ( items == null || items.isEmpty() ) items = generate(interaction, null, false);
+      }            
+      return items;
    }
 
    /**
@@ -62,7 +92,13 @@ public class Agent extends Actor {
     * @see #generate(Interaction,boolean)
     */
    public Plugin.Item generateBest (Interaction interaction, boolean guess) {
-      List<Plugin.Item> items = generate(interaction, guess, true);
+      List<Plugin.Item> items = generate(interaction, false, true); // no guessing
+      if ( guess ) {
+         // guess first true applicable decomposition
+         if ( items == null ) items = generate(interaction, true, true);
+         // guess first unknown applicable decomposition
+         if ( items == null ) items = generate(interaction, null, true);
+      }
       return items == null ? null : items.get(0);
    }
 
@@ -126,7 +162,7 @@ public class Agent extends Actor {
          Plugin.Item item = chooseBest(interaction);
          return item == null ? null : Collections.singletonList(item);
       } // else 
-      return generate(interaction);
+      return super.generate(interaction); // Actor method
    }
    
    /**
@@ -150,19 +186,19 @@ public class Agent extends Actor {
    
    /**
     * Override this method to choose best on basis other than priorities or randomly.
-    * Call {@link #generate(Interaction)} to generate candidates.
+    * Call {@link #generate(Interaction,boolean)} to generate candidates.
     * 
     * @see Agent#RANDOM
     */
    protected Plugin.Item chooseBest (Interaction interaction) {
       if ( Disco.TRACE || RANDOM != null ) {
-         List<Plugin.Item> items = generate(interaction); // Actor method
+         List<Plugin.Item> items = super.generate(interaction); // Actor method
          if ( items.isEmpty() ) return null;
          if ( Disco.TRACE ) Utils.print(items, interaction.getDisco().getOut());
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 
-      return generateBest(interaction); // Actor method
+      return super.generateBest(interaction); // Actor method
    }
    
    /**
@@ -209,15 +245,7 @@ public class Agent extends Actor {
       Disco disco = interaction.getDisco();
       if ( retry) retry(disco); // see also in done
       disco.decomposeAll();
-      Plugin.Item item = generateBest(interaction, false);
-      if ( item == null && guess ) {
-         // guess first true applicable decomposition
-         List<Plugin.Item> items = generate(interaction, true, true);
-         // guess first unknown applicable decomposition
-         if ( items == null ) items = generate(interaction, null, true);
-         return items == null ? null : items.get(0);
-      }
-      return item;
+      return generateBest(interaction, guess);
    }
    
    private static Plugin.Item newOk (Disco disco) {
