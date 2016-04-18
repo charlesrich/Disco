@@ -817,7 +817,8 @@ public class Disco extends TaskEngine {
                if ( Utils.isTrue(success) ) stream.print(" -succeeded");
                else if ( Utils.isFalse(success) ) stream.print(" -failed");
             }
-            if ( TaskEngine.VERBOSE && task.isUnexplained() && !parent.isRoot() )
+            if ( (TaskEngine.VERBOSE || TaskEngine.DEBUG)
+                  && task.isUnexplained() && !parent.isRoot() )
                stream.print(" -unexplained");
             stream.println();
          } else {

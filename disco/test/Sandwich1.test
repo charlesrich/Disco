@@ -131,7 +131,7 @@
       [BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]])] -succeeded <-focus
          Propose.Should(agent,BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]))
          BagSandwich(user,cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]],bag3[null],bag3[cut sandwich[bread8[;],bread7[;boiled sliced egg2,salt,pickles]]]) -succeeded
-         Ok(agent)
+         Ok(agent) -unexplained
 
   > quit
     

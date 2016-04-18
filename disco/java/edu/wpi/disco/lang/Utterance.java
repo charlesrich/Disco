@@ -33,8 +33,16 @@ public abstract class Utterance extends Decomposition.Step {
       // do not call super
       boolean explained = interpret(this, contributes, continuation);
       getDisco().getSegment().add(this);
+      interpret(contributes);
       return explained;
    }
+   
+   /**
+    * Extension point to add listener semantics (update to mental state)
+    * of application-specific utterance. Note that plan recognition is called
+    * <em>before</em> this method.
+    */
+   protected void interpret (Plan contributes) {}
 
    // see Propose.Interpret
    // NB: this method does not add occurrence to segment!

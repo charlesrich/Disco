@@ -161,7 +161,7 @@ Unexplained occurrence: execute Prim4
 [Root1] -live
    [Abs1 by abs1a] -live <-focus
       Prim3(user)
-      Prim4(user)
+      Prim4(user) -unexplained
       [Abs2] -live
          [Prim1(user)] -live
          [Prim2(user)] -live

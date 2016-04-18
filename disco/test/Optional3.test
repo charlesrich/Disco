@@ -87,10 +87,10 @@
    [Propose.What(user,Optional3(agent,"foo",null,null),"input2")] -succeeded
       Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(user,Optional3(agent,"foo",null,null),"input2"))
-      Ok(agent)
+      Ok(agent) -unexplained
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
    Optional3(agent,"foo",null,null)
-   Ok(agent)
+   Ok(agent) -unexplained
 [Optional3(agent,"foo",null,null)] -accepted -done
    Propose.Should(user,Optional3(agent,"foo",null,null))
    [Propose.Who(user,Optional3(agent,"foo",null,null),false)] -done
@@ -103,7 +103,7 @@
       Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
    Optional3(agent,"foo",null,null)
-   Ok(agent)
+   Ok(agent) -unexplained
 [Optional3(agent,"foo",null,null)] -accepted -done <-focus
    Propose.Should(user,Optional3(agent,"foo",null,null))
    [Propose.Who(user,Optional3(agent,"foo",null,null),false)] -done
@@ -116,7 +116,7 @@
       Ask.What(agent,Optional3(agent,"foo",null,null),"input2")
       Reject(user,Propose.What(,Optional3(agent,"foo",null,null)))
    Optional3(agent,"foo",null,null)
-   Ok(agent)
+   Ok(agent) -unexplained
 
   > quit
     
