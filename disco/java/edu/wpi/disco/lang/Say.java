@@ -157,7 +157,7 @@ public class Say extends Utterance {
          public String getEval () { return (String) getSlotValue("eval"); }
 
          @Override
-         protected void interpret (Plan contributes) {
+         protected void interpret () {
             if ( isOccurred() ) eval(getEval(), "Say.Expression.Eval");
          }
       } 

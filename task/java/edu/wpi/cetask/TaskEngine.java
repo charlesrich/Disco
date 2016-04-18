@@ -531,18 +531,6 @@ public class TaskEngine {
             model.scripts.add(script);
          }
       }
-      // after script evaluation (since conditions evaluated below)
-      if ( isRecognition() ) 
-         for (TaskClass taskClass : model.getTaskClasses())
-            for (DecompositionClass decompClass : taskClass.getDecompositions()) {
-               Decomposition decomp = new Plan(taskClass.newInstance()).apply(decompClass);
-               taskClass.setLastDecomposition(null); 
-               decompClass.liveStepNames = new ArrayList<String>(decompClass.getStepNames().size());         
-               for (String step : decompClass.getStepNames())
-                  // TODO not quite right to precompute liveness now; really
-                  // should recompute each time starting recognition
-                  if ( decomp.getStep(step).isLive() ) decompClass.liveStepNames.add(step);
-            }
       // very last
       if ( callback != null ) callback.onLoad(from, model);
       return model;

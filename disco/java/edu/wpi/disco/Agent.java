@@ -118,7 +118,8 @@ public class Agent extends Actor {
             if ( top.isLive() ) live.add(top);
       }
       for (Plan plan : live) {
-         if ( !plan.isPrimitive() && !plan.isDecomposed() ) {
+         if ( plan.isPrimitive() ) continue;
+         if ( !plan.isDecomposed() ) {
             Task goal = plan.getGoal();
             List<DecompositionClass> decomps = plan.getDecompositions();
             if ( decomps.isEmpty() ) continue; // possible loop exit without return
@@ -149,7 +150,7 @@ public class Agent extends Actor {
                         && Utils.equals(decomp.isApplicable(goal), guess) ) {
                      plan.apply(decomp); // one guess
                      plan.decomposeAll();
-                     // new live plans may have been create above
+                     // new live plans may have been created above
                      items = generate(interaction, false, onlyBest); // no guessing
                      return items != null && !items.isEmpty() ? items : 
                         // recursion ends when no more live non-decomposed plans

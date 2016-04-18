@@ -75,6 +75,13 @@ public class DecompositionClass extends TaskModel.Member {
    private final List<String> stepNames; // in order of definition
    public List<String> getStepNames () { return stepNames; }    
    
+   private final List<String> leadingStepNames;
+   
+   /**
+    * @return list of step names which have no predecessors (for plan recognition extension)
+    */
+   public List<String> getLeadingStepNames () { return leadingStepNames; }
+   
    private abstract static class Slot extends TaskClass.SlotBase {
        
       protected final TaskClass.Slot slot;
@@ -478,8 +485,15 @@ public class DecompositionClass extends TaskModel.Member {
       this.goal.getDecompositionScript(); // for error check
       // check for cycles
       for (String name : stepNames) isRequired(name, null, 0);
-      if ( getEngine().isRecognition() ) 
+      if ( getEngine().isRecognition() ) {
          for (String name : stepNames) getStepType(name).contributes(this.goal);
+         leadingStepNames = ordered ?  Collections.singletonList(steps.get(0).name) 
+            : new ArrayList<String>(steps.size());
+         if ( !ordered ) 
+            for (Step step : steps)  
+               if ( step.getRequired() == null || step.getRequired().isEmpty() ) 
+                  leadingStepNames.add(step.name);
+      } else leadingStepNames = null;
       if ( node != null ) { // temporary check
          // analyze and store binding dependencies
          // TODO: Check type compatibility between slots
@@ -530,14 +544,6 @@ public class DecompositionClass extends TaskModel.Member {
    public boolean isRejected (Task task) { 
       return task.getRejected().contains(this);
    }
-   
-   List<String> liveStepNames;
-   
-   /**
-    * @return list of step names which are live when decomposition
-    *         first instantiated (for plan recognition extension).
-    */
-   public List<String> getLiveStepNames () { return liveStepNames; }
       
    void updateBindings (Decomposition decomp, String onlyStep, String retractedStep, String retractedSlot) {
       for (Binding binding : bindings.values()) 

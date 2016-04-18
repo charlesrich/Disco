@@ -33,7 +33,7 @@ public abstract class Utterance extends Decomposition.Step {
       // do not call super
       boolean explained = interpret(this, contributes, continuation);
       getDisco().getSegment().add(this);
-      interpret(contributes);
+      interpret();
       return explained;
    }
    
@@ -42,7 +42,7 @@ public abstract class Utterance extends Decomposition.Step {
     * of application-specific utterance. Note that plan recognition is called
     * <em>before</em> this method.
     */
-   protected void interpret (Plan contributes) {}
+   protected void interpret () {}
 
    // see Propose.Interpret
    // NB: this method does not add occurrence to segment!
