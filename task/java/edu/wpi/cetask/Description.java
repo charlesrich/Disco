@@ -327,7 +327,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
       protected abstract boolean check (String slot);
 
       private final static Pattern pattern = // to match $this.slot
-         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.|\\)|\\s|\\Z)");      
+         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.|\\)|\\,|\\s|\\Z)");      
 
       @Override
       void setEnclosing (Description enclosing) {
@@ -337,7 +337,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
             Matcher matcher = pattern.matcher(script);
             while ( matcher.find() ) {
                String slot = matcher.group().substring(6).trim();
-               if ( slot.endsWith(".") || slot.endsWith(")") )
+               if ( slot.endsWith(".") || slot.endsWith(")") || slot.endsWith(",") )
                   slot = slot.substring(0, slot.length()-1);
                if ( check(slot) ) slots.add(slot);
             }
