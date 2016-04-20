@@ -9,7 +9,7 @@ import edu.wpi.cetask.*;
 import edu.wpi.disco.Disco;
 
 /**
- * Base class for Propose.Nested and Reject, both of which take nested Task 
+ * Base class for Propose.Nested, and Respond, both of which take nested Task 
  */
 public abstract class Nested extends Utterance {
    
@@ -64,7 +64,8 @@ public abstract class Nested extends Utterance {
       // default formatting
       StringBuilder buffer = new StringBuilder();
       appendKeySp(buffer, getKey());
-      buffer.append(formatTask ? getNested().formatTask() : getNested().format());
+      if ( getNested() == null ) appendKey(buffer, "something@word");
+      else buffer.append(formatTask ? getNested().formatTask() : getNested().format());
       return buffer.toString();
    }
    

@@ -1,0 +1,106 @@
+    # Apr 19, 2016 8:00:06 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > next false
+  > load models/Test.xml
+  > task ShiftA
+    User says "Let's achieve ShiftA."
+  > debug
+    # Notice the plan for ShiftA
+  > history
+
+[ShiftA] -accepted -live <-focus
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live
+      [ShiftC] -live
+         [ShiftE] -live
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+
+    # Execute some primitive to shift focus inside (to ShiftC)
+  > execute ShiftE
+    ShiftE(user)
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live
+      [ShiftC] -live <-focus
+         ShiftE(user)
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+
+    # Convenient command to set $new to new instance of ShiftI
+  > instance ShiftI
+    # So that you can easily provide it as input to Mention
+  > execute edu.wpi.disco.lang.Mention / $new
+    Mention(user,ShiftI)
+    # Notice focus has shifted to ShiftI (where Mention contributes)
+    # Note -stopped flag means it was started and focus shifted away
+    #  before it was finished; you can come back and continue
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live -stopped
+      [ShiftC] -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift <-focus
+      Mention(user,ShiftI)
+
+    # You can shift focus back to B (or anywhere else)
+    # Notice -continuation flag
+  > task ShiftB
+    Propose.Should(user,ShiftB)
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -accepted -live -stopped
+      [ShiftC] -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift -stopped
+      Mention(user,ShiftI)
+   [ShiftB] -accepted -live -continuation -shift <-focus
+      Propose.Should(user,ShiftB)
+      [ShiftC] -live
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+
+    # Now here's an instance of a task outside of this tree (could
+    # be primitive or non-primitive)
+  > instance Unauth
+    # And we mention it
+  > execute edu.wpi.disco.lang.Mention / $new
+    # Warning line only generated in debug mode
+Unexplained occurrence: mention execute Unauth
+    Mention(user,Unauth)
+    # you can check -unexplained flag below by
+    #     Disco.getLastOccurrence().isUnexplained()
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -accepted -live -stopped
+      [ShiftC] -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift -stopped
+      Mention(user,ShiftI)
+   [ShiftB] -accepted -live -continuation -shift <-focus
+      Propose.Should(user,ShiftB)
+      Mention(user,Unauth) -unexplained
+      [ShiftC] -live
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+
+  > quit
+    

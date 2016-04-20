@@ -604,13 +604,13 @@ public class TaskClass extends TaskModel.Member {
    /**
     * Test whether this class can serve as root of plan recognition. Typically 
     * this is because it does not contribute to any other task classes.  However,
-    * this can be overridden by the @top property.
+    * this can be overridden by the @top property.  Note primitives can never be top.
     * 
     * @see TaskEngine#getTopClasses()
     * @see #setTop(boolean)
     */
    public boolean isTop () {
-      return engine.topClasses.contains(this);
+      return !isPrimitive() && engine.topClasses.contains(this);
    }
    
    /**

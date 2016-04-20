@@ -127,7 +127,11 @@
   <task id="edu.wpi.disco.lang.Ask$How">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
   </task>
-
+  
+  <task id="edu.wpi.disco.lang.Mention">
+    <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+  </task>
+  
   <task id="edu.wpi.disco.lang.Accept">
     <input name="proposal" type="Packages.edu.wpi.disco.lang.Propose" />
   </task>
