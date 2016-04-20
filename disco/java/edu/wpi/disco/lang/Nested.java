@@ -58,6 +58,7 @@ public abstract class Nested extends Utterance {
       else if ( contributes != null ) 
          reconcileStack(contributes, continuation);
       getDisco().getSegment().add(this);
+      interpret();
       return contributes != null;
    }
    
