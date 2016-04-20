@@ -105,5 +105,18 @@ Unexplained occurrence: mention execute Unauth
          [ShiftG] -live
          [ShiftH] -live
 
+    # Here's the toplevel plan.  Notice that primitive events are *not*
+    # in chronological order, as compared to segment history above
+  > eval $disco.getTop($disco.getFocus()).print()
+[ShiftA] -accepted -live
+   [ShiftB] -live
+      [ShiftC] -accepted -live
+         [ShiftE(user)] -done
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+    # Returned 'null'
   > quit
     
