@@ -200,12 +200,13 @@ public class Disco extends TaskEngine {
       return getModel(ns).getTaskClass(id);
    }
    
-   private Stack<Segment> stack;
+   private Stack<Segment> stack; 
+   
    public Stack<Segment> getStack () { return stack; }
    
-   private Segment lastShift; // last shifted segment or null
+   private Segment recentShift; // most recent shift segment or null
 
-   private Segment getLastShift () {
+   private Segment getRecentShift () {
 	   for (int i = stack.size(); i-- > 1;)
 		   if (stack.get(i).isShift())
 			   return stack.get(i);
@@ -217,9 +218,16 @@ public class Disco extends TaskEngine {
     * focus shift (see docs/LeshRichSidner2001_UM.pdf)
     */
    public boolean isLastShift () {
-	   Segment shift = getLastShift();
-	   return shift != null && shift != lastShift;
+	   Segment shift = getRecentShift();
+	   return shift != null && shift != recentShift;
    }
+
+   /**
+    * If {@link #isLastShift()} returns true, then this method returns the segment
+    * to shift the focus back to where it was before the unnecessary focus shift. 
+    * (This segment is not currently on the stack.)
+    */
+   public Segment getLastUnshift () { return firstPop; }
 
    /**
     * Test whether discourse stack is empty
@@ -353,12 +361,21 @@ public class Disco extends TaskEngine {
             .findFirst().isPresent();
    }
    
+   private Segment firstPop; // first segment popped on interpretation of last occurrence
+   
    @Override
    public void clear () {
       super.clear();
       if ( utteranceToString != null ) utteranceToString.clear();
       if ( utteranceFormat != null) utteranceFormat.clear();
-      stack = new Stack<Segment>();
+      stack = new Stack<Segment>() {
+           
+         @Override 
+         public Segment pop () {
+            if ( firstPop == null ) firstPop = peek();
+            return super.pop();
+         }
+      };
       stack.push(new Segment()); 
    }
    
@@ -565,7 +582,8 @@ public class Disco extends TaskEngine {
   
    @Override
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
-      lastShift = getLastShift(); // cache before stack changed
+      recentShift = getRecentShift(); // cache before stack changed
+      firstPop = null;
       boolean explained = super.interpret(occurrence, contributes, continuation);
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 

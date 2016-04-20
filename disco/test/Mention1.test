@@ -42,7 +42,9 @@
     Mention(user,ShiftI)
     # Notice focus has shifted to ShiftI (where Mention contributes)
     # Note -stopped flag means it was started and focus shifted away
-    #  before it was finished; you can come back and continue
+    #  before it was finished, which checked as follows
+  > eval $disco.isLastShift()
+    # Returned 'true'
   > history
 
 [ShiftA] -accepted -live
@@ -53,22 +55,23 @@
    [ShiftI] -live -shift <-focus
       Mention(user,ShiftI)
 
-    # You can shift focus back to B (or anywhere else)
+    # You can shift focus back to C (or anywhere else)
+    # Notice use of getLastUnshift() method below to shift the focus back
+  > execute edu.wpi.disco.lang.Propose$Should / $disco.getLastUnshift().getPlan().getGoal()
+    Propose.Should(user,ShiftC)
     # Notice -continuation flag
-  > task ShiftB
-    Propose.Should(user,ShiftB)
   > history
 
 [ShiftA] -accepted -live
    Propose.Should(user,ShiftA)
-   [ShiftB] -accepted -live -stopped
-      [ShiftC] -live -stopped
+   [ShiftB] -live -stopped
+      [ShiftC] -accepted -live -stopped
          ShiftE(user)
    [ShiftI] -live -shift -stopped
       Mention(user,ShiftI)
-   [ShiftB] -accepted -live -continuation -shift <-focus
-      Propose.Should(user,ShiftB)
-      [ShiftC] -live
+   [ShiftB] -live -continuation -shift
+      [ShiftC] -accepted -live -continuation <-focus
+         Propose.Should(user,ShiftC)
          [ShiftF] -live
       [ShiftD] -live
          [ShiftG] -live
@@ -88,15 +91,15 @@ Unexplained occurrence: mention execute Unauth
 
 [ShiftA] -accepted -live
    Propose.Should(user,ShiftA)
-   [ShiftB] -accepted -live -stopped
-      [ShiftC] -live -stopped
+   [ShiftB] -live -stopped
+      [ShiftC] -accepted -live -stopped
          ShiftE(user)
    [ShiftI] -live -shift -stopped
       Mention(user,ShiftI)
-   [ShiftB] -accepted -live -continuation -shift <-focus
-      Propose.Should(user,ShiftB)
-      Mention(user,Unauth) -unexplained
-      [ShiftC] -live
+   [ShiftB] -live -continuation -shift
+      [ShiftC] -accepted -live -continuation <-focus
+         Propose.Should(user,ShiftC)
+         Mention(user,Unauth) -unexplained
          [ShiftF] -live
       [ShiftD] -live
          [ShiftG] -live
