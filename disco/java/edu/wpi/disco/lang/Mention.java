@@ -31,18 +31,7 @@ public class Mention extends Nested {
       
       @Override
       protected Task getNested () { return getGoal(); }
-      
-      @Override
-      public boolean interpret (Plan contributes, boolean continuation) { 
-         if ( Utterance.interpret(this, contributes, continuation) ) 
-            // matches to same Mention
-            contributes = contributes.getParent();
-         else if ( contributes != null ) 
-            reconcileStack(contributes, continuation);
-         getDisco().getSegment().add(this);
-         return contributes != null;
-      }
-      
+    
       @Override
       protected String getKey () { return "mention@word"; }
 }

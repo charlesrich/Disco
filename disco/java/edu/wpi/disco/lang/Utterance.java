@@ -31,7 +31,7 @@ public abstract class Utterance extends Decomposition.Step {
    @Override
    public boolean interpret (Plan contributes, boolean continuation) {
       // do not call super
-      boolean explained = interpret(this, contributes, continuation);
+      boolean explained = Utterance.interpret(this, contributes, continuation);
       getDisco().getSegment().add(this);
       interpret();
       return explained;

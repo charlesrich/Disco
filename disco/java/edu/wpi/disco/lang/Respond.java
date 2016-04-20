@@ -35,7 +35,8 @@ abstract public class Respond extends Nested {
    
    @Override
    public boolean interpret (Plan contributes, boolean continuation) {
-      if ( super.interpret(contributes, continuation) ) {
+      getDisco().getSegment().add(this);
+      if ( Utterance.interpret(this,contributes, continuation) ) {
          // match to same Respond
          respond(((Respond) contributes.getGoal()).getProposal(), contributes);
          engine.clearLiveAchieved(); // response can change liveness and achieved
