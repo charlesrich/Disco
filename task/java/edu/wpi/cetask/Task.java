@@ -218,9 +218,9 @@ public class Task extends Instance {
    }
    
    private boolean checkSlotValue (String name, String type, Object value) {
-      if ( type == null || 
+      if ( type == null || type == "object" || type == "function" ||
             ( type.equals("boolean") && value instanceof Boolean ) ||
-            ( type.equals("string") && value instanceof String ) ||
+            ( type.equals("string") && value instanceof String ) || 
             ( type.equals("number") && value instanceof Number ) )
          return true;
       Slot slot = getType().getSlot(name);
@@ -239,7 +239,8 @@ public class Task extends Instance {
          try {
             bindings.put("$$value", value); 
             return Utils.booleanValue(
-                  eval( (type.equals("boolean") || type.equals("string") || type.equals("number")) ?
+                  eval( (type.equals("boolean") || type.equals("string") || type.equals("number") 
+                        || type.equals("object") || type.equals("function")) ?
                          ("typeof $$value === '"+type+"'") :
                          ("$$value instanceof "+type), 
                         "checkSlotValue"));
@@ -311,8 +312,9 @@ public class Task extends Instance {
              ("boolean".equals(type) ? "typeof value == \"boolean\"" :
                "string".equals(type) ? "typeof value == \"string\"" :
                   "number".equals(type) ? "typeof value == \"number\"" :
-                     "function".equals(type) ? "typeof value == \"function\"" :
-                        "value instanceof "+type));
+                     "object".equals(type) ? "typeof value == \"object\"" :
+                        "function".equals(type) ? "typeof value == \"function\"" :
+                           "value instanceof "+type));
    }
    
    public int countSlotValues () {
