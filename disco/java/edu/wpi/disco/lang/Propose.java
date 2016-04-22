@@ -46,6 +46,7 @@ public interface Propose {
          if ( utterance.isUser() ) { 
             // TODO fix asymmetry: eventually there needs to be some systematic
             //      way for agent not to automatically accept user utterances
+            //      (see setting of implicitAccept in Disco.interpret())
             propose.accept(contributes, false);
             // accept can change liveness and achieved
             disco.clearLiveAchieved();

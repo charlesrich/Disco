@@ -213,9 +213,11 @@ public class Disco extends TaskEngine {
 	   return null;
    }
 	
-   /*
+   /**
     * Test whether interpretation of last occurrence resulted in an unnecessary
     * focus shift (see docs/LeshRichSidner2001_UM.pdf)
+    * 
+    * @see #getLastOccurrence()
     */
    public boolean isLastShift () {
 	   Segment shift = getRecentShift();
@@ -229,6 +231,20 @@ public class Disco extends TaskEngine {
     */
    public Segment getLastUnshift () { return firstPop; }
 
+   /**
+    * @return true iff last occurrence implicitly accepts the proposal that was in
+    * focus, e.g., it is the first step of the proposed goal.
+    * 
+    * @see #getLastOccurrence()
+    */
+   public boolean isLastImplicitAccept () { return implicitAccepted != null; }
+   
+   /**
+    * if {@link #isLastImplicitAccept()} return true, then this method returns
+    * the plan that was implicitly accepted.
+    */
+   public Plan getLastImplicitAccepted () { return implicitAccepted; }
+   
    /**
     * Test whether discourse stack is empty
     */
@@ -584,7 +600,11 @@ public class Disco extends TaskEngine {
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
       recentShift = getRecentShift(); // cache before stack changed
       firstPop = null;
+      implicitAccepted = null;
       boolean explained = super.interpret(occurrence, contributes, continuation);
+      if ( occurrence.isUser() && occurrence instanceof Propose.Should )
+         // see Propose.interpretPropose()
+         implicitAccepted = getFocus();
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 
          // overrides interpret() and does its own stack management
@@ -632,6 +652,9 @@ public class Disco extends TaskEngine {
       reconcileStack(occurrence, getFocus(), contributes, continuation, false);
     }
    
+   private Plan implicitAccepted;
+   
+   
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
          boolean continuation, boolean shift) {
       if ( focus != contributes ) {
@@ -644,6 +667,7 @@ public class Disco extends TaskEngine {
                   Plan parent = focus.getParent().getParent();
                   if ( parent.pathToDescendant(contributes) != null ) {
                      proposal.accept(parent, true);
+                     implicitAccepted = focus.getParent();
                      clearLiveAchieved();
                   }
                } // TODO extend for other types of proposals
