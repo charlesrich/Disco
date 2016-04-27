@@ -56,6 +56,7 @@
     <input name="slot" type="string" />
     <input name="value" />	
     <postcondition sufficient="true">
+      $this.goal == undefined ? null :
       ( $this.value == undefined ? $this.goal.isDefinedSlot($this.slot) :
          $this.goal.getSlotValue($this.slot) == $this.value )
     </postcondition>
@@ -65,9 +66,10 @@
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
     <input name="value" type="boolean"/>	
     <postcondition sufficient="true">
-      $this.goal.isDefinedSlot("external") &amp;&amp; 
-      ( $this.value == undefined ? $this.goal.external != undefined :
-          $this.goal.external == $this.value )
+      $this.goal == undefined ? null :
+      ($this.goal.isDefinedSlot("external") &amp;&amp; 
+       ( $this.value == undefined ? $this.goal.external != undefined :
+          $this.goal.external == $this.value ) )
     </postcondition>
   </task>
   
@@ -79,8 +81,9 @@
       !$this.decomp.isRejected($this.plan.getGoal())
     </precondition>
     <postcondition sufficient="true">
-      ( $this.decomp == undefined ? $this.plan.getDecompositionClass() != null : 
-         $this.plan.getDecompositionClass() == $this.decomp )
+      $this.plan == undefined ? null :
+      $this.decomp == undefined ? $this.plan.getDecompositionClass() != null : 
+      $this.plan.getDecompositionClass() == $this.decomp
     </postcondition>
   </task>
   

@@ -1,0 +1,89 @@
+    # Apr 26, 2016 9:20:49 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > next false
+  > debug
+  > task A
+    Propose.Should(user,A)
+  > history
+    # Notice that the external slot of C is unknown (null)
+
+[A] -accepted -live <-focus
+   Propose.Should(user,A)
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+  > instance C / false
+    # thus plan recognition will unify the goal of this
+    # Propose.Should with C
+  > execute edu.wpi.disco.lang.Propose$Should / $new
+    Propose.Should(user,C(agent))
+  > history
+    # and notice that external slot of C is now false
+
+[A] -accepted -live
+   Propose.Should(user,A)
+   [C(agent)] -accepted -live <-focus
+      Propose.Should(user,C(agent))
+   [B] -optionalStep -optional -live
+   [D] -optionalStep -optional
+
+  > instance C / true
+    # however, now that the external slot of C is false in the
+    # plan tree, the goal of this Propose.Should does not
+    # unify with it and we have an interruption
+    # in other words, Disco doesn't know what "the C that the
+    # user is supposed to do" refers to
+  > execute edu.wpi.disco.lang.Propose$Should / $new
+Interruption: [C(user)]
+    Propose.Should(user,C(user))
+  > history
+
+[A] -accepted -live
+   Propose.Should(user,A)
+   [C(agent)] -accepted -live
+      Propose.Should(user,C(agent))
+      [C(user)] -accepted -live -interruption <-focus
+         Propose.Should(user,C(user))
+   [B] -optionalStep -optional -live
+   [D] -optionalStep -optional
+
+  > clear
+    # However, there is a correct way to do this using Propose.Who
+  > task A
+    Propose.Should(user,A)
+  > instance C / false
+  > execute edu.wpi.disco.lang.Propose$Should / $new
+    Propose.Should(user,C(agent))
+  > history
+    # as before, the external slot of C is false
+
+[A] -accepted -live
+   Propose.Should(user,A)
+   [C(agent)] -accepted -live <-focus
+      Propose.Should(user,C(agent))
+   [B] -optionalStep -optional -live
+   [D] -optionalStep -optional
+
+  > instance C
+    # but notice that the goal of the Propose.Who is now
+    # any instance of C (without constraining external).
+    # alternatively, 'instance C / false' would also work
+  > execute edu.wpi.disco.lang.Propose$Who / $new / true
+    Propose.Who(user,C,true)
+  > history
+    # and external slot now changed
+    # similar processing is done for other inputs using
+    # Propose.What
+
+[A] -accepted -live
+   Propose.Should(user,A)
+   [C(user)] -accepted -live <-focus
+      Propose.Should(user,C(agent))
+      Propose.Who(user,C,true)
+   [B] -optionalStep -optional -live
+   [D] -optionalStep -optional
+
+  > quit
+    

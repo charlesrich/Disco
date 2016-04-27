@@ -1035,28 +1035,33 @@ public class Plan {
          // always try script first
          boolean decomposed = applyDecompositionScript();
          if ( !decomposed ) {
-            List<DecompositionClass> decomps = goal.getType().getDecompositions();
-            // if only one *known* decomposition for goal type and not
-            // de-authorized, apply it now if applicable
-            if ( decomps.size() == 1 ) {
-               DecompositionClass only = decomps.get(0);
-               if ( only.getProperty("@authorized", true) ) {
-                  synchronized (goal.bindings) {
-                     goal.bindings.put("$plan", this);
-                     if ( !Utils.isFalse(only.isApplicable(goal)) ) {
-                        Plan focus = goal.engine.getFocus();
-                        // inhibit infinite recursion, but allow incremental expansion
-                        // if live (and recursive parent started) or if focus or child 
-                        // of focus 
-                        if ( !stack.contains(only) 
-                              || (focus != null && 
-                              (focus == this || focus.children.contains(this))) 
-                              || (isLive() && recursiveParent(only).isStarted()) ) 
-                        { apply(only); applied = true; }
-                     }
-                  }
+            // if decomposition chosen and plan is live, 
+            // or only one *known* decomposition for goal type and not de-authorized, 
+            // then apply it now if ap1046plicable
+            DecompositionClass decomp = getDecompositionClass();
+            if ( !isLive() ) decomp = null;
+            if ( decomp == null ) {
+               List<DecompositionClass> decomps = goal.getType().getDecompositions();
+               if ( decomps.size() == 1 ) {
+                  decomp = decomps.get(0);
+                  if ( !decomp.getProperty("@authorized", true) ) decomp = null;
                }
             }
+            if ( decomp != null )
+               synchronized (goal.bindings) {
+                  goal.bindings.put("$plan", this);
+                  if ( !Utils.isFalse(decomp.isApplicable(goal)) ) {
+                     Plan focus = goal.engine.getFocus();
+                     // inhibit infinite recursion, but allow incremental expansion
+                     // if live (and recursive parent started) or if focus or child 
+                     // of focus 
+                     if ( !stack.contains(decomp) 
+                           || (focus != null && 
+                           (focus == this || focus.children.contains(this))) 
+                           || (isLive() && recursiveParent(decomp).isStarted()) ) 
+                     { apply(decomp); applied = true; }
+                  }
+               }
          }
       }
       if ( decomp != null ) stack.push(decomp.getType());
