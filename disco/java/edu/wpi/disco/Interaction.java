@@ -268,6 +268,17 @@ public class Interaction extends Thread {
       if ( console != null ) console.occurred(occurrence);
    }   
    
+   // TODO: The whole execution of scripts needs to be cleaned up!
+   //       In particular there really wasn't a problem with using
+   //       grounding scripts for utterance semantics; it was just
+   //       a bug in Console execute command that evaluated script
+   //       before plan recognition (and sometimes twice)
+   void occurred (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      responded = true;
+      disco.occurred(external, occurrence, contributes, eval);
+      if ( console != null ) console.occurred(occurrence);
+   }
+   
    /**
     * Variant of {@link #occurred(boolean,Task,Plan)}, used in {@link
     * #choose(List,int,String)}, to notify interaction that given

@@ -328,14 +328,12 @@ public class Console extends Shell {
     * Report user execution of primitive task or completion of non-primitive
     * task. Task class and unspecified args default to current focus.
     */
-   public Task done (String args) {
+   public void done (String args) {
       Plan focus = getEngine().getFocus(true);
       Task task = processTaskIf(args, focus, false);
-      if ( task != null ) {
-         if ( task.isPrimitive() ) done(task); 
-         else done(new Propose.Done(getEngine(), true, task));
-      }
-      return task;
+      if ( task != null ) 
+         done(task.isPrimitive() ? task : new Propose.Done(getEngine(), true, task),
+              false);
    } 
    
    /**
@@ -351,21 +349,18 @@ public class Console extends Shell {
          err.println("Execute not allowed for non-primitive tasks.");
          return null;
       }
-      if ( !(task instanceof Utterance) ) { // see Interaction.done
-         if ( task.getExternal() == null )
-            task.setExternal(true); // must be set before eval
-         task.eval(new Plan(task));
-      }
-      done(task);
+      done(task, true);
       return task;
    }
    
-   private Task done (Task occurrence) {
+   private Task done (Task occurrence, boolean eval) {
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             boolean external = !Utils.isFalse(occurrence.getExternal());
             if ( !external ) command = null; // keep user turn
-            interaction.occurred(external, occurrence, null); 
+            // TODO: This is temporary hack to fix problem (see Interaction.occurred)
+            if ( eval ) interaction.occurred(external, occurrence, null, true);
+            else interaction.occurred(external, occurrence, null);
          } else warning("All input values must be defined--ignored.");
       }
       return occurrence;
