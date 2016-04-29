@@ -245,11 +245,11 @@ public class Shell {
          }
          // synchronized so that console can run for debugging alongside
          synchronized (engine.synchronizer) {
+            String args = line.substring(command.length()).trim(); 
             try {
-               // dispatch to command method
-               new Statement(this, command, 
-                     new Object[] { line.substring(command.length()).trim() }) 
-               .execute();
+               if ( "new".equals(command) ) newInstance(args);
+               else // dispatch to command method
+                  new Statement(this, command, new Object[] {args}).execute();
                if ( onProcessCommand != null ) onProcessCommand.run();
             } catch (NoSuchMethodException m) {
                // do not use respond here (for shell)
@@ -308,7 +308,7 @@ public class Shell {
 
    // allow later additions to list
    protected final List<String> status = new ArrayList<String>(
-      Arrays.asList("load", "cd", "status", "eval", "clear",
+      Arrays.asList("load", "cd", "status", "eval", "new", "clear",
                     "source", "test", "step", "verbose", "debug", "quit", "help"));
            
    // commands 
@@ -324,6 +324,9 @@ public class Shell {
       out.println("    status              - print current engine state");
       out.println("    clear               - delete all current tasks");
       out.println("    eval <javascript>   - evaluate inline JavaScript");
+      out.println("    new [<id> [<namespace>]] [/ <input> ]* [/ <output> ]* [/ <external>]");
+      out.println("                        - sets $new to specified new task instance");
+      out.println("                          (slot values optional)");
       out.println("    source <filename>   - read command input from file");
       out.println("    test <filename>     - like 'source', except for .test files");
       out.println("    step [<filename>]   - like 'test', except single-stepping");
@@ -351,6 +354,19 @@ public class Shell {
       TaskEngine engine = getEngine();
       println("# Returned '"+engine.toString(engine.eval(script, "Shell"))+"'");
       getEngine().clearLiveAchieved();
+   }
+   
+   /**
+    * Create a new instance of specified task class, including slot values.
+    * task. Task class must be specified and unspecified args do not default.
+    * This command is needed to avoid recursive invocation of eval in test cases.
+    * 
+    * Note this method cannot be named 'new' even though that is typed command
+    */
+   private Task newInstance (String args) {
+      Task task = processTaskIf(args, null, false);
+      getEngine().setGlobal("$new", task);
+      return task;
    }
    
    private boolean stepping;

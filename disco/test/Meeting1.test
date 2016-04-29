@@ -68,7 +68,7 @@
     Agent says "What is the Meeting start?"
   > say / / / 1200
     User says "The Meeting start is 1200."
-  > instance End
+  > new End
   > say edu.wpi.disco.lang.Propose$What / $new / "time" / 1300
     User says "The End time is 1300."
   > next
@@ -81,7 +81,7 @@
     Agent says "What is the Meeting start?"
   > say / / / 1200
     User says "The Meeting start is 1200."
-  > instance Duration
+  > new Duration
   > say edu.wpi.disco.lang.Propose$What / $new / "duration" / 100
     User says "The Duration duration is 100."
   > next
@@ -94,10 +94,10 @@
 
   > task _Meeting
     User says "Let's achieve _Meeting."
-  > instance Meeting
+  > new Meeting
   > say edu.wpi.disco.lang.Propose$What / $new / "start" / 1200
     User says "The Meeting start is 1200."
-  > instance End
+  > new End
   > say edu.wpi.disco.lang.Propose$What / $new / "time" / 1200
     User says "The End time is 1200."
   > next
@@ -109,10 +109,10 @@
 
   > task _Meeting
     User says "Let's achieve _Meeting."
-  > instance Meeting
+  > new Meeting
   > say edu.wpi.disco.lang.Propose$What / $new / "start" / 1200
     User says "The Meeting start is 1200."
-  > instance Duration
+  > new Duration
   > say edu.wpi.disco.lang.Propose$What / $new / "duration" / 100
     User says "The Duration duration is 100."
   > next

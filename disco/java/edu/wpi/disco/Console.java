@@ -138,9 +138,6 @@ public class Console extends Shell {
       out.println("                        - like 'done', except runs script if any");
       out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'execute' for utterances, except defaults to menu of choices");
-      out.println("    instance [<id> [<namespace>]] [/ <input> ]* [/ <output> ]* [/ <external>]");
-      out.println("                        - sets $new to specified new task instance");
-      out.println("                          (slot values optional)");
       out.println("    next [<boolean>]    - end user console turn");
       out.println("                          (boolean turns automatic turn mode on/off)");
       super.help();
@@ -234,8 +231,8 @@ public class Console extends Shell {
    }
    
    { 
-      status.add("history"); status.add("trace"); status.add("reset"); 
-      status.add("print"); status.add("instance"); 
+      status.add("history"); status.add("trace"); 
+      status.add("reset"); status.add("print"); 
    }
 
    /* *
@@ -364,17 +361,6 @@ public class Console extends Shell {
          } else warning("All input values must be defined--ignored.");
       }
       return occurrence;
-   }
-   
-   /**
-    * Create a new instance of specified task class, including slot values.
-    * task. Task class must be specified and unspecified args do not default.
-    * This command is needed to avoid recursive invocation of eval in test cases.
-    */
-   public Task instance (String args) {
-      Task task = processTaskIf(args, null, false);
-      getEngine().setGlobal("$new", task);
-      return task;
    }
 
    /**

@@ -14,7 +14,7 @@
    [C] -live
    [D] -optionalStep -optional
 
-  > instance C / false
+  > new C / false
     # thus plan recognition will unify the goal of this
     # Propose.Should with C
   > execute edu.wpi.disco.lang.Propose$Should / $new
@@ -29,7 +29,7 @@
    [B] -optionalStep -optional -live
    [D] -optionalStep -optional
 
-  > instance C / true
+  > new C / true
     # however, now that the external slot of C is false in the
     # plan tree, the goal of this Propose.Should does not
     # unify with it and we have an interruption
@@ -53,7 +53,7 @@ Interruption: [C(user)]
     # However, there is a correct way to do this using Propose.Who
   > task A
     Propose.Should(user,A)
-  > instance C / false
+  > new C / false
   > execute edu.wpi.disco.lang.Propose$Should / $new
     Propose.Should(user,C(agent))
   > history
@@ -66,7 +66,7 @@ Interruption: [C(user)]
    [B] -optionalStep -optional -live
    [D] -optionalStep -optional
 
-  > instance C
+  > new C
     # but notice that the goal of the Propose.Who is now
     # any instance of C (without constraining external).
     # alternatively, 'instance C / false' would also work

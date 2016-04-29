@@ -68,7 +68,7 @@
   > done / / / "foo"
     User says "The Optional3 input1 is foo."
     Agent says "What is the Optional3 input2?"
-  > instance edu.wpi.disco.lang.Propose$What / $disco.getPlan($disco.getTaskClass("Optional3")).getGoal()
+  > new edu.wpi.disco.lang.Propose$What / $disco.getPlan($disco.getTaskClass("Optional3")).getGoal()
   > done edu.wpi.disco.lang.Reject / $new
     User says "I don't want to specify any more values for Optional3."
     Agent execute Optional3 on foo and null and null.

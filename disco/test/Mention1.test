@@ -36,7 +36,7 @@
    [ShiftI] -live
 
     # Convenient command to set $new to new instance of ShiftI
-  > instance ShiftI
+  > new ShiftI
     # So that you can easily provide it as input to Mention
   > execute edu.wpi.disco.lang.Mention / $new
     Mention(user,ShiftI)
@@ -79,7 +79,7 @@
 
     # Now here's an instance of a task outside of this tree (could
     # be primitive or non-primitive)
-  > instance Unauth
+  > new Unauth
     # And we mention it
   > execute edu.wpi.disco.lang.Mention / $new
     # Warning line only generated in debug mode

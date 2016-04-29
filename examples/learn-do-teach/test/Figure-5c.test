@@ -24,7 +24,7 @@
     # Agent teaching another copy of itself by demonstration how to do C
     #
     # give system agent starting intention of teaching C to external agent
-  > instance LearnRecipe / C / r4 / true
+  > new LearnRecipe / C / r4 / true
   > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
     # Returned 'null'
   > system

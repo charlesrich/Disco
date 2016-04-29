@@ -122,7 +122,7 @@
     # Agent teaching another human by mixture of demonstration and instructions how to do C
     #
     # give system agent starting intention of teaching C to external agent
-  > instance LearnRecipe / C / r4 / true
+  > new LearnRecipe / C / r4 / true
   > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
     # Returned 'null'
   > eval $disco.getInteraction().getExternal().setName("human'")

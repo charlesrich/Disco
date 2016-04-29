@@ -5,7 +5,7 @@
   > debug
     # next two lines are most convenient way to simulate the *agent*
     # making a proposal (since 'task' command is always user speaking)
-  > instance A
+  > new A
     # sets $new to a new instance of A
   > execute edu.wpi.disco.lang.Propose$Should / $new / false
     Propose.Should(agent,A)
@@ -23,7 +23,7 @@
 
     # next two lines are convenient way to simulate the agent explicitly
     # accepting a proposal (see implicit acceptance below)
-  > instance edu.wpi.disco.lang.Propose$Should / $new
+  > new edu.wpi.disco.lang.Propose$Should / $new
   > execute edu.wpi.disco.lang.Accept / $new
     Accept(user,Propose.Should(,A))
     # notice the -accepted flag on A (which means value of Task.getShould() is true)
@@ -48,7 +48,7 @@
     # Returned '[A]'
   > clear
     # now doing the same thing for rejection
-  > instance A 
+  > new A 
   > execute edu.wpi.disco.lang.Propose$Should / $new / false
     Propose.Should(agent,A)
   > history
@@ -60,7 +60,7 @@
    [C] -live
    [D] -optionalStep -optional
 
-  > instance edu.wpi.disco.lang.Propose$Should / $new
+  > new edu.wpi.disco.lang.Propose$Should / $new
   > execute edu.wpi.disco.lang.Reject / $new
     Reject(user,Propose.Should(,A))
     # notice the -rejected flag on A (which means value of Task.getShould() is false)
@@ -77,7 +77,7 @@
     # Returned 'true'
   > clear
     # now let's do implicit acceptance
-  > instance A
+  > new A
   > execute edu.wpi.disco.lang.Propose$Should / $new / false
     Propose.Should(agent,A)
   > history

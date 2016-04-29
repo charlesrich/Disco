@@ -10,7 +10,7 @@
 [ChooseFlavor] -accepted -live <-focus
    Propose.Should(user,ChooseFlavor)
 
-  > instance ChooseFlavor
+  > new ChooseFlavor
   > execute edu.wpi.disco.lang.Ask$What / $new / "flavor" / false
     Ask.What(agent,ChooseFlavor,"flavor")
     # notice semantics of Ask is to push corresponding proposal goal by
@@ -58,7 +58,7 @@
 [ChooseFlavor] -accepted -live <-focus
    Propose.Should(user,ChooseFlavor)
 
-  > instance ChooseFlavor
+  > new ChooseFlavor
     # similarly for external slot, which is really just another input
   > execute edu.wpi.disco.lang.Ask$Who / $new / false
     Ask.Who(agent,ChooseFlavor)
@@ -89,7 +89,7 @@
 [IntA] -accepted -live <-focus
    Propose.Should(user,IntA)
 
-  > instance IntA
+  > new IntA
   > execute edu.wpi.disco.lang.Ask$How / $new / false
     Ask.How(agent,IntA)
     # note similar stack structure of Propose and Accept
