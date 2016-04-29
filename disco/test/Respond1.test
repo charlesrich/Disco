@@ -40,11 +40,11 @@
     # Returned 'true'
     # you can extract the *domain* goal of the Accept utterance as follows
     # note if you do this in Java, you will need to cast the result of
-    # getLastProposal() to edu.wpi.disco.lang.Accept
+    # getLastOccurrence() to edu.wpi.disco.lang.Accept
   > eval $disco.getLastOccurrence().getProposal().getGoal() 
     # Returned 'A'
-    # if you need to know the plan, then it will always be the focus
-  > eval $disco.getFocus() 
+    # if you need to know the plan, then use the following method
+  > eval $disco.getLastContributes()
     # Returned '[A]'
   > clear
     # now doing the same thing for rejection

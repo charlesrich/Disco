@@ -177,14 +177,23 @@ public class TaskEngine {
       }
    }
 
-   private Task last;
+   private Task lastOccurrence;
+   private Plan lastContributes;
    
-   void setLastOccurrence (Task last) {
-      if ( !last.isPrimitive() ) throw new IllegalArgumentException("Occurrence is not primitive: "+last);
-      this.last = last;
-   }
+   /**
+    * Return the most recently interpreted occurrence.
+    * 
+    * @see #getLastContributes()
+    */
+   public Task getLastOccurrence () { return lastOccurrence; }
    
-   public Task getLastOccurrence () { return last; }
+   /**
+    * Return the plan to which the most recently interpreted occurrence 
+    * directly contributes, or null if it was unexplained. 
+    * 
+    * @see #getLastOccurrence()
+    */
+   public Plan getLastContributes () { return lastContributes; }
    
    /**
     * Evaluate in using default (global) context (not in any task instance)
@@ -899,6 +908,8 @@ public class TaskEngine {
       if ( contributes != null && contributes.getType() == occurrence.getType()) 
          // TODO is this best/only place to check success/failure?
          contributes.checkAchieved(); 
+      lastOccurrence = occurrence;
+      lastContributes = contributes;
       return explained;
    }
     
