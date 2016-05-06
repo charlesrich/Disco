@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.*;
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.*;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -930,14 +931,32 @@ public class Disco extends TaskEngine {
       utteranceToString.put(utterance,  string);
    }
    
+   private Function<Task,String> toHistoryStringHook;
+   
    /**
-    * Utility method to create human-readable string for given task for 
+    * Hook for adding application-specific information to printout of
+    * primitive tasks in history and shell.   
+    * 
+    * @param hook lambda expression to return string to be appended
+    *        to normal printout after single space (return null
+    *        if nothing to be added)
+    */
+   public void setToHistoryStringHook (Function<Task,String> hook) {
+      toHistoryStringHook = hook;
+   }
+   
+   /**
+    * Utility method to create human-readable string for given primitive task for 
     * use in history.
     */
    public String toHistoryString (Task task) {
-      return task instanceof Utterance && task.isOccurred() ?
-         task.format() : // already cached
-         toHistoryString(task, null, false);
+      String string = task instanceof Utterance && task.isOccurred() ? 
+         task.format() // already cached
+         : toHistoryString(task, null, false);
+      String hook = toHistoryStringHook == null ? null :
+         toHistoryStringHook.apply(task);
+      if ( hook != null ) string =  string+' '+hook;
+      return string;
    }
 
    private String toHistoryString (Task task, String formatted, boolean formatTask) {
