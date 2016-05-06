@@ -908,8 +908,12 @@ public class Disco extends TaskEngine {
    
    public void print (Task task, PrintStream stream, int indent) {
       for (int i = indent; i-- > 0;) stream.print("   ");
-      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) stream.print(task);
-      else stream.print(toHistoryString(task));
+      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
+         stream.print(task);
+         String hook = toHistoryStringHook == null ? null :
+            toHistoryStringHook.apply(task);
+         if ( hook != null ) stream.print(' '+hook);
+      } else stream.print(toHistoryString(task));
    }
    
    private void print (Plan plan, PrintStream stream, int indent) {
