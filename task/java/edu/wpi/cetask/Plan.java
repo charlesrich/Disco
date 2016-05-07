@@ -808,6 +808,7 @@ public class Plan {
     * 
     * @see Task#getDecompositions()
     * @see TaskClass#getDecompositions()
+    * @see Plan#getFailed()
     */
    public List<DecompositionClass> getDecompositions () {
       if ( decompClass != null ) return Collections.singletonList(decompClass);
