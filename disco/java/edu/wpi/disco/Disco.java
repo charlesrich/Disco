@@ -27,8 +27,10 @@ import javax.xml.xpath.XPath;
  */
 public class Disco extends TaskEngine {
    
+   public static String VERSION = "1.15";
+   
    /**
-    * Main class for running stand-alone Disco with console.
+    * Main method for running stand-alone Disco with console.
     * 
     * @param args first string (if any) is url or filename from which to read 
     *             console commands
@@ -41,7 +43,25 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.15";
+   public static class Dual {
+
+      /**
+       * Main method for running stand-alone Disco with two agents and console.
+       * Note that the two agents are not treated entirely symmetrically. For example,
+       * the external agent does not need permission to perform unauthorized actions.
+       * 
+       * @param args first string (if any) is url or filename from which to read 
+       *             console commands
+       */
+      public static void main (String[] args) {
+         new Interaction(
+               new Agent("system"), 
+               new Agent("external"),
+               args.length > 0 && args[0].length() > 0 ? args[0] : null)
+         .start(true); // given external agent first turn
+      }
+
+   }
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
