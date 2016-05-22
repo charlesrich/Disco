@@ -11,7 +11,7 @@ include "../lib/cea-2018-ext.rnc" {
       attribute about { xsd:anyURI },
       Description*,
       # adding Top and Do
-      ( Task | Subtasks | Script | Top | Do )*
+      ( Task | Subtasks | Script | Top )*
   }
 }
 
@@ -23,6 +23,11 @@ Top =
     }
  |  element agent { TopBody }
  |  element user { TopBody }
+ |  element do {
+       DoAttributes,
+       attribute precondition { text }?,
+       Choices
+    }
  )
 
 TopBody =
@@ -39,16 +44,19 @@ Say =
 
 Do = 
   element do {
+    DoAttributes,
+    attribute applicable { text }?,
+    Choices
+  }
+
+DoAttributes = 
     attribute id { xsd:ID }?,
     attribute actor { xsd:NCName }?,
     attribute task { xsd:QName },
     attribute minOccurs { xsd:nonNegativeInteger }?,
     attribute maxOccurs { xsd:positiveInteger | "unbounded" }?,
-    attribute applicable { text }?,
     # other attributes interpeted as bindings for inputs
-    attribute * - (id | actor | task | minOccurs | maxOccurs | applicable) { text }*,
-    Choices
-  }
+    attribute * - (id | actor | task | minOccurs | maxOccurs | applicable | precondition) { text }*
 
 Choices =
     ( Do | Say | User | Agent )*
