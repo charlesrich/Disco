@@ -22,6 +22,8 @@ abstract class Instance {
    
    public final TaskEngine engine; 
    
+   public TaskEngine getEngine () { return engine; }
+   
    Instance (TaskModel.Member type, TaskEngine engine) { 
       if ( type == null ) 
          throw new IllegalArgumentException("Type of instance cannot be null");

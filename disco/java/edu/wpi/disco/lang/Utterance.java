@@ -32,25 +32,34 @@ public abstract class Utterance extends Decomposition.Step {
    public interface Text {
       
       String getText ();
+      String formatTaskText (String format, String key);
+      
+      Disco getDisco ();
+      TaskClass getType ();
+      Decomposition getDecomposition ();
+      String getName ();
+      TaskEngine getEngine ();
+      String formatTask ();
+      String format ();
 
-      static String formatTask (Utterance utterance) { 
-         String format = utterance.getDisco().getFormat(utterance);
-         if ( format != null) return utterance.formatTask(format, null);
-         String text = ((Text) utterance).getText(); 
+      default String formatTaskText (Task task) { 
+         String format = getDisco().getFormat(task);
+         if ( format != null ) return formatTaskText(format, null);
+         String text = getText(); 
          return text == null ? "..." :  
             // use decomposition and step name to identify this point in dialogue tree
-            ((Disco) utterance.getType().getEngine()).getAlternative(
-                  utterance.getDecomposition()+"."+utterance.getName(),
+            ((Disco) getType().getEngine()).getAlternative(
+                  getDecomposition()+"."+getName(),
                   text, true);
       }
 
-      static String toHistoryString (Utterance utterance, boolean formatTask) {
+      default String toHistoryStringText (boolean formatTask) {
          StringBuilder buffer = new StringBuilder(
-               Utils.capitalize(formatTask ? utterance.formatTask() : utterance.format()));
+               Utils.capitalize(formatTask ? formatTask() : format()));
          Utils.endSentence(buffer);
          buffer.insert(0, '\"').append('\"');
          buffer.insert(0, ' ');
-         buffer.insert(0, utterance.engine.getProperty("says@word"));
+         buffer.insert(0, getEngine().getProperty("says@word"));
          return buffer.toString();
       }
 

@@ -43,11 +43,17 @@ public class Mention extends Nested implements Utterance.Text {
    protected String getKey () { return "mention@word"; }
 
    @Override
-   public String formatTask () { return Utterance.Text.formatTask(this); }
+   public String formatTask () { return formatTaskText(this); }
+
+   @Override
+   public String formatTaskText (String format, String key) {
+      return formatTask(format, key); 
+   }
+   
    
    @Override
    public String toHistoryString (boolean formatTask) { 
-      return Utterance.Text.toHistoryString(this, formatTask); 
+      return toHistoryStringText(formatTask); 
    }
 
 }

@@ -41,11 +41,16 @@ public class Say extends Utterance implements Utterance.Text {
    public String getText () { return (String) getSlotValue("text"); }
 
    @Override
-   public String formatTask () { return Utterance.Text.formatTask(this); }
-
+   public String formatTask () { return formatTaskText(this); }
+   
+   @Override
+   public String formatTaskText (String format, String key) {
+      return formatTask(format, key); 
+   }
+   
    @Override
    public String toHistoryString (boolean formatTask) { 
-      return Utterance.Text.toHistoryString(this, formatTask); 
+      return toHistoryStringText(formatTask); 
    }
        
    // Say.User: utterance by user 
