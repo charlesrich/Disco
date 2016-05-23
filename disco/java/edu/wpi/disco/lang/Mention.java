@@ -11,13 +11,10 @@ import edu.wpi.disco.Disco;
 /**
  * Builtin utterance similar to {@link Say} for mentioning a goal. This is for
  * typical use with other application-specific information that is being
- * provided by other methods or in grounding script, in order to shift the focus
+ * provided by other methods in order to shift the focus
  * if the goal is recognized.  
  * <p>
  * Note that mentioned task only is printed in DEBUG mode.
- * <p>
- * If grounding scripts used, see {@link edu.wpi.disco.Actor#setEval(boolean)} 
- * to make sure that grounding scripts executed for user. 
  */
 public class Mention extends Nested implements Utterance.Text {
 
