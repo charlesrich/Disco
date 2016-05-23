@@ -133,6 +133,7 @@
   
   <task id="edu.wpi.disco.lang.Mention">
     <input name="goal" type="Packages.edu.wpi.cetask.Task" />
+    <input name="text" type="string" />
   </task>
   
   <task id="edu.wpi.disco.lang.Accept">

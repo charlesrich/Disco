@@ -9,29 +9,48 @@ import edu.wpi.cetask.*;
 import edu.wpi.disco.Disco;
 
 /**
- * Builtin utterance for mentioning a goal.   This is for typical use with other
- * application-specific information that is being provided by other methods, in order
- * to shift the focus if the goal is recognized.
+ * Builtin utterance similar to {@link Say} for mentioning a goal. This is for
+ * typical use with other application-specific information that is being
+ * provided by other methods or in grounding script, in order to shift the focus
+ * if the goal is recognized.  
+ * <p>
+ * Note that mentioned task only is printed in DEBUG mode.
+ * <p>
+ * If grounding scripts used, see {@link edu.wpi.disco.Actor#setEval(boolean)} 
+ * to make sure that grounding scripts executed for user. 
  */
-public class Mention extends Nested {
+public class Mention extends Nested implements Utterance.Text {
 
-      public static TaskClass CLASS;
-      
-      // for TaskClass.newStep
-      public Mention (Disco disco, Decomposition decomp, String step, boolean repeat) { 
-         super(Mention.class, disco, decomp, step, repeat);
-      }
+   public static TaskClass CLASS;
 
-      public Mention (Disco disco, Boolean external, Task goal) { 
-         super(Mention.class, disco, external);
-         if ( goal != null ) setSlotValue("goal", goal);
-      }
-      
-      public Task getGoal () { return (Task) getSlotValue("goal"); }
-      
-      @Override
-      protected Task getNested () { return getGoal(); }
-    
-      @Override
-      protected String getKey () { return "mention@word"; }
+   // for TaskClass.newStep
+   public Mention (Disco disco, Decomposition decomp, String step, boolean repeat) { 
+      super(Mention.class, disco, decomp, step, repeat);
+   }
+
+   public Mention (Disco disco, Boolean external, Task goal, String text) { 
+      super(Mention.class, disco, external);
+      if ( goal != null ) setSlotValue("goal", goal);
+      if ( text != null ) setSlotValue("text", text);
+   }
+
+   public Task getGoal () { return (Task) getSlotValue("goal"); }
+
+   @Override
+   public String getText () { return (String) getSlotValue("text"); }
+
+   @Override
+   protected Task getNested () { return getGoal(); }
+
+   @Override
+   protected String getKey () { return "mention@word"; }
+
+   @Override
+   public String formatTask () { return Utterance.Text.formatTask(this); }
+   
+   @Override
+   public String toHistoryString (boolean formatTask) { 
+      return Utterance.Text.toHistoryString(this, formatTask); 
+   }
+
 }

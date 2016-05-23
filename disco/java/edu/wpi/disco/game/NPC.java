@@ -42,7 +42,7 @@ public class NPC extends Agent {
 	public void occurred (Interaction interaction, Item item, boolean retry) {
 	   if (item.task instanceof Utterance) {
 	      Utterance utterance = (Utterance) item.task;
-	      if ( !(utterance instanceof Say) && utterance.equals(getLastUtterance()) )
+	      if ( !(utterance instanceof Utterance.Text) && utterance.equals(getLastUtterance()) )
 	         return;
 	   }
 		super.occurred(interaction, item, retry);

@@ -71,7 +71,7 @@ public class Console extends Shell {
    
    private void printTranslateKeys (Utterance utterance) {
       if ( TaskEngine.VERBOSE && translateStream != null && 
-            !(utterance instanceof Say) ) { 
+            !(utterance instanceof Utterance.Text) ) { 
          String formatted = utterance.formatTask(),
                translated = getEngine().translate(formatted, utterance);
          // check if utterance was not actually translated (i.e., new key for file)

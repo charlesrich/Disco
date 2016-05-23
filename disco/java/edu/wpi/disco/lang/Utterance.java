@@ -28,6 +28,34 @@ public abstract class Utterance extends Decomposition.Step {
       if ( external != null ) setSlotValue("external", external);
    }
 
+   // for Say and Mention
+   public interface Text {
+      
+      String getText ();
+
+      static String formatTask (Utterance utterance) { 
+         String format = utterance.getDisco().getFormat(utterance);
+         if ( format != null) return utterance.formatTask(format, null);
+         String text = ((Text) utterance).getText(); 
+         return text == null ? "..." :  
+            // use decomposition and step name to identify this point in dialogue tree
+            ((Disco) utterance.getType().getEngine()).getAlternative(
+                  utterance.getDecomposition()+"."+utterance.getName(),
+                  text, true);
+      }
+
+      static String toHistoryString (Utterance utterance, boolean formatTask) {
+         StringBuilder buffer = new StringBuilder(
+               Utils.capitalize(formatTask ? utterance.formatTask() : utterance.format()));
+         Utils.endSentence(buffer);
+         buffer.insert(0, '\"').append('\"');
+         buffer.insert(0, ' ');
+         buffer.insert(0, utterance.engine.getProperty("says@word"));
+         return buffer.toString();
+      }
+
+   };
+   
    @Override
    public boolean interpret (Plan contributes, boolean continuation) {
       // do not call super

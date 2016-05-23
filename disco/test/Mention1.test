@@ -38,8 +38,8 @@
     # Convenient command to set $new to new instance of ShiftI
   > new ShiftI
     # So that you can easily provide it as input to Mention
-  > execute edu.wpi.disco.lang.Mention / $new
-    Mention(user,ShiftI)
+  > execute edu.wpi.disco.lang.Mention / $new / "this is shifty"
+    Mention(user,ShiftI,"this is shifty")
     # Notice focus has shifted to ShiftI (where Mention contributes)
     # Note -stopped flag means it was started and focus shifted away
     #  before it was finished, which checked as follows
@@ -53,7 +53,7 @@
       [ShiftC] -live -stopped
          ShiftE(user)
    [ShiftI] -live -shift <-focus
-      Mention(user,ShiftI)
+      Mention(user,ShiftI,"this is shifty")
 
     # You can shift focus back to C (or anywhere else)
     # Notice use of getLastUnshift() method below to shift the focus back
@@ -68,7 +68,7 @@
       [ShiftC] -accepted -live -stopped
          ShiftE(user)
    [ShiftI] -live -shift -stopped
-      Mention(user,ShiftI)
+      Mention(user,ShiftI,"this is shifty")
    [ShiftB] -live -continuation -shift
       [ShiftC] -accepted -live -continuation <-focus
          Propose.Should(user,ShiftC)
@@ -81,10 +81,9 @@
     # be primitive or non-primitive)
   > new Unauth
     # And we mention it
-  > execute edu.wpi.disco.lang.Mention / $new
-    # Warning line only generated in debug mode
-Unexplained occurrence: mention execute Unauth
-    Mention(user,Unauth)
+  > execute edu.wpi.disco.lang.Mention / $new / "this is unauthorized"
+Unexplained occurrence: this is unauthorized
+    Mention(user,Unauth,"this is unauthorized")
     # you can check -unexplained flag below by
     #     Disco.getLastOccurrence().isUnexplained()
   > history
@@ -95,11 +94,11 @@ Unexplained occurrence: mention execute Unauth
       [ShiftC] -accepted -live -stopped
          ShiftE(user)
    [ShiftI] -live -shift -stopped
-      Mention(user,ShiftI)
+      Mention(user,ShiftI,"this is shifty")
    [ShiftB] -live -continuation -shift
       [ShiftC] -accepted -live -continuation <-focus
          Propose.Should(user,ShiftC)
-         Mention(user,Unauth) -unexplained
+         Mention(user,Unauth,"this is unauthorized") -unexplained
          [ShiftF] -live
       [ShiftD] -live
          [ShiftG] -live
