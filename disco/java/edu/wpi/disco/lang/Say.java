@@ -44,8 +44,8 @@ public class Say extends Utterance implements Utterance.Text {
    public String formatTask () { return formatTaskText(this); }
    
    @Override
-   public String formatTaskText (String format, String key) {
-      return formatTask(format, key); 
+   public String formatTask (String format, String key) {
+      return super.formatTask(format, key); 
    }
    
    @Override

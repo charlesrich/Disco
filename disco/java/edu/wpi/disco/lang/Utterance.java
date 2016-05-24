@@ -32,8 +32,7 @@ public abstract class Utterance extends Decomposition.Step {
    public interface Text {
       
       String getText ();
-      String formatTaskText (String format, String key);
-      
+      String formatTask (String format, String key);
       Disco getDisco ();
       TaskClass getType ();
       Decomposition getDecomposition ();
@@ -44,7 +43,7 @@ public abstract class Utterance extends Decomposition.Step {
 
       default String formatTaskText (Task task) { 
          String format = getDisco().getFormat(task);
-         if ( format != null ) return formatTaskText(format, null);
+         if ( format != null ) return formatTask(format, null);
          String text = getText(); 
          return text == null ? "..." :  
             // use decomposition and step name to identify this point in dialogue tree
