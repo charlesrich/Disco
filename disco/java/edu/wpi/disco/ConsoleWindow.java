@@ -26,7 +26,6 @@ public class ConsoleWindow extends ShellWindow {
          @Override
          public void windowClosed (WindowEvent e) { interaction.exit(); }
       });
-      interaction.start(true);
    }
    
    @Override

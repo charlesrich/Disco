@@ -211,7 +211,7 @@ public class Guide extends Shell {
     * @param args &lt;id&gt; [&lt;namespace&gt;] [ / &lt;value&gt; ]*
     */
    public void task (String args) {
-      Task task = processTask(args, getProposed(), false);
+      Task task = processTask(args, getProposed(), true);
       propose(null); // clear proposals, if any
       if ( task != null ) {
          Plan focus = null;
@@ -266,7 +266,7 @@ public class Guide extends Shell {
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public void done (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), false);
+      Task occurrence = processTaskIf(args, getProposed(), true);
       if ( occurrence != null ) done(occurrence); 
    }
    
@@ -300,7 +300,7 @@ public class Guide extends Shell {
     * @see #done(String)
     */
    public void execute (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), false);
+      Task occurrence = processTaskIf(args, getProposed(), true);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             Grounding script = occurrence.getGrounding();

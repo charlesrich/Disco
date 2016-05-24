@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<model about="urn:disco.wpi.edu:models:Restaurant"
+       xmlns="http://www.cs.wpi.edu/~rich/d4g"
+       xmlns:t="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext">
+
+  <!--
+       This is a greatly simplified version of the restaurant negotiation model that
+       is part of Lydia Ould Ouali's research at LIMSI.  See test/Restaurant0.test and also
+       test/dual/Restaurant.txt, Restaurant1.test and Restaurant2.test
+
+       See Restaurant.properties for control properties.
+  -->
+
+  <t:task id="Top">
+
+    <t:subtasks id="agentFirst">
+      <t:step name="first" task="AgentFirst"/>
+    </t:subtasks>
+
+    <t:subtasks id="userFirst">
+      <t:step name="first" task="UserFirst"/>
+    </t:subtasks>
+
+  </t:task>
+
+  <!--
+       If agent is dominant, it will keep insisting on Chinese until the user agrees.
+       If agent is submissive, it asks what the user likes and always agrees.
+  -->
+
+  <agent id="AgentFirst" text="Let's eat dinner together">
+
+    <do task="Chinese"/>
+    
+    <do task="Mexican"/>
+    
+    <user text="What do you like?">
+
+      <agent text="I like Chinese">
+
+        <do task="Mexican"/>
+        
+        <user text="Ok, which Chinese restaurant?"/>
+
+      </agent>
+
+    </user>
+
+  </agent>
+
+  <user id="UserFirst" text="Let's eat dinner together">
+
+    <agent text="I like Chinese" applicable="dominant">
+      
+      <do task="Mexican"/>
+      
+      <user text="Ok, which Chinese restaurant?"/>
+
+    </agent>
+
+    <agent text="What do you like?" applicable="!dominant">
+      
+      <do task="Chinese"/>
+      
+      <do task="Mexican"/>
+
+    </agent>
+
+  </user>
+ 
+  <user id="Chinese" text="I like Chinese">
+
+    <agent text="Ok, which Chinese restaurant?"/>
+
+  </user>
+
+  <user id="Mexican" text="I like Mexican">
+
+    <agent text="I like Chinese" applicable="dominant">
+
+      <do task="Mexican"/>
+      
+      <user text="Ok, which Chinese restaurant?"/>
+
+    </agent>
+    
+    <agent text="Ok, which Mexican restaurant?" applicable="!dominant"/>
+    
+  </user>
+
+  <t:script init="true">
+    $disco.addTop("Top");
+    var dominant = true;  // can reset before starting dialog
+  </t:script>
+  
+</model>

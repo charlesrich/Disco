@@ -1,0 +1,93 @@
+    # This is Console2.test from executing bin/dual
+    # Agent2 is "self" (system)
+    
+    # See test/dual/Restaurant1.test for Console1 (other agent)
+    
+    # See also test/dual/Test2.txt and test/Restaurant0.test
+
+    # May 22, 2016 3:23:53 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+    Agent1 says "Ok."
+
+    # See disco/models/Restaurant.d4g.xml
+  > load models/Restaurant.xml
+  
+    # this agent set to submissive (other agent default dominant)
+  > eval dominant = false
+    # Returned 'false'
+    
+    # this agent gets next turn
+  > next
+    Agent2 says "Let's eat dinner together."
+  > next
+    Agent1 says "I like Chinese."
+  > next
+    Agent2 says "Ok, which Chinese restaurant?"
+  > history
+
+Agent1 says "Ok."
+[Achieve Top by agentFirst] -done
+   [Achieve AgentFirst] -done
+      Agent2 says "Let's eat dinner together."
+      [ ] -done
+         [Achieve Chinese] -done
+            Agent1 says "I like Chinese."
+            [ ] -done <-focus
+               Agent2 says "Ok, which Chinese restaurant?"
+
+  > clear
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+    
+    # this agent also set to dominant
+  > eval dominant = true
+    # Returned 'true'
+
+    # other agent gets first turn
+  > next
+    Agent1 says "Let's eat dinner together."
+  > next
+    Agent2 says "I like Chinese."
+  > next
+    Agent1 says "Ok, which Chinese restaurant?"
+  > history
+
+[Achieve Top by userFirst] -done
+   [Achieve UserFirst] -done
+      Agent1 says "Let's eat dinner together."
+      [ ] -done
+         Agent2 says "I like Chinese."
+         [ ] -done <-focus
+            Agent1 says "Ok, which Chinese restaurant?"
+
+  > clear
+    
+    # this agent set to submissive
+    # other agent also set to submissive (see Restaurant.test)
+  > eval dominant = false
+    # Returned 'false'
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+
+    # this agent gets first turn
+  > next
+    Agent2 says "Let's eat dinner together."
+  > next
+    Agent1 says "What do you like?"
+  > next
+    Agent2 says "I like Chinese."
+  > next
+    Agent1 says "Ok, which Chinese restaurant?"
+  > history
+
+[Achieve Top by agentFirst] -done
+   [Achieve AgentFirst] -done
+      Agent2 says "Let's eat dinner together."
+      [ ] -done
+         Agent1 says "What do you like?"
+         Agent2 says "I like Chinese."
+         [ ] -done <-focus
+            Agent1 says "Ok, which Chinese restaurant?"
+
+  > quit
+    

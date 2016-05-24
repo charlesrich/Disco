@@ -5,7 +5,7 @@
     User says "Let's achieve RepeatingMinMax."
     Agent execute B.
     Agent execute B.
-    Agent says "Do you want to do B again?"
+    Agent says "Should we do B again?"
   > history
 
 [Achieve RepeatingMinMax] -accepted -live
@@ -15,7 +15,7 @@
    [Execute B] -optional -live
       [User says one of us should execute B again] -live <-focus
          [User accept] -live
-            Agent says "Do you want to do B again?"
+            Agent says "Should we do B again?"
    [Execute C] -live
    [Execute B] -optional
    [Execute C]
@@ -28,7 +28,7 @@
   >> 1
     User says "Yes."
     Agent execute B.
-    Agent says "Do you want to do B again?"
+    Agent says "Should we do B again?"
   > history
 
 [Achieve RepeatingMinMax] -accepted -live
@@ -37,13 +37,13 @@
    Agent execute B.
    [Agent execute B] -optional -accepted -done
       [User says please execute B again] -succeeded
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
       Agent execute B.
    [Execute B] -optional -live
       [User says one of us should execute B again] -live <-focus
          [User accept] -live
-            Agent says "Do you want to do B again?"
+            Agent says "Should we do B again?"
    [Execute C] -live
    [Execute C]
    [Execute C]
@@ -66,12 +66,12 @@
    Agent execute B.
    [Agent execute B] -optional -accepted -done
       [User says please execute B again] -succeeded
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
       Agent execute B.
    [Execute B] -optional -rejected
       [User says one of us should execute B again]
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "No."
    Agent execute C.
    Agent execute C.

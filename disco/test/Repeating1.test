@@ -29,7 +29,7 @@
    [repeat$3: Execute B] -optional
 
   > next
-    Agent says "Do you want to do B again?"
+    Agent says "Should we do B again?"
   > say
 [1] Yes.
 [2] No.
@@ -43,7 +43,7 @@
    User execute B.
    [repeat$1: Execute B] -optional -accepted -live
       [User says one of us should execute B again] -succeeded <-focus
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
    [next: Execute C] -live
    [repeat$2: Execute B] -optional
@@ -51,7 +51,7 @@
 
   > next
     Agent execute B.
-    Agent says "Do you want to do B again?"
+    Agent says "Should we do B again?"
   > history
 
 [Achieve Repeating by repeating] -accepted -live
@@ -59,13 +59,13 @@
    User execute B.
    [repeat$1: Agent execute B] -optional -accepted -done
       [User says please execute B again] -succeeded
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
       Agent execute B.
    [repeat$2: Execute B] -optional -live
       [User says one of us should execute B again] -live
-         [User accept do you want to do B again?] -live <-focus
-            Agent says "Do you want to do B again?"
+         [User accept should we do B again?] -live <-focus
+            Agent says "Should we do B again?"
    [next: Execute C] -live
    [repeat$3: Execute B] -optional
 
@@ -82,12 +82,12 @@
    User execute B.
    [repeat$1: Agent execute B] -optional -accepted -done
       [User says please execute B again] -succeeded
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
       Agent execute B.
    [repeat$2: Execute B] -optional -rejected
       [User says one of us should execute B again] <-focus
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "No."
    [next: Execute C] -live
    [repeat$3: Execute B] -optional
@@ -102,12 +102,12 @@
    User execute B.
    [repeat$1: Agent execute B] -optional -accepted -done
       [User says please execute B again] -succeeded
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "Yes."
       Agent execute B.
    [repeat$2: Execute B] -optional -rejected
       [User says one of us should execute B again]
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "No."
    Agent execute C.
    Agent says "Ok." -unexplained

@@ -103,14 +103,15 @@ public class Shell {
       else source(from);
       // allow overriding of log file name
       this.log = log != null ? log :
-         new File(System.getProperty("java.io.tmpdir") + '/'
-            + (source == null ? 
-               Utils.getSimpleName(getClass(), false) : 
-                  new File(source.getFile()).getName()) 
-                  + ".test");
+         newLog(source == null ? Utils.getSimpleName(getClass(), false) : 
+                new File(source.getFile()).getName());
       shell = this;
    }
     
+   public static File newLog (String name) {  
+      return new File(System.getProperty("java.io.tmpdir") + '/' + name + ".test");
+   }
+   
    /**
     * Command loop. Uses reflection to invoke commands; see methods with command
     * names.
@@ -364,7 +365,7 @@ public class Shell {
     * Note this method cannot be named 'new' even though that is typed command
     */
    private Task newInstance (String args) {
-      Task task = processTaskIf(args, null, false);
+      Task task = processTaskIf(args, null, true);
       getEngine().setGlobal("$new", task);
       return task;
    }
@@ -507,8 +508,8 @@ public class Shell {
    /**
     * @see #processTask(String,Plan,boolean)
     */
-   protected Task processTaskIf (String args, Plan focus, boolean optional) {
-      Task occurrence = processTask(args, focus, optional);
+   protected Task processTaskIf (String args, Plan focus, boolean success) {
+      Task occurrence = processTask(args, focus, success);
       if ( occurrence == null ) 
          warning("Missing task argument (and no focus).");
       else if ( focus != null && focus.getGoal().isMatch(occurrence) )
@@ -521,7 +522,7 @@ public class Shell {
     * 
     * JavaScript to compute all <em>declared</em> input
     * and output slot values (in order declared), followed by external, and followed
-    * by success slot if optional is false. Skipped slots can be specified
+    * by success slot if success flag is true. Skipped slots can be specified
     * by '/ /'.<br>
     * <br>
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
@@ -529,7 +530,7 @@ public class Shell {
     * 
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
-   public Task processTask (String args, Plan focus, boolean optional) {
+   public Task processTask (String args, Plan focus, boolean success) {
       TaskClass type = focus == null ? null : focus.getType(); 
       StringTokenizer tokenizer = new StringTokenizer(args, "/");
       if ( tokenizer.hasMoreTokens() && !args.startsWith("/") ) {
@@ -554,7 +555,7 @@ public class Shell {
       for (String name : type.declaredOutputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       if ( !nextArg(tokenizer, task, "external") ) return task;
-      if ( !optional ) nextArg(tokenizer, task, "success");
+      if ( success ) nextArg(tokenizer, task, "success");
       if ( tokenizer.hasMoreTokens() ) 
          warning("Ignoring rest of line starting at: \'"+tokenizer.nextToken()+"\'");
       return task;

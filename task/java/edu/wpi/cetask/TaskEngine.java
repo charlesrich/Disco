@@ -30,7 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.9";
+   public static String VERSION = "1.10";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
@@ -604,7 +604,7 @@ public class TaskEngine {
    public Collection<TaskModel> getModels () { return Collections.unmodifiableCollection(models.values()); }
 
    /**
-    * Return unique task class, if any, identified by given qualified name
+    * Return unique task class identified by given qualified name or null if none
     */
    public TaskClass resolveTaskClass (QName qname) {
       return getModel(qname.getNamespaceURI()).getTaskClass(qname.getLocalPart()); 

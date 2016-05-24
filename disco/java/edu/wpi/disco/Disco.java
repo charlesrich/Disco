@@ -27,7 +27,7 @@ import javax.xml.xpath.XPath;
  */
 public class Disco extends TaskEngine {
    
-   public static String VERSION = "1.15";
+   public static String VERSION = "1.16";
    
    /**
     * Main method for running stand-alone Disco with console.
@@ -43,12 +43,21 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static class Dual {
+   public static class Shared { 
 
       /**
-       * Main method for running stand-alone Disco with two agents and console.
-       * Note that the two agents are not treated entirely symmetrically. For example,
+       * Main method for running a <em>single</em> instance of Disco with two instances
+       * of Disco default agents and a console.  This approach works only if
+       * all of the recipe applicability conditions in the task model are based
+       * on <em>shared</em> knowledge, which is typically not true, for example,
+       * for dialogue trees.  
+       * <p>
+       * Note also that the two agents are not treated entirely symmetrically. For example,
        * the external agent does not need permission to perform unauthorized actions.
+       * <p>
+       * See test/dual/Shared1.test
+       * <p>
+       * @see Dual
        * 
        * @param args first string (if any) is url or filename from which to read 
        *             console commands
@@ -60,7 +69,6 @@ public class Disco extends TaskEngine {
                args.length > 0 && args[0].length() > 0 ? args[0] : null)
          .start(true); // given external agent first turn
       }
-
    }
    
    /**
@@ -364,7 +372,7 @@ public class Disco extends TaskEngine {
    }
 
    @Override
-   public void pop() {
+   public void pop () {
 	   if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
 	   Segment segment = stack.pop();
 	   Plan plan = segment.getPlan();
@@ -433,17 +441,21 @@ public class Disco extends TaskEngine {
       super.removeTop(plan);
    }
    
+   /**
+    * Use {@link Interaction#occurred(boolean,Task,Plan)}
+    */
    @Override
+   @Deprecated
    public Plan occurred (Task occurrence) { 
       return interaction.occurredSilent(true, occurrence, null);
    }
    
-   /* *
+   /*
     * Extend simple plan recognition in task engine with discourse interpretation
     * algorithm (but still not including decomposition choice interpolation).
     */
    @Override
-   public Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
+   protected Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
       Segment top = getSegment();
       if ( contributes == null && top.isInterruption() && top.getPlan().isExhausted() ) {
          // special case for automatically popping exhausted interruptions

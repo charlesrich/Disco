@@ -9,7 +9,7 @@
 #
 this=`dirname $0`
 testdir=test
-command=$this/disco
+command="$this/disco"
 if [ "$1" ]; then
   testdir=$1
 fi

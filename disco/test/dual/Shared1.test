@@ -1,0 +1,38 @@
+    # May 23, 2016 8:57:09 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+    External says "Ok."
+  > load models/Test.xml
+  > task A
+    External says "Let's achieve A."
+    System says "Should we do B?"
+  > next
+    External says "One of us should execute B."
+  > next
+    System execute B.
+    System execute C.
+    System says "Should one of us execute D?"
+  > next
+    External says "One of us should execute D."
+  > next
+    System execute D.
+    System says "Ok."
+  > history
+
+External says "Ok."
+[Achieve A] -accepted -done
+   External says "Let's achieve A."
+   [System execute B] -optional -accepted -done
+      [External says please execute B] -done
+         System says "Should we do B?"
+         External says "One of us should execute B."
+      System execute B.
+   System execute C.
+   [System execute D] -optional -accepted -done <-focus
+      [External says please execute D] -done
+         System says "Should one of us execute D?"
+         External says "One of us should execute D."
+      System execute D.
+      System says "Ok."
+
+  > quit
+    

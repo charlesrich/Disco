@@ -532,7 +532,9 @@ public class TaskClass extends TaskModel.Member {
    TaskClass (TaskEngine engine, String id) {
       new TaskModel(null, engine).super(null, null, "**ROOT**");
       precondition = null; postcondition = null;
-      inputNames = outputNames = declaredInputNames = declaredOutputNames = null;
+      inputNames = outputNames = declaredInputNames = declaredOutputNames = Collections.emptyList();
+      declaredInputs = Collections.emptyList();
+      declaredOutputs = Collections.emptyList();
       scripts = null; 
       slots = new HashMap<String,Slot>();
       inputs  =  new ArrayList<Input>();
@@ -540,8 +542,6 @@ public class TaskClass extends TaskModel.Member {
       outputs = new ArrayList<Output>();
       new Output("success", false, this); 
       new Output("when", false, this); 
-      declaredInputs = Collections.emptyList();
-      declaredOutputs = Collections.emptyList(); 
       hasModifiedInputs = false;
    }
    

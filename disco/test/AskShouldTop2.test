@@ -1,0 +1,45 @@
+    # May 21, 2016 2:37:54 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > new A
+  > execute edu.wpi.disco.lang.Ask$Should / $new
+    User says "Should we achieve A?"
+    Agent says "Let's achieve A."
+  > next
+    Agent says "Should we do B?"
+  > say
+[1] Yes.
+[2] No.
+[3] Let's not achieve A.
+  >> 1
+    User says "Yes."
+    Agent execute B.
+    Agent execute C.
+    Agent says "Should one of us execute D?"
+  > say
+[1] Yes.
+[2] No.
+[3] Stop achieve A.
+  >> 2
+    User says "No."
+    Agent says "Ok."
+  > history
+
+[Agent says let's achieve A] -accepted -done
+   User says "Should we achieve A?"
+   Agent says "Let's achieve A."
+[Achieve A] -accepted -done
+   [Agent execute B] -optional -accepted -done
+      [User says please execute B] -succeeded
+         Agent says "Should we do B?"
+         User says "Yes."
+      Agent execute B.
+   Agent execute C.
+   [Execute D] -optional -rejected
+      [User says one of us should execute D] <-focus
+         Agent says "Should one of us execute D?"
+         User says "No."
+         Agent says "Ok."
+
+  > quit
+    

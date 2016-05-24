@@ -236,12 +236,12 @@ public class Console extends Shell {
    }
 
    /* *
-    * Equivalent to executing Propose.Should of specified task.
+    * Equivalent to user executing Propose.Should of specified task.
     * 
     * @see Propose.Should
     */
    public void task (String args) {
-      Task should = processTaskIf(args, null, true);
+      Task should = processTaskIf(args, null, false);
       if ( should != null ) 
          interaction.occurred(true, 
                Propose.Should.newInstance(getEngine(), true, should), null); 
@@ -327,7 +327,7 @@ public class Console extends Shell {
     */
    public void done (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, false);
+      Task task = processTaskIf(args, focus, true);
       if ( task != null ) 
          done(task.isPrimitive() ? task : new Propose.Done(getEngine(), true, task),
               false);
@@ -341,7 +341,7 @@ public class Console extends Shell {
     */
    public Task execute (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, false);
+      Task task = processTaskIf(args, focus, true);
       if ( !task.isPrimitive() ) {
          err.println("Execute not allowed for non-primitive tasks.");
          return null;
@@ -364,7 +364,7 @@ public class Console extends Shell {
    }
 
    /**
-    * End user console turn.  If there is a nested user, then it gets to
+    * End console (user) turn.  If there is a nested user, then it gets to
     * respond next; otherwise it is agent's turn to respond.
     * In automatic turn mode this command is not needed, since
     * every turn is a single task; otherwise this is the command that

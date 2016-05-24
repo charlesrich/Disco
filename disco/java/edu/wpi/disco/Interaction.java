@@ -325,7 +325,7 @@ public class Interaction extends Thread {
    
    private boolean responded;  // see doTurn
  
-   private boolean externalFloor; // true iff external has floor
+   protected boolean externalFloor = true; // true iff external has floor
    
    /**
     * Return the actor who currently has the turn (may be null ).
@@ -334,7 +334,7 @@ public class Interaction extends Thread {
    
    // NB all read/write to discourse state on this single thread
 
-   protected boolean running;
+   protected volatile boolean running; // volatile for event thread
    
    @Override
    public void run () {
@@ -343,7 +343,9 @@ public class Interaction extends Thread {
       boolean first = true;
       // this is the turn-taking loop
       while (running) {
-         try { if ( !doTurn(first) ) break; }
+         // may be updated by library loading
+         boolean ok = disco.getProperty("interaction@ok", this.ok);
+         try { if ( !doTurn(ok) ) break; }
          catch (Throwable e) {
             if ( console != null ) { 
                console.exception(e); // will throw if debug
@@ -351,7 +353,10 @@ public class Interaction extends Thread {
                externalFloor = false;
             } else throw e;
          }
+         if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
+            console.respond(this); 
          first = false;
+         externalFloor = !externalFloor;
       }
       cleanup();
    }
@@ -359,22 +364,17 @@ public class Interaction extends Thread {
    /**
     * Perform one turn of interaction.
     * 
-    * @param first true if this is first turn
-    * @return true iff interaction should continue running
+    * @param ok generate Ok if nothing else to say
+    * @return true iff interaction should continue running 
     */
-   public boolean doTurn (boolean first) {
+   protected boolean doTurn (boolean ok) {
       Actor floor = getFloor();
       responded = false;
-      boolean ok = disco.getProperty("interaction@ok", this.ok);
       if ( floor != null ) 
          floor.respond(this, ok, 
                disco.getProperty("interaction@guess", guess),
                disco.getProperty("interaction@retry", retry));
-      if ( !running ) return false;
-      if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
-         console.respond(this);
-      externalFloor = !externalFloor;
-      return true;
+      return running;
    }
    
    /**
@@ -405,7 +405,7 @@ public class Interaction extends Thread {
     * @param from url or filename from which to read console commands (for testing),
     *        or null (ignored if console false)
     * @param console flag to control whether a console is provided
-    * @param disco associated instance of Disco (or extension)
+    * @param disco associated instance of Disco (or extension) or null (new Disco created by default)
     * @param title for interaction thread 
     */
    public Interaction (Actor system, Actor external, String from, boolean console, Disco disco, String title) {
@@ -436,10 +436,15 @@ public class Interaction extends Thread {
     */
    public void start (boolean externalFloor) {
       this.externalFloor = externalFloor;
-      running = true;
       start();
    }
 
+   @Override
+   public void start () {
+      running = true;
+      super.start();
+   }
+   
    /**
     * Clear any discourse state information stored in this interaction.
     * Thread-safe.  
@@ -461,8 +466,10 @@ public class Interaction extends Thread {
     * Stop this interaction thread.
     */
    public void exit () { 
-      running = false; 
-      interrupt(); // in case blocked 
+      if ( running ) {
+         running = false;
+         interrupt(); // in case blocked
+      }
    }
    
    /**

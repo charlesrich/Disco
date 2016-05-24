@@ -28,7 +28,7 @@ public class ShellWindow extends JFrame implements AutoCloseable {
    @Override
    public void close () { 
       // note shell.cleanup() called automatically via InterruptedException
-      // below in panel readline
+      // below in panel readLine
       dispose();
    }
    
@@ -71,9 +71,11 @@ public class ShellWindow extends JFrame implements AutoCloseable {
          shell.setOut(print);
          shell.setErr(print);
          shell.init(engine); // to set logStream
+         /* caused duplicate lines
          OutputStream logOutputStream = new Utils.CopyOutputStream(shell.getLogStream(), outputStream);
          System.setOut(new PrintStream(new Utils.CopyOutputStream(System.out, logOutputStream), true));
          System.setErr(new PrintStream(new Utils.CopyOutputStream(System.err, logOutputStream), true));
+         */
          shell.setReader(new Shell.Reader() {
 
             @Override

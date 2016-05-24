@@ -1,0 +1,133 @@
+    # May 22, 2016 2:40:32 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Restaurant.xml
+    # default dominant = true
+    # make agent take first turn
+  > next
+    Agent says "Let's eat dinner together."
+  > say
+[1] I like Chinese.
+[2] I like Mexican.
+[3] What do you like?
+  >> 3
+    User says "What do you like?"
+    Agent says "I like Chinese."
+  > say
+[1] I like Mexican.
+[2] Ok, which Chinese restaurant?
+  >> 1
+    User says "I like Mexican."
+    Agent says "I like Chinese."
+  > say
+[1] I like Mexican.
+[2] Ok, which Chinese restaurant?
+  >> 1
+    User says "I like Mexican."
+    Agent says "I like Chinese."
+  > say
+[1] I like Mexican.
+[2] Ok, which Chinese restaurant?
+  >> 2
+    User says "Ok, which Chinese restaurant?"
+    Agent says "Ok."
+  > history
+
+[Achieve Top by agentFirst] -done
+   [Achieve AgentFirst] -done
+      Agent says "Let's eat dinner together."
+      [ ] -done
+         User says "What do you like?"
+         Agent says "I like Chinese."
+         [ ] -done
+            [Achieve Mexican] -done
+               User says "I like Mexican."
+               [ ] -done
+                  Agent says "I like Chinese."
+                  [ ] -done
+                     [Achieve Mexican] -done
+                        User says "I like Mexican."
+                        [ ] -done
+                           Agent says "I like Chinese."
+                           [ ] -done <-focus
+                              User says "Ok, which Chinese restaurant?"
+                              Agent says "Ok."
+
+  > clear
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+    # user takes first turn now (agent still dominant)
+  > execute edu.wpi.disco.lang.Say / "Let's eat dinner together"
+    User says "Let's eat dinner together."
+    Agent says "I like Chinese."
+  > say
+[1] I like Mexican.
+[2] Ok, which Chinese restaurant?
+  >> 2
+    User says "Ok, which Chinese restaurant?"
+    Agent says "Ok."
+  > history
+
+[Achieve Top by userFirst] -done
+   [Achieve UserFirst] -done
+      User says "Let's eat dinner together."
+      [ ] -done
+         Agent says "I like Chinese."
+         [ ] -done <-focus
+            User says "Ok, which Chinese restaurant?"
+            Agent says "Ok."
+
+  > clear
+    # make agent submissive
+  > eval dominant = false
+    # Returned 'false'
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+    # agent taking first turn
+  > next
+    Agent says "Let's eat dinner together."
+  > say
+[1] I like Chinese.
+[2] I like Mexican.
+[3] What do you like?
+  >> 2
+    User says "I like Mexican."
+    Agent says "Ok, which Mexican restaurant?"
+  > history
+
+[Achieve Top by agentFirst] -done
+   [Achieve AgentFirst] -done
+      Agent says "Let's eat dinner together."
+      [ ] -done
+         [Achieve Mexican] -done
+            User says "I like Mexican."
+            [ ] -done <-focus
+               Agent says "Ok, which Mexican restaurant?"
+
+  > clear
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+    # user taking first turn
+  > execute edu.wpi.disco.lang.Say / "Let's eat dinner together"
+    User says "Let's eat dinner together."
+    Agent says "What do you like?"
+  > say
+[1] I like Chinese.
+[2] I like Mexican.
+  >> 1
+    User says "I like Chinese."
+    Agent says "Ok, which Chinese restaurant?"
+  > history
+
+[Achieve Top by userFirst] -done
+   [Achieve UserFirst] -done
+      User says "Let's eat dinner together."
+      [ ] -done
+         Agent says "What do you like?"
+         [ ] -done
+            [Achieve Chinese] -done
+               User says "I like Chinese."
+               [ ] -done <-focus
+                  Agent says "Ok, which Chinese restaurant?"
+
+  > quit
+    

@@ -78,7 +78,7 @@ public abstract class Utils {
       catch (MalformedURLException e) {
          URL url = ClassLoader.getSystemResource(
                source.startsWith("/") ? source.substring(1) : source);
-         // sic toURI() first (see usage note in File.toURL)
+         // sic toURI() first (see deprecated usage note in {@link File#toURL()})
          return url == null ? new File(source).toURI().toURL() : url;
       }
    }

@@ -40,9 +40,12 @@ public class ComponentExample {
       // for debugging, such as using the 'history' or 'status' commands and using
       // 'eval' to check or set application state.
       try (ConsoleWindow window = new ConsoleWindow(interaction, 600, 500, 14)) {
-         
-         window.setVisible(true);
 
+         // this line only needed if using optional console window
+         interaction.start(true);
+
+         window.setVisible(true);
+         
          // the code below is running on the *main* thread, but think of this as an
          // example of the appropriate thread in the embedding application
 
@@ -86,6 +89,7 @@ public class ComponentExample {
          System.out.println();
          for (Plugin.Item item : items) 
             System.out.println("MENU: "+interaction.format(item, true, true));
+         System.out.println();
          // choose second utterance from menu
          Plugin.Item item = items.get(1);
          user(item.task, item.contributes);
@@ -93,8 +97,8 @@ public class ComponentExample {
          // if optional Disco console window used, go to window now and try typing in 
          // commands, such as 'history'
       
-         // next line is here only to keep optional Disco console window open in 
-         // this demo until you type 'quit' or close it
+         // next line is here only to keep optional Disco console window open in this
+         // demo so you can type commands at it until you type 'quit' or close it
          try { interaction.join(); } catch (InterruptedException e) {}
       }
    }
@@ -123,7 +127,7 @@ public class ComponentExample {
          // and/or pass utterance string to TTS or GUI
          // for now we just call Disco's default formatting and print
          // out result on system console
-         System.out.println("AGENT: "+interaction.format(utterance));
+         System.out.println("\nAGENT: "+interaction.format(utterance));
       }
    }
 }

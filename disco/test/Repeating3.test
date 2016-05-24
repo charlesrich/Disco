@@ -3,7 +3,7 @@
   > load models/Test.xml
   > task RepeatingAll
     User says "Let's achieve RepeatingAll."
-    Agent says "Do you want to do B?"
+    Agent says "Should we do B?"
   > history
 
 [Achieve RepeatingAll] -accepted -done
@@ -11,7 +11,7 @@
    [Execute B] -optional -live
       [User says one of us should execute B] -live <-focus
          [User accept] -live
-            Agent says "Do you want to do B?"
+            Agent says "Should we do B?"
    [Execute B] -optional
    [Execute B] -optional
    [Execute B] -optional
@@ -23,20 +23,20 @@
   >> 1
     User says "Yes."
     Agent execute B.
-    Agent says "Do you want to do B again?"
+    Agent says "Should we do B again?"
   > history
 
 [Achieve RepeatingAll] -accepted -done
    User says "Let's achieve RepeatingAll."
    [Agent execute B] -optional -accepted -done
       [User says please execute B]
-         Agent says "Do you want to do B?"
+         Agent says "Should we do B?"
          User says "Yes."
       Agent execute B.
    [Execute B] -optional -live
       [User says one of us should execute B again] -live <-focus
          [User accept] -live
-            Agent says "Do you want to do B again?"
+            Agent says "Should we do B again?"
    [Execute B] -optional
    [Execute B] -optional
 
@@ -53,12 +53,12 @@
    User says "Let's achieve RepeatingAll."
    [Agent execute B] -optional -accepted -done
       [User says please execute B]
-         Agent says "Do you want to do B?"
+         Agent says "Should we do B?"
          User says "Yes."
       Agent execute B.
    [Execute B] -optional -rejected
       [User says one of us should execute B again] <-focus
-         Agent says "Do you want to do B again?"
+         Agent says "Should we do B again?"
          User says "No."
          Agent says "Ok."
    [Execute B] -optional

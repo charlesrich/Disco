@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# Usage: dual [ <filename> ]
+# Usage: dual
 #
-# Runs the given script file with two agents and compares resulting temporary log with
-# corresponding test log file <filename>.test, if it exists
+# Runs two instances of Disco with two interactive consoles.
 #
 dir="`dirname $0`"
-"$dir/../../task/bin/_run" edu.wpi.disco.Disco\$Dual "$1" class ../disco/class lib/msv-rng.jar
+"$dir/_disco" edu.wpi.disco.Dual 

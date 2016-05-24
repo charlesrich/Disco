@@ -13,7 +13,7 @@ public class Segment {
 
 	private Segment parent;
 
-	public Segment getParent() {
+	public Segment getParent () {
 		return parent;
 	}
 
@@ -23,15 +23,15 @@ public class Segment {
 	 * @return unmodifiable list of children of this segment. Children are
 	 *         either segments or task occurrences
 	 */
-	public List<Object> getChildren() {
+	public List<Object> getChildren () {
 		return Collections.unmodifiableList(children);
 	}
 
-	protected Iterator<Object> children() {
+	protected Iterator<Object> children () {
 		return children.iterator();
 	}
 
-	public void add(Task task) {
+	public void add (Task task) {
 		if (task == null)
 			throw new IllegalArgumentException("Null task not allowed!");
 		children.add(task);
@@ -39,16 +39,16 @@ public class Segment {
 
 	private Plan plan;
 
-	public Plan getPlan() {
+	public Plan getPlan () {
 		return plan;
 	}
 
 	// see Disco.retry
-	void setPlan(Plan plan) {
+	void setPlan (Plan plan) {
 		this.plan = plan;
 	}
 
-	public Task getPurpose() {
+	public Task getPurpose () {
 		return plan == null ? null : plan.getGoal();
 	}
 
@@ -56,13 +56,13 @@ public class Segment {
 	// should not make it an interruption
 	private boolean interruption; // not final due to remove method
 
-	public boolean isInterruption() {
+	public boolean isInterruption () {
 		return interruption;
 	}
 
 	private boolean stopped;
 
-	public boolean isStopped() {
+	public boolean isStopped () {
 		return stopped;
 	}
 
@@ -73,41 +73,41 @@ public class Segment {
 	 *         i.e., one of its children was popped when the child's purpose was
 	 *         not done (see docs/LeshRichSidner2001_UM.pdf).
 	 */
-	public boolean isShift() {
+	public boolean isShift () {
 		return shift;
 	}
 
 	/**
 	 * @see #isShift()
 	 */
-	public void setShift(boolean shift) {
+	public void setShift (boolean shift) {
 		this.shift = shift;
 	}
 
 	private final boolean continuation;
 
-	public boolean isContinuation() {
+	public boolean isContinuation () {
 		return continuation;
 	}
 
-	public void stop() {
+	public void stop () {
 		if (isRoot())
 			throw new RuntimeException("Cannot stop root segment!");
 		stopped = true;
 	}
 
-	Segment() { // for root only
+	Segment () { // for root only
 		this.plan = null;
 		this.parent = null;
 		interruption = false;
 		continuation = false;
 	}
 
-	public boolean isRoot() {
+	public boolean isRoot () {
 		return parent == null;
 	}
 
-	public Segment(Plan plan, Segment parent, boolean continuation) {
+	public Segment (Plan plan, Segment parent, boolean continuation) {
 		if (plan == null || parent == null)
 			throw new IllegalArgumentException("Segment must have non-null plan and parent!");
 		this.plan = plan;
@@ -120,7 +120,7 @@ public class Segment {
 	}
 
 	// used for removing implicit Accept goals, see Disco.reconcileStack()
-	void remove() {
+	void remove () {
 		int index = parent.children.indexOf(this);
 		parent.children.remove(this);
 		Plan planParent = plan.getParent();
@@ -140,7 +140,7 @@ public class Segment {
 	}
 
 	@Override
-	public String toString() {
+	public String toString () {
 		return "<Segment " + getPurpose() + '>';
 	}
 }

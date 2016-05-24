@@ -1,0 +1,52 @@
+# See definition of task A in disco/models/Test.xml
+#
+# Below is the output printed by
+#
+#  java -cp disco.jar edu.wpi.disco.Dual\$Test1
+#
+# See the main method definition of this class, which runs two agents in
+# separate instances of Disco without consoles. 
+#
+# See also test/dual/Console1.test and Console2.test
+
+Agent2 Interaction
+
+[Agent2 says let's achieve A] -accepted -done
+   Agent1 says "Should we achieve A?"
+   Agent2 says "Let's achieve A."
+[Achieve A] -accepted -done
+   [Agent1 execute B] -optional -done
+      [Agent2 says one of us should execute B] -accepted -done
+         Agent1 says "Should we do B?"
+         Agent2 says "One of us should execute B."
+      Agent1 execute B.
+   Agent1 execute C.
+   [Agent1 execute D] -optional -done <-focus
+      [Agent2 says one of us should execute D] -accepted -done
+         Agent1 says "Should one of us execute D?"
+         Agent2 says "One of us should execute D."
+      Agent1 execute D.
+      Agent1 says "Ok."
+      Agent2 says "Yup."
+      Agent1 says "Sure."
+
+Agent1 Interaction
+
+[Achieve A] -accepted -done
+   [Agent2 says let's achieve A] -done
+      Agent1 says "Should we achieve A?"
+      Agent2 says "Let's achieve A."
+   [Agent1 execute B] -optional -accepted -done
+      [Agent2 says one of us should execute B] -done
+         Agent1 says "Should we do B?"
+         Agent2 says "One of us should execute B."
+      Agent1 execute B.
+   Agent1 execute C.
+   [Agent1 execute D] -optional -accepted -done <-focus
+      [Agent2 says one of us should execute D] -done
+         Agent1 says "Should one of us execute D?"
+         Agent2 says "One of us should execute D."
+      Agent1 execute D.
+      Agent1 says "Ok."
+      Agent2 says "Yup."
+      Agent1 says "Sure."

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskModel xmlns="http://www.cs.wpi.edu/~rich/cetask/cea-2018-ext"
+           xmlns:disco="urn:disco.wpi.edu:Disco"
+           about="urn:disco.wpi.edu:models:Restaurant">
+   <task id="AgentFirst">
+      <subtasks id="_AgentFirst_subtasks">
+         <step name="_AgentFirst_step" task="disco:Say"/>
+         <step name="_AgentFirst_ref" task="_AgentFirst_tree"/>
+         <binding slot="$_AgentFirst_step.text" value="&#34;Let's eat dinner together&#34;"/>
+         <binding slot="$_AgentFirst_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="UserFirst">
+      <subtasks id="_UserFirst_subtasks">
+         <step name="_UserFirst_step" task="disco:Say"/>
+         <step name="_UserFirst_ref" task="_UserFirst_tree"/>
+         <binding slot="$_UserFirst_step.text" value="&#34;Let's eat dinner together&#34;"/>
+         <binding slot="$_UserFirst_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="Chinese">
+      <subtasks id="_Chinese_subtasks">
+         <step name="_Chinese_step" task="disco:Say"/>
+         <step name="_Chinese_ref" task="_Chinese_tree"/>
+         <binding slot="$_Chinese_step.text" value="&#34;I like Chinese&#34;"/>
+         <binding slot="$_Chinese_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="Mexican">
+      <subtasks id="_Mexican_subtasks">
+         <step name="_Mexican_step" task="disco:Say"/>
+         <step name="_Mexican_ref" task="_Mexican_tree"/>
+         <binding slot="$_Mexican_step.text" value="&#34;I like Mexican&#34;"/>
+         <binding slot="$_Mexican_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_AgentFirst_tree">
+      <subtasks id="_d4e10_subtasks">
+         <step name="_d4e10_step" task="Chinese"/>
+      </subtasks>
+      <subtasks id="_d4e11_subtasks">
+         <step name="_d4e11_step" task="Mexican"/>
+      </subtasks>
+      <subtasks id="_d4e12_subtasks">
+         <step name="_d4e12_step" task="disco:Say"/>
+         <step name="_d4e13_step" task="disco:Say"/>
+         <step name="_d4e13_ref" task="_d4e13_tree"/>
+         <binding slot="$_d4e12_step.text" value="&#34;What do you like?&#34;"/>
+         <binding slot="$_d4e12_step.external" value="true"/>
+         <binding slot="$_d4e13_step.text" value="&#34;I like Chinese&#34;"/>
+         <binding slot="$_d4e13_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e13_tree">
+      <subtasks id="_d4e14_subtasks">
+         <step name="_d4e14_step" task="Mexican"/>
+      </subtasks>
+      <subtasks id="_d4e15_subtasks">
+         <step name="_d4e15_step" task="disco:Say"/>
+         <binding slot="$_d4e15_step.text" value="&#34;Ok, which Chinese restaurant?&#34;"/>
+         <binding slot="$_d4e15_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_UserFirst_tree">
+      <subtasks id="_d4e17_subtasks">
+         <step name="_d4e17_step" task="disco:Say"/>
+         <step name="_d4e17_ref" task="_d4e17_tree"/>
+         <applicable>dominant</applicable>
+         <binding slot="$_d4e17_step.text" value="&#34;I like Chinese&#34;"/>
+         <binding slot="$_d4e17_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e20_subtasks">
+         <step name="_d4e20_step" task="disco:Say"/>
+         <step name="_d4e20_ref" task="_d4e20_tree"/>
+         <applicable>!dominant</applicable>
+         <binding slot="$_d4e20_step.text" value="&#34;What do you like?&#34;"/>
+         <binding slot="$_d4e20_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e17_tree">
+      <subtasks id="_d4e18_subtasks">
+         <step name="_d4e18_step" task="Mexican"/>
+      </subtasks>
+      <subtasks id="_d4e19_subtasks">
+         <step name="_d4e19_step" task="disco:Say"/>
+         <binding slot="$_d4e19_step.text" value="&#34;Ok, which Chinese restaurant?&#34;"/>
+         <binding slot="$_d4e19_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="_d4e20_tree">
+      <subtasks id="_d4e21_subtasks">
+         <step name="_d4e21_step" task="Chinese"/>
+      </subtasks>
+      <subtasks id="_d4e22_subtasks">
+         <step name="_d4e22_step" task="Mexican"/>
+      </subtasks>
+   </task>
+   <task id="_Chinese_tree">
+      <subtasks id="_d4e24_subtasks">
+         <step name="_d4e24_step" task="disco:Say"/>
+         <binding slot="$_d4e24_step.text" value="&#34;Ok, which Chinese restaurant?&#34;"/>
+         <binding slot="$_d4e24_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_Mexican_tree">
+      <subtasks id="_d4e26_subtasks">
+         <step name="_d4e26_step" task="disco:Say"/>
+         <step name="_d4e26_ref" task="_d4e26_tree"/>
+         <applicable>dominant</applicable>
+         <binding slot="$_d4e26_step.text" value="&#34;I like Chinese&#34;"/>
+         <binding slot="$_d4e26_step.external" value="false"/>
+      </subtasks>
+      <subtasks id="_d4e29_subtasks">
+         <step name="_d4e29_step" task="disco:Say"/>
+         <applicable>!dominant</applicable>
+         <binding slot="$_d4e29_step.text" value="&#34;Ok, which Mexican restaurant?&#34;"/>
+         <binding slot="$_d4e29_step.external" value="false"/>
+      </subtasks>
+   </task>
+   <task id="_d4e26_tree">
+      <subtasks id="_d4e27_subtasks">
+         <step name="_d4e27_step" task="Mexican"/>
+      </subtasks>
+      <subtasks id="_d4e28_subtasks">
+         <step name="_d4e28_step" task="disco:Say"/>
+         <binding slot="$_d4e28_step.text" value="&#34;Ok, which Chinese restaurant?&#34;"/>
+         <binding slot="$_d4e28_step.external" value="true"/>
+      </subtasks>
+   </task>
+   <task id="Top">
+      <subtasks id="agentFirst">
+         <step name="first" task="AgentFirst"/>
+      </subtasks>
+      <subtasks id="userFirst">
+         <step name="first" task="UserFirst"/>
+      </subtasks>
+   </task>
+   <script init="true">
+    $disco.addTop("Top");
+    var dominant = true;  // can reset before starting dialog
+  </script>
+</taskModel>
