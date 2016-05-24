@@ -41,8 +41,8 @@ public abstract class Utterance extends Decomposition.Step {
       String formatTask ();
       String format ();
 
-      default String formatTaskText (Task task) { 
-         String format = getDisco().getFormat(task);
+      default String formatTaskText (Utterance utterance) { 
+         String format = getDisco().getFormat(utterance);
          if ( format != null ) return formatTask(format, null);
          String text = getText(); 
          return text == null ? "..." :  
