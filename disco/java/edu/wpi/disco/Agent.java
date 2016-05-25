@@ -6,6 +6,7 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.*;
 import edu.wpi.disco.plugin.*;
@@ -23,6 +24,7 @@ public class Agent extends Actor {
       new AuthorizedPlugin(agenda, 225);
       new ProposeShouldSelfPlugin(agenda, 100, false);
       new AskShouldPlugin(agenda, 80); 
+      new ProposeWhatPlugin(agenda, 78); // higher priority than ProposeShouldOther
       new ProposeShouldOtherPlugin(agenda, 75);
       new AskWhatPlugin(agenda, 25);
       new AskWhoPlugin(agenda, 20);
@@ -41,7 +43,7 @@ public class Agent extends Actor {
     * Set maximum number of non-utterance tasks on agent turn.
     */
    public void setMax (int max) { this.max = max; }
-   
+
    /**
     * Thread-safe method to generate list of tasks for agent, 
     * sorted according to plugin priorities (with guessing)
@@ -309,6 +311,77 @@ public class Agent extends Actor {
          }
       }
    }
+   
+   // support for private beliefs
 
+   /**
+    * Return private belief about value (including null) of given input of 
+    * given plan.
+    * 
+    * @see #isDefinedSlot(Plan,TaskClass.Input)
+    * @see #setSlotValue(Plan,TaskClass.Input,Object)
+    */
+   public Object getSlotValue (Plan plan, Input input) { 
+      // convenient default for testing 
+      return inputs.get(new InputKey(plan, input));
+   }
+
+   /**
+    * Set private belief about value (including null) of given input of 
+    * given plan.
+    * 
+    * @see #isDefinedSlot(Plan,TaskClass.Input)
+    * @see #getSlotValue(Plan,TaskClass.Input)
+    */
+   public void setSlotValue (Plan plan, Input input, Object value) { 
+      // convenient default for testing
+      inputs.put(new InputKey(plan, input), value);
+   }
+
+   /**
+    * Tests whether this agent has private knowledge about given input of given
+    * plan.
+    * 
+    * @see #getSlotValue(Plan,TaskClass.Input)
+    * @see #setSlotValue(Plan,TaskClass.Input,Object)
+    */
+   public boolean isDefinedSlot (Plan plan, Input input) {
+      // convenient default for testing 
+      return inputs.containsKey(new InputKey(plan, input));
+   }
+
+   // for testing above
+   
+   final private Map<InputKey,Object> inputs = new HashMap<InputKey,Object>(); 
+
+   private static class InputKey {
+      private final Plan plan;
+      private final String input;
+   
+      private InputKey (Plan plan, Input input) {
+         this.plan = plan;
+         this.input = input.toString();
+      }
+      
+      @Override
+      public int hashCode () {
+         final int prime = 31;
+         int result = 1;
+         result = prime * result + input.hashCode();
+         result = prime * result + plan.hashCode();
+         return result;
+      }
+
+      @Override
+      public boolean equals (Object obj) {
+         if ( obj == null || getClass() != obj.getClass() )
+            return false;
+         InputKey other = (InputKey) obj;
+         return plan == other.plan && input.equals(other.input);
+      }
+
+      @Override
+      public String toString () { return input; } 
+   }
 }
      

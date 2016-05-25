@@ -13,34 +13,36 @@ import edu.wpi.disco.lang.Propose;
 import java.util.*;
 
 /**
- * Plugin to propose enumerated values for global variable.  Typically used to 
+ * Plugin to propose enumerated values for slot.  Typically used to 
  * generate things-to-say list. 
  */
-public class ProposeGlobalPlugin extends EnumerationPlugin {
-   
+public class ProposeWhatEnumerationPlugin extends EnumerationPlugin {
+
    @Override 
    public List<Plugin.Item> apply (Plan plan) {
-      Task goal = plan.getGoal();
-      if ( !(goal instanceof Propose.Global && canSelf(goal)) ) return null;
-      Propose.Global propose = (Propose.Global) goal;
-      String variable = propose.getVariable(),
-         type = propose.getVariableType();
+      if ( !(plan.getGoal() instanceof Propose.What) ) return null;
+      Propose.What propose = (Propose.What) plan.getGoal();
+      Task goal = propose.getGoal();
+      if ( goal == null ) return null;
+      String slot = propose.getSlot();
+      if ( slot == null ) return null;
       Object value = propose.getValue();
-      if ( variable == null || type == null || value != null ) return null;
+      if ( value != null ) return null;
+      String type = goal.getType().getSlotType(slot);
       List<Object> values = values(type);
       if ( values == null ) return null;
       List<Plugin.Item> items = new ArrayList<Plugin.Item>(values.size());
       boolean menu = getMenuProperty(type);
       for (Object e : values)
          items.add(new Plugin.Item(
-               new Propose.Global((Disco) plan.getGoal().engine, 
-                     self(), variable, type, e), 
-                     plan,
-                     menu ? getDisco().toString(e) : null)); 
+               new Propose.What((Disco) plan.getGoal().engine, 
+                     self(), goal, slot, e),
+               plan, 
+               menu ? getDisco().toString(e) : null)); 
       return items;
    }
-
-   public ProposeGlobalPlugin (Agenda agenda, int priority) { 
+   
+   public ProposeWhatEnumerationPlugin (Agenda agenda, int priority) { 
       super(agenda, priority);
    }
 }

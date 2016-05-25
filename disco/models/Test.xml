@@ -508,8 +508,19 @@
   <task id="ShiftH"/>
   <task id="ShiftI"/>
   
-  <script init="true">
+  <task id="PrivateTop">
+  	  <subtasks id="private">
+  	     <step name="step1" task="Private"/>
+  	     <binding slot="$step1.external" value="true"/>
+  	  </subtasks>
+  </task>
   
+  <task id="Private">
+     <input name="input1" type="number"/>	
+  </task>
+  
+  <script init="true">
+    
     // for BindingsValueTest
     var test;
     

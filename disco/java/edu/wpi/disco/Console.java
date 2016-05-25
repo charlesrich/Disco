@@ -358,7 +358,7 @@ public class Console extends Shell {
             // TODO: This is temporary hack to fix problem (see Interaction.occurred)
             if ( eval ) interaction.occurred(external, occurrence, null, true);
             else interaction.occurred(external, occurrence, null);
-         } else warning("All input values must be defined--ignored.");
+         } else warning("All input values must be defined--occurrence ignored.");
       }
       return occurrence;
    }

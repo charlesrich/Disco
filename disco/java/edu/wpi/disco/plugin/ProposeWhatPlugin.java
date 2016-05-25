@@ -6,42 +6,40 @@
 package edu.wpi.disco.plugin;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.*;
-import edu.wpi.disco.Agenda.Plugin;
-import edu.wpi.disco.lang.Propose;
-
-import java.util.*;
+import edu.wpi.disco.lang.*;
 
 /**
- * Plugin to propose enumerated values for slot.  Typically used to 
- * generate things-to-say list. 
+ * Plugin for agent which proposes first undefined input value of non-utterance
+ * task based on agent's private knowledge.  
  */
-public class ProposeWhatPlugin extends EnumerationPlugin {
-
-   @Override 
-   public List<Plugin.Item> apply (Plan plan) {
-      if ( !(plan.getGoal() instanceof Propose.What) ) return null;
-      Propose.What propose = (Propose.What) plan.getGoal();
-      Task goal = propose.getGoal();
-      if ( goal == null ) return null;
-      String slot = propose.getSlot();
-      if ( slot == null ) return null;
-      Object value = propose.getValue();
-      if ( value != null ) return null;
-      String type = goal.getType().getSlotType(slot);
-      List<Object> values = values(type);
-      if ( values == null ) return null;
-      List<Plugin.Item> items = new ArrayList<Plugin.Item>(values.size());
-      boolean menu = getMenuProperty(type);
-      for (Object e : values)
-         items.add(new Plugin.Item(
-               new Propose.What((Disco) plan.getGoal().engine, 
-                     self(), goal, slot, e),
-               plan, 
-               menu ? getDisco().toString(e) : null)); 
-      return items;
+public class ProposeWhatPlugin extends SingletonPlugin {
+   
+   // assuming single threaded
+   private Input input;
+   
+   @Override
+   protected boolean isApplicable (Plan plan) {
+      Task goal = plan.getGoal();
+      if ( goal instanceof Utterance || goal.isDefinedInputs() )
+         return false;
+      for (Input input : goal.getType().getDeclaredInputs()) 
+         if ( getGenerateProperty(Propose.What.class, goal, input.getName()) &&
+              !input.isDefinedSlot(goal) &&
+              ((Agent) getWho()).isDefinedSlot(plan, input) ) {
+            this.input = input;
+            return true;
+         }
+      return false;
    }
    
+   @Override
+   protected Task newTask (Disco disco, Plan plan) {
+      return new Propose.What(disco, self(), plan.getGoal(), input.getName(), 
+            ((Agent) getWho()).getSlotValue(plan, input));
+   }
+
    public ProposeWhatPlugin (Agenda agenda, int priority) { 
       super(agenda, priority);
    }

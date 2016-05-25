@@ -11,13 +11,12 @@ import edu.wpi.disco.*;
 import edu.wpi.disco.lang.*;
 
 /**
- * Plugin which asks for first unknown input value of non-utterance 
+ * Plugin which asks for first undefined input value of non-utterance 
  * task that cannot be done by other actor.
  */
 public class AskWhatPlugin extends SingletonPlugin {
    
    // assuming single threaded
-   
    private Input input;
    
    @Override

@@ -18,11 +18,11 @@ public class User extends Actor {
       super(name);
       new RespondPlugin.Accept(agenda, 120);
       new UtterancePlugin(agenda, 100, true); // excludeAcceptShould 
-      new ProposeGlobalPlugin(agenda, 95);
+      new ProposeGlobalEnumerationPlugin(agenda, 95);
       new ProposeShouldSelfPlugin(agenda, 90, false);
       new ProposeShouldOtherPlugin(agenda, 70);
       new ProposeWhoPlugin(agenda, 50);
-      new ProposeWhatPlugin(agenda, 50);
+      new ProposeWhatEnumerationPlugin(agenda, 50);
       new RejectProposeWhatPlugin(agenda, 45); // after ProposeWhatPlugin (re enumerations)
       new RespondPlugin.Reject(agenda, 30);
       new ProposeHowPlugin(agenda, 30);
