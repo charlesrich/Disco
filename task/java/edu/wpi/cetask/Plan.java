@@ -786,7 +786,7 @@ public class Plan {
          parent.unFail();
       }
       // remove all output values (including success and when)
-      // do not know what input values to remove because no dependencies
+      // do not know which input values to remove because no dependencies
       for (String name : goal.getType().outputNames) 
          goal.removeSlotValue(name);
       goal.engine.clearLiveAchieved();

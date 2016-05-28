@@ -465,6 +465,7 @@ public class Disco extends TaskEngine {
       interpret(occurrence, contributes, continuation); // before translation
       if ( occurrence instanceof Utterance )
          putUtterance((Utterance) occurrence, translate((Utterance) occurrence));
+      retry();
       return contributes;
    }
    
@@ -488,6 +489,24 @@ public class Disco extends TaskEngine {
       return thisTask;
    }
 
+   void retry () {
+      Stack<Segment> stack = getStack();
+      for (int i = stack.size(); i-- > 1;) {
+         Plan plan = stack.get(i).getPlan();
+         if ( plan.isFailed() ) {
+            Plan retried = plan.retry();
+            if ( retried != null ) {
+               // expose retried plan
+               while ( getFocus() != retried ) pop();
+               // substitute copy of failed goal
+               getSegment().setPlan(retried.getRetryOf());
+               pop(); push(retried);
+               break;
+            }
+         }
+      }
+   }
+   
    /**
     * Thread-safe variant of {@link 
     * edu.wpi.cetask.TaskEngine#explainBest(Task,boolean)} for Disco.

@@ -222,7 +222,7 @@ public class Agent extends Actor {
    @Override
    protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
-      if ( retry ) retry(disco); // see also in done
+      if ( retry ) disco.retry(); // see also in occurred
       for (int i = max; i-- > 0;) {
          Plugin.Item item = respondIf(interaction, guess, retry);
          if ( item == null ) {
@@ -246,7 +246,7 @@ public class Agent extends Actor {
     */
    public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
-      if ( retry) retry(disco); // see also in done
+      if ( retry ) disco.retry(); // see also in occurred
       disco.decomposeAll();
       return generateBest(interaction, guess);
    }
@@ -288,30 +288,16 @@ public class Agent extends Actor {
             lastUtterance = (Utterance) item.task;
             say(interaction, (Utterance) item.task);
          }
-         if ( retry ) retry(interaction.getDisco());  // see also in respond
+         if ( retry ) retry(interaction);  // see also in respond
       }
    }
 
-   protected void retry (Disco disco) {
-      synchronized (disco.getInteraction()) { // called in DiscoUnity agent
-         Stack<Segment> stack = disco.getStack();
-         for (int i = stack.size(); i-- > 1;) {
-            Plan plan = stack.get(i).getPlan();
-            if ( plan.isFailed() ) {
-               Plan retried = plan.retry();
-               if ( retried != null ) {
-                  // expose retried plan
-                  while ( disco.getFocus() != retried ) disco.pop();
-                  // substitute copy of failed goal
-                  disco.getSegment().setPlan(retried.getRetryOf());
-                  disco.pop(); disco.push(retried);
-                  break;
-               }
-            }
-         }
+   protected void retry (Interaction interaction) {
+      synchronized (interaction) { // called in DiscoUnity agent
+         interaction.getDisco().retry();
       }
    }
-   
+     
    // support for private beliefs
 
    /**
