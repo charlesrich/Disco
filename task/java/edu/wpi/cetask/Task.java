@@ -516,14 +516,8 @@ public class Task extends Instance {
    }
    
    public boolean printSuccess (PrintStream stream) {
-      if ( Utils.isTrue(getSuccess()) ) {
-         stream.print(" -succeeded");
-         return true;
-      }
-      else if ( Utils.isFalse(getSuccess()) ) {
-         stream.print(" -failed");
-         return true;
-      }
+      if ( Utils.isTrue(getSuccess()) ) { stream.print(" -succeeded"); return true; }
+      else if ( Utils.isFalse(getSuccess()) ) { stream.print(" -failed"); return true; }
       return false;
    }
    
