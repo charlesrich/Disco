@@ -301,8 +301,8 @@ public class Agent extends Actor {
     * @see #setSlotValue(Plan,TaskClass.Input,Object)
     */
    public Object getSlotValue (Plan plan, Input input) { 
-      // convenient default for testing 
-      return inputs.get(new InputKey(plan, input));
+      // default for testing only -- ignores plan 
+      return inputs.get(input);
    }
 
    /**
@@ -312,9 +312,9 @@ public class Agent extends Actor {
     * @see #isDefinedSlot(Plan,TaskClass.Input)
     * @see #getSlotValue(Plan,TaskClass.Input)
     */
-   public void setSlotValue (Plan plan, Input input, Object value) { 
-      // convenient default for testing
-      inputs.put(new InputKey(plan, input), value);
+   public void setSlotValue (Plan plan, Input input, Object value) {
+      // default for testing only -- ignores plan 
+      inputs.put(input, value);
    }
 
    /**
@@ -325,42 +325,12 @@ public class Agent extends Actor {
     * @see #setSlotValue(Plan,TaskClass.Input,Object)
     */
    public boolean isDefinedSlot (Plan plan, Input input) {
-      // convenient default for testing 
-      return inputs.containsKey(new InputKey(plan, input));
+      // default for testing only -- ignores plan 
+      return inputs.containsKey(input);
    }
 
    // for testing above
-   
-   final private Map<InputKey,Object> inputs = new HashMap<InputKey,Object>(); 
+   final private Map<Input,Object> inputs = new HashMap<Input,Object>(); 
 
-   private static class InputKey {
-      private final Plan plan;
-      private final String input;
-   
-      private InputKey (Plan plan, Input input) {
-         this.plan = plan;
-         this.input = input.toString();
-      }
-      
-      @Override
-      public int hashCode () {
-         final int prime = 31;
-         int result = 1;
-         result = prime * result + input.hashCode();
-         result = prime * result + plan.hashCode();
-         return result;
-      }
-
-      @Override
-      public boolean equals (Object obj) {
-         if ( obj == null || getClass() != obj.getClass() )
-            return false;
-         InputKey other = (InputKey) obj;
-         return plan == other.plan && input.equals(other.input);
-      }
-
-      @Override
-      public String toString () { return input; } 
-   }
 }
      
