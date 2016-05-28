@@ -5,6 +5,7 @@
  */
 package edu.wpi.cetask;
 
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.*;
 import javax.script.*;
@@ -512,6 +513,18 @@ public class Task extends Instance {
    public void setSuccess (boolean success) {
       setSlotValue("success", success);
       engine.clearLive();  // not clearLivedAchieved (infinite loop)
+   }
+   
+   public boolean printSuccess (PrintStream stream) {
+      if ( Utils.isTrue(getSuccess()) ) {
+         stream.print(" -succeeded");
+         return true;
+      }
+      else if ( Utils.isFalse(getSuccess()) ) {
+         stream.print(" -failed");
+         return true;
+      }
+      return false;
    }
    
    protected Boolean checkAchieved () {

@@ -905,11 +905,7 @@ public class Disco extends TaskEngine {
             if ( !history && parent.isRoot() ) continue;
             Task task = (Task) child;
             print(task, stream, indent);
-            if ( !(task instanceof Utterance) ) {
-               Boolean success = task.getSuccess();
-               if ( Utils.isTrue(success) ) stream.print(" -succeeded");
-               else if ( Utils.isFalse(success) ) stream.print(" -failed");
-            }
+            if ( !(task instanceof Utterance) ) task.printSuccess(stream);
             if ( (TaskEngine.VERBOSE || TaskEngine.DEBUG)
                   && task.isUnexplained() && !parent.isRoot() )
                stream.print(" -unexplained");

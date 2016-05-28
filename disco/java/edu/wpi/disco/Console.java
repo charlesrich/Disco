@@ -59,11 +59,13 @@ public class Console extends Shell {
    public void occurred (Task occurrence) { 
       synchronized (interaction) { 
          // print out all occurrences in shell
+         out.print("    ");
          if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
-            out.print("    ");
             interaction.getDisco().print(occurrence, out, 0);
-            out.println();
-         } else println(getEngine().toHistoryString(occurrence));
+         } else out.print(getEngine().toHistoryString(occurrence));
+         if ( TaskEngine.DEBUG || TaskEngine.VERBOSE )
+            occurrence.printSuccess(out);
+         out.println();
          if ( occurrence instanceof Utterance ) 
             printTranslateKeys((Utterance) occurrence);
       }

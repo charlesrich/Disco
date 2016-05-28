@@ -1173,12 +1173,9 @@ public class Plan {
       if ( Utils.isTrue(goal.getShould()) ) stream.print(" -accepted");
       else if ( Utils.isFalse(goal.getShould()) ) stream.print(" -rejected");
       if ( isLive() ) stream.print(" -live");
-      else {
-         stream.print(
-            isSucceeded() ? " -succeeded" :
-              isFailed() ? " -failed" :
-                isDone() ? " -done" : 
-                  !contributes ? "-nonContributing" : "");
+      else if ( !goal.printSuccess(stream) ) {
+         if ( isDone() ) stream.print(" -done"); 
+         else if ( !contributes ) stream.print(" -nonContributing");
       }
       for (Object note : notes) { stream.print(' '); stream.print(note); }
       if ( recurse ) {
