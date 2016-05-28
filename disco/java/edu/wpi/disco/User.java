@@ -13,9 +13,13 @@ import java.util.List;
 
 public class User extends Actor {
   
-   // TTSay plugins
    public User (String name) {
       super(name);
+   }
+   
+   @Override
+   protected void init () {
+      // TTSay plugins
       new RespondPlugin.Accept(agenda, 120);
       new UtterancePlugin(agenda, 100, true); // excludeAcceptShould 
       new ProposeGlobalEnumerationPlugin(agenda, 95);

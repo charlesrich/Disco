@@ -27,10 +27,13 @@ public abstract class Actor {
    protected final Agenda agenda;
    public Agenda getAgenda () { return agenda; }
    
-   public Actor (String name) {
+   protected Actor (String name) {
       this.name = name;
-      this.agenda = new Agenda(this); 
+      this.agenda = new Agenda(this);
+      init();
    }
+   
+   protected void init () {}
    
    /**
     * Initialize the state of this actor in given discourse engine.

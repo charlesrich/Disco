@@ -17,6 +17,10 @@ public class Agent extends Actor {
   
    public Agent (String name) {
       super(name);
+   }
+   
+   @Override
+   protected void init () {
       new AskShouldTopPlugin(agenda, 300); // only generates when stack empty
       new AskShouldPassablePlugin(agenda, 275); // ask optional before input 
       new AskHowPassablePlugin(agenda, 275);
