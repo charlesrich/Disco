@@ -693,8 +693,14 @@ public class DecompositionClass extends TaskModel.Member {
             default: // NON_IDENTITY
                from = null;
                to = step.equals("this") ? getSlot(slot) : getStep(step).getSlot(slot);
+         }         
+         if ( type != BindingType.NON_IDENTITY ) {
+            if ( from == null ) 
+               throw new TaskModel.Error(DecompositionClass.this,
+                     "binding value \""+value+
+                     "\" refers to unknown slot");
+            addBinding(from, to);
          }
-         if ( type != BindingType.NON_IDENTITY ) addBinding(from, to);
       }
 
       /* DESIGN NOTE: Self-referring bindings for default values and inverse bindings
