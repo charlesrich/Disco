@@ -216,7 +216,7 @@ public class Agent extends Actor {
     * 
     * @param ok force turn to end with 'Ok' if necessary
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
+    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     * @return true if some response was made
     */
    @Override
@@ -242,11 +242,11 @@ public class Agent extends Actor {
     * Return best response or null if there is no response.
     * 
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
+    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     */
    public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
-      if ( retry ) disco.retry(); // see also in occurred
+      //if ( retry ) disco.retry(); // see also in occurred
       disco.decomposeAll();
       return generateBest(interaction, guess);
    }
@@ -278,7 +278,7 @@ public class Agent extends Actor {
     * Thread-safe method for notifying interaction that given plugin item
     * has occurred.
     * 
-    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
+    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     */
    public void occurred (Interaction interaction, Plugin.Item item, boolean retry) { 
       synchronized (interaction) { // typically used in dialogue loop
@@ -288,16 +288,9 @@ public class Agent extends Actor {
             lastUtterance = (Utterance) item.task;
             say(interaction, (Utterance) item.task);
          }
-         if ( retry ) retry(interaction);  // see also in respond
       }
    }
-
-   protected void retry (Interaction interaction) {
-      synchronized (interaction) { // called in DiscoUnity agent
-         interaction.getDisco().retry();
-      }
-   }
-     
+   
    // support for private beliefs
 
    /**

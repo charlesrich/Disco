@@ -275,8 +275,14 @@ public class Interaction extends Thread {
    //       before plan recognition (and sometimes twice)
    void occurred (boolean external, Task occurrence, Plan contributes, boolean eval) {
       responded = true;
-      disco.occurred(external, occurrence, contributes, eval);
+      occurredRetry(external, occurrence, contributes, eval);
       if ( console != null ) console.occurred(occurrence);
+   }
+   
+   private Plan occurredRetry (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      Plan plan = disco.occurred(external, occurrence, contributes, eval);
+      if ( disco.getProperty("interaction@retry", retry) ) disco.retry();
+      return plan;
    }
    
    /**
@@ -299,8 +305,8 @@ public class Interaction extends Thread {
     */
    public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes) {
       responded = true;
-      return disco.occurred(external, occurrence, contributes, 
-            (external ? getExternal() : getSystem()).isEval());
+      return occurredRetry(external, occurrence, contributes, 
+                    (external ? getExternal() : getSystem()).isEval());
    }
    
    /**
