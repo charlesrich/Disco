@@ -58,7 +58,7 @@ public abstract class Actor {
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)
     * @param guess guess decompositions
-    * @param retry try other decompositions if failure (see {@link Agent#retry(Disco)})
+    * @param retry try other decompositions if failure (see {@link Agent#retry(Interaction)})
     * @return true if some response was made
     * 
     * @see Interaction

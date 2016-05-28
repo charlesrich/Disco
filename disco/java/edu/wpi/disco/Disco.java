@@ -465,7 +465,6 @@ public class Disco extends TaskEngine {
       interpret(occurrence, contributes, continuation); // before translation
       if ( occurrence instanceof Utterance )
          putUtterance((Utterance) occurrence, translate((Utterance) occurrence));
-      retry();
       return contributes;
    }
    

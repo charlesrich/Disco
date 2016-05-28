@@ -216,7 +216,7 @@ public class Agent extends Actor {
     * 
     * @param ok force turn to end with 'Ok' if necessary
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
     * @return true if some response was made
     */
    @Override
@@ -242,7 +242,7 @@ public class Agent extends Actor {
     * Return best response or null if there is no response.
     * 
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
     */
    public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
       Disco disco = interaction.getDisco();
@@ -278,7 +278,7 @@ public class Agent extends Actor {
     * Thread-safe method for notifying interaction that given plugin item
     * has occurred.
     * 
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @param retry try other decompositions if failure (see {@link #retry(Interaction)})
     */
    public void occurred (Interaction interaction, Plugin.Item item, boolean retry) { 
       synchronized (interaction) { // typically used in dialogue loop
