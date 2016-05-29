@@ -23,7 +23,7 @@ public class AuthorizedPlugin extends SingletonPlugin {
          if ( proposal instanceof Propose.Should ) {
             goal = ((Propose.Should) proposal).getGoal();
             if ( getWho().isAuthorized(goal, getInteraction()) && goal.isDefinedInputs() )
-               // don't accept proposal to do action if can just do it
+               // don't accept proposal to do action if can just do it (implicit acceptance)
                return false;
          }
       } // else
