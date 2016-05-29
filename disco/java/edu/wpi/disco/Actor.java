@@ -28,8 +28,12 @@ public abstract class Actor {
    public Agenda getAgenda () { return agenda; }
    
    protected Actor (String name) {
+      this(name, null);
+   }
+   
+   protected Actor (String name, Agenda agenda) {
       this.name = name;
-      this.agenda = new Agenda(this);
+      this.agenda = agenda == null ? new Agenda(this) : agenda;
       init();
    }
    
