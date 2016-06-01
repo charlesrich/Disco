@@ -24,11 +24,12 @@ public class Agent extends Actor {
       new AskShouldTopPlugin(agenda, 300); // only generates when stack empty
       new AskShouldPassablePlugin(agenda, 275); // ask optional before input 
       new AskHowPassablePlugin(agenda, 275);
+      // higher priority than ProposeShouldOther, AskWhatNoBinding, AskWhat
+      new ProposeWhatPlugin(agenda, 260);
       new AskWhatNoBindingPlugin(agenda, 250);
       new AuthorizedPlugin(agenda, 225);
       new ProposeShouldSelfPlugin(agenda, 100, false);
       new AskShouldPlugin(agenda, 80); 
-      new ProposeWhatPlugin(agenda, 78); // higher priority than ProposeShouldOther
       new ProposeShouldOtherPlugin(agenda, 75);
       new AskWhatPlugin(agenda, 25);
       new AskWhoPlugin(agenda, 20);

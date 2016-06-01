@@ -11,9 +11,10 @@
   > say
 [1] Yes.
 [2] I don't want to specify input1 for Private.
-[3] I'm going to execute Private.
-[4] I'm not going to execute Private.
-[5] Let's not achieve PrivateTop.
+[3] What is the Private input1?
+[4] I'm going to execute Private.
+[5] I'm not going to execute Private.
+[6] Let's not achieve PrivateTop.
   >> 1
     User says "Yes."
     Agent says "Please execute Private on 7."

@@ -19,6 +19,7 @@ public class User extends Actor {
    
    @Override
    protected void init () {
+      new AskWhatPlugin(agenda, 26);
       // TTSay plugins
       new RespondPlugin.Accept(agenda, 120);
       new UtterancePlugin(agenda, 100, true); // excludeAcceptShould 
