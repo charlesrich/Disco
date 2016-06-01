@@ -114,6 +114,33 @@ public class Decomposition extends Instance {
    private Task goal;
    public Task getGoal () { return goal; }
    
+   /* DESIGN NOTE: The field below keeps track of which inputs in the goal
+    * of this decomposition were set by bindings in the decomposition (as
+    * opposed to being set, for example, by a Propose.What).
+    * 
+    * This is a partial approach to keeping track of dependencies in
+    * the task model bindings, and is needed in order to decide
+    * which inputs to remove when retrying a failed decomposition
+    * {@link Plan#retryCopy()}
+    */
+   private List<String> modifiedInputs = null;
+   
+   void modifyInput (String name) {
+      if ( goal.getType().inputNames.contains(name) ) {
+         if ( modifiedInputs == null ) 
+            modifiedInputs = new ArrayList<String>(goal.getType().inputNames.size());
+         if ( !modifiedInputs.contains(name) ) modifiedInputs.add(name);
+      }
+   }
+   
+   void unmodifyInput (String name) {
+      if ( modifiedInputs != null ) modifiedInputs.remove(name);
+   }
+   
+   boolean hasModifiedInput (String name) {
+      return modifiedInputs != null && modifiedInputs.contains(name);
+   }
+   
    void attach (Plan plan) {
       Task goal = plan.getGoal();
       if ( this.goal != null )
@@ -235,7 +262,7 @@ public class Decomposition extends Instance {
          updateBindingsTask(false);
          return super.getSlotValueBoolean(name);
       }
-  
+      
       // only setting/removing slot values sets modified bit 
       // evaluation of conditions, etc., is specified not to have side effects
 
@@ -245,6 +272,7 @@ public class Decomposition extends Instance {
          updateBindings(true, null, null);
          return value;
       }
+    
       
       @Override
       public void removeSlotValue (String name) {

@@ -814,9 +814,14 @@ public class Plan {
          parent.unFail();
       }
       // remove all output values (including success and when)
-      // do not know which input values to remove because no dependencies
       for (String name : goal.getType().outputNames) 
          goal.removeSlotValue(name);
+      // remove all input values that depend on failed decomposition
+      if ( retryOf.decomp != null ) {
+         for (String name : goal.getType().inputNames) 
+            if ( retryOf.decomp.hasModifiedInput(name) )
+               goal.removeSlotValue(name);
+      }
       goal.engine.clearLiveAchieved();
    }
   

@@ -732,7 +732,7 @@ public class DecompositionClass extends TaskModel.Member {
          if ( target.isOccurred() ) return; // never update slot after occurrence
          if ( depth > MAX_BINDING_DEPTH )
             throw new IllegalStateException(where + " stopped at depth "+ depth
-                  +" (probably circular bindings)");
+                  +" (probably circular bindings)");       
          depth++;
          if ( "external".equals(slot) && !stepType.isPrimitive() )
             getErr().println("WARNING: "+getId()+" ignoring external binding of non-primitive task "+variable); 
@@ -756,6 +756,7 @@ public class DecompositionClass extends TaskModel.Member {
                if ( depend.step.equals(retractedStep) && depend.slot.equals(retractedSlot) ) {
                   // special case for retracted slot: propagate undefined to target
                   target.removeSlotValue(slot);
+                  if ( step.equals("this") ) decomp.unmodifyInput(slot);
                   updateBindings(decomp, target, step, slot);
                }
                if ( type == BindingType.INPUT_INPUT && target.isDefinedSlot(slot)
@@ -763,12 +764,14 @@ public class DecompositionClass extends TaskModel.Member {
                      && !depend.step.equals(retractedStep) && !depend.slot.equals(retractedSlot) ) { 
                   // special case for input-input identity only: propagate value other direction 
                   dependTask.copySlotValue(target, slot, depend.slot, true, false);
+                  modifyInput(depend.step, depend.slot, decomp);
                   updateBindings(decomp, dependTask, null, null);
                }
                return; // NB return here
             } else if ( type == BindingType.INPUT_INPUT && step.equals(retractedStep) && slot.equals(retractedSlot) ) {
                // special case for input-input identity only: propagate retraction other direction
                decomp.getGoal().removeSlotValue(depend.slot);
+               decomp.unmodifyInput(depend.slot);
                updateBindings(decomp, decomp.getGoal(), depend.step, depend.slot);
             } else if ( !TaskEngine.DEBUG // allow looking at values for debugging 
                   && identity && target.isDefinedSlot(slot)  
@@ -780,12 +783,17 @@ public class DecompositionClass extends TaskModel.Member {
                            "\" in "+DecompositionClass.this);
          }
          if ( value != null ) {
-            if ( identity) 
+            if ( identity)
                target.copySlotValue(getTask(decomp, identityStep), identitySlot, slot,
                      true, false); // onlyDefined true, i.e., do not propagate undefined
             else target.setSlotValueScript(slot, expression, compiled, decomp.bindings, where);
             updateBindings(decomp, target, null, null);
+            modifyInput(step, slot, decomp);
          }
+      }
+      
+      private void modifyInput(String step, String name, Decomposition decomp) {
+         if ( step.equals("this") ) decomp.modifyInput(name);
       }
       
       private void updateBindings (Decomposition decomp, Task task, String retractedStep, String retractedSlot) {
