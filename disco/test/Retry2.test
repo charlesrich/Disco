@@ -28,7 +28,7 @@
       B(agent) -succeeded
    [C(agent)] -failed
       C(agent) -failed
-   [C] -live <-focus
+   [C(agent)] -live <-focus
    [D] -optionalStep -optional
 
   > next
