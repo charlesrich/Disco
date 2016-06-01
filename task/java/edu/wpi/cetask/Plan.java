@@ -746,16 +746,26 @@ public class Plan {
    }
    
    /**
-    * Retry this failed plan if it has any untried decompositions, or else recurse
-    * up through failed parents.  Returns the retried plan or null if none.
+    * If this plan has failed, and the goal is allowed to be retried and has not
+    * already been retried, then retry it; otherwise if it has failed, but it is
+    * not allowed to be retried, recurse up through failed parents. Returns the
+    * retried plan or null if none.
+    * <p>
+    * A non-primitive is allowed to be retried by default if it has any
+    * applicable untried decompositions. A primitive is not allowed to be
+    * retried by default. Either default can be overridden by the boolean
+    * 'goal@retry' property.
     * 
     * @see #getRetry()
     * @see #getRetryOf()
     */
    public Plan retry () {
-      if ( isFailed() && retry == null ) { // don't retry twice
-         List<DecompositionClass> decomps = getDecompositions();
-         if ( !decomps.isEmpty() ) {
+      // don't retry same plan twice (retry can be retried!)
+      if ( retry != null ) return null;  
+      if ( isFailed() ) {
+         if ( goal.getProperty("@retry", 
+                !isPrimitive() &&    
+                !getDecompositions().isEmpty()) ) {
             retryCopy();
             return this;
          } else return parent == null ? null : parent.retry(); 

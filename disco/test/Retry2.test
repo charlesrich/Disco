@@ -1,0 +1,56 @@
+    # May 31, 2016 9:13:02 PM - TaskEngine 1.10 / Disco 1.16
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > next false
+  > debug
+  > task A
+    Propose.Should(user,A)
+  > next
+    Ask.Should(agent,B)
+  > say
+[1] Accept(user,Propose.Should(user,B))
+[2] Reject(user,Propose.Should(user,B))
+[3] Propose.ShouldNot(user,A)
+  >> 1
+    Accept(user,Propose.Should(user,B))
+  > execute B / false / true
+    B(agent) -succeeded
+  > execute C / false / false
+    C(agent) -failed
+  > history
+
+[A] -accepted -live
+   Propose.Should(user,A)
+   [B(agent)] -optionalStep -accepted -succeeded
+      [Propose.Should(user,B(agent))] -succeeded
+         Ask.Should(agent,B)
+         Accept(user,Propose.Should(user,B))
+      B(agent) -succeeded
+   [C(agent)] -failed
+      C(agent) -failed
+   [C(agent)] -live <-focus
+   [D] -optionalStep -optional
+
+  > next
+    C(agent)
+    Ask.Should(agent,D)
+  > history
+
+[A] -accepted -done
+   Propose.Should(user,A)
+   [B(agent)] -optionalStep -accepted -succeeded
+      [Propose.Should(user,B(agent))] -succeeded
+         Ask.Should(agent,B)
+         Accept(user,Propose.Should(user,B))
+      B(agent) -succeeded
+   [C(agent)] -failed
+      C(agent) -failed
+   [C(agent)] -done
+      C(agent)
+   [D] -optionalStep -optional -live
+      [Propose.Should(user,D)] -optional -live <-focus
+         [Accept(user,Ask.Should(agent,D))] -optional -live
+            Ask.Should(agent,D)
+
+  > quit
+    
