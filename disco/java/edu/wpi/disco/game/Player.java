@@ -44,7 +44,7 @@ public class Player extends User {
 
 	@Override
 	public boolean synchronizedRespond (Interaction interaction, 
-	      boolean ok, boolean guess, boolean retry) {
+	      boolean ok, boolean guess) {
 		// pull actions off the list one at a time so as not to
 		// accidentally trigger a ConcurrentModificationException
 		Action a;

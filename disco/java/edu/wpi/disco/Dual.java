@@ -119,8 +119,7 @@ public class Dual {
       private final BlockingQueue<Object> queue = new LinkedBlockingQueue<Object>();
 
       @Override
-      protected boolean synchronizedRespond (Interaction interaction, 
-            boolean ok, boolean guess, boolean retry) {
+      protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
          boolean responded = false;
          Object element;
          do {

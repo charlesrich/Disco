@@ -92,11 +92,11 @@ public class DiscoComponent extends eu.semaine.components.Component {
        if (continueToTheNextStep) {
           // always "drain" coaching interaction first
           setCharacter(coach);
-          boolean responded = coach.respond(coaching, false, true, true);
+          boolean responded = coach.respond(coaching, false, true);
           if ( responded ) generate(coaching);
           if ( !responded || answers == null ) {
              setCharacter(interviewer);
-             interviewer.respond(interview, false, true, true);
+             interviewer.respond(interview, false, true);
              generate(interview);
           }
           if (continueToTheNextStep)

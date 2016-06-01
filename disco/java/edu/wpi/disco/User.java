@@ -62,7 +62,7 @@ public class User extends Actor {
  
    @Override // default definition of dummy user (using console)
    protected boolean synchronizedRespond (Interaction interaction, 
-         boolean ok, boolean guess, boolean retry) {
+         boolean ok, boolean guess) {
       return false;
    }
 }

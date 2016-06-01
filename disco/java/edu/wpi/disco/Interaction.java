@@ -100,6 +100,18 @@ public class Interaction extends Thread {
    public boolean isGuess () { return guess; }
    
    /**
+    * Set default value for interaction@retry property.
+    * Thread-safe.
+    */
+   public void setRetry (boolean retry) { this.retry = retry; }
+
+   /**
+    * Return default value for interaction@retry property.
+    * Thread-safe.
+    */
+   public boolean isRetry () { return retry; }
+   
+   /**
     * Thread-safe method to get current discourse focus.
     * 
     * @see Disco#getFocus()
@@ -378,8 +390,7 @@ public class Interaction extends Thread {
       responded = false;
       if ( floor != null ) 
          floor.respond(this, ok, 
-               disco.getProperty("interaction@guess", guess),
-               disco.getProperty("interaction@retry", retry));
+               disco.getProperty("interaction@guess", guess));
       return running;
    }
    

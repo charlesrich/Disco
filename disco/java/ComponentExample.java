@@ -1,5 +1,4 @@
 import java.util.List;
-
 import edu.wpi.cetask.*;
 import edu.wpi.disco.*;
 import edu.wpi.disco.Agenda.Plugin;
@@ -29,9 +28,7 @@ public class ComponentExample {
    
    private final Interaction interaction = new Interaction(new MyAgent("agent"), new User("user"));
    private final Disco disco = interaction.getDisco(); 
-   private final boolean 
-         guess = interaction.getProperty("interaction@guess", true),
-         retry = interaction.getProperty("interaction@retry", true);
+   private final boolean guess = interaction.getProperty("interaction@guess", interaction.isGuess());
    
    private ComponentExample () {
          
@@ -106,7 +103,7 @@ public class ComponentExample {
 
    private boolean agent () {      
       // see simple model for agent turn at Agent.respond()
-      return interaction.getSystem().respond(interaction, false, guess, retry);
+      return interaction.getSystem().respond(interaction, false, guess);
    }
    
    private void user (Task task, Plan contributes) {

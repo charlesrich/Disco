@@ -44,11 +44,11 @@ public class UnifiedAgent extends Agent {
    }
     
    @Override
-   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
       // override default turn-taking to simply do one action if possible
-      Plugin.Item item = respondIf(interaction, true, retry); // guess true
+      Plugin.Item item = respondIf(interaction, true); // guess true
       if ( item == null ) return false;
-      occurred(interaction, item, retry);
+      occurred(interaction, item);
       return true;
    }
    

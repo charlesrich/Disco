@@ -220,25 +220,23 @@ public class Agent extends Actor {
     * 
     * @param ok force turn to end with 'Ok' if necessary
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     * @return true if some response was made
     */
    @Override
-   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
       Disco disco = interaction.getDisco();
-      if ( retry ) disco.retry(); // see also in occurred
       for (int i = max; i-- > 0;) {
-         Plugin.Item item = respondIf(interaction, guess, retry);
+         Plugin.Item item = respondIf(interaction, guess);
          if ( item == null ) {
             // say "Ok" when nothing else to say and end of turn is required
             if ( ok ) item = newOk(disco);
             else return false;
          }
-         occurred(interaction, item, retry);
+         occurred(interaction, item);
          if ( item.task instanceof Utterance) return true; // end of turn
       }
       // maximum number of non-utterances
-      if ( ok ) occurred(interaction, newOk(disco), retry);
+      if ( ok ) occurred(interaction, newOk(disco));
       return true;
    }
   
@@ -246,11 +244,9 @@ public class Agent extends Actor {
     * Return best response or null if there is no response.
     * 
     * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
-    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     */
-   public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
+   public Plugin.Item respondIf (Interaction interaction, boolean guess) {
       Disco disco = interaction.getDisco();
-      //if ( retry ) disco.retry(); // see also in occurred
       disco.decomposeAll();
       return generateBest(interaction, guess);
    }
@@ -281,10 +277,8 @@ public class Agent extends Actor {
    /**
     * Thread-safe method for notifying interaction that given plugin item
     * has occurred.
-    * 
-    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     */
-   public void occurred (Interaction interaction, Plugin.Item item, boolean retry) { 
+   public void occurred (Interaction interaction, Plugin.Item item) { 
       synchronized (interaction) { // typically used in dialogue loop
          interaction.occurred(this == interaction.getExternal(), 
                item.task, item.contributes);

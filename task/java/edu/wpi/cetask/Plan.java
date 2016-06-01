@@ -748,9 +748,12 @@ public class Plan {
    /**
     * Retry this failed plan if it has any untried decompositions, or else recurse
     * up through failed parents.  Returns the retried plan or null if none.
+    * 
+    * @see #getRetry()
+    * @see #getRetryOf()
     */
    public Plan retry () {
-      if ( isFailed() ) {
+      if ( isFailed() && retry == null ) { // don't retry twice
          List<DecompositionClass> decomps = getDecompositions();
          if ( !decomps.isEmpty() ) {
             retryCopy();
@@ -759,8 +762,22 @@ public class Plan {
       } else return null;
    }
    
-   private Plan retryOf;  // for Disco
+   private Plan retry, retryOf;  
    
+   /**
+    * If this plan has been retried, return the retry otherwise null.
+    * 
+    * @see #getRetryOf()
+    * @see #retry()
+    */
+   public Plan getRetry () { return retry; }
+   
+   /**
+    * If this plan is the retry of another plan, return that plan, otherwise null.
+    * 
+    * @see #getRetry()
+    * @see #retry()
+    */
    public Plan getRetryOf () { return retryOf; }
    
    /**
@@ -772,6 +789,7 @@ public class Plan {
       // and make this plan ready for retry
       retryOf = new Plan(goal.getType().newInstance(), null, 
             new ArrayList<Plan>(children));
+      retryOf.retry = this;
       children.clear();
       planned = false; // since no children left
       retryOf.decomp = decomp;

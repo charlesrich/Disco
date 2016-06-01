@@ -65,19 +65,18 @@ public abstract class Actor {
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)
     * @param guess guess decompositions
-    * @param retry try other decompositions if failure (see {@link Disco#retry()})
     * @return true if some response was made
     * 
     * @see Interaction
     */
-   public final boolean respond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   public final boolean respond (Interaction interaction, boolean ok, boolean guess) {
       synchronized (interaction) { 
-         return synchronizedRespond(interaction, ok, guess, retry); 
+         return synchronizedRespond(interaction, ok, guess); 
       }
    }
    
    protected abstract boolean synchronizedRespond (Interaction interaction, 
-         boolean ok, boolean guess, boolean retry);
+         boolean ok, boolean guess);
    
    private boolean authorized = true;
    
