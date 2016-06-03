@@ -111,7 +111,7 @@ public class Decomposition extends Instance {
       return (DecompositionClass) super.getType(); 
    }
    
-   private Task goal;
+   Task goal;
    public Task getGoal () { return goal; }
    
    /* DESIGN NOTE: The field below keeps track of which inputs in the goal
@@ -162,6 +162,11 @@ public class Decomposition extends Instance {
          throw new IllegalStateException("Decomposition already retracted");
       for (String name : goal.getType().outputNames)
          goal.removeSlotValue(name);
+      if ( modifiedInputs != null ) {
+         for (String name : modifiedInputs)
+            goal.removeSlotValue(name);
+         modifiedInputs.clear();
+      }
       goal = null;
       synchronized (bindings) { 
          bindings.remove("$this"); 

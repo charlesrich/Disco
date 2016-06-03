@@ -802,8 +802,11 @@ public class Plan {
       retryOf.retry = this;
       children.clear();
       planned = false; // since no children left
-      retryOf.decomp = decomp;
-      decomp = null;
+      if ( decomp != null ) {
+         retryOf.decomp = decomp;
+         retryOf.decomp.goal = retryOf.goal;
+         decomp = null;
+      }
       retryOf.contributes = false;
       retryOf.goal.copySlotValues(goal);
       if ( parent != null ) {
