@@ -968,7 +968,10 @@ public class Plan {
          throw new IllegalArgumentException(type+" not applicable to "+this);
       if ( getDecompositionClass() == type && decomp != null ) return decomp; 
       try { setDecomposition(new Decomposition(type, this)); }
-      catch (DecompositionClass.Contradiction e) { return null; }
+      catch (DecompositionClass.Contradiction e) { 
+         if ( TaskEngine.DEBUG ) System.out.println(e);
+         return null;        
+      }
       return decomp;
    }       
  
