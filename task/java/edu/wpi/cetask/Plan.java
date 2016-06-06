@@ -795,7 +795,7 @@ public class Plan {
     */
    private void retryCopy () {
       if ( TaskEngine.VERBOSE ) getGoal().engine.getErr().println("Retrying "+goal);
-      // make copy and move all children to it
+      // make copy to cache failure information and move all children to it
       // and make this plan ready for retry
       retryOf = new Plan(goal.getType().newInstance(), null, 
             new ArrayList<Plan>(children));
@@ -811,9 +811,9 @@ public class Plan {
       retryOf.goal.copySlotValues(goal);
       if ( parent != null ) {
          retryOf.parent = parent;
-         // insert copy in parent before this plan 
+         // insert failure copy in parent before this plan for printing
+         // (but note not updating predecessor/successor information)
          parent.children.add(parent.children.indexOf(this), retryOf);
-         retryOf.splice(this);
          parent.unFail();
       }
       // remove all output values (including success and when)
