@@ -230,20 +230,18 @@ public class Plan {
          throw new IllegalArgumentException(child+" is not child of "+this);
       children.remove(child);
       child.parent = null;
-      Iterator<Plan> iterator = child.requiredBy.iterator();
-      while ( iterator.hasNext() ) {
-         Plan successor = iterator.next();
+      for (Iterator<Plan> successors = child.requiredBy.iterator(); successors.hasNext();) {
+         Plan successor = successors.next();
          if ( steps == null || !steps.contains(successor) ) {
             successor.required.remove(child);
-            iterator.remove();
+            successors.remove();
          }
       }
-      iterator = child.required.iterator();
-      while ( iterator.hasNext() ) {
-         Plan predecessor = iterator.next();
+      for (Iterator<Plan> predecessors = child.required.iterator(); predecessors.hasNext();) {
+         Plan predecessor = predecessors.next();
          if ( steps == null || !steps.contains(predecessor) ) {
             predecessor.requiredBy.remove(child);
-            iterator.remove();
+            predecessors.remove();
          }
       }
    }
