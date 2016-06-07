@@ -223,17 +223,29 @@ public class Plan {
     * 
     * @param child - must be child of this plan
     */
-   public void remove (Plan child) {
+   public void remove (Plan child) { remove(child, null); }
+
+   private void remove (Plan child, Collection<Plan> steps) {
       if ( !children.contains(child) )
          throw new IllegalArgumentException(child+" is not child of "+this);
       children.remove(child);
       child.parent = null;
-      for (Plan next : requiredBy)
-         next.required.remove(child);
-      requiredBy.clear();
-      for (Plan previous : required)
-         previous.requiredBy.remove(child);
-      required.clear();
+      Iterator<Plan> iterator = child.requiredBy.iterator();
+      while ( iterator.hasNext() ) {
+         Plan successor = iterator.next();
+         if ( steps == null || !steps.contains(successor) ) {
+            successor.required.remove(child);
+            iterator.remove();
+         }
+      }
+      iterator = child.required.iterator();
+      while ( iterator.hasNext() ) {
+         Plan predecessor = iterator.next();
+         if ( steps == null || !steps.contains(predecessor) ) {
+            predecessor.requiredBy.remove(child);
+            iterator.remove();
+         }
+      }
    }
    
    // these lists usually contain siblings (common parent), but not checking
@@ -936,10 +948,11 @@ public class Plan {
       if ( decomp != null && decomp.getType().getGoal() != goal.getType() )
          throw new IllegalArgumentException(decomp+" not applicable to "+this);
       if ( this.decomp != null ) { // remove decomposition
-         for (Plan step : this.decomp.getSteps()) {
+         Collection<Plan> steps = this.decomp.getSteps();
+         for (Plan step : steps) {
             if ( step.isStarted() ) step.contributes = false;
             else {
-               remove(step);
+               remove(step, steps);
                if ( goal.engine.getFocus() == step) goal.engine.pop();
             }
          }
