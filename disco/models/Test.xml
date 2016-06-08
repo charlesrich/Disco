@@ -271,7 +271,6 @@
      <input name="input1" type="number"/>
      <input name="input2" type="number"/>
      <binding slot="$this.input1" value="$this.input1 == undefined ? 5 : undefined"/>
-     <binding slot="$this.input2" value="undefined"/>
    </task>
 
    <task id="DefaultTop">
@@ -279,7 +278,6 @@
        <step name="step1" task="Optional3"/>
        <step name="step2" task="Optional3"/>
        <binding slot="$step1.input1" value="$step1.input1 == undefined ? 'hello' : undefined"/>
-       <binding slot="$step2.input1" value="undefined"/>
      </subtasks>
    </task>
 
