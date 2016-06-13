@@ -756,16 +756,18 @@ public class Plan {
    }
    
    /**
-    * If this plan has failed, and the goal is allowed to be retried and has not
-    * already been retried, then retry it; otherwise if it has failed, but it is
-    * not allowed to be retried, recurse up through failed parents. Returns the
-    * retried plan or null if none.
+    * If this plan has failed, and the goal is retriable and it has not already
+    * been retried, then retry it; otherwise if it has failed, but is not
+    * retriable,then recurse up through failed parents looking for retriable goal.
     * <p>
-    * A non-primitive is allowed to be retried by default if it has any
-    * applicable untried decompositions. A primitive is not allowed to be
-    * retried by default. Either default can be overridden by the boolean
-    * 'goal@retry' property.
+    * <em>Note exception:</em> if a goal is primitive and its parent is retriable, then
+    * prefer to retry parent.
+    * <p>
+    * A non-primitive is retriable by default iff it has any applicable untried
+    * decompositions. A primitive is not retriable by default. Either default
+    * can be overridden by the boolean 'goal@retry' property.
     * 
+    * @return the retried plan or null if none.
     * @see #getRetry()
     * @see #getRetryOf()
     */
@@ -773,13 +775,18 @@ public class Plan {
       // don't retry same plan twice (retry can be retried!)
       if ( retry != null ) return null;  
       if ( isFailed() ) {
-         if ( goal.getProperty("@retry", 
-                !isPrimitive() &&    
-                !getDecompositions().isEmpty()) ) {
+         if ( isRetriable() 
+               // exception noted above
+               && !(isPrimitive() && parent != null && parent.isFailed() && parent.isRetriable()) ) {
             retryCopy();
             return this;
          } else return parent == null ? null : parent.retry(); 
       } else return null;
+   }
+
+   private boolean isRetriable () {
+      return goal.getProperty("@retry", 
+            !isPrimitive() && !getDecompositions().isEmpty());
    }
    
    private Plan retry, retryOf;  
