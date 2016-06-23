@@ -62,7 +62,7 @@ public abstract class GuiGuide {
          super(task); 
          // assuming exactly one matching instance in current engine state
          plan =  guide.getEngine().explain(
-               guide.processTask(task, null, false), false).get(0);
+               guide.processTask(task, null, false, true), false).get(0);
          addActionListener(new ActionListener() { 
             @Override
             public void actionPerformed (ActionEvent event) { 

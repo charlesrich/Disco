@@ -15,8 +15,8 @@ import javax.script.*;
  * Abstract class to propose enumerated values.  Typically used to 
  * generate things-to-say list. 
  * 
- * @see ProposeGlobalPlugin
- * @see ProposeWhatPlugin
+ * @see ProposeGlobalEnumerationPlugin
+ * @see ProposeWhatEnumerationPlugin
  */
 public abstract class EnumerationPlugin extends Agenda.Plugin {
    

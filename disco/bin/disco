@@ -6,4 +6,4 @@
 # corresponding test log file <filename>.test, if it exists
 #
 dir="`dirname $0`"
-"$dir/../../task/bin/_run" edu.wpi.disco.Disco "$1" class ../disco/class lib/msv-rng.jar
+"$dir/_disco" edu.wpi.disco.Disco "$1"

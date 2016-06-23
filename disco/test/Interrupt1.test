@@ -6,7 +6,7 @@
     Agent says "How shall we achieve IntA?"
   > task A
     User says "Let's achieve A."
-    Agent says "Do you want to do B?"
+    Agent says "Should we do B?"
   > history
 
 [Achieve IntA] -accepted -live
@@ -18,7 +18,7 @@
          [Execute B] -optional -live
             [User says one of us should execute B] -live <-focus
                [User accept] -live
-                  Agent says "Do you want to do B?"
+                  Agent says "Should we do B?"
          [Execute C] -live
          [Execute D] -optional
 
@@ -41,7 +41,7 @@
          User says "Let's achieve A."
          [Agent execute B] -optional -accepted -done
             [User says please execute B] -done
-               Agent says "Do you want to do B?"
+               Agent says "Should we do B?"
                User says "One of us should execute B."
             Agent execute B.
          Agent execute C.

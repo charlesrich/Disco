@@ -92,11 +92,11 @@ public class DiscoComponent extends eu.semaine.components.Component {
        if (continueToTheNextStep) {
           // always "drain" coaching interaction first
           setCharacter(coach);
-          boolean responded = coach.respond(coaching, false, true, true);
+          boolean responded = coach.respond(coaching, false, true);
           if ( responded ) generate(coaching);
           if ( !responded || answers == null ) {
              setCharacter(interviewer);
-             interviewer.respond(interview, false, true, true);
+             interviewer.respond(interview, false, true);
              generate(interview);
           }
           if (continueToTheNextStep)
@@ -203,19 +203,17 @@ public class DiscoComponent extends eu.semaine.components.Component {
     }
 
     class TenChoicesFrameListener implements ActionListener{
-        private final int choice;
-        TenChoicesFrameListener(int num){
-            choice=num;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-	   synchronized (nway){ // not needed? Since done and doneUtterance already synch'd on interaction
-                gui.disableAllButNot(choice);
-                Plugin.Item item = items.get(choice);
-                interview.getDisco().getInteraction().occurredUtterance((Utterance) item.task, null, formatted[choice]);
-                interview.occurred(true, item.task, item.contributes);
-            }
-            
-        }
+       private final int choice;
+       TenChoicesFrameListener(int num){
+          choice=num;
+       }
+       @Override
+       public void actionPerformed(ActionEvent e) {
+          synchronized (nway){ 
+             gui.disableAllButNot(choice);
+             interview.getDisco().getInteraction().choose(items, choice, formatted[choice]);
+          }
+
+       }
     }
 }

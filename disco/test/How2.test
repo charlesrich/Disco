@@ -71,7 +71,7 @@
 [3] Let's not achieve HowPlus.
   >> 2
     User says "No."
-    Agent says "Do you want to do B?"
+    Agent says "Should we do B?"
   > status
 
 [Achieve HowPlus] -accepted -live
@@ -81,7 +81,7 @@
       [Execute B] -optional -live
          [User says one of us should execute B] -live <-focus
             [User accept] -live
-               Agent says "Do you want to do B?"
+               Agent says "Should we do B?"
       [Execute C] -live
       [Execute D] -optional
 

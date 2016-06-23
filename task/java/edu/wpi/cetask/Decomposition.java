@@ -111,8 +111,35 @@ public class Decomposition extends Instance {
       return (DecompositionClass) super.getType(); 
    }
    
-   private Task goal;
+   Task goal;
    public Task getGoal () { return goal; }
+   
+   /* DESIGN NOTE: The field below keeps track of which inputs in the goal
+    * of this decomposition were set by bindings in the decomposition (as
+    * opposed to being set, for example, by a Propose.What).
+    * 
+    * This is a partial approach to keeping track of dependencies in
+    * the task model bindings, and is needed in order to decide
+    * which inputs to remove when retrying a failed decomposition
+    * {@link Plan#retryCopy()}
+    */
+   private List<String> modifiedInputs = null;
+   
+   void modifyInput (String name) {
+      if ( goal.getType().inputNames.contains(name) ) {
+         if ( modifiedInputs == null ) 
+            modifiedInputs = new ArrayList<String>(goal.getType().inputNames.size());
+         if ( !modifiedInputs.contains(name) ) modifiedInputs.add(name);
+      }
+   }
+   
+   void unmodifyInput (String name) {
+      if ( modifiedInputs != null ) modifiedInputs.remove(name);
+   }
+   
+   boolean hasModifiedInput (String name) {
+      return modifiedInputs != null && modifiedInputs.contains(name);
+   }
    
    void attach (Plan plan) {
       Task goal = plan.getGoal();
@@ -135,6 +162,11 @@ public class Decomposition extends Instance {
          throw new IllegalStateException("Decomposition already retracted");
       for (String name : goal.getType().outputNames)
          goal.removeSlotValue(name);
+      if ( modifiedInputs != null ) {
+         for (String name : modifiedInputs)
+            goal.removeSlotValue(name);
+         modifiedInputs.clear();
+      }
       goal = null;
       synchronized (bindings) { 
          bindings.remove("$this"); 
@@ -218,8 +250,7 @@ public class Decomposition extends Instance {
       @Override
       protected void updateBindingsTask (boolean modified) {
          super.updateBindingsTask(modified); // do 2018-ext self bindings first
-         if ( !isOccurred() ) // don't change slots on occurrences
-            updateBindings(modified, null, null);
+         updateBindings(modified, null, null);
       }
       
       // need these also since SCRIPTABLE optimization does not call eval 
@@ -235,7 +266,7 @@ public class Decomposition extends Instance {
          updateBindingsTask(false);
          return super.getSlotValueBoolean(name);
       }
-  
+      
       // only setting/removing slot values sets modified bit 
       // evaluation of conditions, etc., is specified not to have side effects
 
@@ -245,6 +276,7 @@ public class Decomposition extends Instance {
          updateBindings(true, null, null);
          return value;
       }
+    
       
       @Override
       public void removeSlotValue (String name) {

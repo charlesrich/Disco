@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.*;
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.*;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -26,8 +27,10 @@ import javax.xml.xpath.XPath;
  */
 public class Disco extends TaskEngine {
    
+   public static String VERSION = "1.17";
+   
    /**
-    * Main class for running stand-alone Disco with console.
+    * Main method for running stand-alone Disco with console.
     * 
     * @param args first string (if any) is url or filename from which to read 
     *             console commands
@@ -40,7 +43,33 @@ public class Disco extends TaskEngine {
          .start(true); // prompt user first
    }
    
-   public static String VERSION = "1.14";
+   public static class Shared { 
+
+      /**
+       * Main method for running a <em>single</em> instance of Disco with two instances
+       * of Disco default agents and a console.  This approach works only if
+       * all of the recipe applicability conditions in the task model are based
+       * on <em>shared</em> knowledge, which is typically not true, for example,
+       * for dialogue trees.  
+       * <p>
+       * Note also that the two agents are not treated entirely symmetrically. For example,
+       * the external agent does not need permission to perform unauthorized actions.
+       * <p>
+       * See test/dual/Shared1.test
+       * <p>
+       * @see Dual
+       * 
+       * @param args first string (if any) is url or filename from which to read 
+       *             console commands
+       */
+      public static void main (String[] args) {
+         new Interaction(
+               new Agent("system"), 
+               new Agent("external"),
+               args.length > 0 && args[0].length() > 0 ? args[0] : null)
+         .start(true); // given external agent first turn
+      }
+   }
    
    /**
     * To enabled tracing of Disco implementation.  Note this variable can be conveniently
@@ -200,27 +229,51 @@ public class Disco extends TaskEngine {
       return getModel(ns).getTaskClass(id);
    }
    
-   private Stack<Segment> stack;
+   private Stack<Segment> stack; 
+   
    public Stack<Segment> getStack () { return stack; }
    
-   private Segment lastShift; // last shifted segment or null
+   private Segment recentShift; // most recent shift segment or null
 
-   private Segment getLastShift () {
+   private Segment getRecentShift () {
 	   for (int i = stack.size(); i-- > 1;)
 		   if (stack.get(i).isShift())
 			   return stack.get(i);
 	   return null;
    }
 	
-   /*
+   /**
     * Test whether interpretation of last occurrence resulted in an unnecessary
     * focus shift (see docs/LeshRichSidner2001_UM.pdf)
+    * 
+    * @see #getLastOccurrence()
     */
    public boolean isLastShift () {
-	   Segment shift = getLastShift();
-	   return shift != null && shift != lastShift;
+	   Segment shift = getRecentShift();
+	   return shift != null && shift != recentShift;
    }
 
+   /**
+    * If {@link #isLastShift()} returns true, then this method returns the segment
+    * to shift the focus back to where it was before the unnecessary focus shift. 
+    * (This segment is not currently on the stack.)
+    */
+   public Segment getLastUnshift () { return firstPop; }
+
+   /**
+    * @return true iff last occurrence implicitly accepts the proposal that was in
+    * focus, e.g., it is the first step of the proposed goal.
+    * 
+    * @see #getLastOccurrence()
+    */
+   public boolean isLastImplicitAccept () { return implicitAccepted != null; }
+   
+   /**
+    * if {@link #isLastImplicitAccept()} return true, then this method returns
+    * the plan that was implicitly accepted.
+    */
+   public Plan getLastImplicitAccepted () { return implicitAccepted; }
+   
    /**
     * Test whether discourse stack is empty
     */
@@ -319,7 +372,7 @@ public class Disco extends TaskEngine {
    }
 
    @Override
-   public void pop() {
+   public void pop () {
 	   if ( isEmpty() ) throw new IllegalStateException("Cannot pop stack bottom");
 	   Segment segment = stack.pop();
 	   Plan plan = segment.getPlan();
@@ -353,12 +406,21 @@ public class Disco extends TaskEngine {
             .findFirst().isPresent();
    }
    
+   private Segment firstPop; // first segment popped on interpretation of last occurrence
+   
    @Override
    public void clear () {
       super.clear();
       if ( utteranceToString != null ) utteranceToString.clear();
       if ( utteranceFormat != null) utteranceFormat.clear();
-      stack = new Stack<Segment>();
+      stack = new Stack<Segment>() {
+           
+         @Override 
+         public Segment pop () {
+            if ( firstPop == null ) firstPop = peek();
+            return super.pop();
+         }
+      };
       stack.push(new Segment()); 
    }
    
@@ -379,17 +441,12 @@ public class Disco extends TaskEngine {
       super.removeTop(plan);
    }
    
-   @Override
-   public Plan occurred (Task occurrence) { 
-      return interaction.occurredSilent(true, occurrence, null);
-   }
-   
-   /* *
+   /*
     * Extend simple plan recognition in task engine with discourse interpretation
-    * algorithm (but still not including decomposition choice interpolation).
+    * algorithm. (Note still does not including decomposition choice interpolation).
     */
    @Override
-   public Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
+   protected Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
       Segment top = getSegment();
       if ( contributes == null && top.isInterruption() && top.getPlan().isExhausted() ) {
          // special case for automatically popping exhausted interruptions
@@ -402,13 +459,36 @@ public class Disco extends TaskEngine {
       return contributes;
    }
    
-   public void putUtterance (Utterance utterance, String formatted) {
+   @Override // for package visibility
+   protected Plan occurred (boolean external, Task occurrence, Plan contributes, boolean eval) { 
+       return super.occurred(external, occurrence, contributes, eval); 
+   }
+   
+   void putUtterance (Utterance utterance, String formatted) {
       if ( utteranceFormat.get(utterance) == null ) // in case copied or set in menu
          // cache translation and history formatting at occurrence time
          utteranceFormat.put(utterance, 
                toHistoryString(utterance, 
                      formatted == null ? translate(utterance) : formatted,
                         true));
+   }
+   
+   /**
+    * @deprecated use {@link Actor#done(Task,Interaction,Plan)}
+    */
+   @Override
+   @Deprecated
+   public Plan done (Task occurrence) { 
+      throw new UnsupportedOperationException();
+   }
+   
+   /**
+    * @deprecated use {@link Actor#execute(Task,Interaction,Plan)}
+    */
+   @Override
+   @Deprecated
+   public Plan execute (Task occurrence, Plan contributes) { 
+      throw new UnsupportedOperationException();
    }
    
    @Override
@@ -420,6 +500,32 @@ public class Disco extends TaskEngine {
          if ( translated != null ) utteranceFormat.put((Utterance) thisTask, translated); 
       }
       return thisTask;
+   }
+
+   void retry (Plan contributes) {
+      if ( contributes != null && contributes.isFailed() )  
+         retried(contributes);  // suppressed singleton segment (see reconcileStack)
+      else {
+         for (int i = stack.size(); i-- > 1;) {
+            Plan plan = stack.get(i).getPlan();
+            if ( plan.isFailed() && retried(plan) ) break;
+         }
+      }
+   }
+
+   private boolean retried (Plan plan) {
+      Plan retried = plan.retry();
+      if ( retried != null ) {
+         if ( stackContains(retried) ) {
+            while ( getFocus() != retried ) pop(); // expose retried plan
+            // substitute copy of failed goal
+            getSegment().setPlan(retried.getRetryOf());
+            pop();
+         }
+         push(retried);
+         return true;
+      }
+      return false;
    }
 
    /**
@@ -565,8 +671,13 @@ public class Disco extends TaskEngine {
   
    @Override
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
-      lastShift = getLastShift(); // cache before stack changed
+      recentShift = getRecentShift(); // cache before stack changed
+      firstPop = null;
+      implicitAccepted = null;
       boolean explained = super.interpret(occurrence, contributes, continuation);
+      if ( occurrence.isUser() && occurrence instanceof Propose.Should )
+         // see Propose.interpretPropose()
+         implicitAccepted = getFocus();
       if ( !(occurrence instanceof Utterance) ) {
          // relying here on fact that Utterance is the only subclass of Task that 
          // overrides interpret() and does its own stack management
@@ -614,6 +725,9 @@ public class Disco extends TaskEngine {
       reconcileStack(occurrence, getFocus(), contributes, continuation, false);
     }
    
+   private Plan implicitAccepted;
+   
+   
    private void reconcileStack (Task occurrence, Plan focus, Plan contributes, 
          boolean continuation, boolean shift) {
       if ( focus != contributes ) {
@@ -626,6 +740,7 @@ public class Disco extends TaskEngine {
                   Plan parent = focus.getParent().getParent();
                   if ( parent.pathToDescendant(contributes) != null ) {
                      proposal.accept(parent, true);
+                     implicitAccepted = focus.getParent();
                      clearLiveAchieved();
                   }
                } // TODO extend for other types of proposals
@@ -645,9 +760,8 @@ public class Disco extends TaskEngine {
             		shift = false;
             	}
             }
-            // suppress singleton segments
-            if ( contributes.getType() != occurrence.getType()
-                  || !contributes.getChildren().isEmpty() || !contributes.isDone() ) {
+            if ( contributes.getType() != occurrence.getType() // suppress singleton segments 
+                 || !contributes.getChildren().isEmpty() ) {
             	push(contributes, continuation);
             	if ( shift ) getSegment().setShift(true);
             }
@@ -812,12 +926,9 @@ public class Disco extends TaskEngine {
             if ( !history && parent.isRoot() ) continue;
             Task task = (Task) child;
             print(task, stream, indent);
-            if ( !(task instanceof Utterance) ) {
-               Boolean success = task.getSuccess();
-               if ( Utils.isTrue(success) ) stream.print(" -succeeded");
-               else if ( Utils.isFalse(success) ) stream.print(" -failed");
-            }
-            if ( TaskEngine.VERBOSE && task.isUnexplained() && !parent.isRoot() )
+            if ( !(task instanceof Utterance) ) task.printSuccess(stream);
+            if ( (TaskEngine.VERBOSE || TaskEngine.DEBUG)
+                  && task.isUnexplained() && !parent.isRoot() )
                stream.print(" -unexplained");
             stream.println();
          } else {
@@ -864,8 +975,12 @@ public class Disco extends TaskEngine {
    
    public void print (Task task, PrintStream stream, int indent) {
       for (int i = indent; i-- > 0;) stream.print("   ");
-      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) stream.print(task);
-      else stream.print(toHistoryString(task));
+      if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
+         stream.print(task);
+         String hook = toHistoryStringHook == null ? null :
+            toHistoryStringHook.apply(task);
+         if ( hook != null ) stream.print(' '+hook);
+      } else stream.print(toHistoryString(task));
    }
    
    private void print (Plan plan, PrintStream stream, int indent) {
@@ -887,14 +1002,32 @@ public class Disco extends TaskEngine {
       utteranceToString.put(utterance,  string);
    }
    
+   private Function<Task,String> toHistoryStringHook;
+   
    /**
-    * Utility method to create human-readable string for given task for 
+    * Hook for adding application-specific information to printout of
+    * primitive tasks in history and shell.   
+    * 
+    * @param hook lambda expression to return string to be appended
+    *        to normal printout after single space (return null
+    *        if nothing to be added)
+    */
+   public void setToHistoryStringHook (Function<Task,String> hook) {
+      toHistoryStringHook = hook;
+   }
+   
+   /**
+    * Utility method to create human-readable string for given primitive task for 
     * use in history.
     */
    public String toHistoryString (Task task) {
-      return task instanceof Utterance && task.isOccurred() ?
-         task.format() : // already cached
-         toHistoryString(task, null, false);
+      String string = task instanceof Utterance && task.isOccurred() ? 
+         task.format() // already cached
+         : toHistoryString(task, null, false);
+      String hook = toHistoryStringHook == null ? null :
+         toHistoryStringHook.apply(task);
+      if ( hook != null ) string =  string+' '+hook;
+      return string;
    }
 
    private String toHistoryString (Task task, String formatted, boolean formatTask) {
@@ -1102,7 +1235,9 @@ public class Disco extends TaskEngine {
    private String translateKey (String key, Utterance utterance) {
       // note evaluation happens before alternatives, so don't
       // have to quote |'s in Javascript
-      return evalFormat(utterance, (String) translate.get(key), key);
+      String value = (String) translate.get(key);
+      if ( value != null && value.isEmpty() ) value = null;
+      return evalFormat(utterance, value, key);
    }
    
    String getTranslateKey (String utterance) { 

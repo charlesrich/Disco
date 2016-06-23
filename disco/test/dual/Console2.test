@@ -1,0 +1,34 @@
+    # This is Console2.test from executing bin/dual
+    # Agent2 is "self" (system)
+
+    # See also test/dual/Test1.txt
+
+    # See test/dual/Console1.test for other agent
+
+    # May 21, 2016 3:06:49 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+    Agent1 says "Ok."
+  > load models/Test.xml
+  > next
+    Agent2 says "Ok."
+  > next
+    Agent1 says "Should we achieve A?"
+  > next
+    Agent2 says "Let's achieve A."
+  > next
+    Agent1 says "Should we do B?"
+  > next
+    Agent2 says "One of us should execute B."
+  > next
+    Agent1 execute B.
+    Agent1 execute C.
+    Agent1 says "Should one of us execute D?"
+  > next
+    Agent2 says "One of us should execute D."
+  > next
+    Agent1 execute D.
+    Agent1 says "Yup."
+  > next
+    Agent2 says "Sure."
+  > quit
+    

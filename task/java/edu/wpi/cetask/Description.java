@@ -8,7 +8,6 @@ package edu.wpi.cetask;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.regex.*;
-import javax.script.ScriptException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -295,7 +294,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
          if ( compiled != null)  
             // assuming that $platform and $deviceType already in task.bindings
             try { compiled.eval(occurrence.bindings); }
-            catch (ScriptException e) { throw TaskEngine.newRuntimeException(e, where); }
+            catch (Exception e) { throw TaskEngine.newRuntimeException(e, where); }
          else engine.eval(script, occurrence.bindings, where); 
       }
       
@@ -328,7 +327,7 @@ public abstract class Description { //TODO: temporarily public for Anahita
       protected abstract boolean check (String slot);
 
       private final static Pattern pattern = // to match $this.slot
-         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*");      
+         Pattern.compile("\\$this\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.|\\)|\\,|\\s|\\Z)");      
 
       @Override
       void setEnclosing (Description enclosing) {
@@ -337,7 +336,9 @@ public abstract class Description { //TODO: temporarily public for Anahita
                (enclosing instanceof TaskClass || enclosing instanceof DecompositionClass) ) {
             Matcher matcher = pattern.matcher(script);
             while ( matcher.find() ) {
-               String slot = matcher.group().substring(6);
+               String slot = matcher.group().substring(6).trim();
+               if ( slot.endsWith(".") || slot.endsWith(")") || slot.endsWith(",") )
+                  slot = slot.substring(0, slot.length()-1);
                if ( check(slot) ) slots.add(slot);
             }
          }

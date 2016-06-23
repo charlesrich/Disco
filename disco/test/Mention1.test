@@ -1,0 +1,121 @@
+    # Apr 19, 2016 8:00:06 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > next false
+  > load models/Test.xml
+  > task ShiftA
+    User says "Let's achieve ShiftA."
+  > debug
+    # Notice the plan for ShiftA
+  > history
+
+[ShiftA] -accepted -live <-focus
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live
+      [ShiftC] -live
+         [ShiftE] -live
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+
+    # Execute some primitive to shift focus inside (to ShiftC)
+  > execute ShiftE
+    ShiftE(user)
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live
+      [ShiftC] -live <-focus
+         ShiftE(user)
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+
+    # Convenient command to set $new to new instance of ShiftI
+  > new ShiftI
+    # So that you can easily provide it as input to Mention
+  > execute edu.wpi.disco.lang.Mention / $new / "this is shifty"
+    Mention(user,ShiftI,"this is shifty")
+    # Notice focus has shifted to ShiftI (where Mention contributes)
+    # Note -stopped flag means it was started and focus shifted away
+    #  before it was finished, which checked as follows
+  > eval $disco.isLastShift()
+    # Returned 'true'
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live -stopped
+      [ShiftC] -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift <-focus
+      Mention(user,ShiftI,"this is shifty")
+
+    # You can shift focus back to C (or anywhere else)
+    # Notice use of getLastUnshift() method below to shift the focus back
+  > execute edu.wpi.disco.lang.Propose$Should / $disco.getLastUnshift().getPlan().getGoal()
+    Propose.Should(user,ShiftC)
+    # Notice -continuation flag
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live -stopped
+      [ShiftC] -accepted -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift -stopped
+      Mention(user,ShiftI,"this is shifty")
+   [ShiftB] -live -continuation -shift
+      [ShiftC] -accepted -live -continuation <-focus
+         Propose.Should(user,ShiftC)
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+
+    # Now here's an instance of a task outside of this tree (could
+    # be primitive or non-primitive)
+  > new Unauth
+    # And we mention it
+  > execute edu.wpi.disco.lang.Mention / $new / "this is unauthorized"
+Unexplained occurrence: this is unauthorized
+    Mention(user,Unauth,"this is unauthorized")
+    # you can check -unexplained flag below by
+    #     Disco.getLastOccurrence().isUnexplained()
+  > history
+
+[ShiftA] -accepted -live
+   Propose.Should(user,ShiftA)
+   [ShiftB] -live -stopped
+      [ShiftC] -accepted -live -stopped
+         ShiftE(user)
+   [ShiftI] -live -shift -stopped
+      Mention(user,ShiftI,"this is shifty")
+   [ShiftB] -live -continuation -shift
+      [ShiftC] -accepted -live -continuation <-focus
+         Propose.Should(user,ShiftC)
+         Mention(user,Unauth,"this is unauthorized") -unexplained
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+
+    # Here's the toplevel plan.  Notice that primitive events are *not*
+    # in chronological order, as compared to segment history above
+  > eval $disco.getTop($disco.getFocus()).print()
+[ShiftA] -accepted -live
+   [ShiftB] -live
+      [ShiftC] -accepted -live
+         [ShiftE(user)] -done
+         [ShiftF] -live
+      [ShiftD] -live
+         [ShiftG] -live
+         [ShiftH] -live
+   [ShiftI] -live
+    # Returned 'null'
+  > quit
+    

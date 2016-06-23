@@ -103,14 +103,15 @@ public class Shell {
       else source(from);
       // allow overriding of log file name
       this.log = log != null ? log :
-         new File(System.getProperty("java.io.tmpdir") + '/'
-            + (source == null ? 
-               Utils.getSimpleName(getClass(), false) : 
-                  new File(source.getFile()).getName()) 
-                  + ".test");
+         newLog(source == null ? Utils.getSimpleName(getClass(), false) : 
+                new File(source.getFile()).getName());
       shell = this;
    }
     
+   public static File newLog (String name) {  
+      return new File(System.getProperty("java.io.tmpdir") + '/' + name + ".test");
+   }
+   
    /**
     * Command loop. Uses reflection to invoke commands; see methods with command
     * names.
@@ -245,11 +246,11 @@ public class Shell {
          }
          // synchronized so that console can run for debugging alongside
          synchronized (engine.synchronizer) {
+            String args = line.substring(command.length()).trim(); 
             try {
-               // dispatch to command method
-               new Statement(this, command, 
-                     new Object[] { line.substring(command.length()).trim() }) 
-               .execute();
+               if ( "new".equals(command) ) newInstance(args);
+               else // dispatch to command method
+                  new Statement(this, command, new Object[] {args}).execute();
                if ( onProcessCommand != null ) onProcessCommand.run();
             } catch (NoSuchMethodException m) {
                // do not use respond here (for shell)
@@ -308,7 +309,7 @@ public class Shell {
 
    // allow later additions to list
    protected final List<String> status = new ArrayList<String>(
-      Arrays.asList("load", "cd", "status", "eval", "clear",
+      Arrays.asList("load", "cd", "status", "eval", "new", "clear",
                     "source", "test", "step", "verbose", "debug", "quit", "help"));
            
    // commands 
@@ -324,9 +325,12 @@ public class Shell {
       out.println("    status              - print current engine state");
       out.println("    clear               - delete all current tasks");
       out.println("    eval <javascript>   - evaluate inline JavaScript");
+      out.println("    new [<id> [<namespace>]] [/ <input> ]* [/ <output> ]* [/ <external>]");
+      out.println("                        - sets $new to specified new task instance");
+      out.println("                          (slot values optional)");
       out.println("    source <filename>   - read command input from file");
-      out.println("    test <filename>     - like source but only prompt lines");
-      out.println("    step (<filename>)   - single-step command input from file");
+      out.println("    test <filename>     - like 'source', except for .test files");
+      out.println("    step [<filename>]   - like 'test', except single-stepping");
       out.println("    cd <path>           - change working directory");
       out.println("    quit                - quit program");
       out.println("    verbose [<boolean>] - turn verbose output on/off (default true)");
@@ -351,6 +355,19 @@ public class Shell {
       TaskEngine engine = getEngine();
       println("# Returned '"+engine.toString(engine.eval(script, "Shell"))+"'");
       getEngine().clearLiveAchieved();
+   }
+   
+   /**
+    * Create a new instance of specified task class, including slot values.
+    * task. Task class must be specified and unspecified args do not default.
+    * This command is needed to avoid recursive invocation of eval in test cases.
+    * 
+    * Note this method cannot be named 'new' even though that is typed command
+    */
+   private Task newInstance (String args) {
+      Task task = processTaskFocus(args, null, false, true);
+      getEngine().setGlobal("$new", task);
+      return task;
    }
    
    private boolean stepping;
@@ -491,8 +508,8 @@ public class Shell {
    /**
     * @see #processTask(String,Plan,boolean)
     */
-   protected Task processTaskIf (String args, Plan focus, boolean optional) {
-      Task occurrence = processTask(args, focus, optional);
+   protected Task processTaskFocus (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task occurrence = processTask(args, focus, userDefault, hasSuccess);
       if ( occurrence == null ) 
          warning("Missing task argument (and no focus).");
       else if ( focus != null && focus.getGoal().isMatch(occurrence) )
@@ -505,15 +522,25 @@ public class Shell {
     * 
     * JavaScript to compute all <em>declared</em> input
     * and output slot values (in order declared), followed by external, and followed
-    * by success slot if optional is false. Skipped slots can be specified
+    * by success slot if success flag is true. Skipped slots can be specified
     * by '/ /'.<br>
     * <br>
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
-    * variable and use variable in 'done'.
+    * variable and use variable in command.
     * 
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
+    * @param focus to use for filling in missig slots
+    * @param userDefault default value for external is true (only for primitives)
+    * @param hasSuccess flag controlling whether to process success slot
     */
-   public Task processTask (String args, Plan focus, boolean optional) {
+   public Task processTask (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task task = processTask(args, focus, hasSuccess);
+      if ( task.isPrimitive() && userDefault &&!task.isDefinedSlot("external") ) 
+         task.setExternal(true);
+      return task;
+   }
+      
+   private Task processTask (String args, Plan focus, boolean hasSuccess) {
       TaskClass type = focus == null ? null : focus.getType(); 
       StringTokenizer tokenizer = new StringTokenizer(args, "/");
       if ( tokenizer.hasMoreTokens() && !args.startsWith("/") ) {
@@ -532,13 +559,13 @@ public class Shell {
       }
       if ( type == null ) return null;
       Task task = type.newInstance();
-      // process input, output and success slot values, if any
+      // process slot values, if any
       for (String name : type.declaredInputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       for (String name : type.declaredOutputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       if ( !nextArg(tokenizer, task, "external") ) return task;
-      if ( !optional ) nextArg(tokenizer, task, "success");
+      if ( hasSuccess ) nextArg(tokenizer, task, "success");
       if ( tokenizer.hasMoreTokens() ) 
          warning("Ignoring rest of line starting at: \'"+tokenizer.nextToken()+"\'");
       return task;

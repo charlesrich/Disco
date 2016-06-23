@@ -6,6 +6,7 @@
 package edu.wpi.disco;
 
 import edu.wpi.cetask.*;
+import edu.wpi.cetask.TaskClass.Input;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.*;
 import edu.wpi.disco.plugin.*;
@@ -16,9 +17,15 @@ public class Agent extends Actor {
   
    public Agent (String name) {
       super(name);
+   }
+   
+   @Override
+   protected void init () {
       new AskShouldTopPlugin(agenda, 300); // only generates when stack empty
       new AskShouldPassablePlugin(agenda, 275); // ask optional before input 
       new AskHowPassablePlugin(agenda, 275);
+      // higher priority than ProposeShouldOther, AskWhatNoBinding, AskWhat
+      new ProposeWhatPlugin(agenda, 260);
       new AskWhatNoBindingPlugin(agenda, 250);
       new AuthorizedPlugin(agenda, 225);
       new ProposeShouldSelfPlugin(agenda, 100, false);
@@ -41,13 +48,78 @@ public class Agent extends Actor {
     * Set maximum number of non-utterance tasks on agent turn.
     */
    public void setMax (int max) { this.max = max; }
+
+   @Override
+   public void execute (Task occurrence, Interaction interaction, Plan contributes) {
+      super.execute(occurrence, interaction, contributes);
+      if ( occurrence instanceof Utterance ) { // after interpretation
+         Utterance utterance = (Utterance) occurrence;
+         lastUtterance = utterance;
+         say(interaction, utterance);
+      }
+   }
    
+   /**
+    * Thread-safe method to generate list of tasks for agent, 
+    * sorted according to plugin priorities (with guessing)
+    * 
+    * @see #generate(Interaction,boolean)
+    * @see #generateBest(Interaction)
+    */
+   @Override
+   public List<Plugin.Item> generate (Interaction interaction) {
+     return generate(interaction, true);
+   }
+   
+   /**
+    * Thread-safe method to return highest priority task for agent (with guessing)
+    * 
+    * @see #generateBest(Interaction,boolean)
+    * @see #generate(Interaction)
+    */
    @Override
    public Plugin.Item generateBest (Interaction interaction) {
-     return generateBest(interaction, false);
+      return generateBest(interaction, true);
+   }
+   
+   /**
+    * Thread-safe method to generate list of tasks for agent, 
+    * sorted according to plugin priorities.
+    * 
+    * @param guess guess among applicable decompositions
+    * 
+    * @see #generateBest(Interaction,boolean)
+    */
+   public List<Plugin.Item> generate (Interaction interaction, boolean guess) {
+      List<Plugin.Item> items = generate(interaction, false, false); // no guessing
+      if ( guess ) {
+         // guess first true applicable decomposition
+         if ( items == null || items.isEmpty() ) items = generate(interaction, true, false);
+         // guess first unknown applicable decomposition
+         if ( items == null || items.isEmpty() ) items = generate(interaction, null, false);
+      }            
+      return items;
    }
 
-   private Plugin.Item generateBest (Interaction interaction, Boolean guess) {
+   /**
+    * Thread-safe method to return highest priority task for agent.
+    * 
+    * @param guess guess among applicable decompositions
+    * 
+    * @see #generate(Interaction,boolean)
+    */
+   public Plugin.Item generateBest (Interaction interaction, boolean guess) {
+      List<Plugin.Item> items = generate(interaction, false, true); // no guessing
+      if ( guess ) {
+         // guess first true applicable decomposition
+         if ( items == null ) items = generate(interaction, true, true);
+         // guess first unknown applicable decomposition
+         if ( items == null ) items = generate(interaction, null, true);
+      }
+      return items == null ? null : items.get(0);
+   }
+
+   private List<Plugin.Item> generate (Interaction interaction, Boolean guess, boolean onlyBest) {
       Disco disco = interaction.getDisco();
       Plan focus = disco.getFocusExhausted(true);
       // decompose *all* live plan in current focus with either chosen decomposition,
@@ -63,7 +135,8 @@ public class Agent extends Actor {
             if ( top.isLive() ) live.add(top);
       }
       for (Plan plan : live) {
-         if ( !plan.isPrimitive() && !plan.isDecomposed() ) {
+         if ( plan.isPrimitive() ) continue;
+         if ( !plan.isDecomposed() ) {
             Task goal = plan.getGoal();
             List<DecompositionClass> decomps = plan.getDecompositions();
             if ( decomps.isEmpty() ) continue; // possible loop exit without return
@@ -84,26 +157,30 @@ public class Agent extends Actor {
                plan.apply(choice);
                plan.decomposeAll();
                // new live plans may have been created above
-               return generateBest(interaction, guess);
+               return generate(interaction, guess, onlyBest);
             } else if ( guess == null || guess ) {
-               Plugin.Item item = generateBest(interaction); // no guessing
-               if ( item != null ) return item;
+               List<Plugin.Item> items = generate(interaction, false, onlyBest); // no guessing
+               if ( items != null  && !items.isEmpty() ) return items;
                for (DecompositionClass decomp : decomps)
                   if ( !decomp.isInternal() // don't guess dialog tree choices
                         && decomp.getProperty("@authorized", true) // only if authorized
                         && Utils.equals(decomp.isApplicable(goal), guess) ) {
                      plan.apply(decomp); // one guess
                      plan.decomposeAll();
-                     // new live plans may have been create above
-                     item = generateBest(interaction); // no guessing
-                     return item != null ? item : 
+                     // new live plans may have been created above
+                     items = generate(interaction, false, onlyBest); // no guessing
+                     return items != null && !items.isEmpty() ? items : 
                         // recursion ends when no more live non-decomposed plans
-                        generateBest(interaction, guess); // continue guessing
+                        generate(interaction, guess, onlyBest); // continue guessing
                   } // possible loop exit without return
             }
          }
       }
-      return chooseBest(interaction);
+      if ( onlyBest ) {
+         Plugin.Item item = chooseBest(interaction);
+         return item == null ? null : Collections.singletonList(item);
+      } // else 
+      return super.generate(interaction); // Actor method
    }
    
    /**
@@ -127,19 +204,19 @@ public class Agent extends Actor {
    
    /**
     * Override this method to choose best on basis other than priorities or randomly.
-    * Call {@link #generate(Interaction)} to generate candidates.
+    * Call {@link #generate(Interaction,boolean)} to generate candidates.
     * 
     * @see Agent#RANDOM
     */
    protected Plugin.Item chooseBest (Interaction interaction) {
       if ( Disco.TRACE || RANDOM != null ) {
-         List<Plugin.Item> items = generate(interaction);
+         List<Plugin.Item> items = super.generate(interaction); // Actor method
          if ( items.isEmpty() ) return null;
          if ( Disco.TRACE ) Utils.print(items, interaction.getDisco().getOut());
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 
-      return super.generateBest(interaction);
+      return super.generateBest(interaction); // Actor method
    }
    
    /**
@@ -153,51 +230,36 @@ public class Agent extends Actor {
     * initiative or discourse structure.
     * 
     * @param ok force turn to end with 'Ok' if necessary
-    * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
     * @return true if some response was made
     */
    @Override
-   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
       Disco disco = interaction.getDisco();
-      if ( retry ) retry(disco); // see also in done
       for (int i = max; i-- > 0;) {
-         Plugin.Item item = respondIf(interaction, guess, retry);
+         Plugin.Item item = respondIf(interaction, guess);
          if ( item == null ) {
             // say "Ok" when nothing else to say and end of turn is required
-            if ( ok ) item = newOk(disco);
+            if ( ok ) item = Agenda.newItem(new Ok(disco, null), null);
             else return false;
          }
-         occurred(interaction, item, retry);
+         execute(item.task, interaction, item.contributes);
          if ( item.task instanceof Utterance) return true; // end of turn
       }
       // maximum number of non-utterances
-      if ( ok ) occurred(interaction, newOk(disco), retry);
+      if ( ok ) execute(new Ok(disco, null), interaction, null);
       return true;
    }
   
    /**
     * Return best response or null if there is no response.
     * 
-    * @param guess guess decompositions (see {@link #generateBest(Interaction,Boolean)})
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @param guess guess decompositions (see {@link #generateBest(Interaction,boolean)})
     */
-   public Plugin.Item respondIf (Interaction interaction, boolean guess, boolean retry) {
+   public Plugin.Item respondIf (Interaction interaction, boolean guess) {
       Disco disco = interaction.getDisco();
-      if ( retry) retry(disco); // see also in done
       disco.decomposeAll();
-      Plugin.Item item = generateBest(interaction);
-      if ( guess ) {
-         // guess first true applicable decomposition
-         if ( item == null ) item = generateBest(interaction, true);
-         // guess first unknown applicable decomposition
-         if ( item == null ) item = generateBest(interaction, null);
-      }
-      return item;
-   }
-   
-   private static Plugin.Item newOk (Disco disco) {
-      return Agenda.newItem(new Ok(disco, false), null);
+      return generateBest(interaction, guess);
    }
 
    /**
@@ -219,43 +281,46 @@ public class Agent extends Actor {
       lastUtterance = null; 
    }
    
+   // support for private beliefs
+
    /**
-    * Thread-safe method for notifying interaction that given plugin item
-    * has occurred.
+    * Return private belief about value (including null) of given input of 
+    * given plan.
     * 
-    * @param retry try other decompositions if failure (see {@link #retry(Disco)})
+    * @see #isDefinedSlot(Plan,TaskClass.Input)
+    * @see #setSlotValue(Plan,TaskClass.Input,Object)
     */
-   public void occurred (Interaction interaction, Plugin.Item item, boolean retry) { 
-      synchronized (interaction) { // typically used in dialogue loop
-         interaction.occurred(this == interaction.getExternal(), 
-               item.task, item.contributes);
-         if ( item.task instanceof Utterance ) { // after occurred
-            lastUtterance = (Utterance) item.task;
-            say(interaction, (Utterance) item.task);
-         }
-         if ( retry ) retry(interaction.getDisco());  // see also in respond
-      }
+   public Object getSlotValue (Plan plan, Input input) { 
+      // default for testing only -- ignores plan 
+      return inputs.get(input);
    }
 
-   protected void retry (Disco disco) {
-      synchronized (disco.getInteraction()) { // called in DiscoUnity agent
-         Stack<Segment> stack = disco.getStack();
-         for (int i = stack.size(); i-- > 1;) {
-            Plan plan = stack.get(i).getPlan();
-            if ( plan.isFailed() ) {
-               Plan retried = plan.retry();
-               if ( retried != null ) {
-                  // expose retried plan
-                  while ( disco.getFocus() != retried ) disco.pop();
-                  // substitute copy of failed goal
-                  disco.getSegment().setPlan(retried.getRetryOf());
-                  disco.pop(); disco.push(retried);
-                  break;
-               }
-            }
-         }
-      }
+   /**
+    * Set private belief about value (including null) of given input of 
+    * given plan.
+    * 
+    * @see #isDefinedSlot(Plan,TaskClass.Input)
+    * @see #getSlotValue(Plan,TaskClass.Input)
+    */
+   public void setSlotValue (Plan plan, Input input, Object value) {
+      // default for testing only -- ignores plan 
+      inputs.put(input, value);
    }
+
+   /**
+    * Tests whether this agent has private knowledge about given input of given
+    * plan.
+    * 
+    * @see #getSlotValue(Plan,TaskClass.Input)
+    * @see #setSlotValue(Plan,TaskClass.Input,Object)
+    */
+   public boolean isDefinedSlot (Plan plan, Input input) {
+      // default for testing only -- ignores plan 
+      return inputs.containsKey(input);
+   }
+
+   // for testing above
+   final private Map<Input,Object> inputs = new HashMap<Input,Object>(); 
 
 }
      

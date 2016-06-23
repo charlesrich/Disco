@@ -1,0 +1,41 @@
+# See disco/models/Restaurant.d4g.xml
+#
+# Below is the output printed by
+#
+#  java -cp disco.jar edu.wpi.disco.Dual\$Test2
+#
+# See the main method definition of this class, which runs two agents in
+# separate instances of Disco without consoles.  Notice that Agent1 is
+# dominant (default) and Agent2 is set to be submissive.  Notice that
+# there is quick agreement because both have the same preference for
+# Chinese.
+#
+# See also test/Restaurant0.test, test/dual/Restaurant1.test and Restaurant2.test
+
+Agent1 Interaction
+
+[Achieve Top by agentFirst] -done
+   [Achieve AgentFirst] -done
+      Agent1 says "Let's eat dinner together."
+      [ ] -done
+         Agent2 says "What do you like?"
+         Agent1 says "I like Chinese."
+         [ ] -done <-focus
+            Agent2 says "Ok, which Chinese restaurant?"
+            Agent1 says "Ok."
+            Agent2 says "Ok."
+
+Agent2 Interaction
+
+[Achieve Top by userFirst] -done
+   [Achieve UserFirst] -done
+      Agent1 says "Let's eat dinner together."
+      [ ] -done
+         Agent2 says "What do you like?"
+         [ ] -done
+            [Achieve Chinese] -done
+               Agent1 says "I like Chinese."
+               [ ] -done <-focus
+                  Agent2 says "Ok, which Chinese restaurant?"
+                  Agent1 says "Ok."
+                  Agent2 says "Ok."

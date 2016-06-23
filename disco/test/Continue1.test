@@ -18,7 +18,7 @@
     # Returned '[IntA]'
   > task A
     User says "Let's achieve A."
-    Agent says "Do you want to do B?"
+    Agent says "Should we do B?"
   > say
 [1] Yes.
 [2] No.
@@ -79,7 +79,7 @@
             User says "Let's achieve A."
             [Agent execute B] -optional -accepted -done
                [User says please execute B] -succeeded
-                  Agent says "Do you want to do B?"
+                  Agent says "Should we do B?"
                   User says "Yes."
                Agent execute B.
             Agent execute C.
@@ -127,7 +127,7 @@
             User says "Let's achieve A."
             [Agent execute B] -optional -accepted -done
                [User says please execute B] -succeeded
-                  Agent says "Do you want to do B?"
+                  Agent says "Should we do B?"
                   User says "Yes."
                Agent execute B.
             Agent execute C.

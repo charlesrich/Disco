@@ -17,7 +17,6 @@
             <ref name="Subtasks"/>
             <ref name="Script"/>
             <ref name="Top"/>
-            <ref name="Do"/>
           </choice>
         </zeroOrMore>
       </element>
@@ -38,6 +37,13 @@
       </element>
       <element name="user">
         <ref name="TopBody"/>
+      </element>
+      <element name="do">
+        <ref name="DoAttributes"/>
+        <optional>
+          <attribute name="precondition"/>
+        </optional>
+        <ref name="Choices"/>
       </element>
     </choice>
   </define>
@@ -65,52 +71,56 @@
   </define>
   <define name="Do">
     <element name="do">
-      <optional>
-        <attribute name="id">
-          <data type="ID"/>
-        </attribute>
-      </optional>
-      <optional>
-        <attribute name="actor">
-          <data type="NCName"/>
-        </attribute>
-      </optional>
-      <attribute name="task">
-        <data type="QName"/>
-      </attribute>
-      <optional>
-        <attribute name="minOccurs">
-          <data type="nonNegativeInteger"/>
-        </attribute>
-      </optional>
-      <optional>
-        <attribute name="maxOccurs">
-          <choice>
-            <data type="positiveInteger"/>
-            <value>unbounded</value>
-          </choice>
-        </attribute>
-      </optional>
+      <ref name="DoAttributes"/>
       <optional>
         <attribute name="applicable"/>
       </optional>
-      <zeroOrMore>
-        <!-- other attributes interpeted as bindings for inputs -->
-        <attribute>
-          <anyName>
-            <except>
-              <name ns="">id</name>
-              <name ns="">actor</name>
-              <name ns="">task</name>
-              <name ns="">minOccurs</name>
-              <name ns="">maxOccurs</name>
-              <name ns="">applicable</name>
-            </except>
-          </anyName>
-        </attribute>
-      </zeroOrMore>
       <ref name="Choices"/>
     </element>
+  </define>
+  <define name="DoAttributes">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="actor">
+        <data type="NCName"/>
+      </attribute>
+    </optional>
+    <attribute name="task">
+      <data type="QName"/>
+    </attribute>
+    <optional>
+      <attribute name="minOccurs">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="maxOccurs">
+        <choice>
+          <data type="positiveInteger"/>
+          <value>unbounded</value>
+        </choice>
+      </attribute>
+    </optional>
+    <zeroOrMore>
+      <!-- other attributes interpeted as bindings for inputs -->
+      <attribute>
+        <anyName>
+          <except>
+            <name ns="">id</name>
+            <name ns="">actor</name>
+            <name ns="">task</name>
+            <name ns="">minOccurs</name>
+            <name ns="">maxOccurs</name>
+            <name ns="">applicable</name>
+            <name ns="">precondition</name>
+          </except>
+        </anyName>
+      </attribute>
+    </zeroOrMore>
   </define>
   <define name="Choices">
     <zeroOrMore>

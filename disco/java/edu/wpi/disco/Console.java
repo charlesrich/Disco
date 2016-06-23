@@ -59,11 +59,13 @@ public class Console extends Shell {
    public void occurred (Task occurrence) { 
       synchronized (interaction) { 
          // print out all occurrences in shell
+         out.print("    ");
          if ( TaskEngine.DEBUG || TaskEngine.PRINT_TASK ) {
-            out.print("    ");
             interaction.getDisco().print(occurrence, out, 0);
-            out.println();
-         } else println(getEngine().toHistoryString(occurrence));
+         } else out.print(getEngine().toHistoryString(occurrence));
+         if ( TaskEngine.DEBUG || TaskEngine.VERBOSE )
+            occurrence.printSuccess(out);
+         out.println();
          if ( occurrence instanceof Utterance ) 
             printTranslateKeys((Utterance) occurrence);
       }
@@ -71,7 +73,7 @@ public class Console extends Shell {
    
    private void printTranslateKeys (Utterance utterance) {
       if ( TaskEngine.VERBOSE && translateStream != null && 
-            !(utterance instanceof Say) ) { 
+            !(utterance instanceof Utterance.Text) ) { 
          String formatted = utterance.formatTask(),
                translated = getEngine().translate(formatted, utterance);
          // check if utterance was not actually translated (i.e., new key for file)
@@ -131,17 +133,13 @@ public class Console extends Shell {
       out.println("                          (namespace optional if unambiguous id)");
       out.println("                          (slot values optional)");
       out.println("    done [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
-      out.println("                        - this task has been performed (default by user)");
-      out.println("                          (for primitive tasks only)");
-      out.println("                          (task defaults to current focus)");
-      out.println("                          (all slot values required)");
+      out.println("                        - this task has been completed (default by user)");
+      out.println("                          (task and slot values default to current focus)");
       out.println("    execute [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
-      out.println("                        - like 'done', except runs script if any");
+      out.println("                        - like 'done', except runs grounding script if any");
+      out.println("                          (for primitive tasks only)");
       out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'execute' for utterances, except defaults to menu of choices");
-      out.println("    instance [<id> [<namespace>]] [ / <input> ]* [ / <output> ]* [/ <external>]");
-      out.println("                        - sets $new to specified new task instance");
-      out.println("                          (slot values optional)");
       out.println("    next [<boolean>]    - end user console turn");
       out.println("                          (boolean turns automatic turn mode on/off)");
       super.help();
@@ -235,20 +233,20 @@ public class Console extends Shell {
    }
    
    { 
-      status.add("history"); status.add("trace"); status.add("reset"); 
-      status.add("print"); status.add("instance"); 
+      status.add("history"); status.add("trace"); 
+      status.add("reset"); status.add("print"); 
    }
 
    /* *
-    * Equivalent to executing Propose.Should of specified task.
+    * Equivalent to user executing Propose.Should of specified task.
     * 
     * @see Propose.Should
     */
    public void task (String args) {
-      Task should = processTaskIf(args, null, true);
+      Task should = processTaskFocus(args, null, false, false);
       if ( should != null ) 
-         interaction.occurred(true, 
-               Propose.Should.newInstance(getEngine(), true, should), null); 
+         interaction.getExternal().execute(
+               Propose.Should.newInstance(getEngine(), true, should), interaction, null); 
    }
    
    /**
@@ -289,7 +287,7 @@ public class Console extends Shell {
                if ( line.length() == 0 ) { 
                   command = null; 
                   if (TTSay) 
-                     interaction.occurred(false, new TTSay(getEngine(), items, null), null);
+                     interaction.getSystem().execute(new TTSay(getEngine(), items, null), interaction, null);
                   break; 
                }
                if ( "quit".equals(line) ) throw new Quit();
@@ -297,7 +295,7 @@ public class Console extends Shell {
                   int choice = Integer.parseInt(line.trim());
                   interaction.choose(items, choice, formatted[choice-1]);
                   if (TTSay) 
-                     interaction.occurred(false, new TTSay(getEngine(), items, choice-1), null);
+                     interaction.getExternal().execute(new TTSay(getEngine(), items, choice-1), interaction, null);
                   break;
                } catch (NumberFormatException e) { println("Not a number!"); }
                  catch (IndexOutOfBoundsException e) { println("Number not in menu!"); }
@@ -326,64 +324,53 @@ public class Console extends Shell {
    }
 
    /**
-    * Report user execution of primitive task or completion of non-primitive
+    * Report <em>observation</em> of completion of user execution of primitive task or completion of non-primitive
     * task. Task class and unspecified args default to current focus.
+    * 
+    * @see Actor#done(Task,Interaction,Plan)
     */
-   public Task done (String args) {
+   public void done (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, false);
+      Task task = processTaskDefined(args, focus, true, true);
       if ( task != null ) {
-         if ( task.isPrimitive() ) done(task); 
-         else done(new Propose.Done(getEngine(), true, task));
+         if ( task.isPrimitive() )
+            interaction.getActor(task).done(task, interaction, null);
+         else
+            interaction.getExternal().execute(new Propose.Done(getEngine(), true, task),
+                  interaction, null);
       }
-      return task;
    } 
    
    /**
-    * Like 'done', but first executes script associated with primitive task, if
+    * Like 'done', but also executes script associated with primitive task, if
     * any. Convenient for running simulations.
     * 
     * @see #done(String)
+    * @see Actor#execute(Task,Interaction,Plan)
     */
    public Task execute (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, false);
+      Task task = processTaskDefined(args, focus, true, true);
       if ( !task.isPrimitive() ) {
          err.println("Execute not allowed for non-primitive tasks.");
          return null;
       }
-      if ( !(task instanceof Utterance) ) { // see Interaction.done
-         task.setExternal(true); // must be set before eval
-         task.eval(new Plan(task));
-      }
-      done(task);
+      interaction.getActor(task).execute(task, interaction, null);
       return task;
    }
    
-   private Task done (Task occurrence) {
+   private Task processTaskDefined (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task occurrence = processTaskFocus(args, focus, userDefault, hasSuccess);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
-            boolean external = !Utils.isFalse(occurrence.getExternal());
-            if ( !external ) command = null; // keep user turn
-            interaction.occurred(external, occurrence, null); 
-         } else warning("All input values must be defined--ignored.");
+            if ( occurrence.isSystem() ) command = null; // keep user turn
+         } else warning("All input values must be defined--occurrence ignored.");
       }
       return occurrence;
    }
-   
-   /**
-    * Create a new instance of specified task class, including slot values.
-    * task. Task class must be specified and unspecified args do not default.
-    * This command is needed to avoid recursive invocation of eval in test cases.
-    */
-   public Task instance (String args) {
-      Task task = processTaskIf(args, null, false);
-      getEngine().setGlobal("$new", task);
-      return task;
-   }
 
    /**
-    * End user console turn.  If there is a nested user, then it gets to
+    * End console (user) turn.  If there is a nested user, then it gets to
     * respond next; otherwise it is agent's turn to respond.
     * In automatic turn mode this command is not needed, since
     * every turn is a single task; otherwise this is the command that

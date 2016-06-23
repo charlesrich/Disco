@@ -1,10 +1,10 @@
     # May 16, 2012 10:20:24 PM - TaskEngine 1.2.1 / Disco 1.4.3
     Welcome to Disco! (Type 'help' for command list)
   > load models/Test.xml
-  > instance A
+  > new A
   > eval $disco.addTop($new)
     # Returned '[A]'
-  > instance IntA
+  > new IntA
   > eval $disco.addTop($new)
     # Returned '[IntA]'
   > next

@@ -11,7 +11,6 @@
           <xsd:element ref="t:subtasks"/>
           <xsd:element ref="t:script"/>
           <xsd:group ref="d4g:Top"/>
-          <xsd:element ref="d4g:do"/>
         </xsd:choice>
       </xsd:sequence>
       <xsd:attribute name="about" use="required" type="xsd:anyURI"/>
@@ -30,6 +29,16 @@
       </xsd:element>
       <xsd:element name="agent" type="d4g:TopBody"/>
       <xsd:element name="user" type="d4g:TopBody"/>
+      <xsd:element name="do">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="d4g:Choices">
+              <xsd:attributeGroup ref="d4g:DoAttributes"/>
+              <xsd:attribute name="precondition"/>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
     </xsd:choice>
   </xsd:group>
   <xsd:complexType name="TopBody">
@@ -54,34 +63,41 @@
       </xsd:element>
     </xsd:sequence>
   </xsd:group>
-  <xsd:element name="do">
-    <xsd:complexType>
-      <xsd:complexContent>
-        <xsd:extension base="d4g:Choices">
-          <xsd:attribute name="id" type="xsd:ID"/>
-          <xsd:attribute name="actor" type="xsd:NCName"/>
-          <xsd:attribute name="task" use="required" type="xsd:QName"/>
-          <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger"/>
-          <xsd:attribute name="maxOccurs">
-            <xsd:simpleType>
-              <xsd:union memberTypes="xsd:positiveInteger">
-                <xsd:simpleType>
-                  <xsd:restriction base="xsd:token">
-                    <xsd:enumeration value="unbounded"/>
-                  </xsd:restriction>
-                </xsd:simpleType>
-              </xsd:union>
-            </xsd:simpleType>
-          </xsd:attribute>
-          <xsd:attribute name="applicable"/>
-          <xsd:anyAttribute processContents="skip"/>
-        </xsd:extension>
-      </xsd:complexContent>
-    </xsd:complexType>
-  </xsd:element>
+  <xsd:group name="Do">
+    <xsd:sequence>
+      <xsd:element name="do">
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="d4g:Choices">
+              <xsd:attributeGroup ref="d4g:DoAttributes"/>
+              <xsd:attribute name="applicable"/>
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:attributeGroup name="DoAttributes">
+    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="actor" type="xsd:NCName"/>
+    <xsd:attribute name="task" use="required" type="xsd:QName"/>
+    <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger"/>
+    <xsd:attribute name="maxOccurs">
+      <xsd:simpleType>
+        <xsd:union memberTypes="xsd:positiveInteger">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:token">
+              <xsd:enumeration value="unbounded"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:union>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:anyAttribute processContents="skip"/>
+  </xsd:attributeGroup>
   <xsd:complexType name="Choices">
     <xsd:choice minOccurs="0" maxOccurs="unbounded">
-      <xsd:element ref="d4g:do"/>
+      <xsd:group ref="d4g:Do"/>
       <xsd:group ref="d4g:Say"/>
       <xsd:group ref="d4g:User"/>
       <xsd:group ref="d4g:Agent"/>

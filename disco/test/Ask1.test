@@ -1,0 +1,120 @@
+    # Apr 27, 2016 7:02:40 AM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > next false
+  > load models/Test.xml
+  > debug
+  > task ChooseFlavor
+    Propose.Should(user,ChooseFlavor)
+  > history
+
+[ChooseFlavor] -accepted -live <-focus
+   Propose.Should(user,ChooseFlavor)
+
+  > new ChooseFlavor
+  > execute edu.wpi.disco.lang.Ask$What / $new / "flavor" / false
+    Ask.What(agent,ChooseFlavor,"flavor")
+    # notice semantics of Ask is to push corresponding proposal goal by
+    # interlocutor onto the stack
+    # there is also provision for an explicit Accept (or Reject), which
+    # can be implicitly popped by answer (see below)
+  > history
+
+[ChooseFlavor] -accepted -live
+   Propose.Should(user,ChooseFlavor)
+   [Propose.What(user,ChooseFlavor,"flavor")] -live <-focus
+      [Accept(user,Ask.What(agent,ChooseFlavor,"flavor"))] -live
+         Ask.What(agent,ChooseFlavor,"flavor")
+
+  > debug false
+    # here's the default gloss (can be improved with @format properties)
+  > history
+
+[Execute ChooseFlavor] -accepted -live
+   User says "One of us should execute ChooseFlavor."
+   [User says propose the ChooseFlavor flavor] -live <-focus
+      [User accept] -live
+         Agent says "What is the ChooseFlavor flavor?"
+
+  > debug true
+    # the user answers the question
+    # note taking advantage of convenient console feature below that
+    # omitted inputs default from focus
+  > execute / / / Flavor.ENUM.Chocolate
+    Propose.What(user,ChooseFlavor,"flavor",Flavor.ENUM.Chocolate)
+    # notice flavor input of ChooseFlavor now has value
+  > history
+
+[ChooseFlavor(,Flavor.ENUM.Chocolate)] -accepted -live
+   Propose.Should(user,ChooseFlavor)
+   [Propose.What(user,ChooseFlavor,"flavor",Flavor.ENUM.Chocolate)] -done <-focus
+      Ask.What(agent,ChooseFlavor,"flavor")
+      Propose.What(user,ChooseFlavor,"flavor",Flavor.ENUM.Chocolate)
+
+  > clear
+  > task ChooseFlavor
+    Propose.Should(user,ChooseFlavor)
+  > history
+
+[ChooseFlavor] -accepted -live <-focus
+   Propose.Should(user,ChooseFlavor)
+
+  > new ChooseFlavor
+    # similarly for external slot, which is really just another input
+  > execute edu.wpi.disco.lang.Ask$Who / $new / false
+    Ask.Who(agent,ChooseFlavor)
+  > history
+
+[ChooseFlavor] -accepted -live
+   Propose.Should(user,ChooseFlavor)
+   [Propose.Who(user,ChooseFlavor)] -live <-focus
+      [Accept(user,Ask.Who(agent,ChooseFlavor))] -live
+         Ask.Who(agent,ChooseFlavor)
+
+  > execute edu.wpi.disco.lang.Propose$Who / / false
+    Propose.Who(user,ChooseFlavor,false)
+  > history
+
+[ChooseFlavor(agent)] -accepted -live
+   Propose.Should(user,ChooseFlavor)
+   [Propose.Who(user,ChooseFlavor,false)] -done <-focus
+      Ask.Who(agent,ChooseFlavor)
+      Propose.Who(user,ChooseFlavor,false)
+
+  > clear
+    # IntA is a non-primitive with two possible recipes
+  > task IntA
+    Propose.Should(user,IntA)
+  > history
+
+[IntA] -accepted -live <-focus
+   Propose.Should(user,IntA)
+
+  > new IntA
+  > execute edu.wpi.disco.lang.Ask$How / $new / false
+    Ask.How(agent,IntA)
+    # note similar stack structure of Propose and Accept
+  > history
+
+[IntA] -accepted -live
+   Propose.Should(user,IntA)
+   [Propose.How(user,[IntA])] -live <-focus
+      [Accept(user,Ask.How(agent,IntA))] -live
+         Ask.How(agent,IntA)
+
+    # small technical detail: the first input of Propose.How is a plan, not
+    # a task
+  > execute edu.wpi.disco.lang.Propose$How / / $disco.getDecompositionClass("IntBC")
+    Propose.How(user,[IntA],IntBC)
+    # notice IntBC recipe chosen and expanded
+  > history
+
+[IntA by IntBC] -accepted -live
+   Propose.Should(user,IntA)
+   [Propose.How(user,[IntA],IntBC)] -done <-focus
+      Ask.How(agent,IntA)
+      Propose.How(user,[IntA],IntBC)
+   [IntB] -live
+   [IntC(user)] -live
+
+  > quit
+    

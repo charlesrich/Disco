@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class Interaction extends Thread {
   
-   // ******* Thread-safe methods *********
+   // ******* Thread-safe public methods *********
    
    private Disco disco;
    
@@ -75,6 +75,10 @@ public class Interaction extends Thread {
          task.isSystem() ? getSystem() : null; 
    }
 
+   public Actor getActor (boolean external) {
+      return external ? getExternal() : getSystem();
+   }
+   
    /**
     * Set default value for interaction@ok property.
     * Thread-safe.
@@ -98,6 +102,18 @@ public class Interaction extends Thread {
     * Thread-safe.
     */
    public boolean isGuess () { return guess; }
+   
+   /**
+    * Set default value for interaction@retry property.
+    * Thread-safe.
+    */
+   public void setRetry (boolean retry) { this.retry = retry; }
+
+   /**
+    * Return default value for interaction@retry property.
+    * Thread-safe.
+    */
+   public boolean isRetry () { return retry; }
    
    /**
     * Thread-safe method to get current discourse focus.
@@ -249,45 +265,6 @@ public class Interaction extends Thread {
     * @see Disco#addTop(String)
     */
    public synchronized Plan addTop (String id) { return disco.addTop(id); }
- 
-   /**
-    * Thread-safe method to notify interaction that given <em>primitive</em>
-    * task has occurred. Typically used in dialogue loop.
-    * 
-    * @param external true if performed by user, false if by system
-    * @param occurrence task that has occurred
-    * @param contributes plan to which this task contributes, or null
-    * 
-    * @see #occurredUtterance(Utterance,Plan,String)
-    */
-   public synchronized void occurred (boolean external, Task occurrence, Plan contributes) {
-      occurredSilent(external, occurrence, contributes);
-      if ( console != null ) console.occurred(occurrence);
-   }   
-   
-   /**
-    * Variant of {@link #occurred(boolean,Task,Plan)}, used in {@link
-    * #choose(List,int,String)}, to notify interaction that given
-    * utterance has occurred. Thread-safe.
-    * 
-    * @param formatted corresponding formatted string, or null
-    */
-   public synchronized void occurredUtterance (Utterance utterance, Plan contributes,
-                                          String formatted) {
-      disco.putUtterance(utterance, formatted);
-      occurred(true, utterance, contributes);
-   }
-   
-   /**
-    * Variant of {@link #occurred(boolean,Task,Plan)}, used in
-    * {@link edu.wpi.disco.game.NWayInteraction}, that does not print to
-    * console. Thread-safe.
-    */
-   public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes) {
-      responded = true;
-      return disco.occurred(external, occurrence, contributes, 
-            (external ? getExternal() : getSystem()).isEval());
-   }
    
    /**
     * Thread-safe method to call when world state has changed due to reasons
@@ -303,25 +280,61 @@ public class Interaction extends Thread {
       if ( i > 0 && i <= items.size() ) {
          Plugin.Item item = items.get(i-1);
          // make sure history shows same alternative as menu selection
-         occurredUtterance((Utterance) item.task, item.contributes, formatted);
+         disco.putUtterance((Utterance) item.task, formatted);
+         getExternal().execute(item.task, this, item.contributes);
       } else throw new IndexOutOfBoundsException();
    }
    
-   // ******* End of thread-safe methods ***********
-   
-   private boolean responded;  // see doTurn
- 
-   private boolean externalFloor; // true iff external has floor
+   protected boolean externalFloor = true; // true iff external has floor
    
    /**
     * Return the actor who currently has the turn (may be null ).
     */
    public Actor getFloor () { return externalFloor ? external : system; }
    
+   // ******* End of thread-safe public methods ***********
+   
+   /**
+    * Notify interaction that given <em>primitive</em>
+    * task has occurred. Typically used in dialogue loop. 
+    * 
+    * @param external true if performed by user, false if by system
+    * @param occurrence task that has occurred
+    * @param contributes plan to which this task contributes, or null
+    */
+   protected synchronized Plan occurred (boolean external, Task occurrence, 
+         Plan contributes, boolean eval) {
+      responded = true;
+      return occurredRetry(external, occurrence, contributes, eval); 
+   }   
+   
+   /**
+    * Variant of {@link #occurred(boolean,Task,Plan,boolean)}, used in
+    * {@link edu.wpi.disco.game.NWayInteraction}, that does not print to
+    * console (even if there is one). 
+    */
+   @Deprecated
+   public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      responded = true;
+      return occurredRetry(external, occurrence, contributes, eval); 
+   }
+   
+   private Plan occurredRetry (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      contributes = disco.occurred(external, occurrence, contributes, eval);
+      if ( disco.getProperty("interaction@retry", retry) ) disco.retry(contributes);
+      return contributes;
+   }
+   
+   void occurredConsole (Task occurrence) {
+      if ( console != null ) console.occurred(occurrence);
+   }
+
    // NB all read/write to discourse state on this single thread
 
-   protected boolean running;
-   
+   protected volatile boolean running; // volatile for event thread
+
+   private boolean responded;  // see doTurn
+      
    @Override
    public void run () {
       if ( (system == null || external == null) && console == null )
@@ -329,7 +342,9 @@ public class Interaction extends Thread {
       boolean first = true;
       // this is the turn-taking loop
       while (running) {
-         try { if ( !doTurn(first) ) break; }
+         // may be updated by library loading
+         boolean ok = disco.getProperty("interaction@ok", this.ok);
+         try { if ( !doTurn(ok) ) break; }
          catch (Throwable e) {
             if ( console != null ) { 
                console.exception(e); // will throw if debug
@@ -337,7 +352,10 @@ public class Interaction extends Thread {
                externalFloor = false;
             } else throw e;
          }
+         if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
+            console.respond(this); 
          first = false;
+         externalFloor = !externalFloor;
       }
       cleanup();
    }
@@ -345,22 +363,16 @@ public class Interaction extends Thread {
    /**
     * Perform one turn of interaction.
     * 
-    * @param first true if this is first turn
-    * @return true iff interaction should continue running
+    * @param ok generate Ok if nothing else to say
+    * @return true iff interaction should continue running 
     */
-   public boolean doTurn (boolean first) {
+   protected boolean doTurn (boolean ok) {
       Actor floor = getFloor();
       responded = false;
-      boolean ok = disco.getProperty("interaction@ok", this.ok);
       if ( floor != null ) 
          floor.respond(this, ok, 
-               disco.getProperty("interaction@guess", guess),
-               disco.getProperty("interaction@retry", retry));
-      if ( !running ) return false;
-      if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
-         console.respond(this);
-      externalFloor = !externalFloor;
-      return true;
+               disco.getProperty("interaction@guess", guess));
+      return running;
    }
    
    /**
@@ -391,7 +403,7 @@ public class Interaction extends Thread {
     * @param from url or filename from which to read console commands (for testing),
     *        or null (ignored if console false)
     * @param console flag to control whether a console is provided
-    * @param disco associated instance of Disco (or extension)
+    * @param disco associated instance of Disco (or extension) or null (new Disco created by default)
     * @param title for interaction thread 
     */
    public Interaction (Actor system, Actor external, String from, boolean console, Disco disco, String title) {
@@ -422,10 +434,15 @@ public class Interaction extends Thread {
     */
    public void start (boolean externalFloor) {
       this.externalFloor = externalFloor;
-      running = true;
       start();
    }
 
+   @Override
+   public void start () {
+      running = true;
+      super.start();
+   }
+   
    /**
     * Clear any discourse state information stored in this interaction.
     * Thread-safe.  
@@ -447,8 +464,10 @@ public class Interaction extends Thread {
     * Stop this interaction thread.
     */
    public void exit () { 
-      running = false; 
-      interrupt(); // in case blocked 
+      if ( running ) {
+         running = false;
+         interrupt(); // in case blocked
+      }
    }
    
    /**

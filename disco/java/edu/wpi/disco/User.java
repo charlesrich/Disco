@@ -13,16 +13,21 @@ import java.util.List;
 
 public class User extends Actor {
   
-   // TTSay plugins
    public User (String name) {
       super(name);
+   }
+   
+   @Override
+   protected void init () {
+      new AskWhatPlugin(agenda, 26);
+      // TTSay plugins
       new RespondPlugin.Accept(agenda, 120);
       new UtterancePlugin(agenda, 100, true); // excludeAcceptShould 
-      new ProposeGlobalPlugin(agenda, 95);
+      new ProposeGlobalEnumerationPlugin(agenda, 95);
       new ProposeShouldSelfPlugin(agenda, 90, false);
       new ProposeShouldOtherPlugin(agenda, 70);
       new ProposeWhoPlugin(agenda, 50);
-      new ProposeWhatPlugin(agenda, 50);
+      new ProposeWhatEnumerationPlugin(agenda, 50);
       new RejectProposeWhatPlugin(agenda, 45); // after ProposeWhatPlugin (re enumerations)
       new RespondPlugin.Reject(agenda, 30);
       new ProposeHowPlugin(agenda, 30);
@@ -34,7 +39,7 @@ public class User extends Actor {
    }
    
    /**
-    * Generate list of items for user utterance menu (TTSay).
+    * Thread-safe method to generate list of items for user utterance menu (TTSay).
     * 
     * Note interaction@ok property (default true) controls whether instance of Ok added
     * when menu is either empty or consists exclusively of Propose.ShouldNot
@@ -46,19 +51,19 @@ public class User extends Actor {
     */
    @Override
    public List<Plugin.Item> generate (Interaction interaction) {
-      List<Plugin.Item> items = super.generate(interaction);
+      List<Plugin.Item> items = agenda.generate(interaction);
       for (Plugin.Item item : items)
          if ( !(item.task instanceof Propose.ShouldNot) ) return items;
       Disco disco = interaction.getDisco();
       if ( disco.getProperty("interaction@ok", interaction.isOk()) ||
-            interaction.getSystem().generateBest(interaction) != null )
+            interaction.getSystem().agenda.generateBest(interaction) != null )
          items.add(0, Agenda.newItem(new Ok(disco, true), null));
       return items;
    }
  
    @Override // default definition of dummy user (using console)
    protected boolean synchronizedRespond (Interaction interaction, 
-         boolean ok, boolean guess, boolean retry) {
+         boolean ok, boolean guess) {
       return false;
    }
 }

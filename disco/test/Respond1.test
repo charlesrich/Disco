@@ -1,0 +1,128 @@
+    # Apr 21, 2016 7:13:54 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > next false
+  > load models/Test.xml
+  > debug
+    # next two lines are most convenient way to simulate the *agent*
+    # making a proposal (since 'task' command is always user speaking)
+  > new A
+    # sets $new to a new instance of A
+  > execute edu.wpi.disco.lang.Propose$Should / $new / false
+    Propose.Should(agent,A)
+    # notice in history that dialogue is expecting user to accept
+    # the agent's proposal (this extra goal is only visible in history
+    # printout when debug flag is set, but it is always there)
+  > history
+
+[A] -live <-focus
+   [Accept(user,Propose.Should(agent,A))] -live
+      Propose.Should(agent,A)
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+    # next two lines are convenient way to simulate the agent explicitly
+    # accepting a proposal (see implicit acceptance below)
+  > new edu.wpi.disco.lang.Propose$Should / $new
+  > execute edu.wpi.disco.lang.Accept / $new
+    Accept(user,Propose.Should(,A))
+    # notice the -accepted flag on A (which means value of Task.getShould() is true)
+  > history
+
+[A] -accepted -live <-focus
+   Propose.Should(agent,A)
+   Accept(user,Propose.Should(,A))
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+  > eval $disco.getLastOccurrence() instanceof edu.wpi.disco.lang.Accept
+    # Returned 'true'
+    # you can extract the *domain* goal of the Accept utterance as follows
+    # note if you do this in Java, you will need to cast the result of
+    # getLastOccurrence() to edu.wpi.disco.lang.Accept
+  > eval $disco.getLastOccurrence().getProposal().getGoal() 
+    # Returned 'A'
+    # if you need to know the plan, then use the following method
+  > eval $disco.getLastContributes()
+    # Returned '[A]'
+  > clear
+    # now doing the same thing for rejection
+  > new A 
+  > execute edu.wpi.disco.lang.Propose$Should / $new / false
+    Propose.Should(agent,A)
+  > history
+
+[A] -live <-focus
+   [Accept(user,Propose.Should(agent,A))] -live
+      Propose.Should(agent,A)
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+  > new edu.wpi.disco.lang.Propose$Should / $new
+  > execute edu.wpi.disco.lang.Reject / $new
+    Reject(user,Propose.Should(,A))
+    # notice the -rejected flag on A (which means value of Task.getShould() is false)
+  > history
+
+[A] -rejected <-focus
+   Propose.Should(agent,A)
+   Reject(user,Propose.Should(,A))
+   [B] -optionalStep -optional
+   [C]
+   [D] -optionalStep -optional
+
+  > eval $disco.getLastOccurrence() instanceof edu.wpi.disco.lang.Reject
+    # Returned 'true'
+  > clear
+    # now let's do implicit acceptance
+  > new A
+  > execute edu.wpi.disco.lang.Propose$Should / $new / false
+    Propose.Should(agent,A)
+  > history
+
+[A] -live <-focus
+   [Accept(user,Propose.Should(agent,A))] -live
+      Propose.Should(agent,A)
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+    # user implicitly accepts proposal by starting to execute A
+  > execute B 
+    B(user)
+  > history
+
+[A] -live <-focus
+   Propose.Should(agent,A)
+   B(user)
+   [C] -live
+   [D] -optionalStep -optional
+
+    # but it can still be detected using method below
+  > eval $disco.isLastImplicitAccept()
+    # Returned 'true'
+    # including associated plan
+  > eval $disco.getLastImplicitAccepted()
+    # Returned '[A]'
+  > clear
+    # finally, there is a small anomaly in the case when the *user* makes
+    # the initial proposal, because the Disco agent by default always immediately
+    # accepts user proposals.
+  > task A
+    Propose.Should(user,A)
+  > history
+
+[A] -accepted -live <-focus
+   Propose.Should(user,A)
+   [B] -optionalStep -optional -live
+   [C] -live
+   [D] -optionalStep -optional
+
+  > eval $disco.isLastImplicitAccept()
+    # Returned 'true'
+  > eval $disco.getLastImplicitAccepted()
+    # Returned '[A]'
+  > quit
+    

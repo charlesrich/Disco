@@ -1,0 +1,59 @@
+    # Feb 2, 2016 7:14:49 PM - TaskEngine 1.9 / Disco 1.15
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Recursive.xml
+  > task _top
+    User says "Let's achieve _top."
+    Agent says "Start."
+  > say
+[1] User1.
+[2] User2.
+  >> 1
+    User says "User1."
+    Agent says "User1-Agent1."
+  > say
+[1] User1.
+[2] User2.
+  >> 2
+    User says "User2."
+    Agent says "User2-Agent1."
+  > eval U1A1 = false; U1A2 = true
+    # Returned 'true'
+  > eval U2A1 = false; U2A2 = true
+    # Returned 'true'
+  > say
+[1] User1.
+[2] User2.
+  >> 1
+    User says "User1."
+    Agent says "User1-Agent2."
+  > say
+[1] User1.
+[2] User2.
+  >> 2
+    User says "User2."
+    Agent says "User2-Agent2."
+  > history
+
+[ ] -accepted -live
+   User says "Let's achieve _top."
+   Agent says "Start."
+   [ ] -live
+      User says "User1."
+      [ ] -live
+         Agent says "User1-Agent1."
+         [ ] -live
+            User says "User2."
+            [ ] -live
+               Agent says "User2-Agent1."
+               [ ] -live
+                  User says "User1."
+                  [ ] -live
+                     Agent says "User1-Agent2."
+                     [ ] -live
+                        User says "User2."
+                        [ ] -live <-focus
+                           Agent says "User2-Agent2."
+                           [ ] -live
+
+  > quit
+    

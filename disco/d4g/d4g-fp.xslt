@@ -305,7 +305,7 @@
 
       </xsl:element>     
 
-      <!-- include rest of tree if applicable -->
+      <!-- include rest of tree if appropriate -->
       <xsl:if test="./*">
         <xsl:element name="step">
           <xsl:attribute name="name">
@@ -319,7 +319,7 @@
         </xsl:element>
       </xsl:if>
 
-      <!-- include applicable if applicable -->
+      <!-- include applicable if appropriate -->
       <xsl:if test="@applicable">
 	<xsl:if test="preceding-sibling::* | following-sibling::*">
 	  <xsl:element name="applicable">
@@ -517,7 +517,7 @@
         </xsl:element>
       </xsl:if>
 
-      <!-- include rest of tree if applicable -->
+      <!-- include rest of tree if appropriate -->
       <xsl:if test="./*">
         <xsl:element name="step">
           <xsl:attribute name="name">
@@ -531,7 +531,7 @@
         </xsl:element>
       </xsl:if>
 
-      <!-- include applicable if applicable -->
+      <!-- include applicable if appropriate -->
       <xsl:if test="@applicable">
 	<xsl:if test="preceding-sibling::* | following-sibling::*">
 	  <xsl:element name="applicable">
@@ -594,7 +594,7 @@
           </xsl:if>
         </xsl:if>
 
-	<!-- include eval if applicable -->
+	<!-- include eval if appropriate -->
 	<xsl:if test="@eval">
           <xsl:element name="binding">
             <xsl:attribute name="slot">

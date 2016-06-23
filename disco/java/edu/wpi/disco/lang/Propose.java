@@ -46,11 +46,12 @@ public interface Propose {
          if ( utterance.isUser() ) { 
             // TODO fix asymmetry: eventually there needs to be some systematic
             //      way for agent not to automatically accept user utterances
+            //      (see setting of implicitAccept in Disco.interpret())
             propose.accept(contributes, false);
             // accept can change liveness and achieved
             disco.clearLiveAchieved();
-         } else disco.push(new Plan(new Accept(disco, !utterance.getExternal(), propose), 
-                                    contributes));
+         } else 
+            disco.push(new Plan(new Accept(disco, !utterance.getExternal(), propose), contributes));
       } 
    
       private Interpret () {}
@@ -310,11 +311,14 @@ public interface Propose {
          if ( Utterance.interpret(this, contributes, continuation) ) {
             // matches to same Propose (e.g., from Ask)
             getDisco().getSegment().add(this); added = true;
-            contributes = contributes.getParent();
+            if ( !engine.isTop(contributes) )
+               contributes = contributes.getParent();
          } else if ( contributes != null ) 
             reconcileStack(contributes, continuation);
          Task should = getNested();
-         if ( contributes != null ) {
+         if ( contributes != null &&
+               // special case for toplevel Ask.Should
+               !(engine.isTop(contributes) && contributes.getGoal() instanceof Propose.Should) ) {
             reconcileStack(contributes, continuation);
             TaskClass type = contributes.getType();
             if ( type == Task.Any.CLASS || type == should.getType() )
@@ -323,6 +327,9 @@ public interface Propose {
                contributes.match(should);
             else contributes = new Plan(should, contributes);	
          } else {
+            if ( contributes != null ) 
+               // same special case for toplevel Ask.Should as above
+               should.setShould(true);
             Plan focus = getDisco().getFocusExhausted(true);
             contributes = new Plan(should,
                   focus != null && !focus.isPrimitive() && focus.getType().getDecompositions().isEmpty() ?

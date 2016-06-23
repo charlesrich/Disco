@@ -5,10 +5,10 @@
  */
 package edu.wpi.disco;
 
+import java.util.List;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.lang.Utterance;
-import java.util.List;
 
 /**
  * Base class for entities that execute actions and utterances.  An actor
@@ -27,15 +27,17 @@ public abstract class Actor {
    protected final Agenda agenda;
    public Agenda getAgenda () { return agenda; }
    
-   // to allow creation of Agenda in constructor below 
-   protected class Agenda extends edu.wpi.disco.Agenda { 
-      Agenda () { super(Actor.this); }
+   protected Actor (String name) {
+      this(name, null);
    }
    
-   public Actor (String name) {
+   protected Actor (String name, Agenda agenda) {
       this.name = name;
-      this.agenda = new Agenda(); 
+      this.agenda = agenda == null ? new Agenda(this) : agenda;
+      init();
    }
+   
+   protected void init () {}
    
    /**
     * Initialize the state of this actor in given discourse engine.
@@ -57,42 +59,79 @@ public abstract class Actor {
    public void clear (Interaction interaction) {}
    
    /**
-    * Thread-safe method to generate highest priority task for this actor.
-    */
-   public Plugin.Item generateBest (Interaction interaction) { 
-      return agenda.generateBest(interaction);
-   }
-   
-   /**
-    * Thread-safe method to generate tasks for this actor.
-    */
-   public List<Plugin.Item> generate (Interaction interaction) {
-      return agenda.generate(interaction);
-   }
-   
-   /**
     * Thread-safe method to take a turn in given interaction. <em>Note:</em>
-    * Actor should call {@link Interaction#occurred(boolean,Task,Plan)} as each
+    * Actor should call {@link #execute(Task,Interaction,Plan)} as each
     * task in turn is executed.  
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)
     * @param guess guess decompositions
-    * @param retry try other decompositions if failure (see {@link Agent#retry(Disco)})
     * @return true if some response was made
     * 
     * @see Interaction
     */
-   public final boolean respond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   public final boolean respond (Interaction interaction, boolean ok, boolean guess) {
       synchronized (interaction) { 
-         return synchronizedRespond(interaction, ok, guess, retry); 
+         return synchronizedRespond(interaction, ok, guess); 
       }
    }
    
    protected abstract boolean synchronizedRespond (Interaction interaction, 
-         boolean ok, boolean guess, boolean retry);
+         boolean ok, boolean guess);
    
    private boolean authorized = true;
    
+   /**
+    * Thread-safe method for this actor to execute given task occurrence in
+    * given interaction.  Like {@link #done(Task,Interaction,Plan)}, except
+    * that grounding script, if any, associated with task is executed.
+    * 
+    * @param contributes plan to which this task contributes, or null
+    * 
+    * @see Console#execute(String)
+    */
+   public void execute (Task occurrence, Interaction interaction, Plan contributes) {
+      contributes = interaction.occurred(interaction.getExternal() == this, 
+            occurrence, contributes, true);
+      interaction.occurredConsole(occurrence);
+   }
+  
+   /**
+    * Thread-safe method for <em>observation</em> of this actor having executed
+    * given task occurrence in given interaction. <em>NB:</em> also executes grounding scripts for
+    * utterances.
+    * 
+    * @param contributes plan to which this task contributes, or null
+    * 
+    * @see #execute(Task,Interaction,Plan)
+    * @see Console#done(String)
+    */
+   public void done (Task occurrence, Interaction interaction, Plan contributes) {
+      contributes = interaction.occurred(interaction.getExternal() == this, 
+            occurrence, contributes, occurrence instanceof Utterance);
+      interaction.occurredConsole(occurrence);
+   }
+   
+   /**
+    * Thread-safe method to generate list of tasks for this actor, 
+    * sorted according to plugin priorities.
+    * 
+    * @see #generateBest(Interaction)
+    * @see Agent#generate(Interaction,boolean)
+    */
+   public List<Plugin.Item> generate (Interaction interaction) {
+     return agenda.generate(interaction);
+   }
+
+   /**
+    * Thread-safe method to return highest priority task for this actor.
+    * 
+    * @see #generate(Interaction)
+    * @see Agent#generateBest(Interaction,boolean)
+    */
+   public Plugin.Item generateBest (Interaction interaction) {
+      return agenda.generateBest(interaction);
+   }
+
    /**
     * Test whether this actor is pre-authorized to perform <em>all</em>
     * primitive tasks (unless specifically rejected) without asking for permission. 
@@ -183,17 +222,6 @@ public abstract class Actor {
    public boolean canOther (Task task, Interaction interaction) {
       return interaction.getSystem() == this ? task.canUser() : task.canSystem();
    }
-
-   private boolean eval;
-   
-   /**
-    * It true, then eval grounding scripts for this actor regardless of whether
-    * it is system or external.  Used for running simulations with two agents
-    * as in examples/DualAgents.
-    */
-   public boolean isEval () { return eval; }
-   
-   public void setEval (boolean eval) { this.eval = eval; }
    
    @Override
    public String toString () { return name; }

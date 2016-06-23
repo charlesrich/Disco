@@ -225,7 +225,7 @@ Say(agent,"Please hold for the next operator")
    [Propose.Succeeded(caller,FixFreezeProblem)] <-focus
       com.parc.callcenter.lang.AskSucceeded(agent,FixFreezeProblem)
       Accept(caller,Propose.Succeeded(caller,FixFreezeProblem))
-      Ok(agent)
+      Ok(agent) -unexplained
 
   > quit
     

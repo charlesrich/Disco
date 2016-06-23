@@ -26,8 +26,9 @@ for arg in "$@"
     if [ "$cp" ]; then cp="$cp:"; fi
     if [[ $arg = /* ]]; then
       cp="$cp$arg"
-    else
-      cp="$cp$dir/$arg"
+    else if [ -n "$arg" ]; then
+         cp="$cp$dir/$arg"
+      fi
     fi
   done
 if [[ $uname == CYGWIN* ]]; then 
@@ -50,7 +51,7 @@ else
   java -Xms128m -Xmx512m -Djava.awt.headless=true -Djava.io.tmpdir="$tmp" -cp "$cp" "$main"
 fi
 if [ $? != 0 ]; then 
-  echo "Failed" $base
+  echo "Failed" $base >&2
   exit 1
 fi
 end=`date +%s`
@@ -64,8 +65,8 @@ if [ "$filename" ]; then
 #    diff -B --strip-trailing-cr <($dir/bin/ack -v "^\s*#(?! Returned )" "$arg.test") <($dir/bin/ack -v "^\s*#(?! Returned )" "$good")
     diff=$?
     if [ $diff = 0 ]
-       then echo "Succeed" $base "("`expr $end - $start` "sec)"
-       else echo "Files $arg.test and $good differ"
+       then echo "Succeed" $base "("`expr $end - $start` "sec)" >&2
+       else echo "Files $arg.test and $good differ" >&2
     fi
     exit $diff
   fi

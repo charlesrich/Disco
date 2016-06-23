@@ -532,7 +532,9 @@ public class TaskClass extends TaskModel.Member {
    TaskClass (TaskEngine engine, String id) {
       new TaskModel(null, engine).super(null, null, "**ROOT**");
       precondition = null; postcondition = null;
-      inputNames = outputNames = declaredInputNames = declaredOutputNames = null;
+      inputNames = outputNames = declaredInputNames = declaredOutputNames = Collections.emptyList();
+      declaredInputs = Collections.emptyList();
+      declaredOutputs = Collections.emptyList();
       scripts = null; 
       slots = new HashMap<String,Slot>();
       inputs  =  new ArrayList<Input>();
@@ -540,8 +542,6 @@ public class TaskClass extends TaskModel.Member {
       outputs = new ArrayList<Output>();
       new Output("success", false, this); 
       new Output("when", false, this); 
-      declaredInputs = Collections.emptyList();
-      declaredOutputs = Collections.emptyList(); 
       hasModifiedInputs = false;
    }
    
@@ -604,13 +604,13 @@ public class TaskClass extends TaskModel.Member {
    /**
     * Test whether this class can serve as root of plan recognition. Typically 
     * this is because it does not contribute to any other task classes.  However,
-    * this can be overridden by the @top property.
+    * this can be overridden by the @top property.  Note primitives can never be top.
     * 
     * @see TaskEngine#getTopClasses()
     * @see #setTop(boolean)
     */
    public boolean isTop () {
-      return engine.topClasses.contains(this);
+      return !isPrimitive() && engine.topClasses.contains(this);
    }
    
    /**

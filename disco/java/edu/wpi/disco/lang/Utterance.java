@@ -28,13 +28,57 @@ public abstract class Utterance extends Decomposition.Step {
       if ( external != null ) setSlotValue("external", external);
    }
 
+   // for Say and Mention
+   public interface Text {
+      
+      String getText ();
+      String formatTask (String format, String key);
+      Disco getDisco ();
+      TaskClass getType ();
+      Decomposition getDecomposition ();
+      String getName ();
+      TaskEngine getEngine ();
+      String formatTask ();
+      String format ();
+
+      default String formatTaskText (Utterance utterance) { 
+         String format = getDisco().getFormat(utterance);
+         if ( format != null ) return formatTask(format, null);
+         String text = getText(); 
+         return text == null ? "..." :  
+            // use decomposition and step name to identify this point in dialogue tree
+            ((Disco) getType().getEngine()).getAlternative(
+                  getDecomposition()+"."+getName(),
+                  text, true);
+      }
+
+      default String toHistoryStringText (boolean formatTask) {
+         StringBuilder buffer = new StringBuilder(
+               Utils.capitalize(formatTask ? formatTask() : format()));
+         Utils.endSentence(buffer);
+         buffer.insert(0, '\"').append('\"');
+         buffer.insert(0, ' ');
+         buffer.insert(0, getEngine().getProperty("says@word"));
+         return buffer.toString();
+      }
+
+   };
+   
    @Override
    public boolean interpret (Plan contributes, boolean continuation) {
       // do not call super
-      boolean explained = interpret(this, contributes, continuation);
+      boolean explained = Utterance.interpret(this, contributes, continuation);
       getDisco().getSegment().add(this);
+      interpret();
       return explained;
    }
+   
+   /**
+    * Extension point to add listener semantics (update to mental state)
+    * of application-specific utterance. Note that plan recognition is called
+    * <em>before</em> this method.
+    */
+   protected void interpret () {}
 
    // see Propose.Interpret
    // NB: this method does not add occurrence to segment!
@@ -49,11 +93,7 @@ public abstract class Utterance extends Decomposition.Step {
       } // else
       return false;
    }
-   
-   @Override
-   // always evaluate utterance scripts for both user and agent 
-   protected void evalIf (Plan plan) { eval(plan); }
-   
+
    @Override
    public boolean isStarter (Plan plan) {
       // utterances are only starters if they are a step of decomp

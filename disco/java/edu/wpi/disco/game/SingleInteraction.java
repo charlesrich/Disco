@@ -21,8 +21,9 @@ public class SingleInteraction extends Interaction {
 	}
 	
 	@Override
-	public void occurred (boolean external, Task occurrence, Plan contributes) {
-		nway.broadcastDone(external ? getExternal() : getSystem(), occurrence, contributes);
+	public Plan occurred (boolean external, Task occurrence, Plan contributes, boolean eval) {
+		nway.broadcastOccurred(external ? getExternal() : getSystem(), occurrence, contributes, eval);
+		return contributes;
 	}
 	
 	/**

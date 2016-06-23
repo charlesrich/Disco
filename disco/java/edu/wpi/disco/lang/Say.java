@@ -11,7 +11,7 @@ import edu.wpi.disco.Disco;
 /**
  * Builtin utterance with no semantics (see Disco.xml)
  */
-public class Say extends Utterance {
+public class Say extends Utterance implements Utterance.Text {
 
    public static TaskClass CLASS;
    
@@ -37,31 +37,22 @@ public class Say extends Utterance {
       this(Say.class, disco, external, text);
    }
 
+   @Override
    public String getText () { return (String) getSlotValue("text"); }
 
    @Override
-   public String formatTask () { 
-      String format = getDisco().getFormat(this);
-      if ( format != null) return formatTask(format, null);
-      String text = getText(); 
-      return text == null ? "..." :  
-         // use decomposition and step name to identify this point in dialogue tree
-         ((Disco) getType().getEngine()).getAlternative(
-               getDecomposition()+"."+getName(),
-               text, true);
-   }
-
+   public String formatTask () { return formatTaskText(this); }
+   
    @Override
-   public String toHistoryString (boolean formatTask) {
-      StringBuilder buffer = new StringBuilder(
-            Utils.capitalize(formatTask ? formatTask() : format()));
-      Utils.endSentence(buffer);
-      buffer.insert(0, '\"').append('\"');
-      buffer.insert(0, ' ');
-      buffer.insert(0, engine.getProperty("says@word"));
-      return buffer.toString();
+   public String formatTask (String format, String key) {
+      return super.formatTask(format, key); 
    }
-      
+   
+   @Override
+   public String toHistoryString (boolean formatTask) { 
+      return toHistoryStringText(formatTask); 
+   }
+       
    // Say.User: utterance by user 
    //           (for convenience -- does not support other options!)
 
@@ -157,10 +148,8 @@ public class Say extends Utterance {
          public String getEval () { return (String) getSlotValue("eval"); }
 
          @Override
-         public boolean interpret (Plan contributes, boolean continuation) {
-            boolean explained = super.interpret(contributes, continuation);
+         protected void interpret () {
             if ( isOccurred() ) eval(getEval(), "Say.Expression.Eval");
-            return explained;
          }
       } 
    }

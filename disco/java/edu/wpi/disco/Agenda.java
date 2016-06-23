@@ -198,25 +198,27 @@ public class Agenda {
     * Thread-safe method to generate tasks for this agenda.
     */
    public List<Plugin.Item> generate (Interaction interaction) {
-      onlyBest = false;
-      // used linked map to preserve order and eliminate duplicates
-      return generate(interaction, new LinkedHashMap<Task,Plugin.Item>());
+      return generate(interaction, false);
    }
  
    /**
     * Thread-safe method to generate highest-priority task for this agenda.
     */
    public Plugin.Item generateBest (Interaction interaction) {
-      onlyBest = true;
-      bestItem = null;
-      bestPriority = Integer.MIN_VALUE;
-      generate(interaction, null);
+      generate(interaction, true);
       return bestItem;
    }
    
-   private List<Plugin.Item> generate (Interaction interaction, Map<Task, Plugin.Item> items) {
+   List<Plugin.Item> generate (Interaction interaction, boolean onlyBest) {
       synchronized (interaction) { // typically used in toplevel dialogue loop
          this.interaction = interaction;
+         this.onlyBest = onlyBest;
+         Map<Task, Plugin.Item> items = null;
+         if ( onlyBest ) {
+            bestItem = null;
+            bestPriority = Integer.MIN_VALUE;
+         } else // used linked map to preserve order and eliminate duplicates 
+            items = new LinkedHashMap<Task,Plugin.Item>();
          Disco disco = interaction.getDisco();
          Stack<Segment> stack = disco.getStack();
          int pop = 0; // for virtual popping

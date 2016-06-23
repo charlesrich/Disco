@@ -223,17 +223,27 @@ public class Plan {
     * 
     * @param child - must be child of this plan
     */
-   public void remove (Plan child) {
+   public void remove (Plan child) { remove(child, null); }
+
+   private void remove (Plan child, Collection<Plan> steps) {
       if ( !children.contains(child) )
          throw new IllegalArgumentException(child+" is not child of "+this);
       children.remove(child);
       child.parent = null;
-      for (Plan next : requiredBy)
-         next.required.remove(child);
-      requiredBy.clear();
-      for (Plan previous : required)
-         previous.requiredBy.remove(child);
-      required.clear();
+      for (Iterator<Plan> successors = child.requiredBy.iterator(); successors.hasNext();) {
+         Plan successor = successors.next();
+         if ( steps == null || !steps.contains(successor) ) {
+            successor.required.remove(child);
+            successors.remove();
+         }
+      }
+      for (Iterator<Plan> predecessors = child.required.iterator(); predecessors.hasNext();) {
+         Plan predecessor = predecessors.next();
+         if ( steps == null || !steps.contains(predecessor) ) {
+            predecessor.requiredBy.remove(child);
+            predecessors.remove();
+         }
+      }
    }
    
    // these lists usually contain siblings (common parent), but not checking
@@ -315,17 +325,6 @@ public class Plan {
       return Collections.unmodifiableList(required);
    }
    
-   /**
-    * System executes script for goal of this plan.
-    */
-   public void execute () {
-      synchronized (goal.bindings) {
-         goal.bindings.put("$plan", this);
-         goal.execute(this);
-         checkAchieved();
-      }
-   }
-   
    public boolean isOccurred () { return goal.isOccurred(); }
    
    /**
@@ -368,7 +367,9 @@ public class Plan {
       }
    }
    
-   public Boolean isAchieved () {
+   // not public because has caching side effect
+   // use isSucceeded()
+   Boolean isAchieved () {
       synchronized (goal.bindings) {
          goal.bindings.put("$plan", this);
          return goal.isAchieved();
@@ -698,9 +699,7 @@ public class Plan {
    }
  
    /**
-    * Identify given task as matching this plan and copy slot values. If given
-    * task is occurrence, then also check for failure (false postcondition) in
-    * ancestor plans.
+    * Identify given task as matching this plan and copy slot values.
     */
    public void match (Task task) {
       goal.copySlotValues(task);
@@ -709,7 +708,7 @@ public class Plan {
    
    void checkAchieved () {
       goal.engine.clearLiveAchieved();
-      if ( isExhausted() ) {
+      if ( isStarted() && isExhausted() ) {
          // no more chances to succeed
          Boolean success = goal.checkAchieved();
          if ( decomp != null && 
@@ -744,21 +743,55 @@ public class Plan {
    }
    
    /**
-    * Retry this failed plan if it has any untried decompositions, or else recurse
-    * up through failed parents.  Returns the retried plan or null if none.
+    * If this plan has failed, and the goal is retriable and it has not already
+    * been retried, then retry it; otherwise if it has failed, but is not
+    * retriable,then recurse up through failed parents looking for retriable goal.
+    * <p>
+    * <em>Note exception:</em> if a primitive goal is retriable and its parent is retriable, then
+    * prefer to retry parent.
+    * <p>
+    * A non-primitive is retriable by default iff it has any applicable untried
+    * decompositions. A primitive is not retriable by default. Either default
+    * can be overridden by the boolean 'goal@retry' property.
+    * 
+    * @return the retried plan or null if none.
+    * @see #getRetry()
+    * @see #getRetryOf()
     */
    public Plan retry () {
+      // don't retry same plan twice (retry can be retried!)
+      if ( retry != null ) return null;  
       if ( isFailed() ) {
-         List<DecompositionClass> decomps = getDecompositions();
-         if ( !decomps.isEmpty() ) {
+         if ( isRetriable() 
+               // exception noted above
+               && !(isPrimitive() && parent != null && parent.isFailed() && parent.isRetriable()) ) {
             retryCopy();
             return this;
          } else return parent == null ? null : parent.retry(); 
       } else return null;
    }
+
+   private boolean isRetriable () {
+      return goal.getProperty("@retry", 
+            !isPrimitive() && !getDecompositions().isEmpty());
+   }
    
-   private Plan retryOf;  // for Disco
+   private Plan retry, retryOf;  
    
+   /**
+    * If this plan has been retried, return the retry otherwise null.
+    * 
+    * @see #getRetryOf()
+    * @see #retry()
+    */
+   public Plan getRetry () { return retry; }
+   
+   /**
+    * If this plan is the retry of another plan, return that plan, otherwise null.
+    * 
+    * @see #getRetry()
+    * @see #retry()
+    */
    public Plan getRetryOf () { return retryOf; }
    
    /**
@@ -766,27 +799,36 @@ public class Plan {
     */
    private void retryCopy () {
       if ( TaskEngine.VERBOSE ) getGoal().engine.getErr().println("Retrying "+goal);
-      // make copy and move all children to it
+      // make copy to cache failure information and move all children to it
       // and make this plan ready for retry
       retryOf = new Plan(goal.getType().newInstance(), null, 
             new ArrayList<Plan>(children));
+      retryOf.retry = this;
       children.clear();
       planned = false; // since no children left
-      retryOf.decomp = decomp;
-      decomp = null;
+      if ( decomp != null ) {
+         retryOf.decomp = decomp;
+         retryOf.decomp.goal = retryOf.goal;
+         decomp = null;
+      }
       retryOf.contributes = false;
       retryOf.goal.copySlotValues(goal);
       if ( parent != null ) {
          retryOf.parent = parent;
-         // insert copy in parent before this plan 
+         // insert failure copy in parent before this plan for printing
+         // (but note not updating predecessor/successor information)
          parent.children.add(parent.children.indexOf(this), retryOf);
-         retryOf.splice(this);
          parent.unFail();
       }
       // remove all output values (including success and when)
-      // do not know what input values to remove because no dependencies
       for (String name : goal.getType().outputNames) 
          goal.removeSlotValue(name);
+      // remove all input values that depend on failed decomposition
+      if ( retryOf.decomp != null ) {
+         for (String name : goal.getType().inputNames) 
+            if ( retryOf.decomp.hasModifiedInput(name) )
+               goal.removeSlotValue(name);
+      }
       goal.engine.clearLiveAchieved();
    }
   
@@ -806,6 +848,7 @@ public class Plan {
     * 
     * @see Task#getDecompositions()
     * @see TaskClass#getDecompositions()
+    * @see Plan#getFailed()
     */
    public List<DecompositionClass> getDecompositions () {
       if ( decompClass != null ) return Collections.singletonList(decompClass);
@@ -897,10 +940,11 @@ public class Plan {
       if ( decomp != null && decomp.getType().getGoal() != goal.getType() )
          throw new IllegalArgumentException(decomp+" not applicable to "+this);
       if ( this.decomp != null ) { // remove decomposition
-         for (Plan step : this.decomp.getSteps()) {
+         Collection<Plan> steps = this.decomp.getSteps();
+         for (Plan step : steps) {
             if ( step.isStarted() ) step.contributes = false;
             else {
-               remove(step);
+               remove(step, steps);
                if ( goal.engine.getFocus() == step) goal.engine.pop();
             }
          }
@@ -929,7 +973,10 @@ public class Plan {
          throw new IllegalArgumentException(type+" not applicable to "+this);
       if ( getDecompositionClass() == type && decomp != null ) return decomp; 
       try { setDecomposition(new Decomposition(type, this)); }
-      catch (DecompositionClass.Contradiction e) { return null; }
+      catch (DecompositionClass.Contradiction e) { 
+         if ( TaskEngine.DEBUG ) System.out.println(e);
+         return null;        
+      }
       return decomp;
    }       
  
@@ -972,6 +1019,10 @@ public class Plan {
    }
      
    private List<Decomposition> failed = Collections.emptyList();
+   
+   public List<Decomposition> getFailed () { 
+      return Collections.unmodifiableList(failed); 
+   }
    
    private boolean planned; // for procedural decomposition
    
@@ -1029,28 +1080,33 @@ public class Plan {
          // always try script first
          boolean decomposed = applyDecompositionScript();
          if ( !decomposed ) {
-            List<DecompositionClass> decomps = goal.getType().getDecompositions();
-            // if only one *known* decomposition for goal type and not
-            // de-authorized, apply it now if applicable
-            if ( decomps.size() == 1 ) {
-               DecompositionClass only = decomps.get(0);
-               if ( only.getProperty("@authorized", true) ) {
-                  synchronized (goal.bindings) {
-                     goal.bindings.put("$plan", this);
-                     if ( !Utils.isFalse(only.isApplicable(goal)) ) {
-                        Plan focus = goal.engine.getFocus();
-                        // inhibit infinite recursion, but allow incremental expansion
-                        // if live (and recursive parent started) or if focus or child 
-                        // of focus 
-                        if ( !stack.contains(only) 
-                              || (focus != null && 
-                              (focus == this || focus.children.contains(this))) 
-                              || (isLive() && recursiveParent(only).isStarted()) ) 
-                        { apply(only); applied = true; }
-                     }
-                  }
+            // if decomposition chosen and plan is live, 
+            // or only one *known* decomposition for goal type and not de-authorized, 
+            // then apply it now if ap1046plicable
+            DecompositionClass decomp = getDecompositionClass();
+            if ( !isLive() ) decomp = null;
+            if ( decomp == null ) {
+               List<DecompositionClass> decomps = goal.getType().getDecompositions();
+               if ( decomps.size() == 1 ) {
+                  decomp = decomps.get(0);
+                  if ( !decomp.getProperty("@authorized", true) ) decomp = null;
                }
             }
+            if ( decomp != null )
+               synchronized (goal.bindings) {
+                  goal.bindings.put("$plan", this);
+                  if ( !Utils.isFalse(decomp.isApplicable(goal)) ) {
+                     Plan focus = goal.engine.getFocus();
+                     // inhibit infinite recursion, but allow incremental expansion
+                     // if live (and recursive parent started) or if focus or child 
+                     // of focus 
+                     if ( !stack.contains(decomp) 
+                           || (focus != null && 
+                           (focus == this || focus.children.contains(this))) 
+                           || (isLive() && recursiveParent(decomp).isStarted()) ) 
+                     { apply(decomp); applied = true; }
+                  }
+               }
          }
       }
       if ( decomp != null ) stack.push(decomp.getType());
@@ -1161,12 +1217,9 @@ public class Plan {
       if ( Utils.isTrue(goal.getShould()) ) stream.print(" -accepted");
       else if ( Utils.isFalse(goal.getShould()) ) stream.print(" -rejected");
       if ( isLive() ) stream.print(" -live");
-      else {
-         stream.print(
-            isSucceeded() ? " -succeeded" :
-              isFailed() ? " -failed" :
-                isDone() ? " -done" : 
-                  !contributes ? "-nonContributing" : "");
+      else if ( !goal.printSuccess(stream) ) {
+         if ( isDone() ) stream.print(" -done"); 
+         else if ( !contributes ) stream.print(" -nonContributing");
       }
       for (Object note : notes) { stream.print(' '); stream.print(note); }
       if ( recurse ) {

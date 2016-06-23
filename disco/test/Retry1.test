@@ -33,11 +33,9 @@
 
 [Achieve RetryA by retryA1] -failed
    User says "Let's achieve RetryA."
-   [Agent execute PostA] -failed
-      Agent execute PostA. -failed
+   Agent execute PostA. -failed
 [Achieve RetryA by retryA2] -failed
-   [Agent execute PostA] -failed
-      Agent execute PostA. -failed
+   Agent execute PostA. -failed
 [Achieve RetryA by retryA3] -accepted -failed
    [Agent execute PostA] -optional -accepted -failed
       [User says please execute PostA]
@@ -51,8 +49,7 @@
    Agent says "Yup."
 [Achieve RetryA by retryA1] -failed
    User says "Let's achieve RetryA."
-   [Agent execute PostA] -failed
-      Agent execute PostA. -failed
+   Agent execute PostA. -failed
 [Achieve RetryA by retryA2] -accepted -done <-focus
    Agent execute PostA.
    Agent says "Sure."

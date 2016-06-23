@@ -23,7 +23,7 @@ abstract public class ProposeShouldPlugin extends SingletonPlugin {
 
    protected boolean isApplicablePlan (Plan plan) {
       Task goal = plan.getGoal();
-      return (!(goal instanceof Utterance) || goal instanceof Propose);
+      return !(goal instanceof Utterance) || goal instanceof Propose;
    }
    
    protected Class<? extends Nested> getGenerateClass () { return Propose.Should.class; }

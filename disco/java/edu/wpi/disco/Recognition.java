@@ -98,7 +98,7 @@ class Recognition {
    private void recognizeDecomp (Plan start, TaskClass current, Set<DecompStep> path) {
       if ( !start.isDecomposed() && occurrence.isPathFrom(current) ) {
          for (DecompositionClass decomp : current.getDecompositions()) {
-            for (String step : decomp.getLiveStepNames()) {
+            for (String step : decomp.getLeadingStepNames()) {
                DecompStep decompStep = new DecompStep(decomp, step);
                // check for cycles
                if ( path.contains(decompStep) ) continue;

@@ -2,12 +2,10 @@ This is the documentation directory for Disco.
 
 See release/lib/disco-api.zip for Javadoc API documention.
 
-Also see task/docs for additional papers.  
-
 If you are trying to learn how to use Disco for writing dialogues,
 we recommend starting with the first two papers below (in this order).
 
-   ../../task/docs/Rich2009.pdf:
+   Rich2009.pdf:
 
 C. Rich. Building task-based user interfaces with ANSI/CEA-2018.
 IEEE Computer, 42(8):20--27, August 2009.
@@ -19,7 +17,7 @@ Partially Automated Dialogue Tree Authoring. In 14th Int.
 Conf. on Intelligent Virtual Agents, Santa Cruz, CA, Sept. 2012.
 
 Note that the complete reference documentation for the ANSI-CEA
-standard is included as ../../task/docs/CEA-2018.pdf.
+standard is included as CEA-2018.pdf.
       
 The following papers provide additional technical background.
       

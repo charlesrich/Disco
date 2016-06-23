@@ -27,7 +27,6 @@ public class UnifiedAgent extends Agent {
             args != null && args.length > 0 && args[0].length() > 0 ? args[0] : null,
             args != null, null, "edu.wpi.disco.Interaction");
       interaction.setOk(false);
-      interaction.getExternal().setEval(true);
       DISCO = interaction.getDisco();
       // make glosses agree with figures
       DISCO.setProperty("achieve@word", "do");
@@ -44,11 +43,11 @@ public class UnifiedAgent extends Agent {
    }
     
    @Override
-   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess, boolean retry) {
+   protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
       // override default turn-taking to simply do one action if possible
-      Plugin.Item item = respondIf(interaction, true, retry); // guess true
+      Plugin.Item item = respondIf(interaction, true); // guess true
       if ( item == null ) return false;
-      occurred(interaction, item, retry);
+      execute(item.task, interaction, item.contributes);
       return true;
    }
    

@@ -1,0 +1,37 @@
+    # May 25, 2016 7:08:50 PM - TaskEngine 1.10 / Disco 1.16
+    Welcome to Disco! (Type 'help' for command list)
+  > load models/Test.xml
+  > task PrivateTop
+    User says "Let's achieve PrivateTop."
+    Agent says "Please execute Private."
+  > eval $disco.getInteraction().getSystem().setSlotValue($disco.getFocus(true),$disco.getTaskClass("Private").getInputs().get(0),7)
+    # Returned 'null'
+  > next
+    Agent says "The Private input1 is 7."
+  > say
+[1] Yes.
+[2] I don't want to specify input1 for Private.
+[3] I'm going to execute Private.
+[4] I'm not going to execute Private.
+[5] Let's not achieve PrivateTop.
+  >> 1
+    User says "Yes."
+    Agent says "Please execute Private on 7."
+  > done
+    User execute Private on 7.
+    Agent says "Ok."
+  > history
+
+[Achieve PrivateTop] -accepted -done
+   User says "Let's achieve PrivateTop."
+   [User execute Private on 7] -done <-focus
+      Agent says "Please execute Private."
+      Agent says "The Private input1 is 7."
+      [User accept] -done
+         User says "Yes."
+      Agent says "Please execute Private on 7."
+      User execute Private on 7.
+      Agent says "Ok."
+
+  > quit
+    

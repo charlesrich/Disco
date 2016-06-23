@@ -5,14 +5,27 @@ result=0
 cd $this/..
 #
 echo ">> disco/test"
-./bin/testall
+"./bin/testall"
 if [ $? != 0 ]; then
   result=`expr $result + 1`
 fi
 #
+echo ">> disco/test/dual"
+_dual () {
+  "bin/_disco" edu.wpi.disco.Dual\$$1 > /tmp/$1.txt
+  diff -qB --strip-trailing-cr -I "#.*" test/dual/$1.txt /tmp/$1.txt
+  if [ $? != 0 ]; then
+    result=`expr $result + 1`
+  else echo Succeed $1
+  fi
+}
+_dual Test1
+_dual Test2
+bin/_disco edu.wpi.disco.Disco\$Shared test/dual/Shared1
+#
 echo ">> task/test"
 cd ../task
-../disco/bin/testall test bin/guide
+"../disco/bin/testall" test bin/guide
 if [ $? != 0 ]; then
   result=`expr $result + 1`
 fi
@@ -21,7 +34,7 @@ cd ../examples
 if [ -e DiscoUnity ]; then
   echo ">> DiscoUnity/MyProject/test"
   cd DiscoUnity/MyProject
-  ../../../disco/bin/testall test
+  "../../../disco/bin/testall" test
   if [ $? != 0 ]; then
     result=`expr $result + 1`
   fi
@@ -30,7 +43,7 @@ fi
 if [ -e tardis ]; then
   echo ">> tardis/test"
   cd tardis
-  ../../disco/bin/testall test ../../disco/bin/coach
+  "../../disco/bin/testall" test "../../disco/bin/coach"
   if [ $? != 0 ]; then
     result=`expr $result + 1`
   fi
@@ -39,7 +52,7 @@ fi
 if [ -e team ]; then
   echo ">> team/test"
   cd team
-  ../../disco/bin/testall test
+  "../../disco/bin/testall" test
   if [ $? != 0 ]; then
     result=`expr $result + 1`
   fi
@@ -48,7 +61,7 @@ fi
 if [ -e secrets ]; then
   echo ">> secrets/test"
   cd secrets
-  ../../disco/bin/testall test bin/secrets
+  "../../disco/bin/testall" test bin/secrets
   if [ $? != 0 ]; then
     result=`expr $result + 1`
   fi
@@ -57,7 +70,7 @@ fi
 if [ -e callcenter ]; then
   echo ">> callcenter/test"
   cd callcenter
-  ../../disco/bin/testall test bin/callcenter
+  "../../disco/bin/testall" test bin/callcenter
   if [ $? != 0 ]; then
     result=`expr $result + 1`
   fi

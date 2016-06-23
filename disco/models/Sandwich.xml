@@ -12,7 +12,7 @@
     <output name="egg" type="Bag"/>
     <postcondition sufficient="true">
       $this.pbj.contents != null &amp;&amp; $this.pbj.contents.isKind(Kind.ENUM.PBJ)
-      $this.egg.contents != null &amp;&amp; $this.egg.contents.isKind(Kind.ENUM.EGG) 
+      &amp;&amp; $this.egg.contents != null &amp;&amp; $this.egg.contents.isKind(Kind.ENUM.EGG) 
       &amp;&amp; $this.pbj.contents.isCut 
       &amp;&amp; $this.egg.contents.isCut 
     </postcondition>

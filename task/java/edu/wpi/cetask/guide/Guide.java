@@ -103,7 +103,7 @@ public class Guide extends Shell {
       // see retry check also in completed()
       if ( focus != null && focus.isFailed() ) focus.retry(); 
       if ( accepted != null && isSystem(accepted) ) {
-         accepted.execute();
+         getEngine().execute(accepted.getGoal(), accepted);
          // note some outputs may be undefined (especially if task failed)
          if ( accepted.isDone() ) respond("done@word", accepted.getGoal());
          accepted = null;
@@ -114,7 +114,7 @@ public class Guide extends Shell {
             if ( next != rejected && isSystem(next) ) {
                Task goal = next.getGoal();
                if ( authorized ) {
-                  next.execute();
+                  getEngine().execute(next.getGoal(), next);
                   updateFocus();
                } else {
                   respondq("shall@word", goal);
@@ -211,7 +211,7 @@ public class Guide extends Shell {
     * @param args &lt;id&gt; [&lt;namespace&gt;] [ / &lt;value&gt; ]*
     */
    public void task (String args) {
-      Task task = processTask(args, getProposed(), false);
+      Task task = processTask(args, getProposed(), false, true);
       propose(null); // clear proposals, if any
       if ( task != null ) {
          Plan focus = null;
@@ -266,7 +266,7 @@ public class Guide extends Shell {
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
     */
    public void done (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), false);
+      Task occurrence = processTaskFocus(args, getProposed(), false, true);
       if ( occurrence != null ) done(occurrence); 
    }
    
@@ -277,7 +277,7 @@ public class Guide extends Shell {
             occurrence.copySlotValues(task);
       }
       if ( occurrence.isDefinedInputs() ) { 
-         Plan match = getEngine().occurred(occurrence);
+         Plan match = getEngine().done(occurrence);
          if ( match != null ) {
             if ( !completed() ) respond("ok@word");
             setFocus(match);
@@ -300,7 +300,7 @@ public class Guide extends Shell {
     * @see #done(String)
     */
    public void execute (String args) {
-      Task occurrence = processTaskIf(args, getProposed(), false);
+      Task occurrence = processTaskFocus(args, getProposed(), true, true);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
             Grounding script = occurrence.getGrounding();

@@ -11,13 +11,12 @@ import edu.wpi.disco.*;
 import edu.wpi.disco.lang.*;
 
 /**
- * Plugin which asks for first unknown input value of non-utterance 
- * task that cannot be done by other actor.
+ * Plugin which asks for first undefined input value of non-utterance 
+ * task that cannot be done by other actor.  Used by both Agent and User.
  */
 public class AskWhatPlugin extends SingletonPlugin {
    
    // assuming single threaded
-   
    private Input input;
    
    @Override
@@ -26,9 +25,22 @@ public class AskWhatPlugin extends SingletonPlugin {
       if ( goal instanceof Utterance || canOther(goal) 
             || goal.isDefinedInputs() )
          return false;
+      // TODO can this test be generalized for other plugins?
+      Propose.What what = null;
+      Task focus = getDisco().getFocus().getGoal();
+      if ( focus instanceof Accept ) {
+         Propose proposal = ((Accept) focus).getProposal();
+         if ( proposal instanceof Propose.What ) {
+            what = (Propose.What) proposal;
+            if ( !(self() ? what.isSystem() : what.isUser()) ) what = null;
+            else if ( what.getGoal() != goal ) what = null;
+         }
+      }
       for (Input input : goal.getType().getDeclaredInputs()) 
          if ( getGenerateProperty(Ask.What.class, goal, input.getName()) &&
-              !input.isDefinedSlot(goal) ) {
+              !input.isDefinedSlot(goal) &&
+              // don't ask about slot if other actor just proposed value
+              (what == null || !input.getName().equals(what.getSlot())) ) {
             this.input = input;
             return true;
          }

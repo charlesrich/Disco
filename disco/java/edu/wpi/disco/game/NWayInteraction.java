@@ -172,7 +172,8 @@ public class NWayInteraction implements Runnable {
 	/**
 	 * Notify all interactions concerned that the given actor has completed a task.
 	 */
-	public void broadcastDone (Actor a, Task occurrence, Plan contributes) {
+	@SuppressWarnings("deprecation")
+   public void broadcastOccurred (Actor a, Task occurrence, Plan contributes, boolean eval) {
 		responses += 1;
 		
 		doneUtterance = (occurrence instanceof Utterance); // graceful end-of-turn
@@ -186,16 +187,11 @@ public class NWayInteraction implements Runnable {
 						occurrence = disco.copy(occurrence);
 						contributes = null; // need to recognize in other engines
 					}
-					i.occurredSilent(i.getExternal().equals(a), occurrence, contributes);
+					i.occurredSilent(i.getExternal().equals(a), occurrence, contributes, eval);
+					eval = false; // only evaluate grounding script once
 				} catch (IllegalArgumentException e) {} // ignore if no such task in that engine
 			}
 		}
-		
-		// format and print occurrence (if console is active)
-		Disco disco = (Disco) occurrence.engine;
-		if (isPaused()) 
-			disco.println("    "+disco.toHistoryString(occurrence));
-		
 		generateTTSay();
 	}
 
@@ -258,7 +254,7 @@ public class NWayInteraction implements Runnable {
 	            console.setInteraction(i);
 	            console.init(i.getDisco());
 	         }
-	         a.respond(i, false, false, true);
+	         a.respond(i, false, false);
 	         tries++;
 	         // short circuit for obvious case
 	         if ((responses == 0) && tries > activeActors.size() - 1) break;
@@ -271,7 +267,7 @@ public class NWayInteraction implements Runnable {
 	         console.respond(i);
 	      }
 	      else if (!player.getName().equals(a.getName())) {
-	         player.respond(i, false, false, true);
+	         player.respond(i, false, false);
 	         generateTTSay();  // TODO find better place for this? trying to catch "fortuitous completions" of tasks
 	         try { Thread.sleep(1500); } catch(InterruptedException e) { /* continue on wake */ }
 	      }

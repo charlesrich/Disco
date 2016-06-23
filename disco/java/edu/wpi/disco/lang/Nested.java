@@ -9,7 +9,9 @@ import edu.wpi.cetask.*;
 import edu.wpi.disco.Disco;
 
 /**
- * Base class for Propose.Nested and Reject, both of which take nested Task 
+ * Base class for utterances that take nested Task
+ * 
+ *  @see Propose.Nested
  */
 public abstract class Nested extends Utterance {
    
@@ -47,7 +49,19 @@ public abstract class Nested extends Utterance {
       Task nested = getNested();
       return nested != null && nested.isPathFrom(type);
    }
- 
+   
+   @Override
+   public boolean interpret (Plan contributes, boolean continuation) { 
+      if ( Utterance.interpret(this, contributes, continuation) ) 
+         // matches to same utterance type
+         contributes = contributes.getParent();
+      else if ( contributes != null ) 
+         reconcileStack(contributes, continuation);
+      getDisco().getSegment().add(this);
+      interpret();
+      return contributes != null;
+   }
+   
    protected abstract String getKey ();
    
    @Override 
@@ -64,7 +78,8 @@ public abstract class Nested extends Utterance {
       // default formatting
       StringBuilder buffer = new StringBuilder();
       appendKeySp(buffer, getKey());
-      buffer.append(formatTask ? getNested().formatTask() : getNested().format());
+      if ( getNested() == null ) appendKey(buffer, "something@word");
+      else buffer.append(formatTask ? getNested().formatTask() : getNested().format());
       return buffer.toString();
    }
    

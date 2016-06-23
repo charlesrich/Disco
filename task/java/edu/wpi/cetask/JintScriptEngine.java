@@ -241,8 +241,8 @@ class JintScriptEngine extends ScriptEngineWrapper
             engine.invokeFunction("FOO");
          } catch (NoSuchMethodException e) { System.out.println(e); }
          try { System.out.println(engine.eval(")--x;")); }
-         catch (ScriptException e) { System.out.println(e); }
-      } catch (ScriptException e) { System.out.println(e); }
+         catch (Exception e) { System.out.println(e); }
+      } catch (Exception e) { System.out.println(e); }
    }
 
 }

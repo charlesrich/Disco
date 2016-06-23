@@ -63,6 +63,8 @@ public class DecompositionPlugin extends Agenda.Plugin {
          // remove Propose.How's since they refer to plans
          if ( !(item.task instanceof Propose.How) ) 
             // note all items get priority of *this* plugin
+            // note cannot pass in contributes b/c plan is only temporary,
+            // so must rely in plan recognition to choose decomposition
             results.add(new Plugin.Item(item.task, null));
       return results;
    }

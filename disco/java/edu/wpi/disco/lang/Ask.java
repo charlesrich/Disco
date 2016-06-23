@@ -416,9 +416,8 @@ public abstract class Ask extends Propose.Should {
       
       @Override
       protected Propose.How newGoal () {
-         // TODO: plans is null since since Ask.How does not include plan
-         //       need to search for plan based on getNestedGoal()
-         return new Propose.How(getDisco(), Utils.not(getExternal()), null, null);
+         return new Propose.How(getDisco(), Utils.not(getExternal()), 
+               new Plan(getNestedGoal()), null);
       }
       
       @Override

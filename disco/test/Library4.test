@@ -24,8 +24,7 @@
       [User says I am looking for The Uplift War] -done
          Agent says "What book are you looking for?"
          User says "I am looking for The Uplift War."
-      [Agent look The Uplift War up in the catalog] -failed
-         Agent look The Uplift War up in the catalog. -failed
+      Agent look The Uplift War up in the catalog. -failed
    [Choose The Uplift War using a search engine] -live
       [Use the search engine] -live
          [User says propose who should use the search engine] -live <-focus
@@ -62,8 +61,7 @@
       [User says I am looking for The Uplift War] -done
          Agent says "What book are you looking for?"
          User says "I am looking for The Uplift War."
-      [Agent look The Uplift War up in the catalog] -failed
-         Agent look The Uplift War up in the catalog. -failed
+      Agent look The Uplift War up in the catalog. -failed
    [Choose The Uplift War using a search engine] -done
       [Agent use the search engine] -accepted -succeeded
          [User says you should use the search engine] -done

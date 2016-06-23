@@ -122,7 +122,7 @@
     # Agent teaching another human by mixture of demonstration and instructions how to do C
     #
     # give system agent starting intention of teaching C to external agent
-  > instance LearnRecipe / C / r4 / true
+  > new LearnRecipe / C / r4 / true
   > eval $disco.addTop(new Packages.edu.wpi.cetask.Plan($new)); $new.setShould(true);
     # Returned 'null'
   > eval $disco.getInteraction().getExternal().setName("human'")
@@ -131,13 +131,13 @@
     Agent says "Let's learn how to do C."
   > next
     Agent do h.
-  > done addStep / h / r4
+  > execute addStep / h / r4
     Human' adds step h.
   > eval $disco.getFocus(true).getParent().getChildren().get(1).setDecompositionClass($disco.getDecompositionClass("instruction"))
     # Returned 'null'
   > next
     Agent says "Next step is i."
-  > done
+  > execute
     Human' adds step i.
   > next
     Agent says "We're done learning how to do C."

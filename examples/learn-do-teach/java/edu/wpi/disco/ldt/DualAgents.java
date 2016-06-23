@@ -18,6 +18,7 @@ public class DualAgents extends Console {
             args.length > 0 && args[0].length() > 0 ? args[0] : null,
             interaction, null);
       interaction.setConsole(console);
+      interaction.setRetry(false);
       console.init(UnifiedAgent.DISCO);
       interaction.start(true);
    }
@@ -32,11 +33,11 @@ public class DualAgents extends Console {
    // system and external agents
    
    public void system (String arg) { 
-      interaction.getSystem().respond(interaction, false, false, false);
+      interaction.getSystem().respond(interaction, false, false);
    }
    
    public void external (String arg) { 
-      interaction.getExternal().respond(interaction, false, false, false);
+      interaction.getExternal().respond(interaction, false, false);
    }
    
 }
