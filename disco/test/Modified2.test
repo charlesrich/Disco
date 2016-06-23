@@ -8,9 +8,8 @@
     # Returned '[8]'
   > eval a.setSlotValue("input2", 6)
     # Returned '6'
-  > eval p = new edu.wpi.cetask.Plan(a)
-    # Returned '[ModifiedA(,[8],6)]'
-  > eval p.execute()
+  > eval $disco.getInteraction().getSystem().execute(a, $disco.getInteraction(), null) 
+    Agent execute ModifiedA on [8] ([8]) and 6 producing [14].
     # Returned 'null'
   > eval java.lang.System.out.println(a)
 ModifiedA(agent,[8],6,[14])
@@ -37,9 +36,8 @@ ModifiedA(agent,[9],6)
     # Returned 'ModifiedJava'
   > eval j.setSlotValue("input", new java.util.Vector())
     # Returned '[]'
-  > eval p = new edu.wpi.cetask.Plan(j)
-    # Returned '[ModifiedJava(,[])]'
-  > eval p.execute()
+  > eval $disco.getInteraction().getSystem().execute(j, $disco.getInteraction(), null) 
+    Agent execute ModifiedJava on [] producing [1].
     # Returned 'null'
   > eval java.lang.System.out.println(j)
 ModifiedJava(agent,[],[1])
@@ -103,6 +101,8 @@ ModifiedJava(,[1, 3])
     Agent says "Ok."
   > history
 
+Agent execute ModifiedA on [9] ([9]) and 6 producing [9]. -succeeded
+Agent execute ModifiedJava on [].
 [Execute ModifiedSufficient on [0]] -accepted -succeeded <-focus
    User says "One of us should execute ModifiedSufficient on [0]."
    Agent says "Ok."

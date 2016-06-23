@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class Interaction extends Thread {
   
-   // ******* Thread-safe methods *********
+   // ******* Thread-safe public methods *********
    
    private Disco disco;
    
@@ -75,6 +75,10 @@ public class Interaction extends Thread {
          task.isSystem() ? getSystem() : null; 
    }
 
+   public Actor getActor (boolean external) {
+      return external ? getExternal() : getSystem();
+   }
+   
    /**
     * Set default value for interaction@ok property.
     * Thread-safe.
@@ -261,65 +265,6 @@ public class Interaction extends Thread {
     * @see Disco#addTop(String)
     */
    public synchronized Plan addTop (String id) { return disco.addTop(id); }
- 
-   /**
-    * Thread-safe method to notify interaction that given <em>primitive</em>
-    * task has occurred. Typically used in dialogue loop.  For system
-    * actions, the grounding script is evaluated; for external actions, the
-    * grounding script is evaluated iff <code>getExternal().isEval()</code> returns
-    * true.
-    * 
-    * @param external true if performed by user, false if by system
-    * @param occurrence task that has occurred
-    * @param contributes plan to which this task contributes, or null
-    * 
-    * @see #occurredUtterance(Utterance,Plan,String)
-    */
-   public synchronized void occurred (boolean external, Task occurrence, Plan contributes) {
-      occurredSilent(external, occurrence, contributes);
-      if ( console != null ) console.occurred(occurrence);
-   }   
-   
-   // TODO: The whole execution of scripts needs to be cleaned up!
-   //       In particular there really wasn't a problem with using
-   //       grounding scripts for utterance semantics; it was just
-   //       a bug in Console execute command that evaluated script
-   //       before plan recognition (and sometimes twice)
-   void occurred (boolean external, Task occurrence, Plan contributes, boolean eval) {
-      responded = true;
-      occurredRetry(external, occurrence, contributes, eval);
-      if ( console != null ) console.occurred(occurrence);
-   }
-   
-   private Plan occurredRetry (boolean external, Task occurrence, Plan contributes, boolean eval) {
-      Plan plan = disco.occurred(external, occurrence, contributes, eval);
-      if ( disco.getProperty("interaction@retry", retry) ) disco.retry();
-      return plan;
-   }
-   
-   /**
-    * Variant of {@link #occurred(boolean,Task,Plan)}, used in {@link
-    * #choose(List,int,String)}, to notify interaction that given
-    * utterance has occurred. Thread-safe.
-    * 
-    * @param formatted corresponding formatted string, or null
-    */
-   public synchronized void occurredUtterance (Utterance utterance, Plan contributes,
-                                          String formatted) {
-      disco.putUtterance(utterance, formatted);
-      occurred(true, utterance, contributes);
-   }
-   
-   /**
-    * Variant of {@link #occurred(boolean,Task,Plan)}, used in
-    * {@link edu.wpi.disco.game.NWayInteraction}, that does not print to
-    * console. Thread-safe.
-    */
-   public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes) {
-      responded = true;
-      return occurredRetry(external, occurrence, contributes, 
-                    (external ? getExternal() : getSystem()).isEval());
-   }
    
    /**
     * Thread-safe method to call when world state has changed due to reasons
@@ -335,14 +280,11 @@ public class Interaction extends Thread {
       if ( i > 0 && i <= items.size() ) {
          Plugin.Item item = items.get(i-1);
          // make sure history shows same alternative as menu selection
-         occurredUtterance((Utterance) item.task, item.contributes, formatted);
+         disco.putUtterance((Utterance) item.task, formatted);
+         getExternal().execute(item.task, this, item.contributes);
       } else throw new IndexOutOfBoundsException();
    }
    
-   // ******* End of thread-safe methods ***********
-   
-   private boolean responded;  // see doTurn
- 
    protected boolean externalFloor = true; // true iff external has floor
    
    /**
@@ -350,10 +292,49 @@ public class Interaction extends Thread {
     */
    public Actor getFloor () { return externalFloor ? external : system; }
    
+   // ******* End of thread-safe public methods ***********
+   
+   /**
+    * Notify interaction that given <em>primitive</em>
+    * task has occurred. Typically used in dialogue loop. 
+    * 
+    * @param external true if performed by user, false if by system
+    * @param occurrence task that has occurred
+    * @param contributes plan to which this task contributes, or null
+    */
+   protected synchronized Plan occurred (boolean external, Task occurrence, 
+         Plan contributes, boolean eval) {
+      responded = true;
+      return occurredRetry(external, occurrence, contributes, eval); 
+   }   
+   
+   /**
+    * Variant of {@link #occurred(boolean,Task,Plan,boolean)}, used in
+    * {@link edu.wpi.disco.game.NWayInteraction}, that does not print to
+    * console (even if there is one). 
+    */
+   @Deprecated
+   public synchronized Plan occurredSilent (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      responded = true;
+      return occurredRetry(external, occurrence, contributes, eval); 
+   }
+   
+   private Plan occurredRetry (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      contributes = disco.occurred(external, occurrence, contributes, eval);
+      if ( disco.getProperty("interaction@retry", retry) ) disco.retry(contributes);
+      return contributes;
+   }
+   
+   void occurredConsole (Task occurrence) {
+      if ( console != null ) console.occurred(occurrence);
+   }
+
    // NB all read/write to discourse state on this single thread
 
    protected volatile boolean running; // volatile for event thread
-   
+
+   private boolean responded;  // see doTurn
+      
    @Override
    public void run () {
       if ( (system == null || external == null) && console == null )

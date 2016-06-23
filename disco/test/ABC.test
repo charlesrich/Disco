@@ -47,14 +47,13 @@
     Agent says "Ok."
   > status
 
-[Achieve A on 2 and x producing 3 and y by BC] -accepted -failed
+[Achieve A on 2 and x producing 3 and y by BC] -accepted -failed <-focus
    User says "Let's achieve A."
    [User says propose the A input1] -succeeded
    User execute B on x producing 1 and y.
    [User says propose the A input1] -succeeded
-   [c: User execute C on 2 and 1 producing 3] -failed <-focus
-      User execute C on 2 and 1 producing 3. -failed
-      Agent says "Ok." -unexplained
+   User execute C on 2 and 1 producing 3. -failed
+   Agent says "Ok." -unexplained
 
   > quit
     

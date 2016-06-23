@@ -107,7 +107,7 @@ public class ComponentExample {
    }
    
    private void user (Task task, Plan contributes) {
-      interaction.occurred(true, task, contributes);
+      interaction.getExternal().done(task, interaction, contributes);
    }
    
    private Task newInstance (String task) { 

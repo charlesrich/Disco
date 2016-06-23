@@ -365,7 +365,7 @@ public class Shell {
     * Note this method cannot be named 'new' even though that is typed command
     */
    private Task newInstance (String args) {
-      Task task = processTaskIf(args, null, true);
+      Task task = processTaskFocus(args, null, false, true);
       getEngine().setGlobal("$new", task);
       return task;
    }
@@ -508,8 +508,8 @@ public class Shell {
    /**
     * @see #processTask(String,Plan,boolean)
     */
-   protected Task processTaskIf (String args, Plan focus, boolean success) {
-      Task occurrence = processTask(args, focus, success);
+   protected Task processTaskFocus (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task occurrence = processTask(args, focus, userDefault, hasSuccess);
       if ( occurrence == null ) 
          warning("Missing task argument (and no focus).");
       else if ( focus != null && focus.getGoal().isMatch(occurrence) )
@@ -526,11 +526,21 @@ public class Shell {
     * by '/ /'.<br>
     * <br>
     * Hint: If Javascript contains '/', use 'eval' command to set temporary
-    * variable and use variable in 'done'.
+    * variable and use variable in command.
     * 
     * @param args [&lt;id&gt; [&lt;namespace&gt;]] [ / &lt;value&gt; ]*
+    * @param focus to use for filling in missig slots
+    * @param userDefault default value for external is true (only for primitives)
+    * @param hasSuccess flag controlling whether to process success slot
     */
-   public Task processTask (String args, Plan focus, boolean success) {
+   public Task processTask (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task task = processTask(args, focus, hasSuccess);
+      if ( task.isPrimitive() && userDefault &&!task.isDefinedSlot("external") ) 
+         task.setExternal(true);
+      return task;
+   }
+      
+   private Task processTask (String args, Plan focus, boolean hasSuccess) {
       TaskClass type = focus == null ? null : focus.getType(); 
       StringTokenizer tokenizer = new StringTokenizer(args, "/");
       if ( tokenizer.hasMoreTokens() && !args.startsWith("/") ) {
@@ -549,13 +559,13 @@ public class Shell {
       }
       if ( type == null ) return null;
       Task task = type.newInstance();
-      // process input, output and success slot values, if any
+      // process slot values, if any
       for (String name : type.declaredInputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       for (String name : type.declaredOutputNames) 
          if ( !nextArg(tokenizer, task, name) ) return task;
       if ( !nextArg(tokenizer, task, "external") ) return task;
-      if ( success ) nextArg(tokenizer, task, "success");
+      if ( hasSuccess ) nextArg(tokenizer, task, "success");
       if ( tokenizer.hasMoreTokens() ) 
          warning("Ignoring rest of line starting at: \'"+tokenizer.nextToken()+"\'");
       return task;

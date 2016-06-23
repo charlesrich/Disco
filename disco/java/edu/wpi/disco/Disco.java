@@ -27,7 +27,7 @@ import javax.xml.xpath.XPath;
  */
 public class Disco extends TaskEngine {
    
-   public static String VERSION = "1.16";
+   public static String VERSION = "1.17";
    
    /**
     * Main method for running stand-alone Disco with console.
@@ -441,18 +441,9 @@ public class Disco extends TaskEngine {
       super.removeTop(plan);
    }
    
-   /**
-    * Use {@link Interaction#occurred(boolean,Task,Plan)}
-    */
-   @Override
-   @Deprecated
-   public Plan occurred (Task occurrence) { 
-      return interaction.occurredSilent(true, occurrence, null);
-   }
-   
    /*
     * Extend simple plan recognition in task engine with discourse interpretation
-    * algorithm (but still not including decomposition choice interpolation).
+    * algorithm. (Note still does not including decomposition choice interpolation).
     */
    @Override
    protected Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
@@ -468,13 +459,36 @@ public class Disco extends TaskEngine {
       return contributes;
    }
    
-   public void putUtterance (Utterance utterance, String formatted) {
+   @Override // for package visibility
+   protected Plan occurred (boolean external, Task occurrence, Plan contributes, boolean eval) { 
+       return super.occurred(external, occurrence, contributes, eval); 
+   }
+   
+   void putUtterance (Utterance utterance, String formatted) {
       if ( utteranceFormat.get(utterance) == null ) // in case copied or set in menu
          // cache translation and history formatting at occurrence time
          utteranceFormat.put(utterance, 
                toHistoryString(utterance, 
                      formatted == null ? translate(utterance) : formatted,
                         true));
+   }
+   
+   /**
+    * @deprecated use {@link Actor#done(Task,Interaction,Plan)}
+    */
+   @Override
+   @Deprecated
+   public Plan done (Task occurrence) { 
+      throw new UnsupportedOperationException();
+   }
+   
+   /**
+    * @deprecated use {@link Actor#execute(Task,Interaction,Plan)}
+    */
+   @Override
+   @Deprecated
+   public Plan execute (Task occurrence, Plan contributes) { 
+      throw new UnsupportedOperationException();
    }
    
    @Override
@@ -488,24 +502,32 @@ public class Disco extends TaskEngine {
       return thisTask;
    }
 
-   void retry () {
-      Stack<Segment> stack = getStack();
-      for (int i = stack.size(); i-- > 1;) {
-         Plan plan = stack.get(i).getPlan();
-         if ( plan.isFailed() ) {
-            Plan retried = plan.retry();
-            if ( retried != null ) {
-               // expose retried plan
-               while ( getFocus() != retried ) pop();
-               // substitute copy of failed goal
-               getSegment().setPlan(retried.getRetryOf());
-               pop(); push(retried);
-               break;
-            }
+   void retry (Plan contributes) {
+      if ( contributes != null && contributes.isFailed() )  
+         retried(contributes);  // suppressed singleton segment (see reconcileStack)
+      else {
+         for (int i = stack.size(); i-- > 1;) {
+            Plan plan = stack.get(i).getPlan();
+            if ( plan.isFailed() && retried(plan) ) break;
          }
       }
    }
-   
+
+   private boolean retried (Plan plan) {
+      Plan retried = plan.retry();
+      if ( retried != null ) {
+         if ( stackContains(retried) ) {
+            while ( getFocus() != retried ) pop(); // expose retried plan
+            // substitute copy of failed goal
+            getSegment().setPlan(retried.getRetryOf());
+            pop();
+         }
+         push(retried);
+         return true;
+      }
+      return false;
+   }
+
    /**
     * Thread-safe variant of {@link 
     * edu.wpi.cetask.TaskEngine#explainBest(Task,boolean)} for Disco.
@@ -738,9 +760,8 @@ public class Disco extends TaskEngine {
             		shift = false;
             	}
             }
-            // suppress singleton segments
-            if ( contributes.getType() != occurrence.getType()
-                  || !contributes.getChildren().isEmpty() || !contributes.isDone() ) {
+            if ( contributes.getType() != occurrence.getType() // suppress singleton segments 
+                 || !contributes.getChildren().isEmpty() ) {
             	push(contributes, continuation);
             	if ( shift ) getSegment().setShift(true);
             }

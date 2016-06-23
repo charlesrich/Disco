@@ -5,12 +5,11 @@
  */
 package edu.wpi.disco.game;
 
-import edu.wpi.disco.Agenda.Plugin.Item;
-import edu.wpi.disco.*;
-import edu.wpi.disco.lang.*;
-import edu.wpi.disco.plugin.AskHowPlugin;
-
 import java.util.LinkedList;
+import edu.wpi.cetask.*;
+import edu.wpi.disco.*;
+import edu.wpi.disco.lang.Utterance;
+import edu.wpi.disco.plugin.AskHowPlugin;
 
 /**
  * Represents a non-player character in Disco for Games
@@ -39,13 +38,13 @@ public class NPC extends Agent {
 	}
 	
 	@Override
-	public void occurred (Interaction interaction, Item item) {
-	   if (item.task instanceof Utterance) {
-	      Utterance utterance = (Utterance) item.task;
+	public void done (Task occurrence, Interaction interaction, Plan contributes) {
+	   if (occurrence instanceof Utterance) {
+	      Utterance utterance = (Utterance) occurrence;
 	      if ( !(utterance instanceof Utterance.Text) && utterance.equals(getLastUtterance()) )
 	         return;
 	   }
-		super.occurred(interaction, item);
+		super.done(occurrence, interaction, contributes);
 	}
 	
 	public void setIgnoreObstacles (boolean ignore) {

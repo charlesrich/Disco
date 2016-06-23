@@ -60,7 +60,7 @@ public abstract class Actor {
    
    /**
     * Thread-safe method to take a turn in given interaction. <em>Note:</em>
-    * Actor should call {@link Interaction#occurred(boolean,Task,Plan)} as each
+    * Actor should call {@link #execute(Task,Interaction,Plan)} as each
     * task in turn is executed.  
     *
     * @param ok say "Ok" to end turn if nothing else to say (extension for game)
@@ -79,6 +79,37 @@ public abstract class Actor {
          boolean ok, boolean guess);
    
    private boolean authorized = true;
+   
+   /**
+    * Thread-safe method for this actor to execute given task occurrence in
+    * given interaction.  Like {@link #done(Task,Interaction,Plan)}, except
+    * that grounding script, if any, associated with task is executed.
+    * 
+    * @param contributes plan to which this task contributes, or null
+    * 
+    * @see Console#execute(String)
+    */
+   public void execute (Task occurrence, Interaction interaction, Plan contributes) {
+      contributes = interaction.occurred(interaction.getExternal() == this, 
+            occurrence, contributes, true);
+      interaction.occurredConsole(occurrence);
+   }
+  
+   /**
+    * Thread-safe method for <em>observation</em> of this actor having executed
+    * given task occurrence in given interaction. <em>NB:</em> also executes grounding scripts for
+    * utterances.
+    * 
+    * @param contributes plan to which this task contributes, or null
+    * 
+    * @see #execute(Task,Interaction,Plan)
+    * @see Console#done(String)
+    */
+   public void done (Task occurrence, Interaction interaction, Plan contributes) {
+      contributes = interaction.occurred(interaction.getExternal() == this, 
+            occurrence, contributes, occurrence instanceof Utterance);
+      interaction.occurredConsole(occurrence);
+   }
    
    /**
     * Thread-safe method to generate list of tasks for this actor, 
@@ -191,17 +222,6 @@ public abstract class Actor {
    public boolean canOther (Task task, Interaction interaction) {
       return interaction.getSystem() == this ? task.canUser() : task.canSystem();
    }
-
-   private boolean eval;
-   
-   /**
-    * It true, then eval grounding scripts for this actor regardless of whether
-    * it is system or external.  Used for running simulations with two agents
-    * as in examples/DualAgents.
-    */
-   public boolean isEval () { return eval; }
-   
-   public void setEval (boolean eval) { this.eval = eval; }
    
    @Override
    public String toString () { return name; }

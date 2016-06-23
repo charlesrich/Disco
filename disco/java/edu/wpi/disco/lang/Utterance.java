@@ -93,11 +93,7 @@ public abstract class Utterance extends Decomposition.Step {
       } // else
       return false;
    }
-   
-   @Override
-   // always evaluate utterance scripts for both user and agent 
-   protected void evalIf (Plan plan) { eval(plan); }
-   
+
    @Override
    public boolean isStarter (Plan plan) {
       // utterances are only starters if they are a step of decomp

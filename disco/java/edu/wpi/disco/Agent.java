@@ -49,6 +49,16 @@ public class Agent extends Actor {
     */
    public void setMax (int max) { this.max = max; }
 
+   @Override
+   public void execute (Task occurrence, Interaction interaction, Plan contributes) {
+      super.execute(occurrence, interaction, contributes);
+      if ( occurrence instanceof Utterance ) { // after interpretation
+         Utterance utterance = (Utterance) occurrence;
+         lastUtterance = utterance;
+         say(interaction, utterance);
+      }
+   }
+   
    /**
     * Thread-safe method to generate list of tasks for agent, 
     * sorted according to plugin priorities (with guessing)
@@ -230,14 +240,14 @@ public class Agent extends Actor {
          Plugin.Item item = respondIf(interaction, guess);
          if ( item == null ) {
             // say "Ok" when nothing else to say and end of turn is required
-            if ( ok ) item = newOk(disco);
+            if ( ok ) item = Agenda.newItem(new Ok(disco, null), null);
             else return false;
          }
-         occurred(interaction, item);
+         execute(item.task, interaction, item.contributes);
          if ( item.task instanceof Utterance) return true; // end of turn
       }
       // maximum number of non-utterances
-      if ( ok ) occurred(interaction, newOk(disco));
+      if ( ok ) execute(new Ok(disco, null), interaction, null);
       return true;
    }
   
@@ -250,10 +260,6 @@ public class Agent extends Actor {
       Disco disco = interaction.getDisco();
       disco.decomposeAll();
       return generateBest(interaction, guess);
-   }
-   
-   private static Plugin.Item newOk (Disco disco) {
-      return Agenda.newItem(new Ok(disco, false), null);
    }
 
    /**
@@ -273,21 +279,6 @@ public class Agent extends Actor {
    public void clear (Interaction interaction) { 
       super.clear(interaction);
       lastUtterance = null; 
-   }
-   
-   /**
-    * Thread-safe method for notifying interaction that given plugin item
-    * has occurred.
-    */
-   public void occurred (Interaction interaction, Plugin.Item item) { 
-      synchronized (interaction) { // typically used in dialogue loop
-         interaction.occurred(this == interaction.getExternal(), 
-               item.task, item.contributes);
-         if ( item.task instanceof Utterance ) { // after occurred
-            lastUtterance = (Utterance) item.task;
-            say(interaction, (Utterance) item.task);
-         }
-      }
    }
    
    // support for private beliefs

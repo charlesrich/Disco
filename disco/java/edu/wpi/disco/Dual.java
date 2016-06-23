@@ -110,7 +110,6 @@ public class Dual {
       
       private Other (String name) { 
          super(name); 
-         setEval(true); // make sure grounding scripts evaluated
       }
  
       private volatile boolean exhausted; // volatile for other interaction thread
@@ -134,7 +133,7 @@ public class Dual {
                try { 
                   Task copy = translate(occurrence, interaction);
                   // note plan recognition always used because contributes null
-                  interaction.occurred(true, copy, null); 
+                  interaction.getExternal().execute(copy, interaction, null); 
                   copy.setWhen(occurrence.getWhen()); // keep original timestamp
                } catch (TranslateException e) {
                   System.err.println("WARNING: Ignoring untranslatable occurrence "+occurrence);
@@ -158,9 +157,11 @@ public class Dual {
       }
       
       @Override
-      public synchronized void occurred (boolean external, Task occurrence, Plan contributes) {
-         super.occurred(external, occurrence, contributes);
+      public synchronized Plan occurred (boolean external, Task occurrence, 
+            Plan contributes, boolean eval) {
+         contributes = super.occurred(external, occurrence, contributes, eval);
          if ( !externalFloor ) queue.add(occurrence);
+         return contributes;
       }   
       
       @Override

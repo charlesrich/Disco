@@ -5,11 +5,10 @@
  */
 package edu.wpi.disco.game.actions;
 
-import edu.wpi.cetask.*;
-import edu.wpi.cetask.TaskClass.Grounding;
+import java.util.*;
+import edu.wpi.cetask.Task;
 import edu.wpi.disco.Actor;
 import edu.wpi.disco.game.SingleInteraction;
-import java.util.*;
 
 /**
  * Encapsulates creation and execution of a new task instance 
@@ -46,14 +45,10 @@ public class ExecuteTaskAction extends Action {
 				task.setSlotValue(key, slotValues.get(key));
 			}
 		}
-		task.occurred(true);
-		// execute script, if any 
-		Grounding script = task.getGrounding();
-		if ( script != null ) script.eval(task);
+		actor.execute(task, interaction, null);
 		
-		// broadcast to all interactions (but script not re-executed since
-		// external is true)
-		interaction.getNWay().broadcastDone(actor, task, null);
+		// broadcast to all interactions (but do not re-execute script)
+		interaction.getNWay().broadcastOccurred(actor, task, null, false);
 	}
 
 }

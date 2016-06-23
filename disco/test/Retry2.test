@@ -26,8 +26,7 @@
          Ask.Should(agent,B)
          Accept(user,Propose.Should(user,B))
       B(agent) -succeeded
-   [C(agent)] -failed
-      C(agent) -failed
+   C(agent) -failed
    [C(agent)] -live <-focus
    [D] -optionalStep -optional
 
@@ -43,8 +42,7 @@
          Ask.Should(agent,B)
          Accept(user,Propose.Should(user,B))
       B(agent) -succeeded
-   [C(agent)] -failed
-      C(agent) -failed
+   C(agent) -failed
    [C(agent)] -done
       C(agent)
    [D] -optionalStep -optional -live

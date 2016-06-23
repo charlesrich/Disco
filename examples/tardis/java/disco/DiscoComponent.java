@@ -203,19 +203,17 @@ public class DiscoComponent extends eu.semaine.components.Component {
     }
 
     class TenChoicesFrameListener implements ActionListener{
-        private final int choice;
-        TenChoicesFrameListener(int num){
-            choice=num;
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-	   synchronized (nway){ // not needed? Since done and doneUtterance already synch'd on interaction
-                gui.disableAllButNot(choice);
-                Plugin.Item item = items.get(choice);
-                interview.getDisco().getInteraction().occurredUtterance((Utterance) item.task, null, formatted[choice]);
-                interview.occurred(true, item.task, item.contributes);
-            }
-            
-        }
+       private final int choice;
+       TenChoicesFrameListener(int num){
+          choice=num;
+       }
+       @Override
+       public void actionPerformed(ActionEvent e) {
+          synchronized (nway){ 
+             gui.disableAllButNot(choice);
+             interview.getDisco().getInteraction().choose(items, choice, formatted[choice]);
+          }
+
+       }
     }
 }

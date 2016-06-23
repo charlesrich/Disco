@@ -133,11 +133,11 @@ public class Console extends Shell {
       out.println("                          (namespace optional if unambiguous id)");
       out.println("                          (slot values optional)");
       out.println("    done [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
-      out.println("                        - this task has been performed (default by user)");
-      out.println("                          (for primitive tasks only)");
+      out.println("                        - this task has been completed (default by user)");
       out.println("                          (task and slot values default to current focus)");
       out.println("    execute [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
-      out.println("                        - like 'done', except runs script if any");
+      out.println("                        - like 'done', except runs grounding script if any");
+      out.println("                          (for primitive tasks only)");
       out.println("    say [<id> [<namespace>]] [/ <input>]* [/ <output>]* [/ <external>] [/ <success>]");
       out.println("                        - like 'execute' for utterances, except defaults to menu of choices");
       out.println("    next [<boolean>]    - end user console turn");
@@ -243,10 +243,10 @@ public class Console extends Shell {
     * @see Propose.Should
     */
    public void task (String args) {
-      Task should = processTaskIf(args, null, false);
+      Task should = processTaskFocus(args, null, false, false);
       if ( should != null ) 
-         interaction.occurred(true, 
-               Propose.Should.newInstance(getEngine(), true, should), null); 
+         interaction.getExternal().execute(
+               Propose.Should.newInstance(getEngine(), true, should), interaction, null); 
    }
    
    /**
@@ -287,7 +287,7 @@ public class Console extends Shell {
                if ( line.length() == 0 ) { 
                   command = null; 
                   if (TTSay) 
-                     interaction.occurred(false, new TTSay(getEngine(), items, null), null);
+                     interaction.getSystem().execute(new TTSay(getEngine(), items, null), interaction, null);
                   break; 
                }
                if ( "quit".equals(line) ) throw new Quit();
@@ -295,7 +295,7 @@ public class Console extends Shell {
                   int choice = Integer.parseInt(line.trim());
                   interaction.choose(items, choice, formatted[choice-1]);
                   if (TTSay) 
-                     interaction.occurred(false, new TTSay(getEngine(), items, choice-1), null);
+                     interaction.getExternal().execute(new TTSay(getEngine(), items, choice-1), interaction, null);
                   break;
                } catch (NumberFormatException e) { println("Not a number!"); }
                  catch (IndexOutOfBoundsException e) { println("Number not in menu!"); }
@@ -324,42 +324,46 @@ public class Console extends Shell {
    }
 
    /**
-    * Report user execution of primitive task or completion of non-primitive
+    * Report <em>observation</em> of completion of user execution of primitive task or completion of non-primitive
     * task. Task class and unspecified args default to current focus.
+    * 
+    * @see Actor#done(Task,Interaction,Plan)
     */
    public void done (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, true);
-      if ( task != null ) 
-         done(task.isPrimitive() ? task : new Propose.Done(getEngine(), true, task),
-              false);
+      Task task = processTaskDefined(args, focus, true, true);
+      if ( task != null ) {
+         if ( task.isPrimitive() )
+            interaction.getActor(task).done(task, interaction, null);
+         else
+            interaction.getExternal().execute(new Propose.Done(getEngine(), true, task),
+                  interaction, null);
+      }
    } 
    
    /**
-    * Like 'done', but first executes script associated with primitive task, if
+    * Like 'done', but also executes script associated with primitive task, if
     * any. Convenient for running simulations.
     * 
     * @see #done(String)
+    * @see Actor#execute(Task,Interaction,Plan)
     */
    public Task execute (String args) {
       Plan focus = getEngine().getFocus(true);
-      Task task = processTaskIf(args, focus, true);
+      Task task = processTaskDefined(args, focus, true, true);
       if ( !task.isPrimitive() ) {
          err.println("Execute not allowed for non-primitive tasks.");
          return null;
       }
-      done(task, true);
+      interaction.getActor(task).execute(task, interaction, null);
       return task;
    }
    
-   private Task done (Task occurrence, boolean eval) {
+   private Task processTaskDefined (String args, Plan focus, boolean userDefault, boolean hasSuccess) {
+      Task occurrence = processTaskFocus(args, focus, userDefault, hasSuccess);
       if ( occurrence != null ) {
          if ( occurrence.isDefinedInputs() ) {
-            boolean external = !Utils.isFalse(occurrence.getExternal());
-            if ( !external ) command = null; // keep user turn
-            // TODO: This is temporary hack to fix problem (see Interaction.occurred)
-            if ( eval ) interaction.occurred(external, occurrence, null, true);
-            else interaction.occurred(external, occurrence, null);
+            if ( occurrence.isSystem() ) command = null; // keep user turn
          } else warning("All input values must be defined--occurrence ignored.");
       }
       return occurrence;

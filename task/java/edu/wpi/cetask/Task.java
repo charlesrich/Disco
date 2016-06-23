@@ -745,10 +745,8 @@ public class Task extends Instance {
          throw new IllegalArgumentException("Cannot copy slot values from "+
                from.getType()+" to "+getType()); 
       boolean overwrite = false;
-      for (String name : getType().inputNames)
-         overwrite = copySlotValue(from, name, name, true, false) || overwrite;
-      for (String name : getType().outputNames)
-         overwrite = copySlotValue(from, name, name, true, false) || overwrite;
+      overwrite = copyInputSlotValues(from) || overwrite;
+      overwrite = copyOutputSlotValues(from) || overwrite;
       if ( from.clonedInputs != null ) {
          if ( clonedInputs != null ) overwrite = true;
          clonedInputs = from.clonedInputs;
@@ -756,6 +754,20 @@ public class Task extends Instance {
       return overwrite;
    }
    
+   boolean copyInputSlotValues (Task from) {
+      boolean overwrite = false;
+      for (String name : getType().inputNames)
+         overwrite = copySlotValue(from, name, name, true, false) || overwrite;
+      return overwrite;
+   }
+   
+   boolean copyOutputSlotValues (Task from) {
+      boolean overwrite = false;
+      for (String name : getType().outputNames)
+         overwrite = copySlotValue(from, name, name, true, false) || overwrite;
+      return overwrite;
+   }
+
    /**
     * If named slot of given task is defined, copy value <em>from</em> 
     * slot name of given task to given slot of this task.
@@ -780,58 +792,36 @@ public class Task extends Instance {
       modified = true;
       return overwrite;
    }
-
+   
    /**
-    * Execute primitive <em>system</em> task. 
+    * Evaluate the grounding script, if any, associated with this task occurrence.
     * 
-    * @see TaskEngine#done(Task)
+    * @param plan with goal matching this task, or null
+    * @return true if there was a script to execute
     */
-   void execute (Plan plan) {
-      occurred(false); // before script executed
-      eval(plan);
-   }
+   boolean eval (Plan plan) { return eval(plan, getType()); }
    
-   protected  void evalIf (Plan plan) { if ( isSystem() ) eval(plan); }
-   
-   // public for Console.execute()
-   public void eval (Plan plan) { eval(plan, getType()); }
-   
-   protected void eval (Plan plan, TaskClass type) {  // for Task.Any
-      cloneInputs(); //  cache modified inputs before grounding script executed
+   protected boolean eval (Plan plan, TaskClass type) {  // for Task.Any
       Grounding script = getGrounding();
-      if ( script != null ) 
+      if ( script != null ) {
          synchronized (bindings) {
             bindings.put("$plan", plan);
-            script.eval(this);      
+            script.eval(this);
          }
-      // set outputs to modified inputs
-      if ( type.getPostcondition() != null )
-         for (Input input : type.declaredInputs) {
-            Output modified = input.getModified();
-            if ( modified != null ) 
-               engine.put(clonedInputs, modified.getName(), 
-                     getSlotValue(modified.getName()));
+         // script may have set output slots
+         if ( type.getPostcondition() != null )
+            for (Input input : type.declaredInputs) {
+               Output modified = input.getModified();
+               if ( modified != null ) 
+                  engine.put(clonedInputs, modified.getName(), 
+                        getSlotValue(modified.getName()));
+            }
+         return true;
       }
-   }
-   
-   public void occurred (boolean external) {
-      synchronized (engine.synchronizer) {
-         setExternal(external); 
-         occurred();
-      }
-   }
-   
-   public void occurred () {
-	  if ( !isDefinedSlot("external") ) 
-		  throw new IllegalStateException("Occurrence must have external slot value "+this);
-      setModifiedOutputs();
-      synchronized (engine.synchronizer) {
-         setWhen(System.currentTimeMillis());
-         engine.tick();
-      }
+      return false;
    }
 
-   private void setModifiedOutputs () {
+   void setModifiedOutputs () {
       TaskClass type = getType();
       for (Input input : type.declaredInputs){
          Output modified = input.getModified();
@@ -995,12 +985,12 @@ public class Task extends Instance {
       }
       
       @Override
-      public void eval (Plan plan) { 
+      boolean eval (Plan plan) { 
          // TODO grounding script may reference slots
          TaskClass type = (TaskClass) getSlotValue("type");
          if ( type == null ) 
             throw new IllegalArgumentException("Cannot execute grounding script for: "+plan);
-         eval(plan, type);
+         return eval(plan, type);
       }
    }
    

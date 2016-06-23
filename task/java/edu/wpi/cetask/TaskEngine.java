@@ -30,7 +30,7 @@ import javax.xml.xpath.*;
  */
 public class TaskEngine {
    
-   public static String VERSION = "1.10";
+   public static String VERSION = "1.11";
    
    public static boolean VERBOSE, DEBUG, PRINT_TASK;
    
@@ -176,6 +176,16 @@ public class TaskEngine {
          clearLiveAchieved(); 
       }
    }
+   
+   private void tick (Task occurrence) {
+      if ( !occurrence.isDefinedSlot("external") ) 
+         throw new IllegalStateException("Occurrence must have external slot value "+this);
+       occurrence.setModifiedOutputs();
+       synchronized (synchronizer) {
+          occurrence.setWhen(System.currentTimeMillis());
+          tick();
+       }
+    }
 
    private Task lastOccurrence;
    private Plan lastContributes;
@@ -857,40 +867,57 @@ public class TaskEngine {
     * Method for notifying task engine that given primitive <em>user</em> task 
     * has occurred.
     * 
-    * @return matching plan in current task tree or null if none
+    * @return plan in current task tree to which given occurrence contributes, or null
     * 
-    * @see Plan#execute()
+    * @see #execute(Task,Plan)
     */
-   public Plan occurred (Task occurrence) {
+   public Plan done (Task occurrence) {
       // leave "success" undefined (see doc for Task.isDefinedOutputs)
       return occurred(true, occurrence, null, false);
    }
  
-   // factorization of occurred below is to support extension in Disco
-   
-   public Plan occurred (boolean external, Task occurrence, Plan contributes, 
-         boolean eval) { 
-      occurrence.setExternal(external);
-      // do explanation before evaluating scripts, since expectations are in
-      // terms of state of world before execution
-      if ( contributes == null ) contributes = explainBest(occurrence, true);
-      // check for continuation before setWhen
-      boolean continuation = contributes != null && contributes.isStarted();
-      if ( external ) { 
-         occurrence.occurred(); 
-         // sic evalIf, since overridden in Utterance
-         if ( eval ) occurrence.eval(contributes); 
-         else occurrence.evalIf(contributes); 
-      } else occurrence.execute(contributes);
-      occurred(occurrence, contributes, continuation);     
-      return contributes;
+   /**
+    * Method for executing given primitive <em>system</em> task (includes
+    * executing grounding script, if any). 
+    * 
+    * @param contributes plan in current task tree to which given occurrence contributes, or null
+    * @return plan in current task tree to which given occurrence contributes, or null
+    * 
+    * @see #done(Task)
+    */
+   public Plan execute (Task occurrence, Plan contributes) {
+      return occurred(false, occurrence, contributes, true);
    }
 
+   protected Plan occurred (boolean external, Task occurrence, Plan contributes, boolean eval) {
+      if ( occurrence.getExternal() != null && occurrence.getExternal().booleanValue() != external )
+         throw new IllegalArgumentException("External value does not agree: "+occurrence);
+      else occurrence.setExternal(external);
+      if ( contributes == null ) contributes = explainBest(occurrence, true);
+      // cache modified inputs before grounding script eval
+      if ( eval ) occurrence.cloneInputs();
+      // check for continuation before setWhen
+      boolean continuation = contributes != null && contributes.isStarted();
+      occurred(occurrence, contributes, continuation);
+      // script eval after interpretation
+      boolean match = contributes != null && contributes.getType() == occurrence.getType();
+      if ( eval )  // only pass matching plan to eval
+         eval = occurrence.eval(match ? contributes : null);
+      occurrence.checkAchieved(); // after grounding script eval
+      if ( eval && match ) { // script may have set output slots
+         contributes.getGoal().copyOutputSlotValues(occurrence);
+         contributes.getGoal().updateBindingsTask(true);  // for Decomposition.Step
+      }
+      // TODO is this only/best place to call Plan.checkAchieved?
+      if ( contributes != null ) contributes.checkAchieved();
+      return contributes;
+   }
+   
    protected Plan occurred (Task occurrence, Plan contributes, boolean continuation) {
       interpret(occurrence, contributes, continuation);
       return contributes;
    }
-   
+ 
    /**
     * Update engine state based on this occurrence.
     * 
@@ -901,13 +928,9 @@ public class TaskEngine {
     * @see Task#interpret(Plan,boolean)
     */
    protected boolean interpret (Task occurrence, Plan contributes, boolean continuation) {
+      tick(occurrence); // setWhen before interpret
       boolean explained = occurrence.interpret(contributes, continuation);
       if ( !explained ) unexplained(occurrence);
-      // checkAchieved after interpret so values propagated
-      occurrence.checkAchieved();
-      if ( contributes != null && contributes.getType() == occurrence.getType()) 
-         // TODO is this best/only place to check success/failure?
-         contributes.checkAchieved(); 
       lastOccurrence = occurrence;
       lastContributes = contributes;
       return explained;

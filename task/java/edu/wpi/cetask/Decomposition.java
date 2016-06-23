@@ -250,8 +250,7 @@ public class Decomposition extends Instance {
       @Override
       protected void updateBindingsTask (boolean modified) {
          super.updateBindingsTask(modified); // do 2018-ext self bindings first
-         if ( !isOccurred() ) // don't change slots on occurrences
-            updateBindings(modified, null, null);
+         updateBindings(modified, null, null);
       }
       
       // need these also since SCRIPTABLE optimization does not call eval 

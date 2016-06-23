@@ -325,17 +325,6 @@ public class Plan {
       return Collections.unmodifiableList(required);
    }
    
-   /**
-    * System executes script for goal of this plan.
-    */
-   public void execute () {
-      synchronized (goal.bindings) {
-         goal.bindings.put("$plan", this);
-         goal.execute(this);
-         checkAchieved();
-      }
-   }
-   
    public boolean isOccurred () { return goal.isOccurred(); }
    
    /**
@@ -710,9 +699,7 @@ public class Plan {
    }
  
    /**
-    * Identify given task as matching this plan and copy slot values. If given
-    * task is occurrence, then also check for failure (false postcondition) in
-    * ancestor plans.
+    * Identify given task as matching this plan and copy slot values.
     */
    public void match (Task task) {
       goal.copySlotValues(task);
@@ -721,7 +708,7 @@ public class Plan {
    
    void checkAchieved () {
       goal.engine.clearLiveAchieved();
-      if ( isExhausted() ) {
+      if ( isStarted() && isExhausted() ) {
          // no more chances to succeed
          Boolean success = goal.checkAchieved();
          if ( decomp != null && 
@@ -760,7 +747,7 @@ public class Plan {
     * been retried, then retry it; otherwise if it has failed, but is not
     * retriable,then recurse up through failed parents looking for retriable goal.
     * <p>
-    * <em>Note exception:</em> if a goal is primitive and its parent is retriable, then
+    * <em>Note exception:</em> if a primitive goal is retriable and its parent is retriable, then
     * prefer to retry parent.
     * <p>
     * A non-primitive is retriable by default iff it has any applicable untried
