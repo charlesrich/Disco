@@ -106,7 +106,7 @@ public class Dual {
    // to signal end of turn (since null not allowed in queues)
    private final Object END = new Object(); 
    
-   private class Other extends Actor {
+   public class Other extends Actor {
       
       private Other (String name) { 
          super(name); 
@@ -145,7 +145,7 @@ public class Dual {
       }
    }
    
-   private class OtherInteraction extends Interaction {
+   public class OtherInteraction extends Interaction {
    
       private final BlockingQueue<Object> queue;
       
