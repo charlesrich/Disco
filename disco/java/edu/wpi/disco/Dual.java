@@ -133,7 +133,7 @@ public class Dual {
                try { 
                   Task copy = translate(occurrence, interaction);
                   // note plan recognition always used because contributes null
-                  interaction.getExternal().execute(copy, interaction, null); 
+                  interaction.getActor(copy).execute(copy, interaction, null); 
                   copy.setWhen(occurrence.getWhen()); // keep original timestamp
                } catch (TranslateException e) {
                   System.err.println("WARNING: Ignoring untranslatable occurrence "+occurrence);
