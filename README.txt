@@ -1,5 +1,6 @@
 Disco - Collaborative Discourse Manager
 
+This is an open-source project (see LICENSE file).
 =====
 
 [For information, bug reports, or to just let me know you are using
@@ -9,8 +10,11 @@ This is an implementation of a collaborative discourse manager
 inspired by the same collaborative discourse theory as Collagen (see
 docs).  Disco uses the ANSI/CEA-2018 Task Model Description (CETask
 1.0) standard for its task representation and is built on top of the
-CETask reference implementation (see 'task' project below). This is
-an open-source project under the MIT License (see LICENSE file).
+CETask reference implementation (see 'task' project below).
+
+In addition, Disco also supports a more limited, but simpler,
+dialogue-tree language (called D4g---Disco for Games) described in
+docs/RichSidner2012_IVA.pdf
 
 Disco is intended to be integrated with other systems, such as
 appliances, games, robots, etc.  However, for demonstration and
@@ -72,7 +76,7 @@ development and debugging.
  -Djava.io.tmpdir=/tmp ]
 
 *** The best way to familiarize yourself further with Disco
-    is to look next at test/README.txt ***    
+    is to look next at disco/test/README.txt ***    
 
 Please send bug reports to bug-disco@wpi.edu and make sure to
 include both the Console.test file (from directory indicated at
