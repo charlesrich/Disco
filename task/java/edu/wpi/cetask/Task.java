@@ -744,8 +744,7 @@ public class Task extends Instance {
       if ( !getType().equals(from.getType()) ) 
          throw new IllegalArgumentException("Cannot copy slot values from "+
                from.getType()+" to "+getType()); 
-      boolean overwrite = false;
-      overwrite = copyInputSlotValues(from) || overwrite;
+      boolean overwrite = copyInputSlotValues(from);
       overwrite = copyOutputSlotValues(from) || overwrite;
       if ( from.clonedInputs != null ) {
          if ( clonedInputs != null ) overwrite = true;

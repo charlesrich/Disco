@@ -106,7 +106,7 @@ public class Dual {
    // to signal end of turn (since null not allowed in queues)
    private final Object END = new Object(); 
    
-   private class Other extends Actor {
+   public class Other extends Actor {
       
       private Other (String name) { 
          super(name); 
@@ -133,7 +133,7 @@ public class Dual {
                try { 
                   Task copy = translate(occurrence, interaction);
                   // note plan recognition always used because contributes null
-                  interaction.getExternal().execute(copy, interaction, null); 
+                  interaction.getActor(copy).execute(copy, interaction, null); 
                   copy.setWhen(occurrence.getWhen()); // keep original timestamp
                } catch (TranslateException e) {
                   System.err.println("WARNING: Ignoring untranslatable occurrence "+occurrence);
@@ -145,7 +145,7 @@ public class Dual {
       }
    }
    
-   private class OtherInteraction extends Interaction {
+   public class OtherInteraction extends Interaction {
    
       private final BlockingQueue<Object> queue;
       

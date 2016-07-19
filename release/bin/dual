@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Usage: dual
+#
+# Runs two instances of Disco with two interactive consoles.
+#
+dir="`dirname $0`"
+"$dir/_run" edu.wpi.disco.Dual "" lib/disco.jar
