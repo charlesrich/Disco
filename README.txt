@@ -63,10 +63,10 @@ in GitHub contain an archived copy of the last release of Disco built
 in Java 7 (using the builtin Rhino JavaScript engine).
 
 Note that disco.jar includes all the binary class files in both the
-disco and task projects (but not the libraries for disco/d4g or the
-speech libraries in task/lib).
+disco and task projects (but not the libraries in disco/d4g or
+task/speech).
 
-If you are using an IDE such as Eclipse or Netbeans, I highly
+If you are using an IDE such as Eclipse or Netbeans, I strongly
 recommend adding release/lib/disco-src.zip and disco-api.zip as the
 source and Javadoc attachments for disco.jar.  This will greatly aid
 development and debugging.
@@ -84,23 +84,24 @@ system startup) and all task model files involved.
 
 For Eclipse Users:
 
-You can easily create the two Eclipse projects (called task and disco)
-containing the source by importing the system release archive (zip)
-file as follows:
+If you are developing your own system in Eclipse using Disco it would
+be best to make your system be a *separate* project, rather than
+adding your code to the Disco projects. Simply add the precompiled
+disco.jar as a library of your new project (and don't forget to add
+disco-src.zip and disco-api.zip attachments as discussed above).
 
-          File > Import > General > *Existing...* > Next 
-          > Select Archive > Browse > Select All > Finish
+However, if you do want to build Disco yourself, you can easily create
+the two Eclipse projects (called task and disco) containing the source
+by importing from the cloned repository:
+
+          File > Import > Git > Projects from Git > Next 
+          > Existing Local Repository > Disco > Next
+	  > Select task and disco (or Select All to build all examples)
+	  > Next > Finish
           
-NB: If you are developing your own system in Eclipse using Disco it
-would be best to make your system be a *separate* project, rather than
-adding your code to this project.  You can simply add the task project
-to the project dependencies (see Build Path) of your new project.
-
-Note that the exports of the task project include all the necessary
-libraries, including those for speech, but assumes that the task
-source has been compiled.  If you cannot or do not build the disco
-project, then add the precompiled disco.jar as a library of your
-new project.
+Then you can add the disco project to the project dependencies (see
+Build Path) of your new project.  Note that the exports of the disco
+project do not include the libraries for speech (see task/speech).
 
 The current release was built in Eclipse 4.5 (Mars).
 
