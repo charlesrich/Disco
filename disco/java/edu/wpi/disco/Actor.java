@@ -97,8 +97,8 @@ public abstract class Actor {
   
    /**
     * Thread-safe method for <em>observation</em> of this actor having executed
-    * given task occurrence in given interaction. <em>NB:</em> also executes grounding scripts for
-    * utterances.
+    * given task occurrence in given interaction. 
+    * <em>NB:</em> also executes grounding scripts for utterances.
     * 
     * @param contributes plan to which this task contributes, or null
     * 

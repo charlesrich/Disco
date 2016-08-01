@@ -23,6 +23,9 @@ _dual Test1
 _dual Test2
 bin/_disco edu.wpi.disco.Disco\$Shared test/dual/Shared1
 #
+echo ">> disco/test/ToM"
+bin/_disco edu.wpi.disco.ToM test/ToM/ToM1
+#
 echo ">> task/test"
 cd ../task
 "../disco/bin/testall" test bin/guide
