@@ -19,6 +19,7 @@ public class Dual {
     * 
     * @see #Dual(Actor,Actor,boolean)
     * @see Disco.Shared
+    * @see ToM
     */
    public static void main (String[] args) {  
       new Dual(new Agent("Agent1"), new Agent("Agent2"), true).start();
@@ -133,7 +134,7 @@ public class Dual {
                try { 
                   Task copy = translate(occurrence, interaction);
                   // note plan recognition always used because contributes null
-                  interaction.getActor(copy).execute(copy, interaction, null); 
+                  interaction.getActor(copy).done(copy, interaction, null); 
                   copy.setWhen(occurrence.getWhen()); // keep original timestamp
                } catch (TranslateException e) {
                   System.err.println("WARNING: Ignoring untranslatable occurrence "+occurrence);
@@ -192,7 +193,8 @@ public class Dual {
       }
    }
    
-   private static Task translate (Task task, Interaction interaction) throws TranslateException {
+   // also used in ToM
+   static Task translate (Task task, Interaction interaction) throws TranslateException {
       try { 
          TaskClass type = interaction.getDisco().resolveTaskClass(task.getType().getQName()); 
          if ( type == null ) throw new TranslateException();
@@ -202,9 +204,9 @@ public class Dual {
          for (TaskClass.Output output : type.getDeclaredOutputs())
             output.setSlotValue(copy, translateValue(output.getSlotValue(task), interaction));
          if ( task.isPrimitive() && task.getExternal() != null ) 
-            copy.setExternal(!task.getExternal()); // reverse perspective
+            copy.setExternal(!task.getExternal()); // reverse perspective 
          if ( task.getSuccess() != null ) copy.setSuccess(task.getSuccess());
-         // when slot will be reset after occurred called
+         // 'when' slot will be reset after occurred called
          return copy;
       } catch (IllegalArgumentException e) { throw new TranslateException(e); }
    }
@@ -213,7 +215,7 @@ public class Dual {
       return value instanceof Task ? translate((Task) value, interaction) : value;
    }
    
-   private static class TranslateException extends Exception {
+  static class TranslateException extends Exception {
       private TranslateException () {}
       private TranslateException (Throwable e) { super(e); }
    }}

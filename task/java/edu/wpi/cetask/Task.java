@@ -476,7 +476,9 @@ public class Task extends Instance {
     * or throw UnsupportedOperationException if it did not.
     *
     * @return milliseconds
+    * 
     * @see #setWhen(long)
+    * @see #isOccurred()
     */
    public long getWhen () {
       if ( !isOccurred() ) 
@@ -490,7 +492,7 @@ public class Task extends Instance {
     * @see #getWhen()
     */
    public void setWhen (long milliseconds) {
-      setSlotValue("when", milliseconds);
+      setSlotValue("when", new Long(milliseconds));
    }
    
    /**

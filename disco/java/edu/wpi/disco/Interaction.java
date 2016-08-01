@@ -333,7 +333,7 @@ public class Interaction extends Thread {
 
    protected volatile boolean running; // volatile for event thread
 
-   private boolean responded;  // see doTurn
+   protected boolean responded;  // see doTurn
       
    @Override
    public void run () {
