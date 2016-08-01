@@ -472,14 +472,16 @@ public class Task extends Instance {
    // predefined slots
    
    /**
-    * Get time when this task occurred, if it did.
+    * Get time when this primitive task occurred, 
+    * or throw UnsupportedOperationException if it did not.
     *
-    * @return milliseconds or 0 (if not occurred)
+    * @return milliseconds
     * @see #setWhen(long)
     */
    public long getWhen () {
-      Object value = getSlotValue("when"); 
-      return value == null ? 0 : (Long) value;
+      if ( !isOccurred() ) 
+         throw new UnsupportedOperationException("Cannot call getWhen on task that has not occurred: "+this);
+      return (Long) getSlotValue("when");
    }
 
    /**
@@ -979,7 +981,7 @@ public class Task extends Instance {
          setSlotValue("type", type);
          if ( from.getExternal() != null ) setExternal(from.getExternal());
          if ( from.getSuccess() != null ) setSuccess(from.getSuccess());
-         if ( from.getWhen() != 0 ) setWhen(from.getWhen());
+         if ( from.isOccurred() ) setWhen(from.getWhen());
          return true; 
       }
       
@@ -1078,7 +1080,7 @@ public class Task extends Instance {
       for (String name : getType().outputNames) 
          if ( !name.equals("when") ) first = appendSlot(buffer, name, first);
       // handle 'when' specially (but not 'success')
-      if ( TaskEngine.DEBUG && isDefinedSlot("when") ) {
+      if ( TaskEngine.DEBUG && isOccurred() ) {
          long start = engine.getStart();
          long when = getWhen();
          first = appendSlot(buffer, "when", 
