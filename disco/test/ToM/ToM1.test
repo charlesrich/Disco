@@ -1,40 +1,62 @@
-    # Aug 1, 2016 5:44:22 PM - TaskEngine 1.11 / Disco 1.17
+    # Aug 11, 2016 8:53:58 AM - TaskEngine 1.11 / Disco 1.17
     Welcome to Disco! (Type 'help' for command list)
   > next
     Agent says "Let's eat dinner together."
-    PREDICT (dominant=true): [Say(ToM,"I like Chinese")]
-    PREDICT (dominant=false): [Say(ToM,"What do you like?")]
-    # dialogue model is not a very good predictor (due to lack of symmetry)
+    # user behaves consistent with predictions of submissive assumption
+  > say
+[1] I like Chinese.
+[2] I like Mexican.
+[3] What do you like?
+  >> 3
+    INCONSISTENT: Prediction[Say(,"I like Chinese"),dominant]
+    CONSISTENT: Prediction[Say(,"What do you like?"),submissive]
+    User says "What do you like?"
+    Agent says "I like Chinese."
+  > say
+[1] I like Mexican.
+[2] Ok, which Chinese restaurant?
+  >> 2
+    CONSISTENT: Prediction[Say(,"Ok, which Chinese restaurant?"),dominant]
+    CONSISTENT: Prediction[Say(,"Ok, which Chinese restaurant?"),submissive]
+    User says "Ok, which Chinese restaurant?"
+    Agent says "Ok."
+  > clear
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+  > next
+    Agent says "Let's eat dinner together."
+    # user behaves consistent with predictions of dominant assumption
+  > say
+[1] I like Chinese.
+[2] I like Mexican.
+[3] What do you like?
+  >> 1
+    CONSISTENT: Prediction[Say(,"I like Chinese"),dominant]
+    INCONSISTENT: Prediction[Say(,"What do you like?"),submissive]
+    User says "I like Chinese."
+    Agent says "Ok, which Chinese restaurant?"
+  > clear
+  > eval $disco.addTop("Top")
+    # Returned '[Top]'
+  > next
+    Agent says "Let's eat dinner together."
+    # user behaves inconsistent with predictions of either assumption
   > say
 [1] I like Chinese.
 [2] I like Mexican.
 [3] What do you like?
   >> 2
+    INCONSISTENT: Prediction[Say(,"I like Chinese"),dominant]
+    INCONSISTENT: Prediction[Say(,"What do you like?"),submissive]
     User says "I like Mexican."
     Agent says "I like Chinese."
-    PREDICT (dominant=true): [Say(ToM,"I like Chinese")]
-    PREDICT (dominant=false): [Say(ToM,"What do you like?")]
   > say
 [1] I like Mexican.
 [2] Ok, which Chinese restaurant?
   >> 2
+    INCONSISTENT: Prediction[Say(,"I like Chinese"),dominant]
+    INCONSISTENT: Prediction[Say(,"What do you like?"),submissive]
     User says "Ok, which Chinese restaurant?"
     Agent says "Ok."
-    PREDICT (dominant=true): [Say(ToM,"I like Chinese")]
-    PREDICT (dominant=false): [Say(ToM,"What do you like?")]
-  > history
-
-[Achieve Top by agentFirst] -done
-   [Achieve AgentFirst] -done
-      Agent says "Let's eat dinner together."
-      [ ] -done
-         [Achieve Mexican] -done
-            User says "I like Mexican."
-            [ ] -done
-               Agent says "I like Chinese."
-               [ ] -done <-focus
-                  User says "Ok, which Chinese restaurant?"
-                  Agent says "Ok."
-
   > quit
     
