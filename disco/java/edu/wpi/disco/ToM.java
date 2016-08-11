@@ -1,7 +1,6 @@
 package edu.wpi.disco;
 
 import java.awt.EventQueue;
-import java.io.PrintStream;
 import java.util.*;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
