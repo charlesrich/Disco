@@ -332,6 +332,8 @@ public class Interaction extends Thread {
    // NB all read/write to discourse state on this single thread
 
    protected volatile boolean running; // volatile for event thread
+   
+	public boolean isRunning () { return running; }
 
    protected boolean responded;  // see doTurn
       
@@ -352,6 +354,7 @@ public class Interaction extends Thread {
                externalFloor = false;
             } else throw e;
          }
+         if ( !running ) break;
          if ( console != null && (first || responded || (!ok && !externalFloor)) ) 
             console.respond(this); 
          first = false;

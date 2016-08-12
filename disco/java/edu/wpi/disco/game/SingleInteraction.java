@@ -27,11 +27,6 @@ public class SingleInteraction extends Interaction {
 	}
 	
 	/**
-	 * @return <code>true</code> iff the interaction should continue 
-	 */
-	public boolean isRunning () { return running; }
-	
-	/**
 	 * Alter the running state
 	 */
 	public void startRunning () {	running = true; }
