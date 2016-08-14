@@ -125,6 +125,7 @@ public abstract class Actor {
    /**
     * Thread-safe method to return highest priority task for this actor.
     * 
+    * @see #generateBestDry(Interaction)
     * @see #generate(Interaction)
     * @see Agent#generateBest(Interaction,boolean)
     */
@@ -132,6 +133,17 @@ public abstract class Actor {
       return agenda.generateBest(interaction);
    }
 
+   /**
+    * Return highest priority task without changing any decompositions in plan.
+    * Note this may not return same answer as {@link #generateBest(Interaction)},
+    * but is useful for hypothetical reasoning, such as in {@link ToM}.
+    *
+    * @see #generateBestDry(Interaction)
+    */
+   public Plugin.Item generateBestDry (Interaction interaction) {
+      return agenda.generateBest(interaction);
+   }
+   
    /**
     * Test whether this actor is pre-authorized to perform <em>all</em>
     * primitive tasks (unless specifically rejected) without asking for permission. 

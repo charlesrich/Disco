@@ -4,6 +4,7 @@ import java.util.*;
 import edu.wpi.cetask.*;
 import edu.wpi.disco.Agenda.Plugin;
 import edu.wpi.disco.Dual.TranslateException;
+import edu.wpi.disco.plugin.DecompositionPlugin;
 
 /**
  * Theory of mind component that can be added to any agent.
@@ -20,7 +21,9 @@ public class ToM extends Interaction {
     * the theory or mind, or null.
     */
    public Task predict () {
-      Plugin.Item item = getSystem().generateBest(this);
+      // NB: This may not always give exactly same answer as generateBest (even with
+      // DecompositionPlugin added below).
+      Plugin.Item item = getSystem().generateBestDry(this);
       return item == null ? null: item.task;
    }
 
@@ -52,6 +55,10 @@ public class ToM extends Interaction {
    public ToM (Actor system, boolean console) {
       super(system, null, null, false, null, system.getName());
       isConsole = console;
+      if ( system.getAgenda().getPlugin(DecompositionPlugin.class) == null )
+         // for agent to "look ahead" at decomposition choices (for alternative assumptions),
+         // but not make them permanently (see use of generateBestDry above)
+         new DecompositionPlugin(system.getAgenda(), 25, true, true);
    }
 
    private final boolean isConsole;
@@ -104,16 +111,16 @@ public class ToM extends Interaction {
     */
    public static void main (String[] args) { 
 
-      ToM.Agent agent = new ToM.Agent("agent",
+      TestAgent agent = new TestAgent("agent",
 
-         // ToM here is just a default user with same task model, but it doesn't have to be
-         new ToM(new User("ToM"), true) {
+         // ToM here is a default Disco agent with same task model, but it doesn't have to be
+         new ToM(new Agent("ToM"), true) {
 
             @Override
             public Task occurred (Task occurrence) { 
                Task copy = super.occurred(occurrence);
                if ( copy != null && copy.isSystem() ) {
-                  // for testing compare actual user occurrence with predictions
+                  // for testing, compare actual user occurrence with predictions
                   for (Prediction p : getPredictions()) {
                      p.task.removeSlotValue("external"); // ignore for matching
                      p.task.removeSlotValue("when"); // ignore for matching
@@ -123,23 +130,7 @@ public class ToM extends Interaction {
                }
                return copy;
             }
-         }) 
-      
-      {  // extension of ToM.Agent
-      
-         @Override
-         protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
-            boolean responded = super.synchronizedRespond(interaction, ok, guess);
-            // make ToM predictions immediately after agent response,
-            // before world state changes due to user action
-            getToM().getPredictions().clear();
-            getToM().getDisco().eval("dominant = true", "ToM.main");
-            getToM().getPredictions().add(new ToM.Prediction(getToM().predict(), "dominant"));
-            getToM().getDisco().eval("dominant = false", "ToM.main");
-            getToM().getPredictions().add(new ToM.Prediction(getToM().predict(), "submissive"));
-            return responded;
-         }
-      };
+         });
            
       Interaction interaction = new Interaction(agent, new User("User"),
             args.length > 0 && args[0].length() > 0 ? args[0] : null) {
@@ -148,19 +139,19 @@ public class ToM extends Interaction {
          protected synchronized Plan occurred (boolean external, Task occurrence, 
                Plan contributes, boolean eval) {
             Plan plan = super.occurred(external, occurrence, contributes, eval);
-            ((ToM.Agent) getSystem()).getToM().occurred(occurrence);
+            ((TestAgent) getSystem()).getToM().occurred(occurrence);
             return plan; 
          }
          
          @Override
          public void cleanup () { 
             super.cleanup();
-            Interaction toM = ((ToM.Agent) getSystem()).getToM();
+            Interaction toM = ((TestAgent) getSystem()).getToM();
             toM.exit();
          }
       };
          
-      agent.getToM().load("models/Restaurant.xml"); 
+      agent.getToM().load("models/Restaurant.xml");       
       interaction.load("models/Restaurant.xml");
       console = interaction.getConsole(); // force output to main console
       agent.getToM().start(); // start ToM window first to avoid race condition
@@ -168,14 +159,31 @@ public class ToM extends Interaction {
    }
 
    // for testing (showing how ToM component can be added to any agent class)
-   private static class Agent extends edu.wpi.disco.Agent {
+   private static class TestAgent extends Agent {
 
       private final ToM toM;
       public ToM getToM () { return toM; }
 
-      public Agent (String name, ToM toM) { 
+      public TestAgent (String name, ToM toM) { 
          super(name);
          this.toM = toM; 
+      }
+      
+      @Override
+      protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
+         boolean responded = super.synchronizedRespond(interaction, ok, guess);
+         // make ToM predictions immediately after agent response,
+         // before world state changes due to user action
+         toM.getPredictions().clear();
+         predict("dominant = true", "dominant");
+         predict("dominant = false", "submissive");
+         return responded;
+      }
+      
+      private void predict (String eval, Object assumption) {
+         toM.getDisco().eval(eval, "ToM.TestAgent");
+         Task task = toM.predict();
+         if ( task != null ) toM.getPredictions().add(new Prediction(task, assumption));
       }
    }
 
