@@ -130,7 +130,7 @@ public abstract class Actor {
     * @see Agent#generateBest(Interaction,boolean)
     */
    public Plugin.Item generateBest (Interaction interaction) {
-      return agenda.generateBest(interaction);
+      return generateBestDry(interaction);
    }
 
    /**
@@ -140,7 +140,7 @@ public abstract class Actor {
     *
     * @see #generateBestDry(Interaction)
     */
-   public Plugin.Item generateBestDry (Interaction interaction) {
+   public final Plugin.Item generateBestDry (Interaction interaction) {
       return agenda.generateBest(interaction);
    }
    
