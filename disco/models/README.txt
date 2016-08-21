@@ -36,7 +36,7 @@ group to nil.
 
 If you don't use Emacs, just Google "Free XML editor" to find many
 other free XML editors, most of which will use the XML Schema file
-(see disco/lib/cea-2018-ext.xsd in this directory) instead of the
+(see disco/lib/cea-2018-ext.xsd in this repository) instead of the
 RelaxNG file (the xsd checking is weaker).  For example, Microsoft
 distributes something called "XML Notepad".
 
