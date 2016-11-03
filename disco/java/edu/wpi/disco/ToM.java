@@ -120,10 +120,13 @@ public class ToM extends Interaction {
                // for testing, compare actual user occurrence with predictions
                if ( copy.isSystem() ) {
                   Task task = predictions.next();
-                  task.removeSlotValue("external"); // ignore for matching
-                  task.removeSlotValue("when"); // ignore for matching
-                  console.println(
+                  if ( task == null ) console.println("INCONSISTENT: "+toM+" null");
+                  else {
+                     task.removeSlotValue("external"); // ignore for matching
+                     task.removeSlotValue("when"); // ignore for matching
+                     console.println(
                         (copy.isMatch(task) ? "CONSISTENT: " : "INCONSISTENT: ")+toM+" "+task);
+                  }
                }
             }
             return plan; 
