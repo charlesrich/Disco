@@ -136,6 +136,7 @@ public class Dual {
                   // note plan recognition always used because contributes null
                   interaction.getActor(copy).done(copy, interaction, null); 
                   ///////////////////******////// TEMPORARY WORK AROUND
+                  // SEE SIMILAR WORKAROUND IN TOM
                   //copy.setWhen(occurrence.getWhen()); // keep original timestamp
                } catch (TranslateException e) {
                   System.err.println("WARNING: Ignoring untranslatable occurrence "+occurrence);
