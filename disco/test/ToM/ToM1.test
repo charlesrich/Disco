@@ -8,16 +8,16 @@
 [2] I like Mexican.
 [3] What do you like?
   >> 3
-    INCONSISTENT: dominant Say(,"I like Chinese")
-    CONSISTENT: submissive Say(,"What do you like?")
+    INCONSISTENT: Say(dominant,"I like Chinese")
+    CONSISTENT: Say(submissive,"What do you like?")
     User says "What do you like?"
     Agent says "I like Chinese."
   > say
 [1] I like Mexican.
 [2] Ok, which Chinese restaurant?
   >> 2
-    CONSISTENT: dominant Say(,"Ok, which Chinese restaurant?")
-    CONSISTENT: submissive Say(,"Ok, which Chinese restaurant?")
+    CONSISTENT: Say(dominant,"Ok, which Chinese restaurant?")
+    CONSISTENT: Say(submissive,"Ok, which Chinese restaurant?")
     User says "Ok, which Chinese restaurant?"
     Agent says "Ok."
   > clear
@@ -31,8 +31,8 @@
 [2] I like Mexican.
 [3] What do you like?
   >> 1
-    CONSISTENT: dominant Say(,"I like Chinese")
-    INCONSISTENT: submissive Say(,"What do you like?")
+    CONSISTENT: Say(dominant,"I like Chinese")
+    INCONSISTENT: Say(submissive,"What do you like?")
     User says "I like Chinese."
     Agent says "Ok, which Chinese restaurant?"
   > clear
@@ -46,16 +46,16 @@
 [2] I like Mexican.
 [3] What do you like?
   >> 2
-    INCONSISTENT: dominant Say(,"I like Chinese")
-    INCONSISTENT: submissive Say(,"What do you like?")
+    INCONSISTENT: Say(dominant,"I like Chinese")
+    INCONSISTENT: Say(submissive,"What do you like?")
     User says "I like Mexican."
     Agent says "I like Chinese."
   > say
 [1] I like Mexican.
 [2] Ok, which Chinese restaurant?
   >> 2
-    INCONSISTENT: dominant Say(,"I like Chinese")
-    INCONSISTENT: submissive Say(,"What do you like?")
+    INCONSISTENT: Say(dominant,"I like Chinese")
+    INCONSISTENT: Say(submissive,"What do you like?")
     User says "Ok, which Chinese restaurant?"
     Agent says "Ok."
   > quit

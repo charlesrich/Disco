@@ -99,46 +99,50 @@ public class ToM extends Interaction {
       ToM toM = new ToM(new Agent("dominant"), true ); // console only for first candidate
       toM.load("models/Restaurant.xml");
       toM.getDisco().eval("dominant = true;", "test1");
-      agent.addToM(toM);
+      agent.getCandidateToM().add(toM);
 
       toM = new ToM(new Agent("submissive"), false);
       toM.load("models/Restaurant.xml");
       toM.getDisco().eval("dominant = false;", "test2");
-      agent.addToM(toM);
+      agent.getCandidateToM().add(toM);   
            
-      Interaction interaction = new Interaction(agent, new User("User"),
-            args.length > 0 && args[0].length() > 0 ? args[0] : null) {
-         
-         @Override
-         protected synchronized Plan occurred (boolean external, Task occurrence, 
-               Plan contributes, boolean eval) {
-            TestAgent agent = (TestAgent) getSystem();
-            Plan plan = super.occurred(external, occurrence, contributes, eval);
-            Iterator<Task> predictions = agent.getPredictions().iterator();
-            for (ToM toM : agent.getCandidateToM()) { 
-               Task copy = toM.occurred(occurrence);
-               // for testing, compare actual user occurrence with predictions
-               if ( copy.isSystem() ) {
-                  Task task = predictions.next();
-                  if ( task == null ) console.println("INCONSISTENT: "+toM+" null");
-                  else {
-                     task.removeSlotValue("external"); // ignore for matching
-                     task.removeSlotValue("when"); // ignore for matching
+         Interaction interaction = new Interaction(agent, new User("User"),
+               args.length > 0 && args[0].length() > 0 ? args[0] : null) {
+            
+            @Override
+            protected synchronized Plan occurred (boolean external, Task occurrence, 
+                  Plan contributes, boolean eval) {
+               TestAgent agent = (TestAgent) getSystem();
+               Plan plan = super.occurred(external, occurrence, contributes, eval);
+               Iterator<Task> predictions = agent.getPredictions().iterator();
+               for (ToM toM : agent.getCandidateToM()) { 
+                  Task copy = toM.occurred(occurrence);
+                  // for testing, compare actual user occurrence with prediction
+                  if ( copy.isSystem() ) {
+                     Task prediction = predictions.next();
                      console.println(
-                        (copy.isMatch(task) ? "CONSISTENT: " : "INCONSISTENT: ")+toM+" "+task);
+                           (isConsistent(copy, prediction) ? "CONSISTENT: " : "INCONSISTENT: ")
+                           +prediction);
+                     // could call agent.getCandidateToM().remove(toM) here if inconsistent 
                   }
-               }
+               }     
+               return plan; 
+            }  
+            
+            private boolean isConsistent (Task actual, Task predicted) {
+               if ( predicted == null ) return false;
+               actual.removeSlotValue("external"); // ignore for matching
+               actual.removeSlotValue("when"); // ignore for matching
+               return predicted.isMatch(actual);
             }
-            return plan; 
-         }
-         
-         @Override
-         public void cleanup () { 
-            super.cleanup();
-            for (ToM toM : ((TestAgent) getSystem()).getCandidateToM()) 
-               toM.exit();
-         }
-      };
+            
+            @Override
+            public void cleanup () { 
+               super.cleanup();
+               for (ToM toM : ((TestAgent) getSystem()).getCandidateToM()) 
+                  toM.exit();
+            }
+         };
          
       interaction.load("models/Restaurant.xml");
       console = interaction.getConsole(); // force output to main console
@@ -159,9 +163,6 @@ public class ToM extends Interaction {
       public List<Task> getPredictions () { return predictions; }
 
       public TestAgent (String name) { super(name); }
-      
-      public void addToM (ToM toM) { candidateToM.add(toM); }
-      public void removeToM (ToM toM) { candidateToM.remove(toM); }
 
       @Override
       protected boolean synchronizedRespond (Interaction interaction, boolean ok, boolean guess) {
