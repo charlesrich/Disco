@@ -96,7 +96,7 @@ public class ToM extends Interaction {
       
       // add two candidate ToM's with different initializations 
       // (using default Disco agent and same task model, but need not be so)
-      ToM toM = new ToM(new Agent("dominant"), true ); // console only for first candidate
+      ToM toM = new ToM(new Agent("dominant"), true ); // console only for first candidate (optional)
       toM.load("models/Restaurant.xml");
       toM.getDisco().eval("dominant = true;", "test1");
       agent.getCandidateToM().add(toM);
@@ -131,9 +131,10 @@ public class ToM extends Interaction {
             
             private boolean isConsistent (Task actual, Task predicted) {
                if ( predicted == null ) return false;
-               actual.removeSlotValue("external"); // ignore for matching
-               actual.removeSlotValue("when"); // ignore for matching
-               return predicted.isMatch(actual);
+               try {
+                  predicted.removeSlotValue("external"); // ignore for matching
+                  return predicted.isMatch(actual);   
+               } finally { predicted.setExternal(false); }
             }
             
             @Override
