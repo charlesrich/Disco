@@ -83,10 +83,7 @@ public class ToM extends Interaction {
       super.cleanup();
       if ( window != null ) window.close();
    }
-   
-   @Override
-   public String toString () { return getSystem().toString(); }
-   
+ 
    /**
     * For testing.  See test/ToM/ToM1.test
     */
