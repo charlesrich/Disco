@@ -125,12 +125,12 @@ public abstract class Actor {
    /**
     * Thread-safe method to return highest priority task for this actor.
     * 
-    * @see #generateBestDry(Interaction)
+    * @see #predict(Interaction)
     * @see #generate(Interaction)
     * @see Agent#generateBest(Interaction,boolean)
     */
    public Plugin.Item generateBest (Interaction interaction) {
-      return generateBestDry(interaction);
+      return predict(interaction);
    }
 
    /**
@@ -138,9 +138,11 @@ public abstract class Actor {
     * Note this may not return same answer as {@link #generateBest(Interaction)},
     * but is useful for hypothetical reasoning, such as in {@link ToM}.
     *
-    * @see #generateBestDry(Interaction)
+    * @see #generateBest(Interaction)
     */
-   public final Plugin.Item generateBestDry (Interaction interaction) {
+   public Plugin.Item predict (Interaction interaction) {
+      // TODO override in Agent to return same as generateBest by remembering decomposition
+      // choices made and then undoing them
       return agenda.generateBest(interaction);
    }
    

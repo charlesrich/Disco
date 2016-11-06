@@ -216,7 +216,7 @@ public class Agent extends Actor {
          return RANDOM == null ? items.get(0) :
             items.get(RANDOM.nextInt(items.size()));
       } //else 
-      return generateBestDry(interaction); // Actor method
+      return predict(interaction); // Actor method
    }
    
    /**

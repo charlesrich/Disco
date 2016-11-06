@@ -23,7 +23,7 @@ public class ToM extends Interaction {
    public Task predict () {
       // NB: This may not always give exactly same answer as generateBest (even with
       // DecompositionPlugin added below).
-      Plugin.Item item = getSystem().generateBestDry(this);
+      Plugin.Item item = getSystem().predict(this);
       return item == null ? null: item.task;
    }
 
